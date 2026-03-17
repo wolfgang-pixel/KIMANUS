@@ -1,0 +1,2739 @@
+<!DOCTYPE html>
+<!-- KIMANUS OS v2.4 - Build 20260318-0100 -->
+<html lang="de" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#111111">
+<meta name="color-scheme" content="dark">
+<title>KIMANUS OS</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+/* === RESET & BASE === */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0e0e0e;color:#e0e0e0;color-scheme:dark}
+
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+}
+
+#app{display:flex;flex-direction:column;height:100%;padding-top:var(--sat);padding-bottom:var(--sab)}
+
+/* =========================================
+   METALLIC 3D DESIGN SYSTEM
+   ========================================= */
+.bar-frame{
+  display:flex;align-items:stretch;gap:3px;padding:4px;
+  background:linear-gradient(180deg,#363636 0%,#2a2a2a 30%,#2e2e2e 70%,#333 100%);
+  background-image:url('/generated/bar_dark.jpg');background-size:cover;background-position:center;
+  border-radius:10px;border:1px solid #444;
+  box-shadow:0 4px 16px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.3);
+}
+.panel-inset{
+  background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
+  background-image:url('/generated/panel_setup.jpg');background-size:cover;background-position:center;
+  border-radius:6px;border:1px solid #222;
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.8),inset 0 1px 3px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.02),0 1px 0 rgba(255,255,255,.03);
+  padding:8px 6px 4px;
+}
+.panel-raised{
+  background:linear-gradient(145deg,#3a3a3a 0%,#333 25%,#2e2e2e 50%,#333 75%,#383838 100%);
+  background-image:url('/generated/panel_input_flat.jpg');background-size:cover;background-position:center;
+  border-radius:6px;border:1px solid #444;
+  box-shadow:0 4px 12px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.2);
+  padding:8px 6px 4px;
+}
+.bar-labels{display:flex;padding:2px 4px 0}
+.bar-labels span{text-align:center;font-size:8px;letter-spacing:3px;color:#555;text-transform:uppercase;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.panel-sublabel{font-size:7px;letter-spacing:1.5px;color:#555;text-transform:uppercase;text-align:center;margin-top:2px}
+.m-icon{display:flex;align-items:center;justify-content:center;color:#777;filter:drop-shadow(1px 2px 3px rgba(0,0,0,.6));transition:all .2s}
+
+/* =========================================
+   HEADER BAR
+   ========================================= */
+#header{flex-shrink:0;padding:4px 6px 0}
+.wallet-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.wallet-items{display:flex;align-items:center;justify-content:center;gap:8px}
+.kunden-card{width:36px;height:26px;background:linear-gradient(135deg,#c62828 0%,#8b0000 100%);border-radius:3px;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2);overflow:hidden;position:relative}
+.kunden-card::after{content:'';position:absolute;right:2px;bottom:2px;width:8px;height:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)}
+.kunden-card span{font-size:7px;color:rgba(255,255,255,.9);font-weight:bold}
+.wallet-icon{width:30px;height:24px;background:linear-gradient(145deg,#555 0%,#3a3a3a 100%);border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
+.wallet-icon::before{content:'';width:14px;height:3px;background:linear-gradient(90deg,#666,#888);border-radius:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.wallet-sublabels{display:flex;gap:6px;justify-content:center}
+.wallet-sublabels span{font-size:6px;letter-spacing:1px;color:#555;text-transform:uppercase}
+.view-panel{display:flex;align-items:center;justify-content:center;min-height:52px}
+.view-icons-grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;width:100%;height:100%;place-items:center}
+.vi{display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:#777;filter:drop-shadow(1px 2px 3px rgba(0,0,0,.5))}
+.vi svg{width:18px;height:18px}
+.vi-center{grid-column:2;grid-row:1/3;width:32px;height:32px}
+.vi-center svg{width:26px;height:26px}
+.id-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.id-top-label{font-size:7px;letter-spacing:2px;color:#666;text-transform:uppercase}
+.id-items{display:flex;align-items:center;justify-content:center;gap:6px}
+.qr-block{width:28px;height:28px;background:#444;border-radius:3px;display:grid;grid-template-columns:repeat(5,1fr);gap:1px;padding:2px;box-shadow:inset 0 1px 3px rgba(0,0,0,.4),1px 1px 3px rgba(0,0,0,.4)}
+.qr-block i{background:#888}.qr-block i:nth-child(2n){background:#555}
+.nfc-waves{display:flex;flex-direction:column;align-items:center;gap:1px;color:#666;filter:drop-shadow(1px 1px 2px rgba(0,0,0,.5))}
+.id-sublabels{display:flex;gap:4px;justify-content:center}
+.id-sublabels span{font-size:6px;letter-spacing:1px;color:#555;text-transform:uppercase}
+
+/* =========================================
+   VIEW CANVAS
+   ========================================= */
+#view-section{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:2px 6px}
+#view-label{text-align:center;padding:2px 0;display:flex;align-items:center;justify-content:center;gap:8px}
+#view-label span{font-size:7px;letter-spacing:5px;color:#444;text-transform:uppercase}
+#canvas{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  border-radius:8px;padding:14px 12px;margin:2px 0;
+  background:linear-gradient(180deg,#151515 0%,#111 50%,#131313 100%);
+  border:1px solid #222;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,.5),inset 0 -2px 10px rgba(0,0,0,.3);
+  scroll-behavior:smooth;
+}
+#canvas::-webkit-scrollbar{width:2px}
+#canvas::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+
+/* Back button */
+#back-btn{
+  display:none;width:24px;height:24px;border:none;border-radius:4px;
+  background:linear-gradient(145deg,#333,#282828);cursor:pointer;
+  box-shadow:2px 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
+  color:#888;transition:all .15s;
+}
+#back-btn:active{transform:scale(.9);color:#e63946}
+#back-btn.visible{display:flex;align-items:center;justify-content:center}
+
+/* =========================================
+   WIDGET GRID (Baukasten)
+   ========================================= */
+#widget-grid{
+  display:grid;grid-template-columns:repeat(3, 1fr);
+  gap:16px;padding:20px 10px;max-width:360px;margin:0 auto;width:100%;
+}
+.widget{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none;
+}
+.widget:active{transform:scale(.92)}
+.widget-icon{
+  width:72px;height:72px;border-radius:16px;
+  background:linear-gradient(145deg,#3a3a3a 0%,#2e2e2e 30%,#262626 60%,#2a2a2a 100%);
+  border:1px solid #444;
+  box-shadow:0 6px 20px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;transition:all .15s;
+}
+.widget-icon::after{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.08),transparent 60%);pointer-events:none;
+}
+.widget-icon img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(1px 2px 4px rgba(0,0,0,.6));position:relative;z-index:1}
+.widget-icon svg{width:36px;height:36px;filter:drop-shadow(1px 2px 4px rgba(0,0,0,.6));position:relative;z-index:1}
+.widget-icon.active-glow{
+  box-shadow:0 6px 20px rgba(0,0,0,.6),0 0 20px rgba(230,57,70,.3),0 0 40px rgba(230,57,70,.1),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.3);
+  border-color:#c62828;
+}
+.widget-label{font-size:10px;letter-spacing:2px;color:#666;text-transform:uppercase;font-weight:500;text-shadow:0 1px 2px rgba(0,0,0,.5);text-align:center}
+.widget-icon.sos{background:linear-gradient(145deg,#3a2020 0%,#2a1515 30%,#261010 60%,#2a1818 100%);border-color:#552222}
+.widget-icon.sos svg{fill:#e63946}
+@keyframes sosPulse{0%{box-shadow:0 0 20px rgba(230,57,70,.6)}50%{box-shadow:0 0 40px rgba(230,57,70,.9),0 0 80px rgba(230,57,70,.3)}100%{box-shadow:0 0 20px rgba(230,57,70,.6)}}
+
+/* Module views */
+.module-view{display:none}.module-view.active{display:block}
+
+/* =========================================
+   AGENTEN ÜBERSICHT
+   ========================================= */
+#module-agents{padding:10px 4px}
+.agents-section{margin-bottom:16px}
+.agents-section-title{
+  font-size:9px;letter-spacing:3px;color:#666;text-transform:uppercase;
+  padding:6px 8px;margin-bottom:6px;
+  border-bottom:1px solid #222;
+}
+.agents-grid{display:flex;flex-direction:column;gap:4px;padding:0 4px}
+.agent-card{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:linear-gradient(160deg,#1e1e1e 0%,#181818 100%);
+  border:1px solid #2a2a2a;border-radius:8px;
+  cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
+}
+.agent-card:active{transform:scale(.97);border-color:#444}
+.agent-card::after{
+  content:'';position:absolute;inset:0;border-radius:8px;
+  background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.03),transparent 60%);pointer-events:none;
+}
+.agent-card-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.agent-card-icon.core{background:linear-gradient(135deg,#c62828,#8b0000)}
+.agent-card-icon.biz{background:linear-gradient(135deg,#333,#252525);border:1px solid #444}
+.agent-card-icon.tool{background:linear-gradient(135deg,#2a2a2a,#1e1e1e);border:1px solid #333}
+.agent-card-info{flex:1;min-width:0}
+.agent-card-name{font-size:13px;font-weight:600;color:#ccc;letter-spacing:1px}
+.agent-card-role{font-size:10px;color:#555;letter-spacing:.5px;margin-top:1px}
+.agent-card-status{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  box-shadow:0 0 6px currentColor;
+}
+.agent-card-status.online{background:#4caf50;color:#4caf50}
+.agent-card-status.offline{background:#555;color:#555}
+.agent-card-status.coming{background:#333;color:#333}
+.agent-card-chevron{color:#333;flex-shrink:0}
+
+/* =========================================
+   FULLSCREEN CHAT MODE (WhatsApp-Style)
+   ========================================= */
+#app.chat-fullscreen #header{display:none}
+#app.chat-fullscreen #bottom-nav{display:none}
+#app.chat-fullscreen #view-section{padding:0}
+#app.chat-fullscreen #view-label{display:none}
+#app.chat-fullscreen #canvas{border-radius:0;border:none;margin:0;box-shadow:none;padding:8px 10px 14px}
+#app.chat-fullscreen #input-bar{padding:0 0 2px}
+#app.chat-fullscreen .input-bar-frame{border-radius:0;border-left:none;border-right:none;border-bottom:none;padding:6px 10px}
+/* Chat top bar (WhatsApp header) */
+#chat-header{
+  display:none;flex-shrink:0;
+  align-items:center;gap:10px;padding:10px 12px;
+  background:linear-gradient(180deg,#2a2a2a 0%,#222 100%);
+  border-bottom:1px solid #333;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+#app.chat-fullscreen #chat-header{display:flex}
+#chat-header .ch-back{
+  width:32px;height:32px;border:none;border-radius:50%;
+  background:linear-gradient(145deg,#3a3a3a,#2e2e2e);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:2px 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+  color:#999;transition:all .15s;flex-shrink:0;
+}
+#chat-header .ch-back:active{transform:scale(.9);color:#e63946}
+#chat-header .ch-avatar{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#c62828,#8b0000);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.4);
+  overflow:hidden;
+}
+#chat-header .ch-avatar svg{width:20px;height:20px}
+#chat-header .ch-info{flex:1;min-width:0}
+#chat-header .ch-name{font-size:14px;font-weight:600;color:#e0e0e0;letter-spacing:1px}
+#chat-header .ch-status{font-size:10px;color:#4caf50;letter-spacing:1px;margin-top:1px}
+
+/* =========================================
+   CHAT
+   ========================================= */
+.msg{margin-bottom:16px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-user{text-align:right}
+.msg-user .bubble{display:inline-block;max-width:80%;padding:10px 14px;background:linear-gradient(135deg,#c62828,#a01010);border-radius:16px 16px 4px 16px;text-align:left;font-size:14px;line-height:1.5;color:#fff;box-shadow:0 2px 8px rgba(198,40,40,.3)}
+.msg-bot{text-align:left}
+.msg-bot .bubble{display:inline-block;max-width:85%;padding:10px 14px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 16px 16px 16px;text-align:left;font-size:14px;line-height:1.6;color:#ddd;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.msg-bot .bubble strong{color:#e63946}
+.msg-bot .bubble code{background:#1a1a1a;padding:1px 5px;border-radius:3px;font-size:13px;color:#f0c040}
+.msg-bot .bubble pre{background:#0e0e0e;padding:10px;border-radius:6px;overflow-x:auto;margin:8px 0;border:1px solid #222}
+.msg-bot .bubble pre code{background:none;padding:0}
+.msg-agent{font-size:10px;color:#555;margin-bottom:2px;letter-spacing:1px;text-transform:uppercase}
+.msg-time{font-size:10px;color:#444;margin-top:2px}
+.typing{margin-bottom:16px;animation:fadeIn .3s ease}
+.typing-bubble{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 18px 18px 18px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.typing-dots{display:flex;gap:5px}
+.typing-dots span{width:7px;height:7px;background:#e63946;border-radius:50%;animation:typingPulse 1.4s infinite ease-in-out}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingPulse{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
+.typing-label{font-size:11px;color:#555;letter-spacing:1px}
+/* Copy button */
+.copy-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#666;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.copy-btn:hover,.copy-btn:active{color:#e63946;border-color:#e63946}
+.copy-btn.copied{color:#4caf50;border-color:#4caf50}
+.copy-btn svg{width:12px;height:12px;fill:currentColor}
+/* TTS button */
+.tts-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 8px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#666;cursor:pointer;transition:all .2s}
+.tts-btn:hover,.tts-btn:active{color:#4fc3f7;border-color:#4fc3f7}
+.tts-btn.tts-playing{color:#4fc3f7;border-color:#4fc3f7;animation:ttsPulse 1.2s infinite}
+@keyframes ttsPulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* TTS/Phone toggle in chat header */
+.ch-toggle{width:28px;height:28px;border-radius:50%;border:1px solid #333;background:#1a1a1a;color:#555;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.ch-toggle.active{color:#4fc3f7;border-color:#4fc3f7;background:#1a2a3a}
+.ch-toggle.demo-active{color:#ffd700;border-color:#ffd700;background:#2a2510;animation:demoPulse 2s ease-in-out infinite}
+@keyframes demoPulse{0%,100%{box-shadow:0 0 4px rgba(255,215,0,.3)}50%{box-shadow:0 0 12px rgba(255,215,0,.5)}}
+.ch-toggle svg{width:16px;height:16px;fill:currentColor}
+/* =========================================
+   PHONE MODULE
+   ========================================= */
+#phone-ui{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;text-align:center}
+#phone-agent-label{font-size:11px;letter-spacing:4px;color:#555;text-transform:uppercase;margin-bottom:8px}
+#phone-status{font-size:16px;color:#888;letter-spacing:2px;margin-bottom:24px;min-height:24px;transition:color .3s}
+#phone-wave{display:flex;align-items:center;justify-content:center;gap:4px;height:60px;margin-bottom:20px}
+#phone-wave span{width:4px;background:#e63946;border-radius:2px;height:8px;opacity:.3;transition:height .15s,opacity .15s}
+#phone-ui.listening #phone-wave span{opacity:1;animation:phoneWave 1s infinite ease-in-out}
+#phone-ui.listening #phone-wave span:nth-child(1){animation-delay:0s}
+#phone-ui.listening #phone-wave span:nth-child(2){animation-delay:.15s}
+#phone-ui.listening #phone-wave span:nth-child(3){animation-delay:.3s}
+#phone-ui.listening #phone-wave span:nth-child(4){animation-delay:.15s}
+#phone-ui.listening #phone-wave span:nth-child(5){animation-delay:0s}
+#phone-ui.speaking #phone-wave span{opacity:1;background:#4fc3f7;animation:phoneWave .6s infinite ease-in-out}
+#phone-ui.speaking #phone-wave span:nth-child(1){animation-delay:0s}
+#phone-ui.speaking #phone-wave span:nth-child(2){animation-delay:.1s}
+#phone-ui.speaking #phone-wave span:nth-child(3){animation-delay:.2s}
+#phone-ui.speaking #phone-wave span:nth-child(4){animation-delay:.1s}
+#phone-ui.speaking #phone-wave span:nth-child(5){animation-delay:0s}
+@keyframes phoneWave{0%,100%{height:8px}50%{height:40px}}
+#phone-ui.thinking #phone-status{color:#e63946}
+#phone-transcript{font-size:14px;color:#aaa;line-height:1.6;max-height:35vh;overflow-y:auto;margin-bottom:20px;padding:0 10px;width:100%;word-wrap:break-word}
+#phone-transcript .pt-user{color:#e0e0e0;margin-bottom:8px}
+#phone-transcript .pt-bot{color:#aaa;margin-bottom:12px}
+#phone-transcript .pt-label{font-size:10px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+#phone-call-btn{width:72px;height:72px;border-radius:50%;border:none;background:linear-gradient(145deg,#2e7d32,#1b5e20);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(46,125,50,.4),inset 0 1px 0 rgba(255,255,255,.15);transition:all .2s}
+#phone-call-btn:active{transform:scale(.95)}
+#phone-ui.active #phone-call-btn{background:linear-gradient(145deg,#c62828,#b71c1c);box-shadow:0 4px 20px rgba(198,40,40,.4),inset 0 1px 0 rgba(255,255,255,.15)}
+#phone-hint{font-size:11px;color:#444;letter-spacing:1px;margin-top:12px}
+#phone-ui.active #phone-hint{display:none}
+/* Code blocks improved */
+.msg-bot .bubble pre{background:#0a0a0a;padding:12px 14px;border-radius:8px;overflow-x:auto;margin:8px 0;border:1px solid #2a2a2a;position:relative}
+.msg-bot .bubble pre code{background:none;padding:0;color:#c8d6e5;font-family:'SF Mono',Consolas,'Courier New',monospace;font-size:12.5px;line-height:1.6}
+.msg-bot .bubble ol,.msg-bot .bubble ul{padding-left:20px;margin:6px 0}
+.msg-bot .bubble li{margin:3px 0}
+
+/* =========================================
+   INPUT BAR
+   ========================================= */
+#input-bar{display:none;flex-shrink:0;padding:4px 6px 6px}
+#input-bar.active{display:block}
+.input-bar-frame{
+  display:flex;align-items:center;gap:8px;padding:6px 8px;
+  background:linear-gradient(180deg,#444 0%,#363636 30%,#3a3a3a 70%,#404040 100%);
+  border-radius:10px;border:1px solid #555;
+  box-shadow:0 4px 16px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.3);
+}
+.input-wrap{
+  flex:1;position:relative;display:flex;align-items:center;
+}
+#chat-input{
+  flex:1;padding:10px 42px 10px 14px;border-radius:18px;border:1px solid #2a2a2a;
+  background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
+  color:#e0e0e0;font-size:15px;outline:none;
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.7),inset 0 1px 2px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.04);
+  transition:border-color .2s;
+  overflow-y:auto;
+  min-height:40px;max-height:120px;
+  line-height:1.4;
+  font-family:inherit;
+  color-scheme:dark;
+  -webkit-appearance:none;
+  -webkit-user-select:text;user-select:text;
+  -webkit-user-modify:read-write-plaintext-only;
+  word-break:break-word;white-space:pre-wrap;
+}
+#chat-input:focus{border-color:#c62828;box-shadow:inset 0 3px 8px rgba(0,0,0,.7),0 0 8px rgba(230,57,70,.2)}
+#chat-input:empty::before{content:attr(data-placeholder);color:#555;font-size:14px;pointer-events:none}
+#mic-btn{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:32px;height:32px;border-radius:50%;border:none;
+  background:transparent;color:#666;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;z-index:2;
+}
+#mic-btn:active{transform:translateY(-50%) scale(.9)}
+#mic-btn.recording{color:#e63946;animation:recPulse 1s infinite}
+#send-btn{
+  width:44px;height:44px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#d43040 0%,#a01828 50%,#881020 100%);
+  color:#fff;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(230,57,70,.45),2px 3px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 4px rgba(0,0,0,.3);
+  transition:all .15s;position:relative;
+}
+#send-btn::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.15),transparent 60%)}
+#send-btn:active{transform:scale(.92);box-shadow:0 0 20px rgba(230,57,70,.6),1px 2px 4px rgba(0,0,0,.5)}
+#send-btn svg{position:relative;z-index:1}
+@keyframes recPulse{0%{box-shadow:0 0 16px rgba(230,57,70,.5)}50%{box-shadow:0 0 30px rgba(230,57,70,.8),0 0 50px rgba(230,57,70,.3)}100%{box-shadow:0 0 16px rgba(230,57,70,.5)}}
+#rec-timer{display:none;align-items:center;gap:6px;color:#e63946;font-size:13px;letter-spacing:1px;font-weight:500}
+#rec-timer.active{display:flex}
+#rec-timer .rec-dot{width:8px;height:8px;background:#e63946;border-radius:50%;animation:recPulse 1s infinite}
+
+/* =========================================
+   BOTTOM NAV
+   ========================================= */
+#bottom-nav{flex-shrink:0;padding:0 6px 4px}
+.agent-panel{display:flex;flex-direction:column;gap:1px;width:100%;height:100%}
+.agent-top-label{font-size:6px;letter-spacing:2px;color:#555;text-transform:uppercase;text-align:center}
+.agent-btn{display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 2px;border-radius:4px;border:none;background:transparent;cursor:pointer;width:100%;transition:all .2s}
+.agent-btn:active{opacity:.7}
+.agent-name{font-size:13px;letter-spacing:2px;font-weight:700;color:#666;transition:color .2s}
+.agent-sub{font-size:6px;letter-spacing:1px;color:#444;text-transform:uppercase;margin-top:1px}
+.agent-btn.active .agent-name{color:#e63946;text-shadow:0 0 12px rgba(230,57,70,.5)}
+.agent-btn.active .agent-sub{color:#888}
+/* KIM Blink-Animation beim App-Start */
+@keyframes kimBlink{0%,100%{text-shadow:0 0 12px rgba(230,57,70,.5)}50%{text-shadow:0 0 24px rgba(230,57,70,1),0 0 48px rgba(230,57,70,.4)}}
+@keyframes kimPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 16px rgba(230,57,70,.4),inset 0 0 8px rgba(230,57,70,.15)}}
+.agent-btn.kim-blink{animation:kimPulse 1.5s ease-in-out infinite;border-radius:6px}
+.agent-btn.kim-blink .agent-name{animation:kimBlink 1.5s ease-in-out infinite;color:#e63946!important}
+.agent-bars{display:flex;flex-direction:column;gap:3px;align-items:center;padding:3px 0}
+.agent-bars span{display:block;height:2px;border-radius:1px;background:linear-gradient(90deg,transparent,#e63946,transparent);box-shadow:0 0 6px rgba(230,57,70,.3)}
+
+/* Onboarding */
+.onboard-step.active{display:flex!important}
+.interest-tag{padding:8px 16px;background:#1a1a1a;border:1px solid #333;border-radius:20px;color:#888;font-size:13px;cursor:pointer;transition:all .3s;user-select:none;-webkit-user-select:none}
+.interest-tag.selected{background:#2a1015;border-color:#e63946;color:#e63946;box-shadow:0 0 12px rgba(230,57,70,.2)}
+.tone-btn.active{border-color:#e63946!important;color:#e0e0e0!important;background:#1a0a0c!important}
+
+/* Settings */
+#settings-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:100;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+#settings-overlay.open{display:flex}
+#settings-panel{width:100%;max-width:360px;border-radius:12px;padding:24px;background:linear-gradient(160deg,#2a2a2a,#1a1a1a);border:1px solid #444;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+#settings-panel h2{font-size:14px;letter-spacing:3px;color:#e63946;margin-bottom:16px;text-transform:uppercase;font-weight:500}
+.setting-row{margin-bottom:16px}
+.setting-row label{display:block;font-size:10px;letter-spacing:2px;color:#666;text-transform:uppercase;margin-bottom:6px}
+.setting-row select{width:100%;padding:10px;background:#111;border:1px solid #333;border-radius:8px;color:#ddd;font-size:14px;outline:none}
+.setting-row select:focus{border-color:#e63946}
+.settings-close{width:100%;padding:10px;background:linear-gradient(135deg,#e63946,#c62828);border:none;border-radius:8px;color:#fff;font-size:13px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;margin-top:8px;box-shadow:0 2px 8px rgba(230,57,70,.3)}
+
+@media(min-width:500px){#app{max-width:430px;margin:0 auto;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a}}
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <linearGradient id="metalGrad" x1="0" y1="0" x2=".3" y2="1"><stop offset="0%" stop-color="#999"/><stop offset="40%" stop-color="#666"/><stop offset="100%" stop-color="#555"/></linearGradient>
+    <linearGradient id="metalDark" x1="0" y1="0" x2=".3" y2="1"><stop offset="0%" stop-color="#777"/><stop offset="40%" stop-color="#555"/><stop offset="100%" stop-color="#444"/></linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e63946"/><stop offset="100%" stop-color="#a01020"/></linearGradient>
+  </defs>
+</svg>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div class="bar-frame">
+      <div class="panel-inset wallet-panel" style="flex:.30">
+        <div class="wallet-items">
+          <div class="kunden-card"><span>K</span></div>
+          <div class="wallet-icon"></div>
+        </div>
+        <div class="wallet-sublabels"><span>KUNDEN/CLUB</span><span>CAP-COIN</span></div>
+      </div>
+      <div class="panel-raised view-panel" style="flex:.40">
+        <div class="view-icons-grid">
+          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4z"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></div>
+          <div class="vi vi-center"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
+          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div>
+          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalDark)"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg></div>
+          <div></div>
+          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalDark)"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
+        </div>
+      </div>
+      <div class="panel-inset id-panel" style="flex:.30">
+        <div class="id-top-label">KIMANUSID</div>
+        <div class="id-items">
+          <div class="qr-block"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="nfc-waves"><svg width="22" height="22" viewBox="0 0 24 24" fill="url(#metalDark)"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg></div>
+        </div>
+        <div class="id-sublabels"><span>20 34 65 10</span><span>NFC</span></div>
+      </div>
+    </div>
+    <div class="bar-labels"><span style="flex:.30">WALLET</span><span style="flex:.40">VIEW</span><span style="flex:.30">IDENTIFY</span></div>
+  </div>
+
+  <!-- CHAT HEADER (WhatsApp-Style, nur im Fullscreen sichtbar) -->
+  <div id="chat-header">
+    <button class="ch-back" onclick="showHome()"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <div class="ch-avatar"><svg viewBox="0 0 24 24" fill="rgba(255,255,255,.9)"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+    <div class="ch-info">
+      <div class="ch-name" id="ch-agent-name">KIM · P.A4MY</div>
+      <div class="ch-status" id="ch-agent-status">Online</div>
+    </div>
+    <button class="ch-toggle active" id="tts-toggle" onclick="toggleTTS()" title="Sprachausgabe"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>
+    <button class="ch-toggle" id="phone-toggle" onclick="togglePhoneMode()" title="Telefon-Modus"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button>
+    <button class="ch-toggle" id="demo-toggle" onclick="toggleDemo()" title="Demo-Modus (Premium)"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></button>
+  </div>
+
+  <!-- VIEW CANVAS -->
+  <div id="view-section">
+    <div id="view-label">
+      <button id="back-btn" onclick="showHome()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+      <span id="view-title">KOMMANDOZENTRALE</span>
+    </div>
+    <div id="canvas">
+      <!-- Widget Grid (Home/Baukasten) -->
+      <div id="widget-grid">
+        <!-- Row 1 -->
+        <div class="widget" onclick="openModule('chat')">
+          <div class="widget-icon active-glow"><svg viewBox="0 0 24 24" fill="url(#redGrad)"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+          <div class="widget-label">MESSENGER</div>
+        </div>
+        <div class="widget" onclick="openModule('phone')">
+          <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+          <div class="widget-label">KOMM</div>
+        </div>
+        <div class="widget" onclick="openModule('email')">
+          <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+          <div class="widget-label">E-MAIL</div>
+        </div>
+        <!-- Row 2 -->
+        <div class="widget" onclick="openModule('files')">
+          <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+          <div class="widget-label">DATEIEN</div>
+        </div>
+        <div class="widget" id="sos-widget" onclick="sosPress()">
+          <div class="widget-icon sos"><svg viewBox="0 0 24 24" fill="#e63946"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div>
+          <div class="widget-label">SOS</div>
+        </div>
+        <div class="widget widget-future" onclick="openModule('future')">
+          <div class="widget-icon" style="border-style:dashed;border-color:#333;opacity:.5"><svg viewBox="0 0 24 24" fill="#444"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+          <div class="widget-label" style="color:#444">BALD</div>
+        </div>
+      </div>
+      <!-- Chat Module -->
+      <div id="module-chat" class="module-view"><div id="messages"></div></div>
+      <!-- Placeholder Modules -->
+      <div id="module-phone" class="module-view">
+        <div id="phone-ui">
+          <div id="phone-agent-label"></div>
+          <div id="phone-status">Bereit</div>
+          <div id="phone-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          <div id="phone-cost" style="font-size:11px;color:#666;margin:4px 0;display:none">
+            <span id="phone-timer">00:00</span> · <span id="phone-cost-value">€0.00</span>
+            <span style="opacity:.5"> · Gesamt: <span id="phone-cost-total">€0.00</span></span>
+          </div>
+          <div id="phone-transcript"></div>
+          <button id="phone-call-btn" onclick="togglePhoneCall()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          </button>
+          <div id="phone-hint">Antippen zum Starten</div>
+        </div>
+      </div>
+      <div id="module-email" class="module-view"><div style="text-align:center;padding-top:15vh"><svg width="48" height="48" viewBox="0 0 24 24" fill="#555"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><h2 style="font-size:18px;color:#555;letter-spacing:4px;margin:16px 0 8px">E-MAIL</h2><p style="color:#444;font-size:13px">SMTP/IMAP Integration<br>Kommt bald</p></div></div>
+      <div id="module-sos" class="module-view"><div style="text-align:center;padding-top:15vh"><svg width="48" height="48" viewBox="0 0 24 24" fill="#e63946"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><h2 style="font-size:18px;color:#e63946;letter-spacing:4px;margin:16px 0 8px">SOS</h2><p style="color:#444;font-size:13px">Notfall & Walkie-Talkie<br>Kommt bald</p></div></div>
+      <div id="module-files" class="module-view"><div style="text-align:center;padding-top:12vh"><svg width="48" height="48" viewBox="0 0 24 24" fill="#555"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><h2 style="font-size:18px;color:#555;letter-spacing:4px;margin:16px 0 8px">DATEIEN</h2><p style="color:#444;font-size:13px">PDFs, Bilder & Dokumente<br>Kommt bald</p></div></div>
+      <div id="module-future" class="module-view"><div style="text-align:center;padding-top:12vh"><svg width="48" height="48" viewBox="0 0 24 24" fill="#333"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><h2 style="font-size:18px;color:#444;letter-spacing:4px;margin:16px 0 8px">NEUES MODUL</h2><p style="color:#333;font-size:13px">Platz fuer zukuenftige Funktionen</p></div></div>
+
+      <!-- TOOLS ÜBERSICHT -->
+      <div id="module-tools" class="module-view">
+        <div style="padding:10px 4px">
+          <div class="agents-section">
+            <div class="agents-section-title">HARDWARE TOOLS</div>
+            <div class="agents-grid">
+              <div class="agent-card">
+                <div class="agent-card-icon tool">&#x1f5bc;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Regio-Frame</div>
+                  <div class="agent-card-role">Digitaler Bilderrahmen &middot; Regional</div>
+                </div>
+                <div class="agent-card-status coming"></div>
+              </div>
+              <div class="agent-card">
+                <div class="agent-card-icon tool">&#x1f3e0;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Safe Home</div>
+                  <div class="agent-card-role">Alkoholmat &middot; Sicherheit f&uuml;r G&auml;ste</div>
+                </div>
+                <div class="agent-card-status coming"></div>
+              </div>
+              <div class="agent-card">
+                <div class="agent-card-icon tool">&#x1f3b5;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Music DJ</div>
+                  <div class="agent-card-role">Musikbox &middot; Stimmung</div>
+                </div>
+                <div class="agent-card-status coming"></div>
+              </div>
+              <div class="agent-card">
+                <div class="agent-card-icon tool">&#x1f4f8;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">BuenaVista</div>
+                  <div class="agent-card-role">Fotografie &middot; Fotodruck &middot; Laser</div>
+                </div>
+                <div class="agent-card-status coming"></div>
+              </div>
+            </div>
+          </div>
+          <div class="agents-section">
+            <div class="agents-section-title">SOFTWARE TOOLS</div>
+            <div class="agents-grid">
+              <div class="agent-card">
+                <div class="agent-card-icon tool">&#x1fa99;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Cap-Coin / Reg-Coin</div>
+                  <div class="agent-card-role">Regional-W&auml;hrung &middot; Krypto</div>
+                </div>
+                <div class="agent-card-status coming"></div>
+              </div>
+              <div class="agent-card" onclick="openModule('video')">
+                <div class="agent-card-icon tool" style="background:linear-gradient(135deg,#333,#252525);border:1px solid #444">&#x1f3ac;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Video Analyzer</div>
+                  <div class="agent-card-role">YouTube Analyse Tool</div>
+                </div>
+                <div class="agent-card-status online"></div>
+                <div class="agent-card-chevron">&#x203a;</div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:12px 0 20px">
+            <div style="font-size:9px;color:#333;letter-spacing:2px">KIMANUS OS &middot; TOOLS v1.0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIVATE SETTINGS -->
+      <div id="module-private" class="module-view">
+        <div style="padding:16px 12px">
+          <div style="text-align:center;margin-bottom:20px">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#c62828,#8b0000);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(198,40,40,.3)"><span style="font-size:28px">&#x1f464;</span></div>
+            <div style="font-size:16px;font-weight:600;color:#ccc;letter-spacing:2px">WOLFGANG</div>
+            <div style="font-size:11px;color:#555;letter-spacing:1px;margin-top:4px">KIMANUS OS Owner</div>
+          </div>
+          <div class="agents-section">
+            <div class="agents-section-title">PERS&Ouml;NLICHE DATEN</div>
+            <div class="agents-grid">
+              <div class="agent-card"><div class="agent-card-icon tool">&#x1f4dd;</div><div class="agent-card-info"><div class="agent-card-name">Profil</div><div class="agent-card-role">Name, Kontakt, Pr&auml;ferenzen</div></div><div class="agent-card-status coming"></div></div>
+              <div class="agent-card"><div class="agent-card-icon tool">&#x1f510;</div><div class="agent-card-info"><div class="agent-card-name">Passw&ouml;rter &amp; Zug&auml;nge</div><div class="agent-card-role">Verschl&uuml;sselt gespeichert</div></div><div class="agent-card-status coming"></div></div>
+              <div class="agent-card"><div class="agent-card-icon tool">&#x1f4c5;</div><div class="agent-card-info"><div class="agent-card-name">Kalender &amp; Termine</div><div class="agent-card-role">Pers&ouml;nliche Planung</div></div><div class="agent-card-status coming"></div></div>
+              <div class="agent-card"><div class="agent-card-icon tool">&#x2764;</div><div class="agent-card-info"><div class="agent-card-name">Gesundheit</div><div class="agent-card-role">Fitness, Joggen, Tracking</div></div><div class="agent-card-status coming"></div></div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:12px 0 20px">
+            <div style="font-size:9px;color:#333;letter-spacing:2px">PRIVATE &middot; NUR F&Uuml;R DICH</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO ANALYZER -->
+      <div id="module-video" class="module-view">
+        <div style="padding:8px 8px 0;display:flex;flex-direction:column;height:100%">
+          <!-- Video Player Area -->
+          <div id="video-player-area" style="display:none;margin-bottom:8px;border-radius:10px;overflow:hidden;background:#000;position:relative">
+            <div style="position:relative;padding-bottom:56.25%;height:0">
+              <iframe id="video-player-iframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <button onclick="closeVideoPlayer()" style="position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid #444;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">&times;</button>
+          </div>
+
+          <!-- Scrollable Content -->
+          <div id="video-content-area" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">
+            <!-- Search Results -->
+            <div id="video-search-results" style="display:none"></div>
+            <!-- Analysis Result -->
+            <div id="video-result" style="font-size:14px;line-height:1.6;color:#ccc"></div>
+          </div>
+
+          <!-- Bottom Controls (Suche + Analyse) -->
+          <div style="padding:8px 0 10px;border-top:1px solid #222;flex-shrink:0">
+            <!-- Suchzeile -->
+            <div style="display:flex;gap:6px;margin-bottom:6px">
+              <input id="video-search-input" type="text" placeholder="YouTube durchsuchen..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')searchVideos()">
+              <button onclick="searchVideos()" style="padding:9px 14px;background:linear-gradient(135deg,#333,#222);border:1px solid #444;border-radius:8px;color:#ccc;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer">&#x1f50d; SUCHE</button>
+            </div>
+            <!-- Analysezeile -->
+            <div style="display:flex;gap:6px">
+              <input id="video-url-input" type="url" placeholder="YouTube URL analysieren..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')analyzeVideo()">
+              <button onclick="analyzeVideo()" style="padding:9px 14px;background:linear-gradient(135deg,#c62828,#8b0000);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 8px rgba(198,40,40,.3)">&#x1f3ac; ANALYSE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENTEN ÜBERSICHT (dynamisch je nach KAI/KIM) -->
+      <div id="module-agents" class="module-view">
+        <div id="agents-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT BAR -->
+  <div id="input-bar">
+    <div class="input-bar-frame">
+      <div class="input-wrap">
+        <div id="chat-input" contenteditable="plaintext-only" role="textbox" enterkeyhint="send" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" aria-placeholder="Nachricht eingeben..." data-placeholder="Nachricht eingeben..."></div>
+        <button id="mic-btn" onclick="handleMicBtn()" title="Spracheingabe">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </button>
+      </div>
+      <div id="rec-timer"><span class="rec-dot"></span><span id="rec-time">0:00</span></div>
+      <button id="send-btn" onclick="sendMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="position:relative;z-index:1"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="bottom-nav">
+    <div class="bar-frame">
+      <div class="panel-inset" style="flex:.24">
+        <div class="agent-panel">
+          <div class="agent-top-label" onclick="openModule('tools')" style="cursor:pointer">ALL TOOLS</div>
+          <div style="display:flex;align-items:center;gap:4px;justify-content:center;width:100%">
+            <button class="agent-btn" id="btn-set" onclick="event.stopPropagation();openSettings()"><div><div class="agent-name">SET</div><div class="agent-sub">ALLG.</div></div></button>
+            <div class="agent-bars" onclick="openModule('tools')" style="cursor:pointer"><span style="width:28px"></span><span style="width:22px"></span><span style="width:26px"></span></div>
+            <button class="agent-btn" id="btn-pri" onclick="event.stopPropagation();openModule('private')"><div><div class="agent-name">PRI</div><div class="agent-sub">PRIVAT</div></div></button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-raised" style="flex:.52;display:flex;align-items:center;justify-content:center">
+        <button onclick="showHome()" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(145deg,#444,#333);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);transition:all .15s;position:relative">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+      </div>
+      <div class="panel-inset" style="flex:.24">
+        <div class="agent-panel">
+          <div class="agent-top-label" onclick="openModule('agents')" style="cursor:pointer">ALL AGENTS</div>
+          <div style="display:flex;align-items:center;gap:4px;justify-content:center;width:100%">
+            <button class="agent-btn" id="btn-kai" onclick="event.stopPropagation();setAgent('kai')"><div><div class="agent-name">KAI</div><div class="agent-sub">A4BIS</div></div></button>
+            <div class="agent-bars" onclick="openModule('agents')" style="cursor:pointer"><span style="width:28px"></span><span style="width:22px"></span><span style="width:26px"></span></div>
+            <button class="agent-btn active" id="btn-kim" onclick="event.stopPropagation();setAgent('kim')"><div><div class="agent-name">KIM</div><div class="agent-sub">P.A4MY</div></div></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bar-labels"><span style="flex:.24">TOOLS</span><span style="flex:.52">HOME</span><span style="flex:.24">AGENTEN</span></div>
+  </div>
+</div>
+
+<!-- ONBOARDING OVERLAY -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;-webkit-overflow-scrolling:touch">
+  <!-- Stufe 1: KIM stellt sich vor -->
+  <div id="onboard-step1" class="onboard-step active" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 24px;text-align:center">
+    <div id="onboard-kim-avatar" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#e63946,#8b0000);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(230,57,70,.4),0 8px 32px rgba(0,0,0,.6);margin-bottom:24px;animation:kimPulse 2s ease-in-out infinite">
+      <span style="font-size:44px">&#x1f916;</span>
+    </div>
+    <div id="onboard-greeting" style="font-size:22px;font-weight:600;color:#e0e0e0;margin-bottom:12px;opacity:0;transform:translateY(20px);transition:all .6s ease"></div>
+    <div id="onboard-intro" style="font-size:15px;color:#999;line-height:1.7;max-width:320px;opacity:0;transform:translateY(20px);transition:all .6s ease .3s"></div>
+    <button id="onboard-next-btn" onclick="onboardStep2()" style="margin-top:32px;padding:14px 40px;background:linear-gradient(135deg,#e63946,#8b0000);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(230,57,70,.4);opacity:0;transform:translateY(20px);transition:all .6s ease .6s;letter-spacing:1px">Ja, gerne!</button>
+    <button onclick="skipOnboarding()" style="margin-top:16px;padding:10px 20px;background:transparent;border:1px solid #333;border-radius:8px;color:#555;font-size:13px;cursor:pointer;opacity:0;transition:all .6s ease .8s">Spaeter</button>
+  </div>
+
+  <!-- Stufe 2: Mini-Profil -->
+  <div id="onboard-step2" class="onboard-step" style="display:none;flex-direction:column;align-items:center;min-height:100vh;padding:40px 24px">
+    <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e63946,#8b0000);display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(230,57,70,.3);margin-bottom:16px">
+      <span style="font-size:26px">&#x1f916;</span>
+    </div>
+    <div style="font-size:18px;font-weight:600;color:#ccc;margin-bottom:4px">Erzaehl mir was ueber dich</div>
+    <div style="font-size:13px;color:#666;margin-bottom:24px;text-align:center">Damit ich dich besser kennenlernen kann</div>
+
+    <div style="width:100%;max-width:360px">
+      <div class="onboard-field">
+        <label style="font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block">Wie soll ich dich nennen?</label>
+        <input id="onboard-name" type="text" placeholder="Dein Vorname" style="width:100%;padding:14px 16px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#e0e0e0;font-size:16px;outline:none;transition:border-color .3s" onfocus="this.style.borderColor='#e63946'" onblur="this.style.borderColor='#333'">
+      </div>
+
+      <div class="onboard-field" style="margin-top:16px">
+        <label style="font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block">Was machst du beruflich?</label>
+        <input id="onboard-job" type="text" placeholder="z.B. Unternehmer, Designer, Student..." style="width:100%;padding:14px 16px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#e0e0e0;font-size:16px;outline:none;transition:border-color .3s" onfocus="this.style.borderColor='#e63946'" onblur="this.style.borderColor='#333'">
+      </div>
+
+      <div class="onboard-field" style="margin-top:16px">
+        <label style="font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block">Was interessiert dich?</label>
+        <div id="onboard-interests" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <span class="interest-tag" onclick="toggleInterest(this)">Technik</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Business</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Fitness</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Musik</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Reisen</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Kochen</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Gaming</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Kunst</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Film</span>
+          <span class="interest-tag" onclick="toggleInterest(this)">Natur</span>
+        </div>
+      </div>
+
+      <div class="onboard-field" style="margin-top:16px">
+        <label style="font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block">Wie soll KIM mit dir reden?</label>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="tone-btn active" onclick="selectTone(this,'locker')" data-tone="locker" style="flex:1;padding:12px;background:#1a1a1a;border:2px solid #e63946;border-radius:10px;color:#e0e0e0;font-size:14px;cursor:pointer;transition:all .3s">Locker &amp; Du</button>
+          <button class="tone-btn" onclick="selectTone(this,'formell')" data-tone="formell" style="flex:1;padding:12px;background:#1a1a1a;border:2px solid #333;border-radius:10px;color:#888;font-size:14px;cursor:pointer;transition:all .3s">Formell &amp; Sie</button>
+        </div>
+      </div>
+
+      <button onclick="saveOnboarding()" style="margin-top:28px;width:100%;padding:16px;background:linear-gradient(135deg,#e63946,#8b0000);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(230,57,70,.4);letter-spacing:1px">Fertig - Los geht's!</button>
+      <button onclick="skipOnboarding()" style="margin-top:12px;width:100%;padding:12px;background:transparent;border:1px solid #333;border-radius:8px;color:#555;font-size:13px;cursor:pointer">Ueberspringen</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-overlay" onclick="closeSettings(event)">
+  <div id="settings-panel" onclick="event.stopPropagation()">
+    <h2>EINSTELLUNGEN</h2>
+    <div class="setting-row">
+      <label>Demo-Modus &#x2B50;</label>
+      <button id="demo-settings-btn" onclick="toggleDemo()" style="padding:10px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;width:100%;border:2px solid #333;background:#1a1a1a;color:#888;transition:all .3s">&#x2606; AUS (Standard)</button>
+      <div id="voice-cost-display" style="margin-top:6px;padding:6px 10px;background:#111;border-radius:6px;font-size:12px;color:#888;border:1px solid #222;display:flex;justify-content:space-between">
+        <span>Voice-Kosten gesamt:</span>
+        <span id="settings-voice-cost" style="color:#e63946;font-weight:bold">€0.00</span>
+      </div>
+    </div>
+    <div class="setting-row"><label>KI-Modell</label>
+      <div id="model-info" style="padding:8px;background:#111;border-radius:6px;font-size:13px;color:#4caf50;border:1px solid #222">Auto-Routing (6 Modelle)</div>
+      <input type="hidden" id="setting-model" value="auto">
+    </div>
+    <div class="setting-row"><label>Stimme KAI &#x1f468;</label>
+      <select id="setting-voice-kai" tabindex="-1" onchange="saveVoiceSetting()">
+        <optgroup label="OpenAI Empfohlen">
+          <option value="cedar">Cedar (Ruhig, natuerlich) &#x2605; NEU</option>
+          <option value="verse">Verse (Vielseitig, lebendig) NEU</option>
+          <option value="onyx">Onyx (Tief, autoritaer)</option>
+        </optgroup>
+        <optgroup label="OpenAI Weitere">
+          <option value="echo">Echo (Klar, praezise)</option>
+          <option value="ash">Ash (Warm, gespraechig)</option>
+          <option value="fable">Fable (Charmant)</option>
+          <option value="ballad">Ballad (Ausdrucksvoll)</option>
+          <option value="alloy">Alloy (Neutral)</option>
+        </optgroup>
+        <optgroup label="Edge TTS (Gratis)">
+          <option value="de-DE-FlorianMultilingualNeural">Florian (Deutsch)</option>
+          <option value="de-DE-ConradNeural">Conrad (Sachlich)</option>
+          <option value="de-DE-KillianNeural">Killian (Jung)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="setting-row"><label>Stimme KIM</label>
+      <select id="setting-voice-kim" tabindex="-1" onchange="saveVoiceSetting()">
+        <optgroup label="OpenAI Empfohlen">
+          <option value="marin">Marin (Natuerlich, klar) &#x2605; NEU</option>
+          <option value="nova">Nova (Warm, natuerlich)</option>
+          <option value="sage">Sage (Ruhig, weise)</option>
+        </optgroup>
+        <optgroup label="OpenAI Weiblich">
+          <option value="shimmer">Shimmer (Hell, optimistisch)</option>
+          <option value="coral">Coral (Warm, freundlich)</option>
+        </optgroup>
+        <optgroup label="OpenAI Maennlich">
+          <option value="cedar">Cedar (Ruhig, natuerlich) NEU</option>
+          <option value="verse">Verse (Vielseitig, lebendig) NEU</option>
+          <option value="onyx">Onyx (Tief, autoritaer)</option>
+          <option value="echo">Echo (Klar, praezise)</option>
+          <option value="ash">Ash (Warm, gespraechig)</option>
+          <option value="fable">Fable (Charmant)</option>
+          <option value="ballad">Ballad (Ausdrucksvoll)</option>
+        </optgroup>
+        <optgroup label="OpenAI Neutral">
+          <option value="alloy">Alloy (Neutral)</option>
+        </optgroup>
+        <optgroup label="Edge TTS (Gratis)">
+          <option value="de-DE-SeraphinaMultilingualNeural">Seraphina (Deutsch)</option>
+          <option value="de-DE-KatjaNeural">Katja (Professionell)</option>
+          <option value="de-DE-AmalaNeural">Amala (Warm)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="setting-row"><label>Stimmen testen</label>
+      <div style="display:flex;gap:8px">
+        <button onclick="testVoiceFor('kai')" style="flex:1;padding:8px 12px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#4caf50;cursor:pointer;font-size:13px">&#x1f50a; KAI</button>
+        <button onclick="testVoiceFor('kim')" style="flex:1;padding:8px 12px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#e63946;cursor:pointer;font-size:13px">&#x1f50a; KIM</button>
+      </div>
+    </div>
+    <div class="setting-row"><label>Server-Status</label><div id="server-status" style="padding:8px;background:#111;border-radius:6px;font-size:13px;color:#4caf50;border:1px solid #222">Verbunden</div></div>
+    <div class="setting-row"><label>Chat-Verlauf</label><button onclick="clearHistory()" style="padding:8px 16px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#e63946;cursor:pointer;font-size:13px;width:100%">Verlauf loeschen</button></div>
+    <div class="setting-row"><label>Onboarding</label><button onclick="resetOnboarding()" style="padding:8px 16px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#ffa500;cursor:pointer;font-size:13px;width:100%">Onboarding nochmal starten</button></div>
+    <button class="settings-close" onclick="closeSettings()" tabindex="-1">Schliessen</button>
+  </div>
+</div>
+
+<script>
+let currentModule = 'home';
+let currentAgent = 'kim';
+let isTyping = false;
+let history = JSON.parse(localStorage.getItem('kimanus-history') || '[]');
+const sessionId = 'kimanus-' + Date.now();
+
+// === TTS (Text-to-Speech) ===
+let ttsEnabled = localStorage.getItem('kimanus-tts') !== 'off'; // Standard: an
+
+// Stimmen-Einstellungen laden
+let voiceKai = localStorage.getItem('kimanus-voice-kai') || 'onyx';
+let voiceKim = localStorage.getItem('kimanus-voice-kim') || 'nova';
+
+function getSelectedVoice() {
+  return currentAgent === 'kim' ? voiceKim : voiceKai;
+}
+
+function saveVoiceSetting() {
+  voiceKai = document.getElementById('setting-voice-kai').value;
+  voiceKim = document.getElementById('setting-voice-kim').value;
+  localStorage.setItem('kimanus-voice-kai', voiceKai);
+  localStorage.setItem('kimanus-voice-kim', voiceKim);
+}
+
+function loadVoiceSettings() {
+  const kaiSel = document.getElementById('setting-voice-kai');
+  const kimSel = document.getElementById('setting-voice-kim');
+  if (kaiSel) kaiSel.value = voiceKai;
+  if (kimSel) kimSel.value = voiceKim;
+}
+
+async function testVoiceFor(agent) {
+  const voice = agent === 'kim' ? voiceKim : voiceKai;
+  const name = agent === 'kim' ? 'KIM' : 'KAI';
+  const text = 'Hallo, hier ist ' + name + '. So klinge ich fuer dich.';
+  try {
+    const resp = await fetch('/api/tts', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text: text, agent: agent, voice: voice })
+    });
+    if (resp.ok) {
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.onended = () => URL.revokeObjectURL(url);
+      audio.play();
+    }
+  } catch(e) { console.error('Test voice error:', e); }
+}
+let ttsPlaying = false;
+let ttsAudio = null;
+let phoneMode = false; // Telefon-Modus: TTS -> auto Mikrofon
+
+let isRecording = false;
+let recognition = null;
+let recInterval = null;
+let recSeconds = 0;
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (history.length > 0) {
+    history.forEach(m => renderMessage(m.role, m.content, m.agent, m.time, false, m.model || ''));
+  }
+  const chatInput = document.getElementById('chat-input');
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  // Paste als reinen Text einfuegen (kein HTML)
+  chatInput.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+  // WhatsApp-Style: Mikrofon <-> Sende-Pfeil Wechsel + Auto-Resize
+  chatInput.addEventListener('input', () => { updateSendBtn(); autoResize(chatInput); });
+  checkHealth();
+  // KIM blinkt beim App-Start als Einladung
+  startKimBlink();
+  // TTS-Toggle Status wiederherstellen
+  const ttsBtn = document.getElementById('tts-toggle');
+  if (ttsBtn) ttsBtn.classList.toggle('active', ttsEnabled);
+  // Stimmen-Einstellungen laden
+  loadVoiceSettings();
+});
+
+// Helfer: contenteditable div Text lesen/schreiben
+function getInputText() {
+  return (document.getElementById('chat-input').textContent || '').trim();
+}
+function setInputText(text) {
+  const el = document.getElementById('chat-input');
+  if (!text) {
+    el.textContent = '';
+    el.innerHTML = '';
+  } else {
+    el.textContent = text;
+  }
+  autoResize(el);
+}
+
+function autoResize(el) {
+  // contenteditable div passt sich automatisch an, aber max-height begrenzen
+  el.scrollTop = el.scrollHeight;
+}
+
+// =========================================
+// MARKDOWN TO HTML
+// =========================================
+function markdownToHtml(md) {
+  if (!md) return '';
+  let html = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code style="background:#1a1a1a;padding:1px 4px;border-radius:3px;font-size:12px">$1</code>')
+    .replace(/^### (.+)$/gm, '<h4 style="color:#e0e0e0;margin:12px 0 6px;font-size:15px">$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3 style="color:#e0e0e0;margin:14px 0 8px;font-size:16px">$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2 style="color:#e0e0e0;margin:16px 0 8px;font-size:18px">$1</h2>')
+    .replace(/^\*   /gm, '• ')
+    .replace(/^- /gm, '• ')
+    .replace(/^(\d+)\. /gm, '$1. ')
+    .replace(/\n{2,}/g, '</p><p style="margin:8px 0">')
+    .replace(/\n/g, '<br>');
+  return '<p style="margin:8px 0">' + html + '</p>';
+}
+
+// =========================================
+// VIDEO ANALYZER + YOUTUBE SEARCH
+// =========================================
+
+// YouTube Video-ID aus URL extrahieren
+function extractVideoId(url) {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+// Video im Embed-Player abspielen
+function playVideo(videoId) {
+  const area = document.getElementById('video-player-area');
+  const iframe = document.getElementById('video-player-iframe');
+  iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+  area.style.display = 'block';
+  // URL ins Analyse-Feld eintragen
+  document.getElementById('video-url-input').value = 'https://www.youtube.com/watch?v=' + videoId;
+}
+
+function closeVideoPlayer() {
+  const area = document.getElementById('video-player-area');
+  const iframe = document.getElementById('video-player-iframe');
+  iframe.src = '';
+  area.style.display = 'none';
+}
+
+// YouTube-Suche via SearXNG
+async function searchVideos() {
+  const input = document.getElementById('video-search-input');
+  const resultsDiv = document.getElementById('video-search-results');
+  const resultDiv = document.getElementById('video-result');
+  const query = input.value.trim();
+  if (!query) return;
+
+  resultsDiv.style.display = 'block';
+  resultDiv.innerHTML = '';
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:20px 0"><div style="font-size:20px;margin-bottom:8px;animation:spin 1s linear infinite;display:inline-block">&#x1f50d;</div><p style="color:#666;font-size:12px">Suche nach "' + query + '"...</p></div>';
+
+  try {
+    const resp = await fetch('/api/video-search?q=' + encodeURIComponent(query));
+    if (!resp.ok) throw new Error('Suche fehlgeschlagen');
+    const data = await resp.json();
+
+    if (!data.results || data.results.length === 0) {
+      resultsDiv.innerHTML = '<p style="color:#666;text-align:center;padding:16px">Keine Videos gefunden</p>';
+      return;
+    }
+
+    let html = '<div style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">' + data.results.length + ' ERGEBNISSE F&Uuml;R "' + query + '"</div>';
+
+    data.results.forEach(function(v) {
+      const vidId = extractVideoId(v.url || '');
+      const thumb = v.thumbnail || (vidId ? 'https://img.youtube.com/vi/' + vidId + '/mqdefault.jpg' : '');
+
+      html += '<div style="display:flex;gap:10px;padding:8px;margin-bottom:6px;background:#1a1a1a;border:1px solid #222;border-radius:8px;cursor:pointer" onclick="' + (vidId ? "playVideo('" + vidId + "')" : '') + '">';
+
+      // Thumbnail
+      if (thumb) {
+        html += '<div style="flex-shrink:0;width:120px;height:68px;border-radius:6px;overflow:hidden;background:#111;position:relative">';
+        html += '<img src="' + thumb + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">';
+        html += '<div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.8);color:#fff;font-size:9px;padding:1px 4px;border-radius:3px">' + (v.length || '') + '</div>';
+        html += '</div>';
+      }
+
+      // Info
+      html += '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">';
+      html += '<div style="font-size:13px;font-weight:500;color:#ddd;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + (v.title || '') + '</div>';
+      html += '<div style="font-size:10px;color:#666;margin-top:3px">' + (v.channel || '') + '</div>';
+      // Analyse-Button
+      if (vidId) {
+        html += '<div style="margin-top:4px"><button onclick="event.stopPropagation();analyzeFromSearch(\'' + vidId + '\')" style="padding:3px 8px;background:#c62828;border:none;border-radius:4px;color:#fff;font-size:9px;font-weight:600;cursor:pointer;letter-spacing:.5px">ANALYSIEREN</button></div>';
+      }
+      html += '</div></div>';
+    });
+
+    resultsDiv.innerHTML = html;
+  } catch(e) {
+    resultsDiv.innerHTML = '<p style="color:#e63946;padding:8px">Fehler: ' + e.message + '</p>';
+  }
+}
+
+// Analyse aus Suchergebnissen starten
+function analyzeFromSearch(videoId) {
+  document.getElementById('video-url-input').value = 'https://www.youtube.com/watch?v=' + videoId;
+  playVideo(videoId);
+  analyzeVideo();
+}
+
+async function analyzeVideo() {
+  const urlInput = document.getElementById('video-url-input');
+  const resultDiv = document.getElementById('video-result');
+  const url = urlInput.value.trim();
+  if (!url) { resultDiv.innerHTML = '<p style="color:#e63946">Bitte YouTube URL eingeben</p>'; return; }
+
+  resultDiv.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:24px;margin-bottom:12px;animation:spin 1s linear infinite;display:inline-block">&#x1f3ac;</div><p style="color:#666;font-size:13px">Video wird analysiert...<br>Gemini sieht das Video (1-3 Min)</p></div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>';
+
+  try {
+    const resp = await fetch('/api/video-analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url: url})
+    });
+    if (!resp.ok) throw new Error('Video Analyse fehlgeschlagen (' + resp.status + ')');
+    var data = await resp.json();
+
+    let html = '';
+    // Kein Thumbnail mehr anzeigen wenn Player aktiv ist
+    const playerVisible = document.getElementById('video-player-area').style.display !== 'none';
+    if (data.thumbnail && !playerVisible) {
+      const vidId = extractVideoId(url);
+      html += '<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;cursor:pointer" onclick="' + (vidId ? "playVideo('" + vidId + "')" : '') + '"><img src="' + data.thumbnail + '" style="width:100%;border-radius:8px" alt="Thumbnail"><div style="text-align:center;margin-top:4px;font-size:10px;color:#666">&#9654; Antippen zum Abspielen</div></div>';
+    }
+    html += '<div style="font-size:16px;font-weight:600;color:#e0e0e0;margin-bottom:4px">' + (data.title || '') + '</div>';
+    html += '<div style="font-size:11px;color:#666;margin-bottom:12px">' + (data.channel || '') + ' &middot; ' + (data.duration || '') + ' &middot; ' + (data.elapsed_seconds || '?') + 's Analyse</div>';
+    html += '<div style="font-size:14px;line-height:1.7;color:#ccc">' + markdownToHtml(data.analysis || 'Keine Analyse') + '</div>';
+
+    // Speichern + Chat-Nachfrage Buttons
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #222;display:flex;gap:8px">';
+    html += '<button onclick="saveVideoAnalysis()" id="video-save-btn" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#4caf50;font-size:13px;cursor:pointer;letter-spacing:1px">&#x1f4be; SPEICHERN</button>';
+    html += '<button onclick="videoChat()" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#999;font-size:13px;cursor:pointer;letter-spacing:1px">&#x1f4ac; NACHFRAGE</button>';
+    html += '</div>';
+
+    // Analysedaten fuer Speichern merken
+    window._lastVideoAnalysis = {title: data.title||'', channel: data.channel||'', duration: data.duration||'', url: url, analysis: data.analysis||'', date: new Date().toISOString()};
+
+    resultDiv.dataset.videoUrl = url;
+    resultDiv.innerHTML = html;
+  } catch(e) {
+    resultDiv.innerHTML = '<p style="color:#e63946">Fehler: ' + e.message + '</p>';
+  }
+}
+
+async function videoChat() {
+  const resultDiv = document.getElementById('video-result');
+  const videoUrl = resultDiv.dataset.videoUrl;
+  if (!videoUrl) return;
+  const question = prompt('Deine Frage zum Video:');
+  if (!question) return;
+
+  const oldHtml = resultDiv.innerHTML;
+  resultDiv.innerHTML += '<div style="margin-top:12px;padding:10px;background:#1a1a1a;border-radius:8px;border:1px solid #222"><div style="color:#e63946;font-size:12px;margin-bottom:4px">DEINE FRAGE:</div><div style="color:#ccc;font-size:14px">' + question + '</div><div style="color:#666;font-size:12px;margin-top:8px">Antwort wird generiert...</div></div>';
+
+  try {
+    const resp = await fetch('/api/video-chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url: videoUrl, question: question})
+    });
+    const data = await resp.json();
+    resultDiv.innerHTML = oldHtml + '<div style="margin-top:12px;padding:10px;background:#1a1a1a;border-radius:8px;border:1px solid #222"><div style="color:#e63946;font-size:12px;margin-bottom:4px">FRAGE: ' + question + '</div><div style="color:#ccc;font-size:14px;line-height:1.6;margin-top:6px">' + markdownToHtml(data.answer || 'Keine Antwort') + '</div></div>';
+  } catch(e) {
+    resultDiv.innerHTML = oldHtml + '<div style="color:#e63946;margin-top:8px">Fehler: ' + e.message + '</div>';
+  }
+}
+
+async function saveVideoAnalysis() {
+  if (!window._lastVideoAnalysis) return;
+  const btn = document.getElementById('video-save-btn');
+  btn.textContent = 'Speichern...';
+  btn.style.color = '#666';
+  try {
+    const resp = await fetch('/api/video-save', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(window._lastVideoAnalysis)
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      btn.innerHTML = '&#x2705; Gespeichert';
+      btn.style.color = '#4caf50';
+      btn.onclick = null;
+    } else {
+      btn.innerHTML = '&#x274c; Fehler';
+      btn.style.color = '#e63946';
+    }
+  } catch(e) {
+    btn.innerHTML = '&#x274c; Fehler';
+    btn.style.color = '#e63946';
+  }
+  haptic();
+}
+
+function updateSendBtn() {
+  // Mic-Button im Feld ausblenden wenn Text vorhanden
+  const micBtn = document.getElementById('mic-btn');
+  if (!micBtn) return;
+  if (getInputText().length > 0) {
+    micBtn.style.display = 'none';
+  } else {
+    // Verzoegert einblenden damit kein versehentlicher Tap
+    setTimeout(() => {
+      if (getInputText().length === 0 && !isRecording) micBtn.style.display = 'flex';
+    }, 300);
+  }
+}
+
+let micBtnCooldown = false;
+function handleMicBtn(e) {
+  if (e) e.preventDefault();
+  if (micBtnCooldown) return;
+  micBtnCooldown = true;
+  setTimeout(() => { micBtnCooldown = false; }, 500);
+  // Wenn gerade aufgenommen wird: stoppen
+  if (isRecording) {
+    voiceStoppedManually = true;
+    toggleVoiceInput();
+    return;
+  }
+  // Nur starten wenn Feld wirklich leer ist und nicht gerade getippt
+  if (getInputText().length > 0) return;
+  if (isTyping) return; // Warte auf Antwort
+  toggleVoiceInput();
+}
+
+// Gesammelter Text ueber mehrere Recognition-Sessions
+let voiceAccumulated = '';
+let voiceResultIndex = 0; // Trackt welche Results schon verarbeitet wurden
+
+function toggleVoiceInput() {
+  if (isRecording) {
+    // Manuell stoppen waehrend Aufnahme
+    voiceStoppedManually = true;
+    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    return;
+  }
+  // Check browser support
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Spracherkennung wird von diesem Browser nicht unterstuetzt. Nutze Chrome oder Safari.');
+    return;
+  }
+
+  // Bestehenden Text behalten (fuer mehrere Mic-Taps hintereinander)
+  voiceAccumulated = getInputText();
+  voiceResultIndex = 0;
+  startRecognitionSession();
+}
+
+// Flag: wurde manuell gestoppt? Dann kein Auto-Restart
+let voiceStoppedManually = false;
+
+function startRecognitionSession() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'de-DE';
+  recognition.continuous = true;   // Laenger zuhoeren!
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  const el = document.getElementById('chat-input');
+  const btn = document.getElementById('mic-btn');
+  const recTimer = document.getElementById('rec-timer');
+
+  recognition.onstart = () => {
+    isRecording = true;
+    voiceStoppedManually = false;
+    btn.classList.add('recording');
+    recTimer.classList.add('active');
+    el.dataset.placeholder = 'Sprich jetzt...';
+    if (!voiceAccumulated) el.textContent = '';
+    // Timer nur beim ersten Start initialisieren
+    if (recSeconds === 0) {
+      document.getElementById('rec-time').textContent = '0:00';
+      if (recInterval) clearInterval(recInterval);
+      recInterval = setInterval(() => {
+        recSeconds++;
+        const m = Math.floor(recSeconds / 60);
+        const s = String(recSeconds % 60).padStart(2, '0');
+        document.getElementById('rec-time').textContent = `${m}:${s}`;
+      }, 1000);
+      haptic();
+    }
+  };
+
+  recognition.onresult = (e) => {
+    let new_final = '';
+    let interim = '';
+    // Nur NEUE Results verarbeiten (ab voiceResultIndex)
+    for (let i = voiceResultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        new_final += t;
+        voiceResultIndex = i + 1; // Dieses Result ist fertig, nicht nochmal verarbeiten
+      } else {
+        interim += t;
+      }
+    }
+    // Finalen Text zum akkumulierten hinzufuegen
+    if (new_final) {
+      const spacer = voiceAccumulated.length > 0 ? ' ' : '';
+      voiceAccumulated = voiceAccumulated + spacer + new_final;
+      setInputText(voiceAccumulated);
+    } else if (interim) {
+      const spacer = voiceAccumulated.length > 0 ? ' ' : '';
+      setInputText(voiceAccumulated + spacer + interim);
+    }
+    updateSendBtn();
+  };
+
+  recognition.onerror = (e) => {
+    // Bei no-speech oder aborted: Auto-Restart versuchen
+    if (e.error === 'aborted' || e.error === 'no-speech') {
+      return; // onend kuemmert sich um Restart
+    }
+    if (e.error === 'not-allowed' || e.error === 'audio-capture') {
+      voiceStoppedManually = true;
+      stopVoiceInput(false);
+      alert('Mikrofon-Zugriff verweigert.\nEinstellungen > Safari > Mikrofon');
+      return;
+    }
+    if (e.error === 'service-not-available') {
+      voiceStoppedManually = true;
+      stopVoiceInput(false);
+      alert('Spracherkennung nicht verfuegbar.\nAktiviere: Einstellungen > Allgemein > Tastatur > Diktierfunktion');
+      return;
+    }
+  };
+
+  recognition.onend = () => {
+    // Text sichern
+    const currentText = getInputText();
+    if (currentText.length > 0) {
+      voiceAccumulated = currentText;
+    }
+    voiceResultIndex = 0; // Reset fuer naechste Session
+    // Wenn NICHT manuell gestoppt: automatisch neue Session starten
+    if (!voiceStoppedManually && isRecording) {
+      recognition = null;
+      setTimeout(() => {
+        if (isRecording && !voiceStoppedManually) {
+          startRecognitionSession();
+        }
+      }, 200);
+      return;
+    }
+    // Manuell gestoppt: aufhoeren
+    stopVoiceInput(false);
+  };
+
+  try {
+    recognition.start();
+  } catch(e) {
+    // Falls continuous:true nicht klappt, Fallback auf continuous:false mit Auto-Restart
+    try {
+      recognition.continuous = false;
+      recognition.start();
+    } catch(e2) {
+      alert('Mikrofon-Start fehlgeschlagen.\nAktiviere: Einstellungen > Allgemein > Tastatur > Diktierfunktion');
+    }
+  }
+}
+
+function stopVoiceInput(andSend) {
+  isRecording = false;
+  voiceStoppedManually = true;
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  if (recInterval) { clearInterval(recInterval); recInterval = null; }
+  const btn = document.getElementById('mic-btn');
+  const el = document.getElementById('chat-input');
+  const recTimer = document.getElementById('rec-timer');
+  btn.classList.remove('recording');
+  recTimer.classList.remove('active');
+  el.dataset.placeholder = 'Nachricht eingeben...';
+  // Sicherstellen dass der gesammelte Text im Input ist
+  if (voiceAccumulated && getInputText().length === 0) {
+    setInputText(voiceAccumulated);
+  }
+  updateSendBtn();
+  haptic();
+  voiceAccumulated = '';
+  voiceResultIndex = 0;
+  // Auto-send wenn gewuenscht und Text vorhanden
+  if (andSend && getInputText().length > 0) {
+    sendMessage();
+  }
+}
+
+function openModule(name) {
+  currentModule = name;
+  const app = document.getElementById('app');
+  document.getElementById('widget-grid').style.display = 'none';
+  document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
+  const mod = document.getElementById('module-' + name);
+  if (mod) mod.classList.add('active');
+  document.getElementById('back-btn').classList.add('visible');
+  const titles = {chat:'MESSENGER',phone:'KOMMUNIKATION',email:'E-MAIL',sos:'SOS',files:'DATEIEN',future:'NEUES MODUL',agents:'ALL AGENTS',video:'VIDEO ANALYZER',tools:'ALL TOOLS','private':'PRIVATE SETTINGS'};
+  document.getElementById('view-title').textContent = titles[name] || name.toUpperCase();
+  document.getElementById('input-bar').classList.toggle('active', name === 'chat');
+
+  if (name === 'chat') {
+    // WhatsApp Fullscreen-Modus
+    app.classList.add('chat-fullscreen');
+    // Manus-Modus beibehalten, sonst KIM/KAI setzen
+    if (manusMode) {
+      document.getElementById('ch-agent-name').innerHTML = 'MANUS <span style="font-size:10px;color:#ffa500;vertical-align:middle">&#x1f7e0; LIVE</span>';
+    } else {
+      const agentName = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+      document.getElementById('ch-agent-name').textContent = agentName;
+    }
+    setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    scrollToBottom();
+  } else {
+    app.classList.remove('chat-fullscreen');
+  }
+  if (name === 'phone') {
+    const agentName = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+    document.getElementById('phone-agent-label').textContent = agentName;
+  }
+  if (name === 'agents') {
+    renderAgentsView();
+    document.getElementById('view-title').textContent = currentAgent === 'kai' ? 'KAI \u00b7 AGENTEN' : 'KIM \u00b7 AGENTEN';
+  }
+  haptic();
+}
+
+function openVideoAnalyzer() {
+  openModule('video');
+}
+
+function renderAgentsView() {
+  const container = document.getElementById('agents-content');
+  if (!container) return;
+
+  if (currentAgent === 'kai') {
+    container.innerHTML = `
+      <div style="padding:10px 4px">
+        <div class="agents-section">
+          <div class="agents-section-title" style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px">&#x1f468;</span>
+            KAI &middot; A4BIS &middot; BUSINESS AGENTEN
+          </div>
+          <div class="agents-grid">
+            <div class="agent-card" onclick="openVideoAnalyzer()">
+              <div class="agent-card-icon biz">&#x1f3ac;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Video Analyzer</div><div class="agent-card-role">YouTube Analyse &middot; Transkript &middot; Visuell</div></div>
+              <div class="agent-card-status online"></div><div class="agent-card-chevron">&#x203a;</div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f4ca;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Rohaufschlagsrechner</div><div class="agent-card-role">Kalkulation &middot; Wareneinsatz</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f3f7;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Preisvergleich</div><div class="agent-card-role">Einkaufsoptimierung</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f4e6;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Lagerverwaltung</div><div class="agent-card-role">Bestand &middot; Bedarfserkennung</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f6d2;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Bestellagent</div><div class="agent-card-role">Automatische Bestellungen</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f4b0;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Finanz-Berater</div><div class="agent-card-role">Bank &middot; Finanzen</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f4cb;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Steuerberater</div><div class="agent-card-role">Steuerfragen &middot; ELSTER</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f3e8;</div>
+              <div class="agent-card-info"><div class="agent-card-name">DEHOGA Agent</div><div class="agent-card-role">Branchenspezifisch &middot; Gastronomie</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f4e3;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Werbung &middot; Marketing</div><div class="agent-card-role">Kampagnen &middot; Social Media</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x2696;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Rechtsfragen</div><div class="agent-card-role">Juristische Themen &middot; Arbeitsrecht</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f512;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Security</div><div class="agent-card-role">&Uuml;berwachung &middot; Notausg&auml;nge &middot; G&auml;stesicherheit &middot; Brandschutz</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon biz">&#x1f527;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Hausmeister Eger</div><div class="agent-card-role">Geb&auml;ude &middot; Technik &middot; Wartung</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+          </div>
+        </div>
+        <!-- KIM Verweis -->
+        <div onclick="setAgent('kim');renderAgentsView();document.getElementById('view-title').textContent='KIM \u00b7 AGENTEN'" style="margin-top:10px;padding:12px 10px;background:#111;border:1px solid #222;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c62828,#8b0000);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#x1f469;</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:#e63946;letter-spacing:1px">KIM &middot; P.A4MY</div>
+            <div style="font-size:10px;color:#666;margin-top:2px">Meine Kollegin f&uuml;r Privates &ndash; Fitness, Termine, E-Mail, Reisen &amp; mehr</div>
+          </div>
+          <div style="color:#e63946;font-size:18px">&#x203a;</div>
+        </div>
+
+        <div style="text-align:center;padding:12px 0 20px">
+          <div style="font-size:9px;color:#333;letter-spacing:2px">KAI &middot; A4BIS &middot; BUSINESS ECOSYSTEM</div>
+        </div>
+      </div>`;
+  } else {
+    // KIM - Persoenliche Agenten mit Begruessung
+    const greeting = getTimeGreeting();
+    container.innerHTML = `
+      <div style="padding:10px 4px">
+        <!-- KIM Begruessung -->
+        <div style="padding:12px 10px 16px;margin-bottom:8px;background:linear-gradient(135deg,#1a1010,#151515);border:1px solid #2a1515;border-radius:10px">
+          <div style="font-size:15px;color:#ddd;margin-bottom:6px">${greeting} Ich bin <strong style="color:#e63946">KIM</strong>, dein pers&ouml;nlicher Assistent.</div>
+          <div style="font-size:12px;color:#888;line-height:1.5">Sag mir einfach was du brauchst &ndash; oder w&auml;hle einen meiner Mitarbeiter. Ich k&uuml;mmere mich um alles Pers&ouml;nliche.</div>
+        </div>
+
+        <!-- KIM fragt direkt -->
+        <div class="agent-card" onclick="openModule('chat')" style="margin-bottom:10px;border-color:#c62828;background:linear-gradient(135deg,#1e1010,#181212)">
+          <div class="agent-card-icon core" style="font-size:18px">&#x1f4ac;</div>
+          <div class="agent-card-info"><div class="agent-card-name" style="color:#e63946">Einfach fragen</div><div class="agent-card-role">Fragen, Texte, &Uuml;bersetzen, Recherche &ndash; alles</div></div>
+          <div class="agent-card-status online"></div><div class="agent-card-chevron" style="color:#e63946">&#x203a;</div>
+        </div>
+
+        <div class="agents-section">
+          <div class="agents-section-title" style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px">&#x1f469;</span>
+            MEINE MITARBEITER
+          </div>
+          <div class="agents-grid">
+            <div class="agent-card" onclick="setAgent('kim');openModule('phone')">
+              <div class="agent-card-icon core">&#x1f4de;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Voice Assistant</div><div class="agent-card-role">Sprachkonversation &middot; Telefon &middot; Joggen</div></div>
+              <div class="agent-card-status online"></div><div class="agent-card-chevron">&#x203a;</div>
+            </div>
+            <div class="agent-card" onclick="openVideoAnalyzer()">
+              <div class="agent-card-icon core">&#x1f3ac;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Video Analyzer</div><div class="agent-card-role">YouTube Videos analysieren &middot; lernen</div></div>
+              <div class="agent-card-status online"></div><div class="agent-card-chevron">&#x203a;</div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x1f3c3;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Fitness &amp; Gesundheit</div><div class="agent-card-role">Joggen &middot; Tracking &middot; Motivation</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x1f4c5;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Kalender &amp; Termine</div><div class="agent-card-role">Planung &middot; Erinnerungen &middot; Tagesablauf</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x1f4e7;</div>
+              <div class="agent-card-info"><div class="agent-card-name">E-Mail Assistent</div><div class="agent-card-role">Postfach &middot; Sortieren &middot; Antworten</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x1f6d2;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Einkaufsliste</div><div class="agent-card-role">Privat &middot; Haushalt &middot; Erinnerungen</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x2708;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Reise &amp; Navigation</div><div class="agent-card-role">Planung &middot; Buchung &middot; Tipps</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x1f4f0;</div>
+              <div class="agent-card-info"><div class="agent-card-name">News &amp; Briefing</div><div class="agent-card-role">Morgen-Briefing &middot; Nachrichten &middot; Trends</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+            <div class="agent-card">
+              <div class="agent-card-icon core">&#x1f4da;</div>
+              <div class="agent-card-info"><div class="agent-card-name">Wissen &amp; Lernen</div><div class="agent-card-role">Recherche &middot; Zusammenfassungen &middot; Notizen</div></div>
+              <div class="agent-card-status coming"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KAI Verweis -->
+        <div onclick="setAgent('kai');renderAgentsView();document.getElementById('view-title').textContent='KAI \u00b7 AGENTEN'" style="margin-top:10px;padding:12px 10px;background:#111;border:1px solid #222;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#333,#252525);border:1px solid #444;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">&#x1f468;</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:#4fc3f7;letter-spacing:1px">KAI &middot; A4BIS</div>
+            <div style="font-size:10px;color:#666;margin-top:2px">Mein Kollege f&uuml;r Business &ndash; hat eigene Mitarbeiter f&uuml;r Kalkulation, Recht, Steuern, Marketing &amp; mehr</div>
+          </div>
+          <div style="color:#4fc3f7;font-size:18px">&#x203a;</div>
+        </div>
+
+        <div style="text-align:center;padding:12px 0 20px">
+          <div style="font-size:9px;color:#333;letter-spacing:2px">KIM &middot; P.A4MY &middot; DEIN PRIVATER BEREICH</div>
+        </div>
+      </div>`;
+  }
+}
+
+function showHome() {
+  currentModule = 'home';
+  document.getElementById('app').classList.remove('chat-fullscreen');
+  document.getElementById('widget-grid').style.display = 'grid';
+  document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
+  document.getElementById('back-btn').classList.remove('visible');
+  document.getElementById('view-title').textContent = 'KOMMANDOZENTRALE';
+  document.getElementById('input-bar').classList.remove('active');
+  haptic();
+}
+
+// KIM Blink beim App-Start
+let kimBlinkTimer = null;
+let kimHasGreeted = false;
+
+function startKimBlink() {
+  const btnKim = document.getElementById('btn-kim');
+  if (!btnKim) return;
+  // Nur blinken wenn noch nicht interagiert
+  if (sessionStorage.getItem('kim-greeted')) { kimHasGreeted = true; return; }
+  btnKim.classList.add('kim-blink');
+  // Nach 30 Sekunden aufhoeren zu blinken (nicht nerven)
+  kimBlinkTimer = setTimeout(() => { btnKim.classList.remove('kim-blink'); }, 30000);
+}
+
+function stopKimBlink() {
+  const btnKim = document.getElementById('btn-kim');
+  if (btnKim) btnKim.classList.remove('kim-blink');
+  if (kimBlinkTimer) { clearTimeout(kimBlinkTimer); kimBlinkTimer = null; }
+}
+
+function kimGreeting() {
+  if (kimHasGreeted) return;
+  kimHasGreeted = true;
+  sessionStorage.setItem('kim-greeted', '1');
+
+  // Neuer User? -> Onboarding starten!
+  if (!localStorage.getItem('kimanus-profile')) {
+    startOnboarding();
+    return;
+  }
+  // Bekannter User -> direkt zum Chat
+  openModule('chat');
+}
+
+function getTimeGreeting() {
+  const h = new Date().getHours();
+  if (h < 6) return 'Gute Nacht!';
+  if (h < 12) return 'Guten Morgen!';
+  if (h < 18) return 'Guten Tag!';
+  return 'Guten Abend!';
+}
+
+// =========================================
+// ONBOARDING (First Launch)
+// =========================================
+function startOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  overlay.style.display = 'block';
+
+  // KIM stellt sich vor mit Animation
+  const greeting = getTimeGreeting();
+  const greetEl = document.getElementById('onboard-greeting');
+  const introEl = document.getElementById('onboard-intro');
+  const nextBtn = document.getElementById('onboard-next-btn');
+  const skipBtn = nextBtn.nextElementSibling;
+
+  setTimeout(() => {
+    greetEl.textContent = greeting + ' Ich bin KIM.';
+    greetEl.style.opacity = '1';
+    greetEl.style.transform = 'translateY(0)';
+  }, 400);
+
+  setTimeout(() => {
+    introEl.innerHTML = 'Ich bin dein persoenlicher Assistent im <strong style="color:#e63946">KIMANUS OS</strong>.<br><br>Ich helfe dir im Alltag, bei Fragen, Erinnerungen und allem was anfaellt.<br><br>Darf ich dich kurz kennenlernen?';
+    introEl.style.opacity = '1';
+    introEl.style.transform = 'translateY(0)';
+  }, 800);
+
+  setTimeout(() => {
+    nextBtn.style.opacity = '1';
+    nextBtn.style.transform = 'translateY(0)';
+  }, 1200);
+
+  setTimeout(() => {
+    skipBtn.style.opacity = '1';
+  }, 1600);
+}
+
+function onboardStep2() {
+  document.getElementById('onboard-step1').style.display = 'none';
+  const step2 = document.getElementById('onboard-step2');
+  step2.style.display = 'flex';
+  step2.style.opacity = '0';
+  step2.style.transition = 'opacity .4s ease';
+  setTimeout(() => { step2.style.opacity = '1'; }, 50);
+  haptic();
+}
+
+function toggleInterest(el) {
+  el.classList.toggle('selected');
+  haptic();
+}
+
+function selectTone(btn, tone) {
+  document.querySelectorAll('.tone-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = '#333';
+    b.style.color = '#888';
+    b.style.background = '#1a1a1a';
+  });
+  btn.classList.add('active');
+  btn.style.borderColor = '#e63946';
+  btn.style.color = '#e0e0e0';
+  btn.style.background = '#1a0a0c';
+  haptic();
+}
+
+async function saveOnboarding() {
+  const name = (document.getElementById('onboard-name').value || '').trim();
+  const job = (document.getElementById('onboard-job').value || '').trim();
+  const interests = Array.from(document.querySelectorAll('.interest-tag.selected')).map(e => e.textContent);
+  const toneBtn = document.querySelector('.tone-btn.active');
+  const tone = toneBtn ? toneBtn.dataset.tone : 'locker';
+
+  const profile = { name, job, interests, tone, created: new Date().toISOString() };
+  localStorage.setItem('kimanus-profile', JSON.stringify(profile));
+
+  // An Server senden (USER.md aktualisieren)
+  try {
+    await fetch('/api/profile', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(profile)
+    });
+  } catch(e) { console.warn('Profil-Sync fehlgeschlagen:', e); }
+
+  // Onboarding schliessen
+  closeOnboarding();
+
+  // Willkommensnachricht im Chat
+  openModule('chat');
+  const greeting = name ? ('Freut mich, ' + name + '!') : 'Freut mich!';
+  const now = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+  renderMessage('bot', greeting + ' Ich bin jetzt fuer dich da. Schreib oder ruf mich einfach an - ich helfe dir gerne. \u{1F60A}', 'kim', now);
+  haptic();
+}
+
+function skipOnboarding() {
+  // Minimales Profil speichern, damit Onboarding nicht nochmal kommt
+  localStorage.setItem('kimanus-profile', JSON.stringify({skipped: true, created: new Date().toISOString()}));
+  closeOnboarding();
+  openModule('agents');
+}
+
+function closeOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity .4s ease';
+  setTimeout(() => { overlay.style.display = 'none'; overlay.style.opacity = '1'; }, 400);
+}
+
+function resetOnboarding() {
+  localStorage.removeItem('kimanus-profile');
+  sessionStorage.removeItem('kim-greeted');
+  kimHasGreeted = false;
+  closeSettings();
+  // Step 1 wieder sichtbar machen, Step 2 verstecken
+  document.getElementById('onboard-step1').style.display = 'flex';
+  document.getElementById('onboard-step2').style.display = 'none';
+  // Felder leeren
+  document.getElementById('onboard-name').value = '';
+  document.getElementById('onboard-job').value = '';
+  document.querySelectorAll('.interest-tag').forEach(t => t.classList.remove('selected'));
+  // Onboarding starten
+  startOnboarding();
+  haptic();
+}
+
+function setAgent(agent) {
+  currentAgent = agent;
+  document.getElementById('btn-kai').classList.toggle('active', agent === 'kai');
+  document.getElementById('btn-kim').classList.toggle('active', agent === 'kim');
+  // Chat-Header Agent-Name aktualisieren
+  const agentName = agent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+  document.getElementById('ch-agent-name').textContent = agentName;
+  // KIM Blink stoppen und begruessen
+  if (agent === 'kim') {
+    stopKimBlink();
+    kimGreeting();
+  }
+  haptic();
+}
+
+// Manus-Weiterleitung erkennen
+const MANUS_PATTERNS = /(verbind.*manus|manus.*verbind|weiterleit.*manus|manus.*weiterleit|weiterverbind.*manus|manus.*weiterverbind|weiter.*an manus|zu manus|manus.*(?:oeffn|öffn)|(?:oeffne|öffne).*manus|manus.*anruf|ruf.*manus|switch.*manus|connect.*manus|manus.*start|start.*manus|manus.*auf|mach.*manus|bring.*manus|gib.*manus|zeig.*manus|durchstell.*manus|manus.*durchstell|manus bitte|brauche manus|will.*manus|manus holen)/i;
+const MANUS_URL = 'https://manus.kimanus.de/#token=578412bbcdb26a543fbb15171470d7557d69dc6ea753a8e0';
+const MANUS_DISCONNECT = /(manus.*trennen|trenn.*manus|manus.*beenden|beende.*manus|zurueck.*kim|zurueck.*kai|disconnect.*manus|manus.*disconnect|schluss.*manus|manus.*schluss|bye.*manus|manus.*bye|tschuess.*manus|ciao.*manus)/i;
+
+let manusMode = false;
+let manusSessionId = '';
+
+function activateManusMode() {
+  manusMode = true;
+  const header = document.getElementById('ch-agent-name');
+  if (header) header.innerHTML = 'MANUS <span style="font-size:10px;color:#ffa500;vertical-align:middle">&#x1f7e0; LIVE</span>';
+  // Chat-Header Hintergrund leicht aendern
+  const chatHeader = document.querySelector('.chat-header');
+  if (chatHeader) chatHeader.style.borderBottom = '2px solid #ffa500';
+}
+
+function deactivateManusMode() {
+  manusMode = false;
+  manusSessionId = '';
+  const agentName = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+  const header = document.getElementById('ch-agent-name');
+  if (header) header.textContent = agentName;
+  const chatHeader = document.querySelector('.chat-header');
+  if (chatHeader) chatHeader.style.borderBottom = '';
+}
+
+async function sendToManus(msg) {
+  isTyping = true; showTyping();
+  try {
+    const resp = await fetch('/api/manus', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message: msg, session_id: manusSessionId})
+    });
+    const data = await resp.json();
+    hideTyping(); isTyping = false;
+    if (data.error) {
+      const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+      renderMessage('bot', 'Manus-Fehler: ' + data.error, 'manus', ansTime);
+      return;
+    }
+    if (data.session_id) manusSessionId = data.session_id;
+    const answer = data.reply || 'Keine Antwort von Manus.';
+    const modelUsed = data.model || 'manus';
+    const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    renderMessage('bot', answer, 'manus', ansTime, true, modelUsed);
+    history.push({role:'bot', content:answer, agent:'manus', time:ansTime, model:modelUsed});
+    saveHistory();
+  } catch(e) {
+    hideTyping(); isTyping = false;
+    const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    renderMessage('bot', 'Verbindung zu Manus fehlgeschlagen: ' + e.message, 'manus', ansTime);
+  }
+}
+
+async function sendMessage() {
+  const msg = getInputText();
+  if (!msg || isTyping) return;
+  // Recording sicher stoppen bevor wir senden
+  if (isRecording) { voiceStoppedManually = true; stopVoiceInput(false); }
+  if (currentModule !== 'chat') openModule('chat');
+  setInputText('');
+  updateSendBtn();
+  const now = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+  renderMessage('user', msg, currentAgent, now);
+  history.push({role:'user', content:msg, agent:currentAgent, time:now});
+  saveHistory(); haptic();
+
+  // Im Manus-Modus: Trennen oder weiter an Manus
+  if (manusMode) {
+    if (MANUS_DISCONNECT.test(msg)) {
+      deactivateManusMode();
+      const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+      const agent = currentAgent;
+      renderMessage('bot', 'Manus-Verbindung getrennt. Ich bin wieder fuer dich da! \u{1F44B}', agent, ansTime);
+      history.push({role:'bot', content:'Manus getrennt', agent:agent, time:ansTime});
+      saveHistory();
+      return;
+    }
+    sendToManus(msg);
+    return;
+  }
+
+  // Manus-Weiterleitung?
+  if (MANUS_PATTERNS.test(msg)) {
+    activateManusMode();
+    const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    renderMessage('bot', 'Alles klar, du bist jetzt mit Manus verbunden! \u{1F680}\n\nManus ist unser Server-Agent mit Zugriff auf System, Dateien und Web. Schreib ihm einfach was du brauchst.\n\n_Sag "Zurueck zu KIM" wenn du fertig bist._', currentAgent, ansTime, true);
+    history.push({role:'bot', content:'Mit Manus verbunden', agent:currentAgent, time:ansTime});
+    saveHistory();
+    return;
+  }
+
+  isTyping = true; showTyping();
+  try {
+    const model = document.getElementById('setting-model').value;
+    const resp = await fetch('/api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg,agent:currentAgent,model:model,session:sessionId,timestamp:new Date().toISOString(),demo:demoMode})
+    });
+    const data = await resp.json();
+    const answer = data.output || data.response || data.answer || 'Keine Antwort erhalten.';
+    const modelUsed = data.model_name || data.model || '';
+    hideTyping(); isTyping = false;
+    const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    renderMessage('bot', answer, currentAgent, ansTime, true, modelUsed);
+    history.push({role:'bot', content:answer, agent:currentAgent, time:ansTime, model:modelUsed});
+    saveHistory();
+    // TTS entfernt - Voice laeuft ueber Telefon-Modus
+  } catch(err) {
+    hideTyping(); isTyping = false;
+    renderMessage('bot', 'Verbindungsfehler: ' + err.message, currentAgent, now);
+  }
+}
+
+function renderMessage(role, content, agent, time, scroll=true, modelUsed='') {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + (role === 'user' ? 'user' : 'bot');
+  const agentLabel = agent === 'manus' ? 'MANUS \u00b7 SERVER' : (agent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS');
+  const modelTag = modelUsed ? ` <span style="opacity:.5;font-size:9px">\u00b7 ${modelUsed}</span>` : '';
+  if (role === 'user') {
+    div.innerHTML = `<div class="msg-agent">${agentLabel}</div><div class="bubble">${escapeHtml(content)}</div><div class="msg-time">${time}</div>`;
+  } else {
+    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}</div><div class="msg-time">${time}</div>`;
+    div.dataset.rawContent = content;
+  }
+  container.appendChild(div);
+  if (scroll) scrollToBottom();
+}
+
+// === TTS Funktionen ===
+async function speakText(text, agent, btnEl) {
+  // Wenn gerade abgespielt wird: stoppen
+  if (ttsPlaying && ttsAudio) {
+    ttsAudio.pause();
+    ttsAudio.currentTime = 0;
+    ttsPlaying = false;
+    if (btnEl) btnEl.classList.remove('tts-playing');
+    return;
+  }
+  // iOS Audio-Unlock bei manuellem Tap
+  iosUnlockedAudio.src = 'data:audio/mp3;base64,/+NIxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVV/+NIxAsAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+  iosUnlockedAudio.play().then(() => { iosUnlockedAudio.pause(); }).catch(() => {});
+  try {
+    ttsPlaying = true;
+    if (btnEl) btnEl.classList.add('tts-playing');
+
+    const resp = await fetch('/api/tts', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text: text, agent: agent || currentAgent})
+    });
+    if (!resp.ok) throw new Error('TTS Fehler');
+
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    // iOS: Verwende entsperrtes Audio-Element
+    ttsAudio = iosUnlockedAudio;
+    ttsAudio.src = url;
+    ttsAudio.volume = 1.0;
+
+    ttsAudio.onended = () => {
+      ttsPlaying = false;
+      if (btnEl) btnEl.classList.remove('tts-playing');
+      URL.revokeObjectURL(url);
+      // Telefon-Modus: nach Vorlesen automatisch Mikrofon starten
+      if (phoneMode && !isRecording) {
+        setTimeout(() => toggleVoiceInput(), 500);
+      }
+    };
+    ttsAudio.onerror = () => {
+      ttsPlaying = false;
+      if (btnEl) btnEl.classList.remove('tts-playing');
+    };
+    await ttsAudio.play();
+  } catch(e) {
+    ttsPlaying = false;
+    if (btnEl) btnEl.classList.remove('tts-playing');
+    console.error('TTS Fehler:', e);
+  }
+}
+
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  localStorage.setItem('kimanus-tts', ttsEnabled ? 'on' : 'off');
+  const btn = document.getElementById('tts-toggle');
+  if (btn) {
+    btn.classList.toggle('active', ttsEnabled);
+    btn.title = ttsEnabled ? 'Sprachausgabe an' : 'Sprachausgabe aus';
+  }
+  haptic();
+}
+
+function togglePhoneMode() {
+  phoneMode = !phoneMode;
+  const btn = document.getElementById('phone-toggle');
+  if (btn) {
+    btn.classList.toggle('active', phoneMode);
+    btn.title = phoneMode ? 'Telefon-Modus an' : 'Telefon-Modus aus';
+  }
+  if (phoneMode) ttsEnabled = true;
+  haptic();
+}
+
+// === DEMO-MODUS (Premium Voice fuer Vorfuehrungen) ===
+let demoMode = localStorage.getItem('kimanus-demo') === 'on';
+
+function toggleDemo() {
+  demoMode = !demoMode;
+  localStorage.setItem('kimanus-demo', demoMode ? 'on' : 'off');
+  updateDemoUI();
+  haptic();
+}
+
+function updateDemoUI() {
+  // Chat-Header Stern
+  const chatBtn = document.getElementById('demo-toggle');
+  if (chatBtn) {
+    chatBtn.classList.toggle('demo-active', demoMode);
+    chatBtn.title = demoMode ? 'Demo-Modus an (Premium)' : 'Demo-Modus aus (Standard)';
+  }
+  // Settings Button
+  const setBtn = document.getElementById('demo-settings-btn');
+  if (setBtn) {
+    if (demoMode) {
+      setBtn.innerHTML = '&#x2605; AN — Premium (Sonnet + Realtime Voice)';
+      setBtn.style.color = '#ffd700';
+      setBtn.style.borderColor = '#ffd700';
+      setBtn.style.background = '#2a2510';
+    } else {
+      setBtn.innerHTML = '&#x2606; AUS (Standard)';
+      setBtn.style.color = '#888';
+      setBtn.style.borderColor = '#333';
+      setBtn.style.background = '#1a1a1a';
+    }
+  }
+  // Modell-Info anpassen
+  const modelInfo = document.getElementById('model-info');
+  if (modelInfo) {
+    if (demoMode) {
+      modelInfo.textContent = 'Demo: Claude Sonnet 4 (Premium)';
+      modelInfo.style.color = '#ffd700';
+    } else {
+      modelInfo.textContent = 'Auto-Routing (6 Modelle)';
+      modelInfo.style.color = '#4caf50';
+    }
+  }
+  // Voice-Kosten in Settings aktualisieren
+  updateVoiceCostDisplay();
+}
+
+function updateVoiceCostDisplay() {
+  const el = document.getElementById('settings-voice-cost');
+  if (el) el.textContent = '\u20ac' + phoneTotalCost.toFixed(2);
+  const totalEl = document.getElementById('phone-cost-total');
+  if (totalEl) totalEl.textContent = '\u20ac' + phoneTotalCost.toFixed(2);
+}
+
+// Demo-Button Zustand beim Laden setzen
+document.addEventListener('DOMContentLoaded', () => updateDemoUI());
+
+// === TELEFON-MODUL (Voice Pipeline: Groq Whisper + Streaming LLM + Chunked TTS) ===
+let phoneActive = false;
+let phoneMediaRecorder = null;
+let phoneAudioStream = null;
+let phoneAudioContext = null;
+let phoneAnalyser = null;
+let phoneAudioChunks = [];
+let phoneAbortController = null;
+let phoneAudioQueue = [];
+let phoneIsPlayingQueue = false;
+
+// === WebRTC Realtime API ===
+let rtcPeerConnection = null;
+let rtcDataChannel = null;
+let rtcAudioEl = null;
+let phoneTimerInterval = null;
+let phoneStartTime = null;
+const COST_PER_MINUTE = 0.28; // ~€0.28 pro Minute
+let phoneTotalCost = parseFloat(localStorage.getItem('kimanus-voice-cost') || '0');
+
+function togglePhoneCall() {
+  if (phoneActive) {
+    endPhoneCall();
+  } else {
+    startPhoneCall();
+  }
+}
+
+// Persistentes Audio-Element fuer iOS (wird beim User-Tap "entsperrt")
+let iosUnlockedAudio = new Audio();
+// Web Audio API fuer zuverlaessige iOS-Wiedergabe
+let phonePlaybackCtx = null;
+let phoneCurrentSource = null;
+
+async function startPhoneCall() {
+  // Demo-Modus = Realtime WebRTC (teuer, ChatGPT-Qualitaet)
+  // Normal = Alte Pipeline (guenstig)
+  if (!demoMode) {
+    startPhoneCallLegacy();
+    return;
+  }
+
+  phoneActive = true;
+  const ui = document.getElementById('phone-ui');
+  ui.classList.add('active');
+  const agentName = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+  document.getElementById('phone-agent-label').textContent = agentName;
+  document.getElementById('phone-transcript').innerHTML = '';
+  document.getElementById('phone-status').textContent = 'Verbinde (Premium)...';
+  haptic();
+
+  try {
+    // 1. Ephemeral Token holen
+    const tokenResp = await fetch('/api/realtime/session', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({agent: currentAgent, demo: demoMode})
+    });
+    const tokenData = await tokenResp.json();
+    if (!tokenData.token) {
+      throw new Error(tokenData.error || 'Kein Token erhalten');
+    }
+
+    // 2. WebRTC PeerConnection erstellen
+    rtcPeerConnection = new RTCPeerConnection();
+
+    // 3. Audio-Element fuer Wiedergabe
+    rtcAudioEl = document.createElement('audio');
+    rtcAudioEl.autoplay = true;
+    rtcPeerConnection.ontrack = (e) => {
+      rtcAudioEl.srcObject = e.streams[0];
+      ui.classList.remove('thinking');
+      ui.classList.add('speaking');
+    };
+
+    // 4. Mikrofon holen und als Track hinzufuegen
+    const micStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    micStream.getTracks().forEach(track => {
+      rtcPeerConnection.addTrack(track, micStream);
+    });
+    phoneAudioStream = micStream;
+
+    // 5. DataChannel fuer Events (Transkript, etc.)
+    rtcDataChannel = rtcPeerConnection.createDataChannel('oai-events');
+    rtcDataChannel.onmessage = handleRealtimeEvent;
+
+    // 6. SDP Offer erstellen
+    const offer = await rtcPeerConnection.createOffer();
+    await rtcPeerConnection.setLocalDescription(offer);
+
+    // 7. SDP an OpenAI senden und Answer empfangen
+    const sdpResp = await fetch('https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + tokenData.token,
+        'Content-Type': 'application/sdp'
+      },
+      body: offer.sdp
+    });
+
+    if (!sdpResp.ok) {
+      throw new Error('OpenAI Realtime SDP Fehler: ' + sdpResp.status);
+    }
+
+    const answerSdp = await sdpResp.text();
+    await rtcPeerConnection.setRemoteDescription({type: 'answer', sdp: answerSdp});
+
+    // Verbunden!
+    document.getElementById('phone-status').textContent = 'Verbunden \u2022 Sprich...';
+    ui.classList.add('listening');
+
+    // Timer + Kosten starten
+    phoneStartTime = Date.now();
+    document.getElementById('phone-cost').style.display = '';
+    phoneTimerInterval = setInterval(updatePhoneTimer, 1000);
+
+    console.log('[Realtime] WebRTC verbunden mit', tokenData.voice);
+
+  } catch (err) {
+    console.error('Realtime Fehler:', err);
+    document.getElementById('phone-status').textContent = 'Fehler: ' + err.message;
+    phoneActive = false;
+    ui.classList.remove('active');
+    // Fallback auf alten Modus
+    setTimeout(() => {
+      document.getElementById('phone-status').textContent = 'Bereit';
+      document.getElementById('phone-hint').style.display = '';
+    }, 3000);
+  }
+}
+
+function handleRealtimeEvent(event) {
+  try {
+    const msg = JSON.parse(event.data);
+    const transcript = document.getElementById('phone-transcript');
+    const ui = document.getElementById('phone-ui');
+
+    if (msg.type === 'conversation.item.input_audio_transcription.completed') {
+      // User-Transkript
+      const text = msg.transcript || '';
+      if (text.trim()) {
+        transcript.innerHTML += '<div class="pt-user"><div class="pt-label">Du</div>' + escapeHtml(text) + '</div>';
+        transcript.scrollTop = transcript.scrollHeight;
+        // Manus-Weiterleitung?
+        if (MANUS_PATTERNS.test(text)) {
+          document.getElementById('phone-status').textContent = 'Verbinde mit Manus...';
+          endPhoneCall();
+          activateManusMode();
+          const ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+          renderMessage('bot', 'Du bist jetzt mit Manus verbunden! \u{1F680}\nSchreib ihm was du brauchst. Sag "Zurueck zu KIM" wenn du fertig bist.', currentAgent, ansTime, true);
+          openModule('chat');
+        }
+      }
+    }
+    else if (msg.type === 'response.audio_transcript.done') {
+      // KI-Antwort komplett
+      const text = msg.transcript || '';
+      if (text.trim()) {
+        const agentLabel = currentAgent === 'kim' ? 'KIM' : 'KAI';
+        transcript.innerHTML += '<div class="pt-bot"><div class="pt-label">' + agentLabel + '</div>' + escapeHtml(text) + '</div>';
+        transcript.scrollTop = transcript.scrollHeight;
+        // In Chat-History speichern
+        const now = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+        history.push({role:'bot', content: text, agent:currentAgent, time:now, model:'Realtime'});
+        saveHistory();
+      }
+    }
+    else if (msg.type === 'input_audio_buffer.speech_started') {
+      ui.classList.remove('speaking');
+      ui.classList.add('listening');
+      document.getElementById('phone-status').textContent = 'Hoert zu...';
+    }
+    else if (msg.type === 'input_audio_buffer.speech_stopped') {
+      ui.classList.remove('listening');
+      ui.classList.add('thinking');
+      document.getElementById('phone-status').textContent = 'Denkt nach...';
+    }
+    else if (msg.type === 'response.audio.started' || msg.type === 'response.created') {
+      ui.classList.remove('thinking');
+      ui.classList.add('speaking');
+      document.getElementById('phone-status').textContent = 'Spricht...';
+    }
+    else if (msg.type === 'error') {
+      console.error('[Realtime] Error:', msg.error);
+      document.getElementById('phone-status').textContent = 'Fehler: ' + (msg.error?.message || 'Unbekannt');
+    }
+  } catch(e) {
+    console.log('[Realtime] Event parse error:', e);
+  }
+}
+
+function updatePhoneTimer() {
+  if (!phoneStartTime) return;
+  const elapsed = Math.floor((Date.now() - phoneStartTime) / 1000);
+  const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+  const secs = (elapsed % 60).toString().padStart(2, '0');
+  const sessionCost = (elapsed / 60) * COST_PER_MINUTE;
+  document.getElementById('phone-timer').textContent = mins + ':' + secs;
+  document.getElementById('phone-cost-value').textContent = '\u20ac' + sessionCost.toFixed(2);
+  const totalEl = document.getElementById('phone-cost-total');
+  if (totalEl) totalEl.textContent = '\u20ac' + (phoneTotalCost + sessionCost).toFixed(2);
+}
+
+function endPhoneCall() {
+  // Kosten der Session zum Gesamt addieren
+  if (phoneStartTime && demoMode) {
+    const elapsed = (Date.now() - phoneStartTime) / 1000;
+    const sessionCost = (elapsed / 60) * COST_PER_MINUTE;
+    phoneTotalCost += sessionCost;
+    localStorage.setItem('kimanus-voice-cost', phoneTotalCost.toFixed(4));
+    updateVoiceCostDisplay();
+  }
+
+  phoneActive = false;
+  const ui = document.getElementById('phone-ui');
+  ui.classList.remove('active', 'listening', 'speaking', 'thinking');
+  document.getElementById('phone-status').textContent = 'Bereit';
+  document.getElementById('phone-hint').style.display = '';
+
+  // Timer stoppen
+  if (phoneTimerInterval) { clearInterval(phoneTimerInterval); phoneTimerInterval = null; }
+  phoneStartTime = null;
+
+  // WebRTC aufraumen
+  if (rtcDataChannel) { try { rtcDataChannel.close(); } catch(e) {} rtcDataChannel = null; }
+  if (rtcPeerConnection) { rtcPeerConnection.close(); rtcPeerConnection = null; }
+  if (rtcAudioEl) { rtcAudioEl.srcObject = null; rtcAudioEl = null; }
+
+  // Abort laufende Anfrage (Legacy)
+  if (phoneAbortController) { phoneAbortController.abort(); phoneAbortController = null; }
+
+  // Audio-Queue leeren (Legacy)
+  phoneAudioQueue = [];
+  phoneIsPlayingQueue = false;
+  if (phoneCurrentSource) { try { phoneCurrentSource.stop(); } catch(e) {} phoneCurrentSource = null; }
+  if (phonePlaybackCtx) { phonePlaybackCtx.close().catch(() => {}); phonePlaybackCtx = null; }
+  ttsPlaying = false;
+
+  // Mikrofon aufraumen
+  phoneCleanupMic();
+  haptic();
+}
+
+function phoneCleanupMic() {
+  if (phoneMediaRecorder && phoneMediaRecorder.state !== 'inactive') {
+    try { phoneMediaRecorder.stop(); } catch(e) {}
+  }
+  phoneMediaRecorder = null;
+  if (phoneAudioStream) {
+    phoneAudioStream.getTracks().forEach(t => t.stop());
+    phoneAudioStream = null;
+  }
+  if (phoneAudioContext) {
+    phoneAudioContext.close().catch(() => {});
+    phoneAudioContext = null;
+  }
+  phoneAnalyser = null;
+}
+
+function startPhoneCallLegacy() {
+  // Alte Pipeline: Groq STT -> LLM -> OpenAI TTS (guenstig, ~€0.01 pro Frage)
+  try {
+    phonePlaybackCtx = new (window.AudioContext || window.webkitAudioContext)();
+    phonePlaybackCtx.resume().then(() => {
+      const silent = phonePlaybackCtx.createBuffer(1, 1, 22050);
+      const src = phonePlaybackCtx.createBufferSource();
+      src.buffer = silent;
+      src.connect(phonePlaybackCtx.destination);
+      src.start();
+    }).catch(e => console.log('[Voice] AudioContext resume error:', e.message));
+  } catch(e) { console.error('AudioContext create error:', e); }
+
+  phoneActive = true;
+  const ui = document.getElementById('phone-ui');
+  ui.classList.add('active');
+  const agentName = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+  document.getElementById('phone-agent-label').textContent = agentName;
+  document.getElementById('phone-transcript').innerHTML = '';
+  document.getElementById('phone-status').textContent = 'Verbunden (Eco)';
+  document.getElementById('phone-cost').style.display = 'none';
+  haptic();
+  phoneStartListening();
+}
+
+async function phoneStartListening() {
+  if (!phoneActive) return;
+  const ui = document.getElementById('phone-ui');
+  ui.classList.remove('speaking', 'thinking');
+  ui.classList.add('listening');
+  document.getElementById('phone-status').textContent = 'Hoert zu...';
+
+  try {
+    phoneAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    // AudioContext fuer Lautstaerke-Erkennung
+    phoneAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    await phoneAudioContext.resume();
+    const source = phoneAudioContext.createMediaStreamSource(phoneAudioStream);
+    phoneAnalyser = phoneAudioContext.createAnalyser();
+    phoneAnalyser.fftSize = 512;
+    source.connect(phoneAnalyser);
+
+    // MediaRecorder (iOS = mp4/aac, Chrome = webm/opus)
+    phoneMediaRecorder = new MediaRecorder(phoneAudioStream);
+    phoneAudioChunks = [];
+
+    phoneMediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) phoneAudioChunks.push(e.data);
+    };
+
+    phoneMediaRecorder.onstop = () => {
+      const mimeType = phoneMediaRecorder.mimeType || 'audio/mp4';
+      const blob = new Blob(phoneAudioChunks, { type: mimeType });
+      // Mikrofon sofort freigeben
+      phoneCleanupMic();
+      if (blob.size > 1000) {
+        phoneSendVoice(blob, mimeType);
+      } else {
+        // Zu kurze Aufnahme - nochmal hoeren
+        if (phoneActive) phoneStartListening();
+      }
+    };
+
+    phoneMediaRecorder.start(250); // 250ms Chunks
+
+    // Stille-Erkennung: Wenn nach Sprache 1.5s Stille, aufhoeren
+    let speechDetected = false;
+    let silenceStart = 0;
+    const dataArray = new Uint8Array(phoneAnalyser.frequencyBinCount);
+
+    function checkVolume() {
+      if (!phoneActive || !phoneMediaRecorder || phoneMediaRecorder.state !== 'recording') return;
+      phoneAnalyser.getByteFrequencyData(dataArray);
+      const volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+      if (volume > 12) {
+        speechDetected = true;
+        silenceStart = 0;
+        // Zeige Aktivitaet
+        document.getElementById('phone-status').textContent = 'Hoert zu... \ud83c\udf99\ufe0f';
+      } else if (speechDetected) {
+        if (!silenceStart) silenceStart = Date.now();
+        if (Date.now() - silenceStart > 1500) {
+          // 1.5s Stille nach Sprache -> Aufnahme beenden
+          try { phoneMediaRecorder.stop(); } catch(e) {}
+          return;
+        }
+      }
+      requestAnimationFrame(checkVolume);
+    }
+    requestAnimationFrame(checkVolume);
+
+  } catch (err) {
+    console.error('Mikrofon-Fehler:', err);
+    document.getElementById('phone-status').textContent = 'Mikrofon-Fehler';
+    if (err.name === 'NotAllowedError') {
+      endPhoneCall();
+      alert('Mikrofon-Zugriff verweigert. Bitte erlaube den Zugriff in den Einstellungen.');
+    }
+  }
+}
+
+async function phoneSendVoice(blob, mimeType) {
+  if (!phoneActive) return;
+  const ui = document.getElementById('phone-ui');
+  ui.classList.remove('listening');
+  ui.classList.add('thinking');
+  document.getElementById('phone-status').textContent = 'Erkennt Sprache...';
+
+  const formData = new FormData();
+  const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'wav';
+  formData.append('audio', blob, 'recording.' + ext);
+
+  const model = document.getElementById('setting-model').value;
+  const voice = getSelectedVoice();
+  const url = '/api/voice?agent=' + currentAgent + '&model=' + model + '&session=' + sessionId + '&voice=' + encodeURIComponent(voice) + (demoMode ? '&demo=1' : '');
+
+  phoneAbortController = new AbortController();
+  phoneAudioQueue = [];
+  phoneIsPlayingQueue = false;
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      signal: phoneAbortController.signal
+    });
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+    const transcript = document.getElementById('phone-transcript');
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE Events parsen
+      const events = buffer.split('\n\n');
+      buffer = events.pop(); // unvollstaendiges Event behalten
+
+      for (const eventBlock of events) {
+        const lines = eventBlock.split('\n');
+        let eventType = '';
+        let eventData = '';
+        for (const line of lines) {
+          if (line.startsWith('event: ')) eventType = line.slice(7);
+          if (line.startsWith('data: ')) eventData = line.slice(6);
+        }
+        if (!eventType || !eventData) continue;
+
+        let data;
+        try { data = JSON.parse(eventData); } catch(e) { continue; }
+
+        if (eventType === 'transcript') {
+          // User-Text erkannt
+          transcript.innerHTML += '<div class="pt-user"><div class="pt-label">Du</div>' + escapeHtml(data.text) + '</div>';
+          transcript.scrollTop = transcript.scrollHeight;
+          // Manus-Weiterleitung per Voice?
+          if (MANUS_PATTERNS.test(data.text)) {
+            document.getElementById('phone-status').textContent = 'Verbinde mit Manus...';
+            transcript.innerHTML += '<div class="pt-bot"><div class="pt-label">SYSTEM</div>Mit Manus verbunden - wechsle zum Chat...</div>';
+            phoneHangup();
+            activateManusMode();
+            const ansTime2 = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+            renderMessage('bot', 'Du bist jetzt mit Manus verbunden! \u{1F680}\nSchreib ihm was du brauchst. Sag "Zurueck zu KIM" wenn du fertig bist.', currentAgent, ansTime2, true);
+            openModule('chat');
+            return;
+          }
+          document.getElementById('phone-status').textContent = 'Denkt nach...';
+        }
+        else if (eventType === 'text') {
+          // KI-Antwort-Satz
+          fullText = data.full || fullText;
+          document.getElementById('phone-status').textContent = data.text.slice(0, 60) + (data.text.length > 60 ? '...' : '');
+        }
+        else if (eventType === 'audio') {
+          // Audio-Chunk empfangen -> in Queue
+          phoneAudioQueue.push(data.audio);
+          if (!phoneIsPlayingQueue) {
+            phonePlayNextChunk();
+          }
+        }
+        else if (eventType === 'done') {
+          // Pipeline fertig
+          const agentLabel = currentAgent === 'kim' ? 'KIM' : 'KAI';
+          const displayText = (data.full_text || fullText);
+          transcript.innerHTML += '<div class="pt-bot"><div class="pt-label">' + agentLabel + '</div>' +
+            escapeHtml(displayText.slice(0, 300)) + (displayText.length > 300 ? '...' : '') + '</div>';
+          transcript.scrollTop = transcript.scrollHeight;
+
+          // In Chat-History speichern
+          const now = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+          const userText = transcript.querySelector('.pt-user:last-of-type');
+          history.push({role:'user', content: userText ? userText.textContent.replace('Du','').trim() : '', agent:currentAgent, time:now});
+          history.push({role:'bot', content: data.full_text || fullText, agent:currentAgent, time:now, model: data.model_name || ''});
+          saveHistory();
+        }
+        else if (eventType === 'error') {
+          document.getElementById('phone-status').textContent = 'Fehler: ' + (data.message || 'Unbekannt');
+        }
+      }
+    }
+
+    // Warten bis Audio-Queue fertig abgespielt ist, dann weiter zuhoeren
+    await phoneWaitForQueueDone();
+    ui.classList.remove('thinking', 'speaking');
+    if (phoneActive) phoneStartListening();
+
+  } catch (err) {
+    if (err.name === 'AbortError') return; // User hat aufgelegt
+    console.error('Voice Pipeline Fehler:', err);
+    ui.classList.remove('thinking', 'speaking');
+    document.getElementById('phone-status').textContent = 'Fehler - erneut versuchen';
+    setTimeout(() => { if (phoneActive) phoneStartListening(); }, 2000);
+  }
+}
+
+function b64toArrayBuffer(b64) {
+  const bin = atob(b64);
+  const buf = new ArrayBuffer(bin.length);
+  const arr = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return buf;
+}
+
+async function phonePlayNextChunk() {
+  if (phoneAudioQueue.length === 0) {
+    phoneIsPlayingQueue = false;
+    console.log('[Voice] ','Queue leer, warte auf mehr...');
+    return;
+  }
+  phoneIsPlayingQueue = true;
+  const ui = document.getElementById('phone-ui');
+  ui.classList.remove('thinking');
+  ui.classList.add('speaking');
+  document.getElementById('phone-status').textContent = 'Spricht...';
+
+  const b64 = phoneAudioQueue.shift();
+  const byteSize = Math.round(b64.length * 3 / 4 / 1024);
+  console.log('[Voice] ','Spiele Chunk (' + byteSize + 'KB), Ctx=' + (phonePlaybackCtx ? phonePlaybackCtx.state : 'NULL'));
+
+  // === Methode 1: Web Audio API (primaer) ===
+  try {
+    if (!phonePlaybackCtx || phonePlaybackCtx.state === 'closed') {
+      phonePlaybackCtx = new (window.AudioContext || window.webkitAudioContext)();
+      console.log('[Voice] ','Neuen AudioContext erstellt');
+    }
+    if (phonePlaybackCtx.state === 'suspended') {
+      await phonePlaybackCtx.resume();
+      console.log('[Voice] ','AudioContext resumed: ' + phonePlaybackCtx.state);
+    }
+
+    const arrayBuf = b64toArrayBuffer(b64);
+    console.log('[Voice] ','ArrayBuffer: ' + arrayBuf.byteLength + ' bytes');
+
+    const audioBuf = await phonePlaybackCtx.decodeAudioData(arrayBuf);
+    console.log('[Voice] ','Decoded: ' + audioBuf.duration.toFixed(1) + 's, ' + audioBuf.sampleRate + 'Hz');
+
+    phoneCurrentSource = phonePlaybackCtx.createBufferSource();
+    phoneCurrentSource.buffer = audioBuf;
+    phoneCurrentSource.connect(phonePlaybackCtx.destination);
+    phoneCurrentSource.onended = () => {
+      console.log('[Voice] ','Chunk fertig abgespielt');
+      phoneCurrentSource = null;
+      phonePlayNextChunk();
+    };
+    phoneCurrentSource.start();
+    ttsPlaying = true;
+    console.log('[Voice] ','PLAY gestartet!');
+    return; // Erfolg!
+  } catch(e) {
+    console.log('[Voice] ','WebAudio FEHLER: ' + e.message);
+  }
+
+  // === Methode 2: Fallback auf HTML5 Audio mit Blob URL ===
+  try {
+    console.log('[Voice] ','Versuche HTML5 Audio Fallback...');
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const blob = new Blob([arr], { type: 'audio/mpeg' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    iosUnlockedAudio.onended = () => {
+      URL.revokeObjectURL(blobUrl);
+      console.log('[Voice] ','HTML5 Chunk fertig');
+      phonePlayNextChunk();
+    };
+    iosUnlockedAudio.onerror = (e) => {
+      console.log('[Voice] ','HTML5 Audio Error: ' + (e.message || e.type || 'unknown'));
+      URL.revokeObjectURL(blobUrl);
+      phonePlayNextChunk();
+    };
+    iosUnlockedAudio.src = blobUrl;
+    iosUnlockedAudio.volume = 1.0;
+    await iosUnlockedAudio.play();
+    console.log('[Voice] ','HTML5 PLAY gestartet!');
+  } catch(e2) {
+    console.log('[Voice] ','HTML5 Audio FEHLER: ' + e2.message);
+    phonePlayNextChunk(); // Skip
+  }
+}
+
+function phoneWaitForQueueDone() {
+  return new Promise(resolve => {
+    const check = () => {
+      if (!phoneIsPlayingQueue && phoneAudioQueue.length === 0) {
+        resolve();
+      } else {
+        setTimeout(check, 100);
+      }
+    };
+    check();
+  });
+}
+
+function copyMessage(btn, id) {
+  const msg = btn.closest('.msg');
+  const raw = msg.dataset.rawContent || msg.querySelector('.bubble').innerText;
+  navigator.clipboard.writeText(raw).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Kopiert!';
+    haptic();
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>Kopieren';
+    }, 2000);
+  });
+}
+
+function showTyping() {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div'); div.id = 'typing-indicator'; div.className = 'typing';
+  const label = currentAgent === 'kim' ? 'KIM denkt nach' : 'KAI denkt nach';
+  const agentLabel = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
+  div.innerHTML = `<div class="msg-agent">${agentLabel}</div><div class="typing-bubble"><div class="typing-dots"><span></span><span></span><span></span></div><div class="typing-label">${label}...</div></div>`;
+  container.appendChild(div); scrollToBottom();
+}
+function hideTyping() { const el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+
+function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+function formatMarkdown(text) {
+  let html = escapeHtml(text);
+  // Code blocks (multi-line)
+  html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Bold
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<strong style="font-size:15px;color:#e63946;display:block;margin:8px 0 4px">$1</strong>');
+  html = html.replace(/^## (.+)$/gm, '<strong style="font-size:16px;color:#e63946;display:block;margin:10px 0 6px">$1</strong>');
+  html = html.replace(/^# (.+)$/gm, '<strong style="font-size:18px;color:#e63946;display:block;margin:12px 0 6px">$1</strong>');
+  // Numbered lists
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<div style="padding-left:16px;margin:3px 0"><span style="color:#e63946;font-weight:600">$1.</span> $2</div>');
+  // Bullet lists
+  html = html.replace(/^- (.+)$/gm, '<div style="padding-left:16px;margin:3px 0">\u2022 $1</div>');
+  // Horizontal rule
+  html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #333;margin:10px 0">');
+  // Line breaks
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+function scrollToBottom() { const c = document.getElementById('canvas'); setTimeout(() => c.scrollTop = c.scrollHeight, 50); }
+function saveHistory() { localStorage.setItem('kimanus-history', JSON.stringify(history.slice(-50))); }
+function clearHistory() { history = []; localStorage.removeItem('kimanus-history'); document.getElementById('messages').innerHTML = ''; showHome(); closeSettings(); }
+function openSettings() { document.getElementById('settings-overlay').classList.add('open'); haptic(); }
+function closeSettings(e) { if (e && e.target !== document.getElementById('settings-overlay')) return; document.getElementById('settings-overlay').classList.remove('open'); }
+async function checkHealth() {
+  try { const r = await fetch('/api/health'); if (r.ok) { document.getElementById('server-status').innerHTML = '\u25cf Verbunden'; document.getElementById('server-status').style.color = '#4caf50'; } else throw 0; }
+  catch { document.getElementById('server-status').innerHTML = '\u25cf Offline'; document.getElementById('server-status').style.color = '#e63946'; }
+}
+// === SOS - Stiller Alarm (3x schnell druecken) ===
+let sosPresses = 0;
+let sosTimer = null;
+let sosActive = false;
+
+function sosPress() {
+  sosPresses++;
+  haptic();
+
+  if (sosTimer) clearTimeout(sosTimer);
+
+  if (sosPresses >= 3) {
+    // 3x schnell gedrueckt = STILLER ALARM
+    sosPresses = 0;
+    triggerSOS();
+    return;
+  }
+
+  sosTimer = setTimeout(() => {
+    if (sosPresses < 3) {
+      // Einfacher Klick = SOS Modul oeffnen
+      openModule('sos');
+    }
+    sosPresses = 0;
+  }, 600);
+}
+
+function triggerSOS() {
+  sosActive = !sosActive;
+  const widget = document.getElementById('sos-widget');
+  const icon = widget.querySelector('.widget-icon');
+
+  if (sosActive) {
+    // Stiller Alarm AKTIV
+    icon.style.boxShadow = '0 0 30px rgba(230,57,70,.8), 0 0 60px rgba(230,57,70,.4)';
+    icon.style.animation = 'sosPulse 1s infinite';
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+
+    // Blitz einschalten (wenn verfuegbar)
+    tryFlashlight(true);
+
+    // In SOS-Modul wechseln
+    openModule('sos');
+    const sosContent = document.getElementById('module-sos');
+    sosContent.innerHTML = '<div style="text-align:center;padding-top:10vh">' +
+      '<div style="font-size:64px;animation:sosPulse 1s infinite">SOS</div>' +
+      '<h2 style="font-size:20px;color:#e63946;letter-spacing:4px;margin:16px 0">ALARM AKTIV</h2>' +
+      '<p style="color:#888;font-size:14px;margin:8px 0">Stiller Alarm wurde ausgeloest</p>' +
+      '<p style="color:#555;font-size:12px;margin:16px 0">3x druecken zum Deaktivieren</p>' +
+      '</div>';
+  } else {
+    // Stiller Alarm AUS
+    icon.style.boxShadow = '';
+    icon.style.animation = '';
+    tryFlashlight(false);
+    if (navigator.vibrate) navigator.vibrate(50);
+
+    const sosContent = document.getElementById('module-sos');
+    sosContent.innerHTML = '<div style="text-align:center;padding-top:15vh">' +
+      '<svg width="48" height="48" viewBox="0 0 24 24" fill="#e63946"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>' +
+      '<h2 style="font-size:18px;color:#e63946;letter-spacing:4px;margin:16px 0 8px">SOS</h2>' +
+      '<p style="color:#444;font-size:13px">Notfall & Walkie-Talkie<br>3x schnell druecken = Stiller Alarm</p></div>';
+    showHome();
+  }
+}
+
+async function tryFlashlight(on) {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const track = stream.getVideoTracks()[0];
+    await track.applyConstraints({advanced:[{torch:on}]});
+    if (!on) stream.getTracks().forEach(t => t.stop());
+  } catch(e) { /* Blitz nicht verfuegbar */ }
+}
+
+function haptic() { if (navigator.vibrate) navigator.vibrate(10); }
+</script>
+</body>
+</html>
