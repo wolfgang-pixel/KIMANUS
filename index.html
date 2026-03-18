@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS OS v2.4 - Build 20260318-0100 -->
+<!-- KIMANUS OS v2.5 - Build 20260318-1400 - WhatsApp-Style Input -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -195,8 +195,8 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #app.chat-fullscreen #view-section{padding:0}
 #app.chat-fullscreen #view-label{display:none}
 #app.chat-fullscreen #canvas{border-radius:0;border:none;margin:0;box-shadow:none;padding:8px 10px 14px}
-#app.chat-fullscreen #input-bar{padding:0 0 2px}
-#app.chat-fullscreen .input-bar-frame{border-radius:0;border-left:none;border-right:none;border-bottom:none;padding:6px 10px}
+#app.chat-fullscreen #input-bar{padding:0}
+#app.chat-fullscreen .input-bar-frame{padding:6px 10px}
 /* Chat top bar (WhatsApp header) */
 #chat-header{
   display:none;flex-shrink:0;
@@ -249,16 +249,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .typing-dots span:nth-child(3){animation-delay:.4s}
 @keyframes typingPulse{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
 .typing-label{font-size:11px;color:#555;letter-spacing:1px}
-/* Copy button */
-.copy-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#666;font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
-.copy-btn:hover,.copy-btn:active{color:#e63946;border-color:#e63946}
-.copy-btn.copied{color:#4caf50;border-color:#4caf50}
-.copy-btn svg{width:12px;height:12px;fill:currentColor}
-/* TTS button */
-.tts-btn{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 8px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#666;cursor:pointer;transition:all .2s}
-.tts-btn:hover,.tts-btn:active{color:#4fc3f7;border-color:#4fc3f7}
-.tts-btn.tts-playing{color:#4fc3f7;border-color:#4fc3f7;animation:ttsPulse 1.2s infinite}
-@keyframes ttsPulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* (Copy/TTS buttons removed - clean chat like WhatsApp) */
 /* TTS/Phone toggle in chat header */
 .ch-toggle{width:28px;height:28px;border-radius:50%;border:1px solid #333;background:#1a1a1a;color:#555;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
 .ch-toggle.active{color:#4fc3f7;border-color:#4fc3f7;background:#1a2a3a}
@@ -308,22 +299,35 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #input-bar{display:none;flex-shrink:0;padding:4px 6px 6px}
 #input-bar.active{display:block}
 .input-bar-frame{
-  display:flex;align-items:center;gap:8px;padding:6px 8px;
-  background:linear-gradient(180deg,#444 0%,#363636 30%,#3a3a3a 70%,#404040 100%);
-  border-radius:10px;border:1px solid #555;
-  box-shadow:0 4px 16px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.3);
+  display:flex;align-items:flex-end;gap:6px;padding:6px 8px;
+  background:linear-gradient(180deg,#2a2a2a 0%,#222 100%);
+  border-radius:0;border:none;border-top:1px solid #333;
+  box-shadow:0 -2px 8px rgba(0,0,0,.3);
 }
 .input-wrap{
-  flex:1;position:relative;display:flex;align-items:center;
-}
-#chat-input{
-  flex:1;padding:10px 42px 10px 14px;border-radius:18px;border:1px solid #2a2a2a;
+  flex:1;display:flex;align-items:flex-end;
   background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
-  color:#e0e0e0;font-size:15px;outline:none;
-  box-shadow:inset 0 3px 8px rgba(0,0,0,.7),inset 0 1px 2px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.04);
+  border-radius:22px;border:1px solid #2a2a2a;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.04);
+  padding:0 6px;
   transition:border-color .2s;
+}
+.input-wrap:focus-within{border-color:#c62828;box-shadow:inset 0 2px 6px rgba(0,0,0,.5),0 0 8px rgba(230,57,70,.15)}
+/* Plus button (attachments) */
+.input-action-btn{
+  width:34px;height:34px;border-radius:50%;border:none;
+  background:transparent;color:#666;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.input-action-btn:active{transform:scale(.9);color:#e63946}
+.input-action-btn svg{width:20px;height:20px;fill:currentColor}
+#chat-input{
+  flex:1;padding:8px 4px;border:none;
+  background:transparent;
+  color:#e0e0e0;font-size:15px;outline:none;
   overflow-y:auto;
-  min-height:40px;max-height:120px;
+  min-height:36px;max-height:120px;
   line-height:1.4;
   font-family:inherit;
   color-scheme:dark;
@@ -332,28 +336,35 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   -webkit-user-modify:read-write-plaintext-only;
   word-break:break-word;white-space:pre-wrap;
 }
-#chat-input:focus{border-color:#c62828;box-shadow:inset 0 3px 8px rgba(0,0,0,.7),0 0 8px rgba(230,57,70,.2)}
 #chat-input:empty::before{content:attr(data-placeholder);color:#555;font-size:14px;pointer-events:none}
+/* Camera button inside input wrap */
+#cam-btn{
+  width:34px;height:34px;border-radius:50%;border:none;
+  background:transparent;color:#666;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+#cam-btn:active{transform:scale(.9);color:#e63946}
+/* Mic button (right side, outside input wrap) */
 #mic-btn{
-  position:absolute;right:6px;top:50%;transform:translateY(-50%);
-  width:32px;height:32px;border-radius:50%;border:none;
-  background:transparent;color:#666;cursor:pointer;
+  width:40px;height:40px;border-radius:50%;border:none;
+  background:transparent;color:#666;cursor:pointer;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:all .2s;z-index:2;
+  transition:all .2s;
 }
-#mic-btn:active{transform:translateY(-50%) scale(.9)}
+#mic-btn:active{transform:scale(.9)}
 #mic-btn.recording{color:#e63946;animation:recPulse 1s infinite}
+/* Send button (replaces mic when text present) */
 #send-btn{
-  width:44px;height:44px;border-radius:50%;border:none;
-  background:linear-gradient(135deg,#d43040 0%,#a01828 50%,#881020 100%);
+  width:40px;height:40px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);
   color:#fff;cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 16px rgba(230,57,70,.45),2px 3px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 4px rgba(0,0,0,.3);
-  transition:all .15s;position:relative;
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(46,125,50,.4);
+  transition:all .15s;
 }
-#send-btn::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.15),transparent 60%)}
-#send-btn:active{transform:scale(.92);box-shadow:0 0 20px rgba(230,57,70,.6),1px 2px 4px rgba(0,0,0,.5)}
-#send-btn svg{position:relative;z-index:1}
+#send-btn:active{transform:scale(.92)}
+#send-btn svg{width:18px;height:18px;fill:currentColor}
 @keyframes recPulse{0%{box-shadow:0 0 16px rgba(230,57,70,.5)}50%{box-shadow:0 0 30px rgba(230,57,70,.8),0 0 50px rgba(230,57,70,.3)}100%{box-shadow:0 0 16px rgba(230,57,70,.5)}}
 #rec-timer{display:none;align-items:center;gap:6px;color:#e63946;font-size:13px;letter-spacing:1px;font-weight:500}
 #rec-timer.active{display:flex}
@@ -649,18 +660,24 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     </div>
   </div>
 
-  <!-- INPUT BAR -->
+  <!-- INPUT BAR (WhatsApp-Style) -->
   <div id="input-bar">
     <div class="input-bar-frame">
+      <button class="input-action-btn" id="plus-btn" onclick="handlePlusBtn()" title="Anhaenge">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
       <div class="input-wrap">
         <div id="chat-input" contenteditable="plaintext-only" role="textbox" enterkeyhint="send" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" aria-placeholder="Nachricht eingeben..." data-placeholder="Nachricht eingeben..."></div>
-        <button id="mic-btn" onclick="handleMicBtn()" title="Spracheingabe">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        <button id="cam-btn" onclick="handleCamBtn()" title="Kamera">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
         </button>
       </div>
       <div id="rec-timer"><span class="rec-dot"></span><span id="rec-time">0:00</span></div>
+      <button id="mic-btn" onclick="handleMicBtn()" title="Spracheingabe">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      </button>
       <button id="send-btn" onclick="sendMessage()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="position:relative;z-index:1"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
   </div>
@@ -1151,17 +1168,52 @@ async function saveVideoAnalysis() {
 }
 
 function updateSendBtn() {
-  // Mic-Button im Feld ausblenden wenn Text vorhanden
+  // WhatsApp-Style: Text vorhanden -> Send-Button, sonst Mic-Button
   const micBtn = document.getElementById('mic-btn');
-  if (!micBtn) return;
-  if (getInputText().length > 0) {
+  const sendBtn = document.getElementById('send-btn');
+  const camBtn = document.getElementById('cam-btn');
+  if (!micBtn || !sendBtn) return;
+  const hasText = getInputText().length > 0;
+  if (hasText || isRecording) {
     micBtn.style.display = 'none';
+    sendBtn.style.display = 'flex';
+    if (camBtn) camBtn.style.display = 'none';
   } else {
-    // Verzoegert einblenden damit kein versehentlicher Tap
+    sendBtn.style.display = 'none';
+    if (camBtn) camBtn.style.display = 'flex';
     setTimeout(() => {
       if (getInputText().length === 0 && !isRecording) micBtn.style.display = 'flex';
     }, 300);
   }
+}
+
+// Plus-Button (Anhaenge - zukuenftig Dateien, Standort etc.)
+function handlePlusBtn() {
+  haptic();
+  // Placeholder: KIM fragt was geteilt werden soll
+  const input = document.getElementById('chat-input');
+  input.textContent = '';
+  input.focus();
+  // Zukuenftig: Attachment-Menue oeffnen
+  alert('Anhaenge kommen bald!\nFotos, Dateien, Standort...');
+}
+
+// Kamera-Button
+function handleCamBtn() {
+  haptic();
+  // Foto aufnehmen oder aus Galerie
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.capture = 'environment';
+  fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Zukuenftig: Bild an KIM senden
+      alert('Bildanalyse kommt bald!\n' + file.name);
+    }
+  };
+  fileInput.click();
 }
 
 let micBtnCooldown = false;

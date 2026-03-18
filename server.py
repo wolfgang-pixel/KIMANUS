@@ -973,7 +973,9 @@ async def handle_profile(request):
 
 
 async def handle_manus_chat(request):
-    """POST /api/manus - Sendet eine Nachricht an Manus (OpenClaw Agent) via Docker API."""
+    """POST /api/manus - Sendet eine Nachricht an einen OpenClaw Agent via Docker API.
+    Unterstuetzte Agents: main (Manus), kim, kai
+    """
     try:
         data = await request.json()
     except:
@@ -981,15 +983,19 @@ async def handle_manus_chat(request):
 
     message = data.get("message", "").strip()
     session_id = data.get("session_id", "")
+    agent_id = data.get("agent", "main")  # Default: Manus (main)
+    # Nur erlaubte Agents
+    if agent_id not in ("main", "kim", "kai"):
+        agent_id = "main"
     if not message:
         return web.json_response({"error": "Keine Nachricht"}, status=400)
 
     try:
-        log.info(f"Manus-Anfrage: {message[:80]}...")
+        log.info(f"Agent [{agent_id}] Anfrage: {message[:80]}...")
 
         # Docker API via Unix Socket: exec create + start
         import aiohttp
-        cmd_parts = ["openclaw", "agent", "--agent", "main",
+        cmd_parts = ["openclaw", "agent", "--agent", agent_id,
                      "--message", message, "--json", "--timeout", "120"]
         if session_id:
             cmd_parts.extend(["--session-id", session_id])
