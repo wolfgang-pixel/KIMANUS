@@ -876,8 +876,8 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
             <button onclick="phoneSelectAgent('manus')" style="padding:10px 20px;border-radius:20px;border:2px solid #e8d4b4;background:#2a2a1a;color:#e8d4b4;cursor:pointer;font-size:14px;font-weight:bold;letter-spacing:2px;-webkit-tap-highlight-color:transparent" id="phone-btn-manus">MANUS</button>
           </div>
           <div style="display:flex;gap:6px;justify-content:center;margin:8px 0 4px">
-            <button onclick="setPhoneMode('premium')" id="phone-mode-premium" style="padding:6px 14px;border-radius:14px;border:2px solid #50dc78;background:#1a2a1a;color:#50dc78;cursor:pointer;font-size:11px;font-weight:bold;letter-spacing:1px;-webkit-tap-highlight-color:transparent">PREMIUM</button>
-            <button onclick="setPhoneMode('realtime')" id="phone-mode-realtime" style="padding:6px 14px;border-radius:14px;border:2px solid #666;background:#1a1a1a;color:#888;cursor:pointer;font-size:11px;font-weight:bold;letter-spacing:1px;-webkit-tap-highlight-color:transparent">REALTIME</button>
+            <button onclick="setPhoneTtsMode('premium')" id="phone-mode-premium" style="padding:6px 14px;border-radius:14px;border:2px solid #50dc78;background:#1a2a1a;color:#50dc78;cursor:pointer;font-size:11px;font-weight:bold;letter-spacing:1px;-webkit-tap-highlight-color:transparent">PREMIUM</button>
+            <button onclick="setPhoneTtsMode('realtime')" id="phone-mode-realtime" style="padding:6px 14px;border-radius:14px;border:2px solid #666;background:#1a1a1a;color:#888;cursor:pointer;font-size:11px;font-weight:bold;letter-spacing:1px;-webkit-tap-highlight-color:transparent">REALTIME</button>
           </div>
           <div id="phone-mode-info" style="font-size:9px;color:#555;letter-spacing:1px;text-align:center;margin-bottom:6px">ELEVENLABS · Deutsche Stimmen · Beste Qualität</div>
           <div id="phone-agent-label">KIM · Laura (warm, freundlich)</div>
@@ -2542,7 +2542,7 @@ function phoneSelectAgent(agent) {
 }
 
 // Demo-Button Zustand beim Laden setzen
-document.addEventListener('DOMContentLoaded', () => { updateDemoUI(); setPhoneMode(phoneMode); });
+document.addEventListener('DOMContentLoaded', () => { updateDemoUI(); setPhoneTtsMode(phoneTtsMode); });
 
 // === TELEFON-MODUL (Voice Pipeline: Groq Whisper + Streaming LLM + Chunked TTS) ===
 let phoneActive = false;
@@ -2565,10 +2565,10 @@ const COST_PER_MINUTE = 0.28; // ~€0.28 pro Minute
 let phoneTotalCost = parseFloat(localStorage.getItem('kimanus-voice-cost') || '0');
 
 // Telefon-Modus: "premium" (ElevenLabs Pipeline) oder "realtime" (OpenAI WebRTC)
-let phoneMode = localStorage.getItem('kimanus-phone-mode') || 'premium';
+let phoneTtsMode = localStorage.getItem('kimanus-phone-mode') || 'premium';
 
-function setPhoneMode(mode) {
-  phoneMode = mode;
+function setPhoneTtsMode(mode) {
+  phoneTtsMode = mode;
   localStorage.setItem('kimanus-phone-mode', mode);
   const btnPremium = document.getElementById('phone-mode-premium');
   const btnRealtime = document.getElementById('phone-mode-realtime');
@@ -2609,7 +2609,7 @@ let phoneCurrentSource = null;
 async function startPhoneCall() {
   // Premium = ElevenLabs Pipeline (STT -> LLM -> ElevenLabs TTS)
   // Realtime = OpenAI WebRTC (Echtzeit-Dialog)
-  if (phoneMode === 'premium') {
+  if (phoneTtsMode === 'premium') {
     startPhoneCallLegacy();
     return;
   }
@@ -2951,7 +2951,7 @@ async function phoneSendVoice(blob, mimeType) {
 
   const model = document.getElementById('setting-model').value;
   const voice = getSelectedVoice();
-  const ttsEngine = (phoneMode === 'premium') ? '&tts=elevenlabs' : '';
+  const ttsEngine = (phoneTtsMode === 'premium') ? '&tts=elevenlabs' : '';
   const url = '/api/voice?agent=' + currentAgent + '&model=' + model + '&session=' + sessionId + '&voice=' + encodeURIComponent(voice) + (demoMode ? '&demo=1' : '') + ttsEngine;
 
   phoneAbortController = new AbortController();
