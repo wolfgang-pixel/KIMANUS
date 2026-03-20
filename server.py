@@ -718,8 +718,8 @@ async def tts_edge(text, voice):
         return None
 
 
-async def tts_chunk(text, voice, agent="kai", demo=False):
-    """Generiert MP3 - OpenAI TTS wenn verfuegbar, sonst Edge TTS."""
+async def tts_chunk(text, voice, agent="kai", demo=False, force_engine=""):
+    """Generiert MP3 - ElevenLabs/Grok/OpenAI/Edge je nach Prioritaet."""
     # Markdown/Sonderzeichen entfernen
     clean = re.sub(r'[*_#`~\[\]()>|]', '', text)
     clean = re.sub(r'https?://\S+', 'Link', clean)
@@ -727,7 +727,16 @@ async def tts_chunk(text, voice, agent="kai", demo=False):
     if not clean or len(clean) < 2:
         return None
 
-    # Stimmen-Strategie:
+    # Premium-Modus: ElevenLabs fuer ALLE Agents erzwingen
+    if force_engine == "elevenlabs" and ELEVENLABS_API_KEY and agent in ELEVENLABS_VOICES:
+        voice_id = ELEVENLABS_VOICES[agent]
+        result = await tts_elevenlabs(clean, voice_id, agent)
+        if result:
+            log.info(f"TTS [PREMIUM/ElevenLabs] fuer {agent.upper()}")
+            return result
+        log.warning(f"ElevenLabs TTS fehlgeschlagen fuer {agent}, Fallback...")
+
+    # Standard-Strategie:
     # KIM = Grok TTS "ara" (weiblich, warm - klingt super auf Deutsch)
     # KAI/MANUS = ElevenLabs (Premium deutsche Maennerstimmen)
     # Fallback: OpenAI > Edge
@@ -806,6 +815,7 @@ async def handle_voice(request):
     session_id = request.query.get("session", "default")
     voice_override = request.query.get("voice", "")  # Optionale Stimmen-Wahl
     demo_mode = request.query.get("demo", "") == "1"
+    tts_override = request.query.get("tts", "")  # Optional: elevenlabs erzwingen
 
     log.info(f"Voice [{agent.upper()}]: {len(audio_bytes)} bytes Audio empfangen")
 
@@ -935,7 +945,7 @@ async def handle_voice(request):
                     await send_sse("text", {"text": s, "full": full_text})
 
                     # TTS fuer diesen Satz generieren
-                    audio = await tts_chunk(s, voice, agent, demo_mode)
+                    audio = await tts_chunk(s, voice, agent, demo_mode, tts_override)
                     if audio:
                         b64 = base64.b64encode(audio).decode("ascii")
                         await send_sse("audio", {"audio": b64, "index": chunk_index})
@@ -948,7 +958,7 @@ async def handle_voice(request):
         remaining = sentence_buffer.strip()
         if remaining and len(remaining) >= 3:
             await send_sse("text", {"text": remaining, "full": full_text})
-            audio = await tts_chunk(remaining, voice, agent, demo_mode)
+            audio = await tts_chunk(remaining, voice, agent, demo_mode, tts_override)
             if audio:
                 b64 = base64.b64encode(audio).decode("ascii")
                 await send_sse("audio", {"audio": b64, "index": chunk_index})
