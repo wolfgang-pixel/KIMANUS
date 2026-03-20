@@ -599,10 +599,10 @@ async def tts_elevenlabs(text, voice_id, agent="kai"):
                     "text": text,
                     "model_id": ELEVENLABS_MODEL,
                     "voice_settings": {
-                        "stability": 0.5,
-                        "similarity_boost": 0.75,
-                        "style": 0.3,
-                        "use_speaker_boost": True
+                        "stability": 0.82,
+                        "similarity_boost": 0.65,
+                        "style": 0.0,
+                        "use_speaker_boost": False
                     }
                 },
                 timeout=ClientTimeout(total=30)
@@ -882,11 +882,11 @@ async def handle_voice(request):
         base_prompt = SYSTEM_PROMPTS.get(agent, SYSTEM_PROMPTS["kai"])
         voice_instruction = (
             "\n\nDu bist jetzt am TELEFON. Wichtige Regeln:"
-            "\n- Sprich natuerlich und warmherzig, wie in einem echten Gespraech"
-            "\n- Halte Antworten kurz (1-3 Saetze), aber freundlich"
-            "\n- Kein Markdown, keine Sonderzeichen, keine Listen"
-            "\n- Sei genauso persoenlich und vertraut wie im Chat"
-            "\n- Antworte so, wie du einem guten Freund am Telefon antworten wuerdest"
+            "\n- Sprich natuerlich und ruhig, wie in einem normalen Gespraech"
+            "\n- Halte Antworten kurz (1-3 Saetze)"
+            "\n- Kein Markdown, keine Sonderzeichen, keine Listen, keine Emojis"
+            "\n- Nicht uebertrieben betonen, nicht dramatisch, nicht singsang"
+            "\n- Einfach normal reden, sachlich und locker"
         )
         # Datum/Uhrzeit + Wetter immer mitgeben
         datetime_info = get_datetime_info()
