@@ -1027,10 +1027,12 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
                 <button onclick="searchVideos()" style="padding:9px 0;background:linear-gradient(135deg,#333,#222);border:1px solid #444;border-radius:8px;color:#ccc;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;width:110px;text-align:center">&#x1f50d; SUCHE</button>
               </div>
               <!-- Analysezeile -->
-              <div style="display:flex;gap:6px">
+              <div style="display:flex;gap:6px;margin-bottom:6px">
                 <input id="video-url-input" type="url" placeholder="YouTube URL analysieren..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')analyzeVideo()">
                 <button onclick="analyzeVideo()" style="padding:9px 0;background:linear-gradient(135deg,#c62828,#8b0000);border:1px solid #8b0000;border-radius:8px;color:#fff;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 8px rgba(198,40,40,.3);width:110px;text-align:center">&#x1f3ac; ANALYSE</button>
               </div>
+              <!-- Bibliothek-Button -->
+              <button onclick="loadVideoLibrary()" style="width:100%;padding:9px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#4caf50;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer">&#x1f4da; MEINE BIBLIOTHEK</button>
             </div>
           </div>
         </div>
@@ -1508,12 +1510,26 @@ async function analyzeVideo() {
     let html = '';
     html += '<div style="font-size:16px;font-weight:600;color:#e0e0e0;margin-bottom:4px">' + (data.title || '') + '</div>';
     html += '<div style="font-size:11px;color:#666;margin-bottom:12px">' + (data.channel || '') + ' &middot; ' + (data.duration || '') + ' &middot; ' + (data.elapsed_seconds || '?') + 's Analyse</div>';
-    html += '<div style="font-size:14px;line-height:1.7;color:#ccc">' + markdownToHtml(data.analysis || 'Keine Analyse') + '</div>';
 
-    // Speichern + Chat-Nachfrage Buttons
-    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #222;display:flex;gap:8px">';
-    html += '<button onclick="saveVideoAnalysis()" id="video-save-btn" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#4caf50;font-size:13px;cursor:pointer;letter-spacing:1px">&#x1f4be; SPEICHERN</button>';
-    html += '<button onclick="videoChat()" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#999;font-size:13px;cursor:pointer;letter-spacing:1px">&#x1f4ac; NACHFRAGE</button>';
+    // Analyse-Text mit klickbaren Timestamps rendern
+    let analysisHtml = markdownToHtml(data.analysis || 'Keine Analyse');
+    // Timestamps MM:SS oder HH:MM:SS klickbar machen
+    if (vidId) {
+      analysisHtml = analysisHtml.replace(/(\d{1,2}:\d{2}(?::\d{2})?)/g, function(match) {
+        const parts = match.split(':').map(Number);
+        let secs = 0;
+        if (parts.length === 3) secs = parts[0]*3600 + parts[1]*60 + parts[2];
+        else secs = parts[0]*60 + parts[1];
+        return '<a href="#" onclick="event.preventDefault();jumpToVideoTime(\'' + vidId + '\',' + secs + ')" style="color:#e63946;text-decoration:none;border-bottom:1px dotted #e63946">' + match + '</a>';
+      });
+    }
+    html += '<div style="font-size:14px;line-height:1.7;color:#ccc">' + analysisHtml + '</div>';
+
+    // Buttons: Speichern + Nachfrage + Vorlesen
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #222;display:flex;gap:6px;flex-wrap:wrap">';
+    html += '<button onclick="saveVideoAnalysis()" id="video-save-btn" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#4caf50;font-size:12px;cursor:pointer;letter-spacing:1px;min-width:90px">&#x1f4be; SPEICHERN</button>';
+    html += '<button onclick="videoChat()" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#999;font-size:12px;cursor:pointer;letter-spacing:1px;min-width:90px">&#x1f4ac; FRAGE</button>';
+    html += '<button onclick="speakVideoAnalysis()" id="video-tts-btn" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;cursor:pointer;letter-spacing:1px;min-width:90px">&#x1f50a; VORLESEN</button>';
     html += '</div>';
 
     // Analysedaten fuer Speichern merken
@@ -1574,6 +1590,149 @@ async function saveVideoAnalysis() {
     btn.style.color = '#e63946';
   }
   haptic();
+}
+
+// YouTube Player zu bestimmtem Timestamp springen
+function jumpToVideoTime(vidId, secs) {
+  const area = document.getElementById('video-player-area');
+  const iframeContainer = document.getElementById('video-iframe-container');
+  const thumbContainer = document.getElementById('video-thumb-container');
+  const iframe = document.getElementById('video-player-iframe');
+  // Player oeffnen mit Startzeit
+  thumbContainer.style.display = 'none';
+  iframe.src = 'https://www.youtube.com/embed/' + vidId + '?autoplay=1&start=' + secs + '&rel=0&enablejsapi=1';
+  iframeContainer.style.display = 'block';
+  area.style.display = 'block';
+  // Zum Player hoch scrollen
+  area.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+// Video-Analyse per ElevenLabs TTS vorlesen
+let _videoTtsAudio = null;
+let _videoTtsPlaying = false;
+async function speakVideoAnalysis() {
+  const btn = document.getElementById('video-tts-btn');
+  if (!btn) return;
+  // Toggle: wenn gerade spielt, stoppen
+  if (_videoTtsPlaying && _videoTtsAudio) {
+    _videoTtsAudio.pause();
+    _videoTtsAudio.currentTime = 0;
+    _videoTtsPlaying = false;
+    btn.innerHTML = '&#x1f50a; VORLESEN';
+    btn.style.color = '#888';
+    return;
+  }
+  if (!window._lastVideoAnalysis || !window._lastVideoAnalysis.analysis) return;
+  btn.innerHTML = '&#x23F3; WIRD GELADEN...';
+  btn.style.color = '#e63946';
+  try {
+    const resp = await fetch('/api/tts', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text: window._lastVideoAnalysis.analysis, agent: 'kim'})
+    });
+    if (!resp.ok) throw new Error('TTS fehlgeschlagen');
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    _videoTtsAudio = new Audio(url);
+    _videoTtsPlaying = true;
+    btn.innerHTML = '&#x23F9; STOPPEN';
+    btn.style.color = '#e63946';
+    _videoTtsAudio.play();
+    _videoTtsAudio.onended = function() {
+      _videoTtsPlaying = false;
+      btn.innerHTML = '&#x1f50a; VORLESEN';
+      btn.style.color = '#888';
+      URL.revokeObjectURL(url);
+    };
+  } catch(e) {
+    btn.innerHTML = '&#x274c; FEHLER';
+    btn.style.color = '#e63946';
+    setTimeout(function(){ btn.innerHTML = '&#x1f50a; VORLESEN'; btn.style.color = '#888'; }, 2000);
+  }
+}
+
+// Video-Bibliothek laden und anzeigen
+async function loadVideoLibrary() {
+  const resultsDiv = document.getElementById('video-search-results');
+  const resultDiv = document.getElementById('video-result');
+  resultsDiv.style.display = 'block';
+  resultDiv.innerHTML = '';
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:20px 0"><div style="font-size:20px;margin-bottom:8px;animation:spin 1s linear infinite;display:inline-block">&#x1f4da;</div><p style="color:#666;font-size:12px">Bibliothek wird geladen...</p></div>';
+  try {
+    const resp = await fetch('/api/video-list');
+    if (!resp.ok) throw new Error('Laden fehlgeschlagen');
+    const data = await resp.json();
+    if (!data.videos || data.videos.length === 0) {
+      resultsDiv.innerHTML = '<p style="color:#666;text-align:center;padding:16px">Noch keine Videos gespeichert</p>';
+      return;
+    }
+    let html = '<div style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">&#x1f4da; BIBLIOTHEK &middot; ' + data.videos.length + ' GESPEICHERT</div>';
+    data.videos.forEach(function(v) {
+      const vidId = extractVideoId(v.url || '');
+      const thumb = vidId ? 'https://img.youtube.com/vi/' + vidId + '/mqdefault.jpg' : '';
+      html += '<div style="display:flex;gap:10px;padding:8px;margin-bottom:6px;background:#1a1a1a;border:1px solid #222;border-radius:8px;cursor:pointer" onclick="loadSavedVideo(\'' + encodeURIComponent(v.filename) + '\')">';
+      if (thumb) {
+        html += '<div style="flex-shrink:0;width:120px;height:68px;border-radius:6px;overflow:hidden;background:#111">';
+        html += '<img src="' + thumb + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">';
+        html += '</div>';
+      }
+      html += '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">';
+      html += '<div style="font-size:13px;font-weight:500;color:#ddd;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + (v.title || 'Unbekannt') + '</div>';
+      html += '<div style="font-size:10px;color:#666;margin-top:3px">' + (v.channel || '') + ' &middot; ' + (v.date || '') + '</div>';
+      html += '</div>';
+      html += '<div style="display:flex;align-items:center"><div style="color:#4caf50;font-size:10px;white-space:nowrap">&#x2705;</div></div>';
+      html += '</div>';
+    });
+    resultsDiv.innerHTML = html;
+  } catch(e) {
+    resultsDiv.innerHTML = '<p style="color:#e63946;padding:8px">Fehler: ' + e.message + '</p>';
+  }
+}
+
+// Gespeichertes Video laden und Analyse anzeigen
+async function loadSavedVideo(encodedFilename) {
+  const filename = decodeURIComponent(encodedFilename);
+  const resultDiv = document.getElementById('video-result');
+  resultDiv.innerHTML = '<div style="text-align:center;padding:20px 0"><div style="font-size:20px;animation:spin 1s linear infinite;display:inline-block">&#x1f4c4;</div></div>';
+  try {
+    const resp = await fetch('/api/video-load?file=' + encodeURIComponent(filename));
+    if (!resp.ok) throw new Error('Laden fehlgeschlagen');
+    const data = await resp.json();
+
+    const vidId = extractVideoId(data.url || '');
+    if (vidId) showVideoThumb(vidId, '');
+    document.getElementById('video-url-input').value = data.url || '';
+
+    let html = '';
+    html += '<div style="font-size:16px;font-weight:600;color:#e0e0e0;margin-bottom:4px">' + (data.title || '') + '</div>';
+    html += '<div style="font-size:11px;color:#666;margin-bottom:12px">' + (data.channel || '') + ' &middot; ' + (data.duration || '') + ' &middot; &#x2705; Gespeichert</div>';
+
+    let analysisHtml = markdownToHtml(data.analysis || '');
+    if (vidId) {
+      analysisHtml = analysisHtml.replace(/(\d{1,2}:\d{2}(?::\d{2})?)/g, function(match) {
+        const parts = match.split(':').map(Number);
+        let secs = 0;
+        if (parts.length === 3) secs = parts[0]*3600 + parts[1]*60 + parts[2];
+        else secs = parts[0]*60 + parts[1];
+        return '<a href="#" onclick="event.preventDefault();jumpToVideoTime(\'' + vidId + '\',' + secs + ')" style="color:#e63946;text-decoration:none;border-bottom:1px dotted #e63946">' + match + '</a>';
+      });
+    }
+    html += '<div style="font-size:14px;line-height:1.7;color:#ccc">' + analysisHtml + '</div>';
+
+    html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #222;display:flex;gap:6px;flex-wrap:wrap">';
+    html += '<button onclick="speakVideoAnalysis()" id="video-tts-btn" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#888;font-size:12px;cursor:pointer;letter-spacing:1px;min-width:90px">&#x1f50a; VORLESEN</button>';
+    html += '<button onclick="videoChat()" style="flex:1;padding:10px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#999;font-size:12px;cursor:pointer;letter-spacing:1px;min-width:90px">&#x1f4ac; FRAGE</button>';
+    html += '</div>';
+
+    window._lastVideoAnalysis = {title: data.title||'', channel: data.channel||'', duration: data.duration||'', url: data.url||'', analysis: data.analysis||'', date: data.date||''};
+    resultDiv.dataset.videoUrl = data.url || '';
+    resultDiv.innerHTML = html;
+    // Suchergebnisse ausblenden
+    document.getElementById('video-search-results').style.display = 'none';
+  } catch(e) {
+    resultDiv.innerHTML = '<p style="color:#e63946">Fehler: ' + e.message + '</p>';
+  }
 }
 
 function updateSendBtn() {

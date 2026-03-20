@@ -1479,6 +1479,100 @@ async def handle_video_save(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
+async def handle_video_list(request):
+    """GET /api/video-list - Liste aller gespeicherten Video-Analysen."""
+    save_dir = os.path.join(WORKSPACE, "video-analysen")
+    if not os.path.isdir(save_dir):
+        return web.json_response({"videos": []})
+
+    videos = []
+    for fname in sorted(os.listdir(save_dir), reverse=True):
+        if not fname.endswith(".md"):
+            continue
+        fpath = os.path.join(save_dir, fname)
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                content = f.read(2000)  # Nur Header lesen
+            title = ""
+            channel = ""
+            url = ""
+            duration = ""
+            date_str = ""
+            for line in content.split("\n"):
+                if line.startswith("# ") and not title:
+                    title = line[2:].strip()
+                elif line.startswith("- **Kanal:**"):
+                    channel = line.split("**Kanal:**")[1].strip()
+                elif line.startswith("- **URL:**"):
+                    url = line.split("**URL:**")[1].strip()
+                elif line.startswith("- **Dauer:**"):
+                    duration = line.split("**Dauer:**")[1].strip()
+                elif line.startswith("- **Analysiert:**"):
+                    date_str = line.split("**Analysiert:**")[1].strip()
+            videos.append({
+                "filename": fname,
+                "title": title,
+                "channel": channel,
+                "url": url,
+                "duration": duration,
+                "date": date_str
+            })
+        except Exception as e:
+            log.warning(f"Video-Liste: Fehler bei {fname}: {e}")
+    return web.json_response({"videos": videos})
+
+
+async def handle_video_load(request):
+    """GET /api/video-load?file=... - Einzelne gespeicherte Video-Analyse laden."""
+    filename = request.query.get("file", "")
+    if not filename or ".." in filename or "/" in filename or "\\" in filename:
+        return web.json_response({"error": "Ungueltige Datei"}, status=400)
+
+    fpath = os.path.join(WORKSPACE, "video-analysen", filename)
+    if not os.path.isfile(fpath):
+        return web.json_response({"error": "Datei nicht gefunden"}, status=404)
+
+    try:
+        with open(fpath, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Markdown parsen
+        title = ""
+        channel = ""
+        url = ""
+        duration = ""
+        date_str = ""
+        analysis = ""
+        in_analysis = False
+
+        for line in content.split("\n"):
+            if line.startswith("# ") and not title:
+                title = line[2:].strip()
+            elif line.startswith("- **Kanal:**"):
+                channel = line.split("**Kanal:**")[1].strip()
+            elif line.startswith("- **URL:**"):
+                url = line.split("**URL:**")[1].strip()
+            elif line.startswith("- **Dauer:**"):
+                duration = line.split("**Dauer:**")[1].strip()
+            elif line.startswith("- **Analysiert:**"):
+                date_str = line.split("**Analysiert:**")[1].strip()
+            elif line.startswith("## Analyse"):
+                in_analysis = True
+            elif in_analysis:
+                analysis += line + "\n"
+
+        return web.json_response({
+            "title": title,
+            "channel": channel,
+            "url": url,
+            "duration": duration,
+            "date": date_str,
+            "analysis": analysis.strip()
+        })
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+
 async def handle_realtime_session(request):
     """POST /api/realtime/session - Erstellt einen ephemeral Token fuer WebRTC.
 
@@ -1587,6 +1681,8 @@ def create_app():
     app.router.add_post("/api/profile/sync", handle_profile_sync)
     app.router.add_post("/api/manus", handle_manus_chat)
     app.router.add_post("/api/video-save", handle_video_save)
+    app.router.add_get("/api/video-list", handle_video_list)
+    app.router.add_get("/api/video-load", handle_video_load)
     app.router.add_post("/api/realtime/session", handle_realtime_session)
     app.router.add_post("/api/video-analyze", handle_video_analyze)
     app.router.add_post("/api/video-chat", handle_video_chat)
