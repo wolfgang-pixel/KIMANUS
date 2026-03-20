@@ -599,8 +599,8 @@ async def tts_elevenlabs(text, voice_id, agent="kai"):
                     "text": text,
                     "model_id": ELEVENLABS_MODEL,
                     "voice_settings": {
-                        "stability": 0.82,
-                        "similarity_boost": 0.65,
+                        "stability": 0.80,
+                        "similarity_boost": 0.70,
                         "style": 0.0,
                         "use_speaker_boost": False
                     }
@@ -723,21 +723,7 @@ async def tts_chunk(text, voice, agent="kai", demo=False, force_engine=""):
     if not clean or len(clean) < 2:
         return None
 
-    # Premium-Modus: ElevenLabs fuer ALLE Agents erzwingen
-    if force_engine == "elevenlabs" and ELEVENLABS_API_KEY and agent in ELEVENLABS_VOICES:
-        voice_id = ELEVENLABS_VOICES[agent]
-        result = await tts_elevenlabs(clean, voice_id, agent)
-        if result:
-            log.info(f"TTS [PREMIUM/ElevenLabs] fuer {agent.upper()}")
-            return result
-        log.warning(f"ElevenLabs TTS fehlgeschlagen fuer {agent}, Fallback...")
-
-    # Standard-Strategie:
-    # KIM = Grok TTS "ara" (weiblich, warm - klingt super auf Deutsch)
-    # KAI/MANUS = ElevenLabs (Premium deutsche Maennerstimmen)
-    # Fallback: OpenAI > Edge
-
-    # ElevenLabs fuer KAI und MANUS (Premium maennliche deutsche Stimmen)
+    # ElevenLabs IMMER zuerst fuer ALLE Agents
     if ELEVENLABS_API_KEY and agent in ELEVENLABS_VOICES:
         voice_id = ELEVENLABS_VOICES[agent]
         result = await tts_elevenlabs(clean, voice_id, agent)
@@ -745,14 +731,7 @@ async def tts_chunk(text, voice, agent="kai", demo=False, force_engine=""):
             return result
         log.warning(f"ElevenLabs TTS fehlgeschlagen fuer {agent}, Fallback...")
 
-    # Grok TTS fuer KIM (weiblich, warm)
-    if XAI_API_KEY and agent == "kim":
-        result = await tts_grok(clean, "ara", agent)
-        if result:
-            return result
-        log.warning("Grok TTS fehlgeschlagen, Fallback auf OpenAI/Edge")
-
-    # OpenAI TTS als Fallback
+    # Fallback: OpenAI TTS
     if OPENAI_API_KEY:
         openai_voice = OPENAI_VOICES.get(agent, OPENAI_VOICE_DEFAULT)
         result = await tts_openai(clean, openai_voice, agent, demo)
