@@ -1,22 +1,28 @@
 {
-  "name": "KIM Chat",
-  "short_name": "KIM",
-  "description": "Deine persoenliche Assistentin - Chat, Voice, alles in einem",
+  "name": "KIMANUS - Deine KI-Familie",
+  "short_name": "KIMANUS",
+  "description": "KIM, KAI & MANUS - Deine persoenlichen KI-Assistenten. Chat, Voice, alles in einem.",
   "start_url": "/",
+  "scope": "/",
+  "id": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#111111",
+  "background_color": "#0e0e0e",
   "theme_color": "#111111",
+  "categories": ["productivity", "utilities"],
+  "lang": "de",
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

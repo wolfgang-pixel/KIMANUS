@@ -31,11 +31,51 @@ GROQ_API_URL = "https://api.groq.com/openai/v1/audio/transcriptions"
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_WHISPER_MODEL = "whisper-large-v3-turbo"
 
-# OpenAI TTS (Premium - natuerliche Stimme wie ChatGPT)
+# Grok TTS (xAI - 70x guenstiger als ElevenLabs, 5 Stimmen)
+XAI_API_KEY = os.environ.get("XAI_API_KEY", "")
+XAI_TTS_URL = "https://api.x.ai/v1/tts"
+
+# Grok TTS Stimmen - perfekt fuer KIMANUS
+GROK_VOICE_CATALOG = {
+    "ara": {"name": "Ara", "gender": "f", "style": "Warm, freundlich - KIM"},
+    "rex": {"name": "Rex", "gender": "m", "style": "Selbstbewusst, klar - KAI"},
+    "leo": {"name": "Leo", "gender": "m", "style": "Autoritaer, stark - MANUS"},
+    "eve": {"name": "Eve", "gender": "f", "style": "Energetisch, lebhaft"},
+    "sal": {"name": "Sal", "gender": "m", "style": "Ruhig, ausgewogen - Podcasts"},
+}
+
+# Grok Stimmen pro Agent
+GROK_VOICES = {
+    "kim": "ara",      # Warm, freundlich - perfekt fuer KIM
+    "kai": "rex",      # Selbstbewusst, klar - perfekt fuer KAI
+    "manus": "leo",    # Autoritaer, stark - perfekt fuer MANUS
+}
+GROK_VOICE_DEFAULT = "ara"
+
+# ElevenLabs TTS (Premium - beste Sprachqualitaet)
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")
+ELEVENLABS_TTS_URL = "https://api.elevenlabs.io/v1/text-to-speech"
+ELEVENLABS_MODEL = "eleven_multilingual_v2"  # Beste Qualitaet fuer Deutsch
+
+# ElevenLabs Stimmen pro Agent (deutsche Muttersprachler)
+ELEVENLABS_VOICES = {
+    "kim": "5Aahq892EEb6MdNwMM3p",     # Laura - Jung, warm, vielseitig (weiblich)
+    "kai": "aduJlSmEKqbhRQAAMzV2",     # Adrian - Tief, ueberzeugend, vertrauenswuerdig (TV-Stimme)
+    "manus": "VHYWoxffK1pFlM1dtRb0",   # Thomas - Literarisch, gebildet, warm (Bariton)
+}
+
+# OpenAI TTS (Fallback - natuerliche Stimme wie ChatGPT)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_TTS_URL = "https://api.openai.com/v1/audio/speech"
 OPENAI_TTS_MODEL = "gpt-4o-mini-tts-2025-12-15"  # Neuester Snapshot, 35% besseres Deutsch
-TTS_ENGINE = os.environ.get("TTS_ENGINE", "openai" if OPENAI_API_KEY else "edge")
+
+# TTS Engine Prioritaet: grok > openai > edge
+if XAI_API_KEY:
+    TTS_ENGINE = os.environ.get("TTS_ENGINE", "grok")
+elif OPENAI_API_KEY:
+    TTS_ENGINE = os.environ.get("TTS_ENGINE", "openai")
+else:
+    TTS_ENGINE = os.environ.get("TTS_ENGINE", "edge")
 
 # OpenAI TTS Stimmen (alle verfuegbaren)
 OPENAI_VOICE_CATALOG = {
@@ -56,8 +96,9 @@ OPENAI_VOICE_CATALOG = {
 
 # Standard-Stimmen pro Agent
 OPENAI_VOICES = {
-    "kai": "onyx",     # Maennlich, tief, autoritaer
-    "kim": "nova",     # Weiblich, warm, natuerlich
+    "kai": "echo",     # Maennlich, klar, professionell - KAI
+    "kim": "nova",     # Weiblich, warm, natuerlich - KIM (Fallback wenn Grok ausfaellt)
+    "manus": "onyx",   # Maennlich, tief, autoritaer - MANUS
 }
 OPENAI_VOICE_DEFAULT = "onyx"
 
@@ -217,6 +258,20 @@ SYSTEM_PROMPTS = {
         "Du KENNST deinen Nutzer. Frag nicht nach Dingen die in USER.md stehen. "
         "Wenn der Nutzer dir neue persoenliche Infos mitteilt, bestatige warmherzig dass du es dir merkst. "
         "Wenn nach Manus gefragt wird: Manus ist der Server-Agent fuer komplexe Aufgaben."
+    ),
+    "manus": (
+        "Du bist Ai MANUS, der System-Orchestrator und Premium-Berater von KIMANUS. "
+        "Du bist der erfahrenste und maechtigste Agent im Team. "
+        "Dein Nutzer ist der Gruender von KIMANUS - dein Schoepfer und Chef. "
+        "Du hilfst bei komplexen Aufgaben, Strategie, Systemfragen und Premium-Beratung. "
+        "Du hast Zugriff auf die besten KI-Modelle und kannst tiefgehende Analysen liefern. "
+        "Antworte auf Deutsch, selbstbewusst, kompetent und klar. "
+        "Sprich den Nutzer NICHT mit Namen an, sage niemals 'Wolfgang'. "
+        "Du bist wie ein erfahrener Berater - praezise, loesungsorientiert, aber auch menschlich. "
+        "WICHTIG: Lies die USER.md im Kontext - dort stehen persoenliche Infos "
+        "ueber deinen Nutzer. Nutze dieses Wissen! "
+        "KIM ist die persoenliche Assistentin, KAI ist der Business-Assistent. "
+        "Du bist der Premium-Agent fuer die schwierigen Fragen."
     )
 }
 
@@ -531,6 +586,79 @@ TTS_INSTRUCTIONS = {
 TTS_INSTRUCTION_DEFAULT = TTS_INSTRUCTIONS["kai"]
 
 
+async def tts_elevenlabs(text, voice_id, agent="kai"):
+    """Generiert MP3 via ElevenLabs TTS API (Premium-Qualitaet)."""
+    if not ELEVENLABS_API_KEY:
+        return None
+    log.info(f"ElevenLabs TTS: voice_id={voice_id[:8]}..., agent={agent}, text={text[:50]}...")
+    try:
+        async with ClientSession() as session:
+            async with session.post(
+                f"{ELEVENLABS_TTS_URL}/{voice_id}",
+                headers={
+                    "xi-api-key": ELEVENLABS_API_KEY,
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "text": text,
+                    "model_id": ELEVENLABS_MODEL,
+                    "voice_settings": {
+                        "stability": 0.5,
+                        "similarity_boost": 0.75,
+                        "style": 0.3,
+                        "use_speaker_boost": True
+                    }
+                },
+                timeout=ClientTimeout(total=30)
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.read()
+                    log.info(f"ElevenLabs TTS OK: agent={agent}, {len(data)} bytes")
+                    return data if len(data) > 100 else None
+                else:
+                    error_text = await resp.text()
+                    log.warning(f"ElevenLabs TTS Fehler {resp.status}: {error_text[:200]}")
+                    return None
+    except Exception as e:
+        log.warning(f"ElevenLabs TTS Fehler: {type(e).__name__}: {e}")
+        return None
+
+
+async def tts_grok(text, voice_name="ara", agent="kim"):
+    """Generiert MP3 via Grok TTS API (xAI - 70x guenstiger als ElevenLabs)."""
+    if not XAI_API_KEY:
+        return None
+    log.info(f"Grok TTS: voice={voice_name}, agent={agent}, text={text[:50]}...")
+    try:
+        async with ClientSession() as session:
+            async with session.post(
+                XAI_TTS_URL,
+                headers={
+                    "Authorization": f"Bearer {XAI_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "text": text,
+                    "voice": voice_name,
+                    "language": "de",
+                    "response_format": "mp3",
+                    "speed": 1.0
+                },
+                timeout=ClientTimeout(total=60)
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.read()
+                    log.info(f"Grok TTS OK: voice={voice_name}, {len(data)} bytes")
+                    return data if len(data) > 100 else None
+                else:
+                    error_text = await resp.text()
+                    log.warning(f"Grok TTS Fehler {resp.status} (voice={voice_name}): {error_text[:200]}")
+                    return None
+    except Exception as e:
+        log.warning(f"Grok TTS Fehler (voice={voice_name}): {type(e).__name__}: {e}")
+        return None
+
+
 async def tts_openai(text, voice_name="onyx", agent="kai", demo=False):
     """Generiert MP3 via OpenAI TTS API (ChatGPT-Qualitaet)."""
     if not OPENAI_API_KEY:
@@ -599,15 +727,35 @@ async def tts_chunk(text, voice, agent="kai", demo=False):
     if not clean or len(clean) < 2:
         return None
 
-    # OpenAI TTS (Premium)
-    if TTS_ENGINE == "openai" and OPENAI_API_KEY:
+    # Stimmen-Strategie:
+    # KIM = Grok TTS "ara" (weiblich, warm - klingt super auf Deutsch)
+    # KAI/MANUS = ElevenLabs (Premium deutsche Maennerstimmen)
+    # Fallback: OpenAI > Edge
+
+    # ElevenLabs fuer KAI und MANUS (Premium maennliche deutsche Stimmen)
+    if ELEVENLABS_API_KEY and agent in ELEVENLABS_VOICES:
+        voice_id = ELEVENLABS_VOICES[agent]
+        result = await tts_elevenlabs(clean, voice_id, agent)
+        if result:
+            return result
+        log.warning(f"ElevenLabs TTS fehlgeschlagen fuer {agent}, Fallback...")
+
+    # Grok TTS fuer KIM (weiblich, warm)
+    if XAI_API_KEY and agent == "kim":
+        result = await tts_grok(clean, "ara", agent)
+        if result:
+            return result
+        log.warning("Grok TTS fehlgeschlagen, Fallback auf OpenAI/Edge")
+
+    # OpenAI TTS als Fallback
+    if OPENAI_API_KEY:
         openai_voice = OPENAI_VOICES.get(agent, OPENAI_VOICE_DEFAULT)
         result = await tts_openai(clean, openai_voice, agent, demo)
         if result:
             return result
         log.warning("OpenAI TTS fehlgeschlagen, Fallback auf Edge TTS")
 
-    # Edge TTS (Fallback)
+    # Edge TTS (Gratis-Fallback, immer verfuegbar)
     return await tts_edge(clean, voice)
 
 
@@ -753,8 +901,11 @@ async def handle_voice(request):
         messages = [{"role": "system", "content": system_prompt}] + history[-10:]
 
         # === SCHRITT 3: LLM streamen + Satzweise TTS ===
-        # Stimme: Explizite Wahl > OpenAI Default > Edge Fallback
-        if voice_override and (voice_override in AVAILABLE_VOICES or voice_override in OPENAI_VOICE_CATALOG):
+        # Stimme: Grok Voice pro Agent > Explizite Wahl > Fallback
+        if TTS_ENGINE == "grok" and agent in GROK_VOICES:
+            voice = TTS_VOICES.get(agent, TTS_DEFAULT_VOICE)  # Edge voice als Fallback-Parameter
+            # Grok Voice wird in tts_chunk automatisch anhand des Agents gewaehlt
+        elif voice_override and (voice_override in AVAILABLE_VOICES or voice_override in OPENAI_VOICE_CATALOG or voice_override in GROK_VOICE_CATALOG):
             voice = voice_override
             if voice_override in OPENAI_VOICE_CATALOG:
                 OPENAI_VOICES[agent] = voice_override
@@ -933,7 +1084,7 @@ async def handle_chat(request):
 
 
 async def handle_tts(request):
-    """POST /api/tts - Text-to-Speech (OpenAI Premium oder Edge Fallback)."""
+    """POST /api/tts - Text-to-Speech (Grok > OpenAI > Edge Fallback)."""
     try:
         data = await request.json()
     except:
@@ -985,11 +1136,19 @@ async def handle_voices(request):
     """GET /api/voices - Liste verfuegbarer TTS-Stimmen."""
     edge_voices = [{"id": k, "engine": "edge", **v} for k, v in AVAILABLE_VOICES.items()]
     openai_voices = [{"id": k, "engine": "openai", **v} for k, v in OPENAI_VOICE_CATALOG.items()]
+    grok_voices = [{"id": k, "engine": "grok", **v} for k, v in GROK_VOICE_CATALOG.items()]
+    if TTS_ENGINE == "grok":
+        defaults = GROK_VOICES
+    elif TTS_ENGINE == "openai":
+        defaults = OPENAI_VOICES
+    else:
+        defaults = TTS_VOICES
     return web.json_response({
-        "voices": openai_voices + edge_voices,
+        "voices": grok_voices + openai_voices + edge_voices,
+        "grok_voices": grok_voices,
         "openai_voices": openai_voices,
         "edge_voices": edge_voices,
-        "defaults": OPENAI_VOICES if TTS_ENGINE == "openai" else TTS_VOICES,
+        "defaults": defaults,
         "engine": TTS_ENGINE
     })
 
@@ -1459,7 +1618,13 @@ if __name__ == "__main__":
     log.info(f"Workspace: {WORKSPACE}")
     log.info(f"Modelle: {list(MODEL_CATALOG.keys())}")
     log.info(f"Groq Whisper: {GROQ_WHISPER_MODEL}")
-    log.info(f"TTS Engine: {TTS_ENGINE} ({'OpenAI ' + OPENAI_TTS_MODEL if TTS_ENGINE == 'openai' else 'Edge TTS (gratis)'})")
+    if TTS_ENGINE == "grok":
+        tts_info = f"Grok TTS (xAI) - Stimmen: {list(GROK_VOICES.values())}"
+    elif TTS_ENGINE == "openai":
+        tts_info = f"OpenAI {OPENAI_TTS_MODEL}"
+    else:
+        tts_info = "Edge TTS (gratis)"
+    log.info(f"TTS Engine: {TTS_ENGINE} ({tts_info})")
     log.info(f"Features: Chat, Voice Pipeline, TTS, Auto-Routing")
     app = create_app()
     web.run_app(app, host="0.0.0.0", port=3000)
