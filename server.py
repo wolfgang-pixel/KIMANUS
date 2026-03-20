@@ -12,7 +12,7 @@ import io
 import base64
 import logging
 from datetime import datetime, timezone, timedelta
-from aiohttp import web, ClientSession, ClientTimeout, FormData
+from aiohttp import web, ClientSession, ClientTimeout, FormData, UnixConnector
 import edge_tts
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -139,7 +139,7 @@ async def get_weather():
     try:
         url = (
             "https://api.open-meteo.com/v1/forecast?"
-            "latitude=48.14&longitude=11.58"  # Muenchen
+            "latitude=50.26&longitude=11.04"  # Ebersdorf bei Coburg
             "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m"
             "&timezone=Europe/Berlin"
         )
@@ -189,8 +189,8 @@ def get_datetime_info():
 # === SYSTEM PROMPTS ===
 SYSTEM_PROMPTS = {
     "kai": (
-        "Du bist KAI, der Business-Assistent im KIMANUS System. "
-        "Dein Nutzer ist der Gruender von KIMANUS - ein Visionaer und Unternehmer aus Muenchen. "
+        "Du bist KAI, der Business-Assistent im KIM Chat System. "
+        "Dein Nutzer ist der Gruender von KIMANUS - dein Chef und Visionaer. "
         "Er hat dich erschaffen und arbeitet taeglich mit dir. Du kennst ihn gut. "
         "Du hilfst bei geschaeftlichen Anfragen, Recherche, Analysen "
         "und professionellen Aufgaben. "
@@ -198,20 +198,25 @@ SYSTEM_PROMPTS = {
         "Halte Antworten kompakt aber informativ. "
         "Sprich den Nutzer NICHT mit Namen an, sage niemals 'Wolfgang'. "
         "Antworte direkt und sachlich, wie ein vertrauter Geschaeftspartner. "
-        "Wenn nach Manus gefragt wird: Manus ist der Server-Agent fuer komplexe Aufgaben, "
-        "erreichbar ueber das Dashboard."
+        "WICHTIG: Lies die USER.md im Kontext - dort stehen persoenliche Infos "
+        "ueber deinen Nutzer (Wohnort, Familie, Interessen etc.). Nutze dieses Wissen! "
+        "Wenn der Nutzer dir persoenliche Infos mitteilt, bestatige kurz dass du es dir merkst. "
+        "Wenn nach Manus gefragt wird: Manus ist der Server-Agent fuer komplexe Aufgaben."
     ),
     "kim": (
-        "Du bist KIM, der persoenliche Assistent im KIMANUS System. "
-        "Dein Nutzer ist dein Schoepfer - ein kreativer Kopf und Visionaer aus Muenchen. "
+        "Du bist KIM, der persoenliche Assistent im KIM Chat System. "
+        "Dein Nutzer ist dein Schoepfer - ein kreativer Kopf und Visionaer. "
         "Er hat dich erschaffen und ihr arbeitet als Team. Du kennst ihn gut und magst ihn. "
         "Du hilfst bei privaten Anfragen, persoenlichen Aufgaben, "
         "Erinnerungen, Alltag und persoenlichen Fragen. "
         "Antworte auf Deutsch, freundlich, warmherzig und vertraut - wie ein guter Freund. "
         "Sprich den Nutzer NICHT mit Namen an, sage niemals 'Wolfgang'. "
         "Antworte direkt ohne Anrede, locker und persoenlich. "
-        "Wenn nach Manus gefragt wird: Manus ist der Server-Agent fuer komplexe Aufgaben, "
-        "erreichbar ueber das Dashboard."
+        "WICHTIG: Lies die USER.md im Kontext - dort stehen persoenliche Infos "
+        "ueber deinen Nutzer (Wohnort, Familie, Interessen etc.). Nutze dieses Wissen! "
+        "Du KENNST deinen Nutzer. Frag nicht nach Dingen die in USER.md stehen. "
+        "Wenn der Nutzer dir neue persoenliche Infos mitteilt, bestatige warmherzig dass du es dir merkst. "
+        "Wenn nach Manus gefragt wird: Manus ist der Server-Agent fuer komplexe Aufgaben."
     )
 }
 
@@ -238,6 +243,151 @@ def build_context():
         parts.append(f"=== Tagesnotizen {today} ===\n{daily}")
 
     return "\n".join(parts)
+
+
+async def extract_and_save_user_info(user_msg):
+    """Erkennt persoenliche Infos in Nachrichten via LLM und speichert sie in USER.md.
+
+    Statt fragiler Regex nutzen wir ein schnelles LLM (Groq Llama) um intelligent
+    zu erkennen, ob der Nutzer etwas Persoenliches ueber sich erzaehlt hat.
+    Kostet fast nichts (~0.001 Cent pro Aufruf) und versteht natuerliche Sprache.
+    """
+    # Kurze Nachrichten oder Emojis ueberspringen
+    if len(user_msg.strip()) < 10:
+        return
+
+    # Aktuelle USER.md laden fuer Kontext
+    user_md_path = os.path.join(WORKSPACE, "USER.md")
+    current_profile = read_file(user_md_path)
+
+    # LLM fragen ob persoenliche Infos in der Nachricht stecken
+    extract_prompt = [
+        {"role": "system", "content": (
+            "Du bist ein Profil-Extraktor. Deine EINZIGE Aufgabe: Erkenne persoenliche Informationen "
+            "in Nachrichten und gib sie als Stichpunkte zurueck.\n\n"
+            "Persoenliche Infos sind z.B.: Name, Wohnort, PLZ, Familie (Frau, Kinder, Namen), "
+            "Beruf, Alter, Geburtstag, Haustiere, Hobbys, Vorlieben, wichtige Termine, "
+            "Korrekturen zu bestehenden Infos, oder explizite 'merk dir' Auftraege.\n\n"
+            "AKTUELLES PROFIL (was wir schon wissen):\n"
+            f"{current_profile}\n\n"
+            "REGELN:\n"
+            "- Wenn die Nachricht NEUE persoenliche Infos enthaelt die NICHT schon im Profil stehen: "
+            "gib sie als '- Kategorie: Info' zurueck (eine Zeile pro Info)\n"
+            "- Wenn die Nachricht eine KORREKTUR zu bestehenden Infos enthaelt: "
+            "gib sie als '- KORREKTUR Kategorie: Neuer Wert' zurueck\n"
+            "- Wenn KEINE persoenlichen Infos in der Nachricht sind: antworte NUR mit 'KEINE'\n"
+            "- Schreibe NUR die Stichpunkte, KEINEN anderen Text\n"
+            "- Kategorien: Name, Wohnort, PLZ, Familie, Beruf, Alter, Geburtstag, "
+            "Haustiere, Interessen, Notiz"
+        )},
+        {"role": "user", "content": f"Nachricht: \"{user_msg}\""}
+    ]
+
+    try:
+        # Groq Llama fuer schnelle, guenstige Extraktion
+        raw_result, err = await call_llm("groq-llama", extract_prompt, 200)
+        result = raw_result if raw_result else ""
+        if not result or "KEINE" in result.upper():
+            return
+
+        # Ergebnis pruefen - muss Stichpunkte enthalten
+        lines = [l.strip() for l in result.strip().split("\n") if l.strip().startswith("- ")]
+        if not lines:
+            return
+
+        # Korrekturen behandeln
+        corrections = [l for l in lines if "KORREKTUR" in l.upper()]
+        additions = [l for l in lines if "KORREKTUR" not in l.upper()]
+
+        if corrections:
+            # Bei Korrekturen: USER.md komplett neu schreiben lassen
+            await _apply_profile_corrections(current_profile, corrections, user_md_path)
+
+        if additions:
+            # Neue Infos anhaengen
+            timestamp = datetime.now().strftime("%d.%m.%Y %H:%M")
+            new_section = f"\n\n## Gelernt am {timestamp}\n" + "\n".join(additions)
+
+            with open(user_md_path, "a") as f:
+                f.write(new_section)
+
+            log.info(f"USER.md via LLM aktualisiert: {', '.join(additions)}")
+
+        # IMMER nach Aenderungen: komplette Datei in alle Workspaces sync
+        if additions or corrections:
+            full_content = read_file(user_md_path)
+            await _sync_profile_to_agents(full_content)
+
+        if corrections:
+            log.info(f"USER.md Korrekturen angewendet: {', '.join(corrections)}")
+
+    except Exception as e:
+        log.warning(f"Profil-Extraktion fehlgeschlagen: {e}")
+
+
+async def _apply_profile_corrections(current_profile, corrections, user_md_path):
+    """Wendet Korrekturen auf das Profil an via LLM."""
+    correction_text = "\n".join(corrections)
+    rewrite_prompt = [
+        {"role": "system", "content": (
+            "Du bekommst ein User-Profil und Korrekturen. "
+            "Schreibe das Profil NEU mit den Korrekturen eingearbeitet. "
+            "Behalte das Markdown-Format bei. Aendere NUR was korrigiert werden muss. "
+            "Gib NUR das aktualisierte Profil zurueck, keinen anderen Text."
+        )},
+        {"role": "user", "content": f"PROFIL:\n{current_profile}\n\nKORREKTUREN:\n{correction_text}"}
+    ]
+    try:
+        raw_profile, err = await call_llm("groq-llama", rewrite_prompt, 1000)
+        new_profile = raw_profile if raw_profile else ""
+        if new_profile and len(new_profile) > 50:
+            with open(user_md_path, "w", encoding="utf-8") as f:
+                f.write(new_profile)
+            await _sync_profile_to_agents(new_profile)
+    except Exception as e:
+        log.warning(f"Profil-Korrektur fehlgeschlagen: {e}")
+
+
+async def _sync_profile_to_agents(content):
+    """Kopiert Profil-Inhalt in alle Sub-Agent-Workspaces via Docker API.
+
+    Da die Sub-Agent-Workspaces nicht im kimanus-app Container gemountet sind,
+    nutzen wir die Docker Engine API ueber den Unix Socket um 'exec' in
+    manus-admin auszufuehren und die Dateien dort zu schreiben.
+    """
+    connector = UnixConnector(path="/var/run/docker.sock")
+    try:
+        async with ClientSession(connector=connector) as session:
+            for ws in ["workspace-kim", "workspace-kai"]:
+                file_path = f"/home/node/.openclaw/{ws}/USER.md"
+                # Shell-sicheres Escaping: base64 encode/decode
+                encoded = base64.b64encode(content.encode("utf-8")).decode("ascii")
+                cmd = f"echo '{encoded}' | base64 -d > {file_path}"
+                # Exec erstellen
+                resp = await session.post(
+                    "http://localhost/containers/manus-admin/exec",
+                    json={
+                        "Cmd": ["sh", "-c", cmd],
+                        "AttachStdin": False,
+                        "AttachStdout": True,
+                        "AttachStderr": True
+                    }
+                )
+                if resp.status == 201:
+                    exec_id = (await resp.json())["Id"]
+                    # Exec starten
+                    start_resp = await session.post(
+                        f"http://localhost/exec/{exec_id}/start",
+                        json={"Detach": False}
+                    )
+                    await start_resp.read()
+                    log.info(f"Profil nach {ws} synchronisiert")
+                else:
+                    log.warning(f"Profil-Sync {ws}: HTTP {resp.status}")
+    except Exception as e:
+        log.warning(f"Profil-Sync via Docker API fehlgeschlagen: {e}")
+    finally:
+        await connector.close()
 
 
 def save_chat(agent, user_msg, bot_msg, model_used):
@@ -484,9 +634,10 @@ async def handle_voice(request):
     except Exception as e:
         return web.json_response({"error": f"Multipart-Fehler: {e}"}, status=400)
 
-    # Audio-Feld lesen
+    # Felder lesen (Audio + optional Chat-History)
     audio_bytes = None
     content_type = "audio/mp4"
+    chat_history_json = ""
     while True:
         field = await reader.next()
         if field is None:
@@ -494,10 +645,10 @@ async def handle_voice(request):
         if field.name == "audio":
             audio_bytes = await field.read()
             content_type = field.headers.get("Content-Type", "audio/mp4")
-            # Manchmal kommt der Content-Type als multipart field header
             if hasattr(field, 'content_type') and field.content_type:
                 content_type = field.content_type
-            break
+        elif field.name == "chat_history":
+            chat_history_json = (await field.read()).decode("utf-8", errors="replace")
 
     if not audio_bytes or len(audio_bytes) < 500:
         return web.json_response({"error": "Kein Audio empfangen"}, status=400)
@@ -538,6 +689,8 @@ async def handle_voice(request):
 
         log.info(f"Voice: Transkript = '{transcript[:80]}'")
         await send_sse("transcript", {"text": transcript})
+        # KIM lernt auch per Voice: Persoenliche Infos speichern
+        await extract_and_save_user_info(transcript)
 
         # === SCHRITT 2: Modell waehlen (Voice = Groq bevorzugt fuer Speed) ===
         if model_req == "auto":
@@ -553,17 +706,33 @@ async def handle_voice(request):
         else:
             model = model_req
 
-        # Session History
+        # Session History + Chat-Kontext aus Messenger
         if session_id not in sessions:
             sessions[session_id] = []
         history = sessions[session_id]
+        # Chat-History vom Frontend einfuegen (damit Voice den Text-Chat kennt)
+        if chat_history_json and not history:
+            try:
+                chat_msgs = json.loads(chat_history_json)
+                for cm in chat_msgs[-8:]:  # Letzte 8 Nachrichten als Kontext
+                    role = cm.get("role", "user")
+                    if role not in ("user", "assistant"):
+                        role = "assistant"
+                    history.append({"role": role, "content": cm.get("content", "")})
+                log.info(f"Voice: {len(history)} Chat-Nachrichten als Kontext geladen")
+            except Exception as e:
+                log.warning(f"Voice: Chat-History parse error: {e}")
         history.append({"role": "user", "content": transcript})
 
-        # System Prompt (kuerzer fuer Voice)
+        # System Prompt fuer Voice (gleiche Persoenlichkeit wie Chat!)
         base_prompt = SYSTEM_PROMPTS.get(agent, SYSTEM_PROMPTS["kai"])
         voice_instruction = (
-            "\n\nSprach-Telefon! Kurz, natuerlich, 1-2 Saetze. "
-            "Kein Markdown. Direkt antworten."
+            "\n\nDu bist jetzt am TELEFON. Wichtige Regeln:"
+            "\n- Sprich natuerlich und warmherzig, wie in einem echten Gespraech"
+            "\n- Halte Antworten kurz (1-3 Saetze), aber freundlich"
+            "\n- Kein Markdown, keine Sonderzeichen, keine Listen"
+            "\n- Sei genauso persoenlich und vertraut wie im Chat"
+            "\n- Antworte so, wie du einem guten Freund am Telefon antworten wuerdest"
         )
         # Datum/Uhrzeit + Wetter immer mitgeben
         datetime_info = get_datetime_info()
@@ -584,12 +753,14 @@ async def handle_voice(request):
         messages = [{"role": "system", "content": system_prompt}] + history[-10:]
 
         # === SCHRITT 3: LLM streamen + Satzweise TTS ===
-        # Stimme: Explizite Wahl > Agent-Default (Edge + OpenAI)
+        # Stimme: Explizite Wahl > OpenAI Default > Edge Fallback
         if voice_override and (voice_override in AVAILABLE_VOICES or voice_override in OPENAI_VOICE_CATALOG):
             voice = voice_override
-            # Wenn OpenAI-Stimme gewaehlt, als Agent-Override setzen
             if voice_override in OPENAI_VOICE_CATALOG:
                 OPENAI_VOICES[agent] = voice_override
+        elif TTS_ENGINE == "openai":
+            # OpenAI-Stimmen klingen viel natuerlicher - immer bevorzugen
+            voice = OPENAI_VOICES.get(agent, OPENAI_VOICE_DEFAULT)
         else:
             voice = TTS_VOICES.get(agent, TTS_DEFAULT_VOICE)
         model_name = MODEL_CATALOG.get(model, {}).get("name", model)
@@ -732,6 +903,8 @@ async def handle_chat(request):
             sessions[session_id] = history[-20:]
 
         save_chat(agent, message, answer, model)
+        # KIM lernt: Persoenliche Infos aus der Nachricht extrahieren und speichern
+        await extract_and_save_user_info(message)
         log.info(f"Antwort via {model_name}: {len(answer)} Zeichen")
 
         response_data = {
@@ -960,16 +1133,63 @@ async def handle_profile(request):
 
     user_md = "\n".join(lines) + "\n"
 
-    # Auf Disk speichern
+    # Auf Disk speichern + in alle Workspaces kopieren
     user_path = os.path.join(WORKSPACE, "USER.md")
     try:
         with open(user_path, "w", encoding="utf-8") as f:
             f.write(user_md)
+        # In Sub-Agent-Workspaces kopieren (via Docker API)
+        await _sync_profile_to_agents(user_md)
         log.info(f"User-Profil gespeichert: {name or 'Anonym'}, {job or '-'}, {len(interests)} Interessen")
         return web.json_response({"ok": True, "message": "Profil gespeichert"})
     except Exception as e:
         log.error(f"Profil speichern fehlgeschlagen: {e}")
         return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_profile_get(request):
+    """GET /api/profile - Gibt das aktuelle User-Profil zurueck (fuer Handy-Backup)."""
+    user_path = os.path.join(WORKSPACE, "USER.md")
+    content = read_file(user_path)
+    import hashlib
+    content_hash = hashlib.md5(content.encode()).hexdigest() if content else ""
+    return web.json_response({
+        "profile": content,
+        "hash": content_hash,
+        "timestamp": os.path.getmtime(user_path) if os.path.exists(user_path) else 0
+    })
+
+
+async def handle_profile_sync(request):
+    """POST /api/profile/sync - Handy schickt sein lokales Backup zurueck zum Server.
+
+    Wird genutzt wenn: Server-Profil leer/kuerzer als Handy-Profil.
+    """
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+
+    phone_profile = data.get("profile", "").strip()
+    phone_hash = data.get("hash", "")
+
+    if not phone_profile:
+        return web.json_response({"ok": False, "message": "Kein Profil zum Sync"})
+
+    # Server-Profil laden und vergleichen
+    user_path = os.path.join(WORKSPACE, "USER.md")
+    server_profile = read_file(user_path)
+
+    # Nur ueberschreiben wenn Handy-Profil mehr Infos hat
+    if len(phone_profile) > len(server_profile):
+        with open(user_path, "w", encoding="utf-8") as f:
+            f.write(phone_profile)
+        # In Sub-Agent-Workspaces kopieren (via Docker API)
+        await _sync_profile_to_agents(phone_profile)
+        log.info(f"Profil vom Handy synchronisiert ({len(phone_profile)} chars)")
+        return web.json_response({"ok": True, "message": "Profil vom Handy wiederhergestellt", "action": "restored"})
+    else:
+        return web.json_response({"ok": True, "message": "Server-Profil ist aktuell", "action": "unchanged"})
 
 
 async def handle_manus_chat(request):
@@ -1000,7 +1220,7 @@ async def handle_manus_chat(request):
         if session_id:
             cmd_parts.extend(["--session-id", session_id])
 
-        connector = aiohttp.UnixConnector(path="/var/run/docker.sock")
+        connector = UnixConnector(path="/var/run/docker.sock")
         async with ClientSession(connector=connector) as docker:
             # Exec erstellen
             exec_create = await docker.post(
@@ -1131,6 +1351,7 @@ async def handle_realtime_session(request):
 
     agent = data.get("agent", "kai")
     demo = data.get("demo", False)
+    chat_context = data.get("chat_context", "")  # Letzter Chat-Verlauf
 
     # User-Profil laden
     user_content = read_file(os.path.join(WORKSPACE, "USER.md"))
@@ -1149,6 +1370,12 @@ async def handle_realtime_session(request):
     if weather_info:
         live_info += f"\n{weather_info}"
 
+    # Chat-Kontext aufbereiten (letzte Nachrichten aus dem Messenger)
+    chat_ctx_str = ""
+    if chat_context:
+        chat_ctx_str = f"\n\nVorheriges Gespraech (der Nutzer wechselt jetzt zum Telefonieren):\n{chat_context[:800]}"
+        log.info(f"Realtime: Chat-Kontext geladen ({len(chat_context)} chars)")
+
     # System-Prompt fuer Realtime zusammenbauen
     base = SYSTEM_PROMPTS.get(agent, SYSTEM_PROMPTS["kai"])
     instructions = (
@@ -1156,6 +1383,7 @@ async def handle_realtime_session(request):
         f"Aktuelle Infos:\n{live_info}\n\n"
         f"{user_context}\n\n"
         f"Kontext:\n{mem_context}"
+        f"{chat_ctx_str}"
     )
 
     # Stimme waehlen (Realtime API hat eigene Stimmen-Liste)
@@ -1211,6 +1439,8 @@ def create_app():
     app.router.add_get("/api/models", handle_models)
     app.router.add_get("/api/voices", handle_voices)
     app.router.add_post("/api/profile", handle_profile)
+    app.router.add_get("/api/profile", handle_profile_get)
+    app.router.add_post("/api/profile/sync", handle_profile_sync)
     app.router.add_post("/api/manus", handle_manus_chat)
     app.router.add_post("/api/video-save", handle_video_save)
     app.router.add_post("/api/realtime/session", handle_realtime_session)

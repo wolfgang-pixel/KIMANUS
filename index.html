@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS OS v2.5 - Build 20260318-1400 - WhatsApp-Style Input -->
+<!-- KIMANUS App v3.0 - Build 20260320 - Die helfende Hand -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#111111">
 <meta name="color-scheme" content="dark">
-<title>KIMANUS OS</title>
+<title>KIM Chat</title>
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <style>
@@ -53,32 +53,16 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .m-icon{display:flex;align-items:center;justify-content:center;color:#777;filter:drop-shadow(1px 2px 3px rgba(0,0,0,.6));transition:all .2s}
 
 /* =========================================
-   HEADER BAR
+   HEADER BAR (slim)
    ========================================= */
-#header{flex-shrink:0;padding:4px 6px 0}
-.wallet-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-.wallet-items{display:flex;align-items:center;justify-content:center;gap:8px}
-.kunden-card{width:36px;height:26px;background:linear-gradient(135deg,#c62828 0%,#8b0000 100%);border-radius:3px;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2);overflow:hidden;position:relative}
-.kunden-card::after{content:'';position:absolute;right:2px;bottom:2px;width:8px;height:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)}
-.kunden-card span{font-size:7px;color:rgba(255,255,255,.9);font-weight:bold}
-.wallet-icon{width:30px;height:24px;background:linear-gradient(145deg,#555 0%,#3a3a3a 100%);border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
-.wallet-icon::before{content:'';width:14px;height:3px;background:linear-gradient(90deg,#666,#888);border-radius:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
-.wallet-sublabels{display:flex;gap:6px;justify-content:center}
-.wallet-sublabels span{font-size:6px;letter-spacing:1px;color:#555;text-transform:uppercase}
-.view-panel{display:flex;align-items:center;justify-content:center;min-height:52px}
-.view-icons-grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;width:100%;height:100%;place-items:center}
-.vi{display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:#777;filter:drop-shadow(1px 2px 3px rgba(0,0,0,.5))}
-.vi svg{width:18px;height:18px}
-.vi-center{grid-column:2;grid-row:1/3;width:32px;height:32px}
-.vi-center svg{width:26px;height:26px}
-.id-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.id-top-label{font-size:7px;letter-spacing:2px;color:#666;text-transform:uppercase}
-.id-items{display:flex;align-items:center;justify-content:center;gap:6px}
-.qr-block{width:28px;height:28px;background:#444;border-radius:3px;display:grid;grid-template-columns:repeat(5,1fr);gap:1px;padding:2px;box-shadow:inset 0 1px 3px rgba(0,0,0,.4),1px 1px 3px rgba(0,0,0,.4)}
-.qr-block i{background:#888}.qr-block i:nth-child(2n){background:#555}
-.nfc-waves{display:flex;flex-direction:column;align-items:center;gap:1px;color:#666;filter:drop-shadow(1px 1px 2px rgba(0,0,0,.5))}
-.id-sublabels{display:flex;gap:4px;justify-content:center}
-.id-sublabels span{font-size:6px;letter-spacing:1px;color:#555;text-transform:uppercase}
+#header{flex-shrink:0;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a1a}
+#header-title{font-size:13px;letter-spacing:4px;color:#666;font-weight:600;text-transform:uppercase}
+#header-subtitle{font-size:9px;color:#444;letter-spacing:2px}
+#header .hdr-btn{background:none;border:none;color:#555;cursor:pointer;padding:6px;display:flex;align-items:center;justify-content:center}
+#header .hdr-btn:active{color:#e63946}
+
+/* Legacy header styles (kept for compatibility) */
+.wallet-panel,.wallet-items,.kunden-card,.wallet-icon,.wallet-sublabels,.view-panel,.view-icons-grid,.vi,.vi-center,.id-panel,.id-top-label,.id-items,.qr-block,.nfc-waves,.id-sublabels{display:none}
 
 /* =========================================
    VIEW CANVAS
@@ -143,7 +127,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 @keyframes sosPulse{0%{box-shadow:0 0 20px rgba(230,57,70,.6)}50%{box-shadow:0 0 40px rgba(230,57,70,.9),0 0 80px rgba(230,57,70,.3)}100%{box-shadow:0 0 20px rgba(230,57,70,.6)}}
 
 /* Module views */
-.module-view{display:none}.module-view.active{display:block}
+.module-view{display:none}.module-view.active{display:block;height:100%}
 
 /* =========================================
    AGENTEN ÜBERSICHT
@@ -371,24 +355,25 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #rec-timer .rec-dot{width:8px;height:8px;background:#e63946;border-radius:50%;animation:recPulse 1s infinite}
 
 /* =========================================
-   BOTTOM NAV
+   BOTTOM NAV (iPhone-Style)
    ========================================= */
-#bottom-nav{flex-shrink:0;padding:0 6px 4px}
-.agent-panel{display:flex;flex-direction:column;gap:1px;width:100%;height:100%}
-.agent-top-label{font-size:6px;letter-spacing:2px;color:#555;text-transform:uppercase;text-align:center}
-.agent-btn{display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 2px;border-radius:4px;border:none;background:transparent;cursor:pointer;width:100%;transition:all .2s}
-.agent-btn:active{opacity:.7}
-.agent-name{font-size:13px;letter-spacing:2px;font-weight:700;color:#666;transition:color .2s}
-.agent-sub{font-size:6px;letter-spacing:1px;color:#444;text-transform:uppercase;margin-top:1px}
-.agent-btn.active .agent-name{color:#e63946;text-shadow:0 0 12px rgba(230,57,70,.5)}
-.agent-btn.active .agent-sub{color:#888}
-/* KIM Blink-Animation beim App-Start */
-@keyframes kimBlink{0%,100%{text-shadow:0 0 12px rgba(230,57,70,.5)}50%{text-shadow:0 0 24px rgba(230,57,70,1),0 0 48px rgba(230,57,70,.4)}}
-@keyframes kimPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 16px rgba(230,57,70,.4),inset 0 0 8px rgba(230,57,70,.15)}}
-.agent-btn.kim-blink{animation:kimPulse 1.5s ease-in-out infinite;border-radius:6px}
-.agent-btn.kim-blink .agent-name{animation:kimBlink 1.5s ease-in-out infinite;color:#e63946!important}
-.agent-bars{display:flex;flex-direction:column;gap:3px;align-items:center;padding:3px 0}
-.agent-bars span{display:block;height:2px;border-radius:1px;background:linear-gradient(90deg,transparent,#e63946,transparent);box-shadow:0 0 6px rgba(230,57,70,.3)}
+#bottom-nav{flex-shrink:0;padding:0 0 4px;border-top:1px solid #1a1a1a;background:#0e0e0e;position:relative}
+.tab-bar{display:flex;align-items:flex-end;justify-content:space-around;padding:4px 8px 0;height:56px}
+.tab-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:4px 0;min-width:52px;color:#555;transition:color .2s}
+.tab-btn:active{opacity:.7}
+.tab-btn.active{color:#e63946}
+.tab-btn svg{width:22px;height:22px;fill:currentColor}
+.tab-btn span{font-size:9px;letter-spacing:1px;font-weight:500}
+/* KIM Center Button */
+.kim-center-btn{position:absolute;left:50%;top:-22px;transform:translateX(-50%);width:56px;height:56px;border-radius:50%;background:linear-gradient(145deg,#e63946,#8b0000);border:3px solid #0e0e0e;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(230,57,70,.4),0 2px 8px rgba(0,0,0,.5);transition:all .15s;z-index:5}
+.kim-center-btn:active{transform:translateX(-50%) scale(.92)}
+.kim-center-btn svg{width:26px;height:26px;fill:#fff}
+/* KIM Pulse Animation */
+@keyframes kimPulse{0%,100%{box-shadow:0 4px 16px rgba(230,57,70,.4),0 2px 8px rgba(0,0,0,.5)}50%{box-shadow:0 4px 24px rgba(230,57,70,.7),0 2px 8px rgba(0,0,0,.5),0 0 32px rgba(230,57,70,.3)}}
+.kim-center-btn.kim-blink{animation:kimPulse 1.5s ease-in-out infinite}
+@keyframes kimBlink{0%,100%{}50%{}}
+/* Legacy (kept for JS compatibility) */
+.agent-btn{display:none}.agent-name,.agent-sub,.agent-bars,.agent-panel,.agent-top-label{display:none}
 
 /* Onboarding */
 .onboard-step.active{display:flex!important}
@@ -407,6 +392,58 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .setting-row select:focus{border-color:#e63946}
 .settings-close{width:100%;padding:10px;background:linear-gradient(135deg,#e63946,#c62828);border:none;border-radius:8px;color:#fff;font-size:13px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;margin-top:8px;box-shadow:0 2px 8px rgba(230,57,70,.3)}
 
+/* =========================================
+   DRAG & DROP SYSTEM
+   ========================================= */
+.widget.dragging{opacity:.3;transform:scale(.9)}
+.widget.drag-over{transform:scale(1.08);transition:transform .15s}
+#drag-ghost{
+  position:fixed;z-index:9999;pointer-events:none;
+  opacity:.85;transform:scale(1.1);
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.7));
+  transition:none;
+}
+#drag-ghost .widget-label{display:none}
+.widget-grid-edit-hint{
+  text-align:center;font-size:9px;letter-spacing:2px;color:#444;
+  text-transform:uppercase;padding:0 0 8px;
+  animation:hintPulse 2s ease-in-out infinite;
+}
+@keyframes hintPulse{0%,100%{opacity:.4}50%{opacity:.8}}
+
+/* =========================================
+   BOTTOM NAV RESTYLED (Widget Tiles)
+   ========================================= */
+.tab-bar{display:flex;align-items:center;justify-content:space-around;padding:6px 6px 2px;height:auto;gap:2px}
+.tab-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:linear-gradient(145deg,#3a3a3a 0%,#2e2e2e 30%,#262626 60%,#2a2a2a 100%);
+  border:1px solid #444;border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.2);
+  cursor:pointer;padding:8px 4px 6px;min-width:0;flex:1;
+  color:#777;transition:all .15s;position:relative;overflow:hidden;
+}
+.tab-btn::after{
+  content:'';position:absolute;inset:0;border-radius:12px;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.06),transparent 60%);pointer-events:none;
+}
+.tab-btn:active{transform:scale(.92)}
+.tab-btn.active{
+  box-shadow:0 4px 12px rgba(0,0,0,.5),0 0 16px rgba(230,57,70,.25),0 0 32px rgba(230,57,70,.08),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -1px 0 rgba(0,0,0,.2);
+  border-color:#c62828;color:#e63946;
+}
+.tab-btn svg{width:22px;height:22px;fill:currentColor;filter:drop-shadow(1px 2px 3px rgba(0,0,0,.5));position:relative;z-index:1}
+.tab-btn span{font-size:8px;letter-spacing:1.5px;font-weight:500;text-transform:uppercase;position:relative;z-index:1}
+.tab-btn.dragging{opacity:.3;transform:scale(.9)}
+.tab-btn.drag-over{transform:scale(1.08);border-color:#e63946;transition:transform .15s}
+
+/* KIM Center Button adjustments for new nav style */
+.kim-center-btn{position:absolute;left:50%;top:-22px;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;background:linear-gradient(145deg,#e63946,#8b0000);border:3px solid #0e0e0e;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(230,57,70,.4),0 2px 8px rgba(0,0,0,.5);transition:all .15s;z-index:5}
+.kim-center-btn svg{width:24px;height:24px;fill:#fff}
+
+/* Spacer for KIM button */
+.tab-bar .kim-spacer{width:48px;flex-shrink:0;flex-grow:0}
+
 @media(min-width:500px){#app{max-width:430px;margin:0 auto;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a}}
 </style>
 </head>
@@ -420,38 +457,20 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   </defs>
 </svg>
 
+
 <div id="app">
 
-  <!-- HEADER -->
+  <!-- HEADER (slim) -->
   <div id="header">
-    <div class="bar-frame">
-      <div class="panel-inset wallet-panel" style="flex:.30">
-        <div class="wallet-items">
-          <div class="kunden-card"><span>K</span></div>
-          <div class="wallet-icon"></div>
-        </div>
-        <div class="wallet-sublabels"><span>KUNDEN/CLUB</span><span>CAP-COIN</span></div>
-      </div>
-      <div class="panel-raised view-panel" style="flex:.40">
-        <div class="view-icons-grid">
-          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 15.2a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4z"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></div>
-          <div class="vi vi-center"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
-          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div>
-          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalDark)"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg></div>
-          <div></div>
-          <div class="vi"><svg viewBox="0 0 24 24" fill="url(#metalDark)"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
-        </div>
-      </div>
-      <div class="panel-inset id-panel" style="flex:.30">
-        <div class="id-top-label">KIMANUSID</div>
-        <div class="id-items">
-          <div class="qr-block"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="nfc-waves"><svg width="22" height="22" viewBox="0 0 24 24" fill="url(#metalDark)"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg></div>
-        </div>
-        <div class="id-sublabels"><span>20 34 65 10</span><span>NFC</span></div>
-      </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="hdr-btn" onclick="forceReload()" title="Neu laden"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
     </div>
-    <div class="bar-labels"><span style="flex:.30">WALLET</span><span style="flex:.40">VIEW</span><span style="flex:.30">IDENTIFY</span></div>
+    <div style="text-align:center">
+      <div id="header-title">KIMANUS</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="hdr-btn" onclick="openSettings()" title="Einstellungen"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg></button>
+    </div>
   </div>
 
   <!-- CHAT HEADER (WhatsApp-Style, nur im Fullscreen sichtbar) -->
@@ -477,28 +496,28 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       <!-- Widget Grid (Home/Baukasten) -->
       <div id="widget-grid">
         <!-- Row 1 -->
-        <div class="widget" onclick="openModule('chat')">
+        <div class="widget" data-module="chat" onclick="widgetClick(this)">
           <div class="widget-icon active-glow"><svg viewBox="0 0 24 24" fill="url(#redGrad)"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
           <div class="widget-label">MESSENGER</div>
         </div>
-        <div class="widget" onclick="openModule('phone')">
+        <div class="widget" data-module="phone" onclick="widgetClick(this)">
           <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
           <div class="widget-label">KOMM</div>
         </div>
-        <div class="widget" onclick="openModule('email')">
+        <div class="widget" data-module="email" onclick="widgetClick(this)">
           <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
           <div class="widget-label">E-MAIL</div>
         </div>
         <!-- Row 2 -->
-        <div class="widget" onclick="openModule('files')">
+        <div class="widget" data-module="files" onclick="widgetClick(this)">
           <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
           <div class="widget-label">DATEIEN</div>
         </div>
-        <div class="widget" id="sos-widget" onclick="sosPress()">
+        <div class="widget" data-module="sos" id="sos-widget" onclick="widgetClick(this)">
           <div class="widget-icon sos"><svg viewBox="0 0 24 24" fill="#e63946"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></div>
           <div class="widget-label">SOS</div>
         </div>
-        <div class="widget widget-future" onclick="openModule('future')">
+        <div class="widget widget-future" data-module="future" onclick="widgetClick(this)">
           <div class="widget-icon" style="border-style:dashed;border-color:#333;opacity:.5"><svg viewBox="0 0 24 24" fill="#444"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
           <div class="widget-label" style="color:#444">BALD</div>
         </div>
@@ -590,7 +609,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
             </div>
           </div>
           <div style="text-align:center;padding:12px 0 20px">
-            <div style="font-size:9px;color:#333;letter-spacing:2px">KIMANUS OS &middot; TOOLS v1.0</div>
+            <div style="font-size:9px;color:#333;letter-spacing:2px">KIM Chat &middot; TOOLS v1.0</div>
           </div>
         </div>
       </div>
@@ -601,7 +620,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
           <div style="text-align:center;margin-bottom:20px">
             <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#c62828,#8b0000);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(198,40,40,.3)"><span style="font-size:28px">&#x1f464;</span></div>
             <div style="font-size:16px;font-weight:600;color:#ccc;letter-spacing:2px">WOLFGANG</div>
-            <div style="font-size:11px;color:#555;letter-spacing:1px;margin-top:4px">KIMANUS OS Owner</div>
+            <div style="font-size:11px;color:#555;letter-spacing:1px;margin-top:4px">KIM Chat Owner</div>
           </div>
           <div class="agents-section">
             <div class="agents-section-title">PERS&Ouml;NLICHE DATEN</div>
@@ -621,33 +640,42 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       <!-- VIDEO ANALYZER -->
       <div id="module-video" class="module-view">
         <div style="padding:8px 8px 0;display:flex;flex-direction:column;height:100%">
-          <!-- Video Player Area -->
-          <div id="video-player-area" style="display:none;margin-bottom:8px;border-radius:10px;overflow:hidden;background:#000;position:relative">
-            <div style="position:relative;padding-bottom:56.25%;height:0">
+          <!-- Video Player/Thumbnail (fest oben, scrollt NICHT mit) -->
+          <div id="video-player-area" style="display:none;margin-bottom:8px;border-radius:10px;overflow:hidden;background:#000;position:relative;flex-shrink:0">
+            <!-- Thumbnail mit Play-Overlay -->
+            <div id="video-thumb-container" style="display:none;position:relative;cursor:pointer">
+              <img id="video-thumb-img" src="" style="width:100%;display:block;border-radius:10px" alt="Video">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);border-radius:10px;transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,.15)'" onmouseout="this.style.background='rgba(0,0,0,.3)'">
+                <div style="width:60px;height:60px;background:rgba(200,40,40,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.5)">
+                  <div style="width:0;height:0;border-style:solid;border-width:12px 0 12px 22px;border-color:transparent transparent transparent #fff;margin-left:4px"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Iframe Player -->
+            <div id="video-iframe-container" style="display:none;position:relative;padding-bottom:56.25%;height:0">
               <iframe id="video-player-iframe" src="" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
             </div>
             <button onclick="closeVideoPlayer()" style="position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.7);border:1px solid #444;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2">&times;</button>
           </div>
 
-          <!-- Scrollable Content -->
+          <!-- Scrollable Content (alles scrollt zusammen, nur Player bleibt oben) -->
           <div id="video-content-area" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">
             <!-- Search Results -->
             <div id="video-search-results" style="display:none"></div>
             <!-- Analysis Result -->
             <div id="video-result" style="font-size:14px;line-height:1.6;color:#ccc"></div>
-          </div>
-
-          <!-- Bottom Controls (Suche + Analyse) -->
-          <div style="padding:8px 0 10px;border-top:1px solid #222;flex-shrink:0">
-            <!-- Suchzeile -->
-            <div style="display:flex;gap:6px;margin-bottom:6px">
-              <input id="video-search-input" type="text" placeholder="YouTube durchsuchen..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')searchVideos()">
-              <button onclick="searchVideos()" style="padding:9px 14px;background:linear-gradient(135deg,#333,#222);border:1px solid #444;border-radius:8px;color:#ccc;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer">&#x1f50d; SUCHE</button>
-            </div>
-            <!-- Analysezeile -->
-            <div style="display:flex;gap:6px">
-              <input id="video-url-input" type="url" placeholder="YouTube URL analysieren..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')analyzeVideo()">
-              <button onclick="analyzeVideo()" style="padding:9px 14px;background:linear-gradient(135deg,#c62828,#8b0000);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 8px rgba(198,40,40,.3)">&#x1f3ac; ANALYSE</button>
+            <!-- Controls (scrollen mit) -->
+            <div style="padding:8px 0 10px;border-top:1px solid #222;margin-top:auto">
+              <!-- Suchzeile -->
+              <div style="display:flex;gap:6px;margin-bottom:6px">
+                <input id="video-search-input" type="text" placeholder="YouTube durchsuchen..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')searchVideos()">
+                <button onclick="searchVideos()" style="padding:9px 0;background:linear-gradient(135deg,#333,#222);border:1px solid #444;border-radius:8px;color:#ccc;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;width:110px;text-align:center">&#x1f50d; SUCHE</button>
+              </div>
+              <!-- Analysezeile -->
+              <div style="display:flex;gap:6px">
+                <input id="video-url-input" type="url" placeholder="YouTube URL analysieren..." style="flex:1;padding:9px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ddd;font-size:13px;outline:none" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#333'" onkeydown="if(event.key==='Enter')analyzeVideo()">
+                <button onclick="analyzeVideo()" style="padding:9px 0;background:linear-gradient(135deg,#c62828,#8b0000);border:1px solid #8b0000;border-radius:8px;color:#fff;font-size:12px;font-weight:600;letter-spacing:1px;cursor:pointer;box-shadow:0 2px 8px rgba(198,40,40,.3);width:110px;text-align:center">&#x1f3ac; ANALYSE</button>
+              </div>
             </div>
           </div>
         </div>
@@ -684,34 +712,31 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 
   <!-- BOTTOM NAV -->
   <div id="bottom-nav">
-    <div class="bar-frame">
-      <div class="panel-inset" style="flex:.24">
-        <div class="agent-panel">
-          <div class="agent-top-label" onclick="openModule('tools')" style="cursor:pointer">ALL TOOLS</div>
-          <div style="display:flex;align-items:center;gap:4px;justify-content:center;width:100%">
-            <button class="agent-btn" id="btn-set" onclick="event.stopPropagation();openSettings()"><div><div class="agent-name">SET</div><div class="agent-sub">ALLG.</div></div></button>
-            <div class="agent-bars" onclick="openModule('tools')" style="cursor:pointer"><span style="width:28px"></span><span style="width:22px"></span><span style="width:26px"></span></div>
-            <button class="agent-btn" id="btn-pri" onclick="event.stopPropagation();openModule('private')"><div><div class="agent-name">PRI</div><div class="agent-sub">PRIVAT</div></div></button>
-          </div>
-        </div>
-      </div>
-      <div class="panel-raised" style="flex:.52;display:flex;align-items:center;justify-content:center">
-        <button onclick="showHome()" style="width:48px;height:48px;border-radius:50%;border:none;background:linear-gradient(145deg,#444,#333);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);transition:all .15s;position:relative">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </button>
-      </div>
-      <div class="panel-inset" style="flex:.24">
-        <div class="agent-panel">
-          <div class="agent-top-label" onclick="openModule('agents')" style="cursor:pointer">ALL AGENTS</div>
-          <div style="display:flex;align-items:center;gap:4px;justify-content:center;width:100%">
-            <button class="agent-btn" id="btn-kai" onclick="event.stopPropagation();setAgent('kai')"><div><div class="agent-name">KAI</div><div class="agent-sub">A4BIS</div></div></button>
-            <div class="agent-bars" onclick="openModule('agents')" style="cursor:pointer"><span style="width:28px"></span><span style="width:22px"></span><span style="width:26px"></span></div>
-            <button class="agent-btn active" id="btn-kim" onclick="event.stopPropagation();setAgent('kim')"><div><div class="agent-name">KIM</div><div class="agent-sub">P.A4MY</div></div></button>
-          </div>
-        </div>
-      </div>
+    <!-- KIM Center Button (ragt oben raus) -->
+    <button class="kim-center-btn" id="btn-kim" onclick="setAgent('kim');openModule('chat')">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+    <!-- Tab Bar -->
+    <div class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" id="tab-home" data-module="home" onclick="navTabClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>HOME</span>
+      </button>
+      <button class="tab-btn" id="tab-video" data-module="video" onclick="navTabClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+        <span>VIDEO</span>
+      </button>
+      <!-- Platzhalter fuer KIM-Button in der Mitte -->
+      <div class="kim-spacer"></div>
+      <button class="tab-btn" id="tab-tools" data-module="tools" onclick="navTabClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+        <span>TOOLS</span>
+      </button>
+      <button class="tab-btn" id="tab-more" data-module="agents" onclick="navTabClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span>MEHR</span>
+      </button>
     </div>
-    <div class="bar-labels"><span style="flex:.24">TOOLS</span><span style="flex:.52">HOME</span><span style="flex:.24">AGENTEN</span></div>
   </div>
 </div>
 
@@ -994,20 +1019,43 @@ function extractVideoId(url) {
   return m ? m[1] : null;
 }
 
-// Video im Embed-Player abspielen
+// Video-Thumbnail oben anzeigen (mit Play-Overlay)
+function showVideoThumb(videoId, thumbUrl) {
+  const area = document.getElementById('video-player-area');
+  const thumbContainer = document.getElementById('video-thumb-container');
+  const iframeContainer = document.getElementById('video-iframe-container');
+  const thumbImg = document.getElementById('video-thumb-img');
+  thumbImg.src = thumbUrl || 'https://img.youtube.com/vi/' + videoId + '/maxresdefault.jpg';
+  thumbImg.onerror = function() { this.src = 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg'; };
+  thumbContainer.style.display = 'block';
+  thumbContainer.onclick = function() { playVideo(videoId); };
+  iframeContainer.style.display = 'none';
+  area.style.display = 'block';
+  document.getElementById('video-url-input').value = 'https://www.youtube.com/watch?v=' + videoId;
+}
+
+// Video im Embed-Player abspielen (ersetzt Thumbnail)
 function playVideo(videoId) {
   const area = document.getElementById('video-player-area');
+  const thumbContainer = document.getElementById('video-thumb-container');
+  const iframeContainer = document.getElementById('video-iframe-container');
   const iframe = document.getElementById('video-player-iframe');
+  // Thumbnail weg, Player her
+  thumbContainer.style.display = 'none';
   iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+  iframeContainer.style.display = 'block';
   area.style.display = 'block';
-  // URL ins Analyse-Feld eintragen
   document.getElementById('video-url-input').value = 'https://www.youtube.com/watch?v=' + videoId;
 }
 
 function closeVideoPlayer() {
   const area = document.getElementById('video-player-area');
   const iframe = document.getElementById('video-player-iframe');
+  const thumbContainer = document.getElementById('video-thumb-container');
+  const iframeContainer = document.getElementById('video-iframe-container');
   iframe.src = '';
+  thumbContainer.style.display = 'none';
+  iframeContainer.style.display = 'none';
   area.style.display = 'none';
 }
 
@@ -1039,7 +1087,7 @@ async function searchVideos() {
       const vidId = extractVideoId(v.url || '');
       const thumb = v.thumbnail || (vidId ? 'https://img.youtube.com/vi/' + vidId + '/mqdefault.jpg' : '');
 
-      html += '<div style="display:flex;gap:10px;padding:8px;margin-bottom:6px;background:#1a1a1a;border:1px solid #222;border-radius:8px;cursor:pointer" onclick="' + (vidId ? "playVideo('" + vidId + "')" : '') + '">';
+      html += '<div style="display:flex;gap:10px;padding:8px;margin-bottom:6px;background:#1a1a1a;border:1px solid #222;border-radius:8px;cursor:pointer" onclick="' + (vidId ? "showVideoThumb('" + vidId + "','" + (thumb||'').replace(/'/g,"\\'") + "')" : '') + '">';
 
       // Thumbnail
       if (thumb) {
@@ -1069,7 +1117,7 @@ async function searchVideos() {
 // Analyse aus Suchergebnissen starten
 function analyzeFromSearch(videoId) {
   document.getElementById('video-url-input').value = 'https://www.youtube.com/watch?v=' + videoId;
-  playVideo(videoId);
+  showVideoThumb(videoId, '');
   analyzeVideo();
 }
 
@@ -1090,13 +1138,15 @@ async function analyzeVideo() {
     if (!resp.ok) throw new Error('Video Analyse fehlgeschlagen (' + resp.status + ')');
     var data = await resp.json();
 
-    let html = '';
-    // Kein Thumbnail mehr anzeigen wenn Player aktiv ist
-    const playerVisible = document.getElementById('video-player-area').style.display !== 'none';
-    if (data.thumbnail && !playerVisible) {
-      const vidId = extractVideoId(url);
-      html += '<div style="margin-bottom:12px;border-radius:8px;overflow:hidden;cursor:pointer" onclick="' + (vidId ? "playVideo('" + vidId + "')" : '') + '"><img src="' + data.thumbnail + '" style="width:100%;border-radius:8px" alt="Thumbnail"><div style="text-align:center;margin-top:4px;font-size:10px;color:#666">&#9654; Antippen zum Abspielen</div></div>';
+    // Thumbnail oben im Player-Bereich anzeigen (mit Play-Button)
+    const vidId = extractVideoId(url);
+    const iframeContainer = document.getElementById('video-iframe-container');
+    const playerAlreadyPlaying = iframeContainer && iframeContainer.style.display !== 'none';
+    if (vidId && !playerAlreadyPlaying) {
+      showVideoThumb(vidId, data.thumbnail || '');
     }
+
+    let html = '';
     html += '<div style="font-size:16px;font-weight:600;color:#e0e0e0;margin-bottom:4px">' + (data.title || '') + '</div>';
     html += '<div style="font-size:11px;color:#666;margin-bottom:12px">' + (data.channel || '') + ' &middot; ' + (data.duration || '') + ' &middot; ' + (data.elapsed_seconds || '?') + 's Analyse</div>';
     html += '<div style="font-size:14px;line-height:1.7;color:#ccc">' + markdownToHtml(data.analysis || 'Keine Analyse') + '</div>';
@@ -1625,7 +1675,13 @@ function showHome() {
   document.getElementById('back-btn').classList.remove('visible');
   document.getElementById('view-title').textContent = 'KOMMANDOZENTRALE';
   document.getElementById('input-bar').classList.remove('active');
+  setActiveTab(document.querySelector('.tab-btn[data-module="home"]') || document.querySelector('.tab-btn'));
   haptic();
+}
+
+function setActiveTab(el) {
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
 }
 
 // KIM Blink beim App-Start
@@ -1691,7 +1747,7 @@ function startOnboarding() {
   }, 400);
 
   setTimeout(() => {
-    introEl.innerHTML = 'Ich bin dein persoenlicher Assistent im <strong style="color:#e63946">KIMANUS OS</strong>.<br><br>Ich helfe dir im Alltag, bei Fragen, Erinnerungen und allem was anfaellt.<br><br>Darf ich dich kurz kennenlernen?';
+    introEl.innerHTML = 'Ich bin dein persoenlicher Assistent bei <strong style="color:#e63946">KIM Chat</strong>.<br><br>Ich helfe dir im Alltag, bei Fragen, Erinnerungen und allem was anfaellt.<br><br>Darf ich dich kurz kennenlernen?';
     introEl.style.opacity = '1';
     introEl.style.transform = 'translateY(0)';
   }, 800);
@@ -2125,11 +2181,12 @@ async function startPhoneCall() {
   haptic();
 
   try {
-    // 1. Ephemeral Token holen
+    // 1. Ephemeral Token holen (Chat-History fuer Kontext mitsenden)
+    const recentCtx = history.slice(-8).map(h => h.role === 'user' ? 'User: ' + h.content : 'KIM: ' + h.content).join('\n');
     const tokenResp = await fetch('/api/realtime/session', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({agent: currentAgent, demo: demoMode})
+      body: JSON.stringify({agent: currentAgent, demo: demoMode, chat_context: recentCtx})
     });
     const tokenData = await tokenResp.json();
     if (!tokenData.token) {
@@ -2445,6 +2502,9 @@ async function phoneSendVoice(blob, mimeType) {
   const formData = new FormData();
   const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'wav';
   formData.append('audio', blob, 'recording.' + ext);
+  // Chat-History mitsenden damit KIM den Kontext kennt
+  const recentHistory = history.slice(-10).map(h => ({role: h.role === 'user' ? 'user' : 'assistant', content: h.content}));
+  formData.append('chat_history', JSON.stringify(recentHistory));
 
   const model = document.getElementById('setting-model').value;
   const voice = getSelectedVoice();
@@ -2704,6 +2764,49 @@ function formatMarkdown(text) {
 function scrollToBottom() { const c = document.getElementById('canvas'); setTimeout(() => c.scrollTop = c.scrollHeight, 50); }
 function saveHistory() { localStorage.setItem('kimanus-history', JSON.stringify(history.slice(-50))); }
 function clearHistory() { history = []; localStorage.removeItem('kimanus-history'); document.getElementById('messages').innerHTML = ''; showHome(); closeSettings(); }
+
+// === PROFIL-BACKUP: Server <-> Handy Sync ===
+async function syncProfile() {
+  try {
+    // 1. Server-Profil holen
+    const res = await fetch('/api/profile');
+    if (!res.ok) return;
+    const server = await res.json();
+
+    // 2. Lokales Backup aus localStorage
+    const localProfile = localStorage.getItem('kimanus-profile-backup') || '';
+    const localHash = localStorage.getItem('kimanus-profile-hash') || '';
+
+    // 3. Server hat Profil -> lokal sichern
+    if (server.profile && server.profile.length > 0) {
+      localStorage.setItem('kimanus-profile-backup', server.profile);
+      localStorage.setItem('kimanus-profile-hash', server.hash);
+      localStorage.setItem('kimanus-profile-sync-ts', Date.now().toString());
+      console.log('[Profile Sync] Server -> Handy gesichert (' + server.profile.length + ' chars)');
+    }
+    // 4. Server leer aber Handy hat Backup -> wiederherstellen
+    else if (localProfile.length > 0 && (!server.profile || server.profile.length < localProfile.length)) {
+      const syncRes = await fetch('/api/profile/sync', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({profile: localProfile, hash: localHash})
+      });
+      if (syncRes.ok) {
+        const result = await syncRes.json();
+        console.log('[Profile Sync] Handy -> Server: ' + result.message);
+      }
+    }
+    // 5. Hashes gleich -> alles aktuell
+    else if (server.hash === localHash) {
+      console.log('[Profile Sync] Alles aktuell');
+    }
+  } catch (e) {
+    console.log('[Profile Sync] Offline - Backup bleibt lokal erhalten');
+  }
+}
+// Sync beim App-Start und alle 5 Minuten
+setTimeout(syncProfile, 2000);
+setInterval(syncProfile, 5 * 60 * 1000);
 function openSettings() { document.getElementById('settings-overlay').classList.add('open'); haptic(); }
 function closeSettings(e) { if (e && e.target !== document.getElementById('settings-overlay')) return; document.getElementById('settings-overlay').classList.remove('open'); }
 async function checkHealth() {
@@ -2786,6 +2889,399 @@ async function tryFlashlight(on) {
 }
 
 function haptic() { if (navigator.vibrate) navigator.vibrate(10); }
+
+// =========================================
+// NAV TAB CLICK HANDLER
+// =========================================
+function navTabClick(btn) {
+  const mod = btn.dataset.module;
+  if (mod === 'home') {
+    showHome();
+  } else if (mod === 'sos') {
+    sosPress();
+  } else {
+    openModule(mod);
+  }
+  setActiveTab(btn);
+}
+
+// Widget click handler (respects drag state)
+function widgetClick(el) {
+  if (dragState.wasDragging) return;
+  const mod = el.dataset.module;
+  if (mod === 'sos') { sosPress(); return; }
+  if (mod === 'home') { showHome(); return; }
+  openModule(mod);
+}
+
+// =========================================
+// DRAG & DROP SYSTEM (Touch + Mouse)
+// =========================================
+const dragState = {
+  active: false,
+  wasDragging: false,
+  source: null,       // DOM element being dragged
+  sourceZone: null,   // 'grid' or 'nav'
+  ghost: null,
+  startX: 0, startY: 0,
+  offsetX: 0, offsetY: 0,
+  longPressTimer: null,
+  dropTarget: null
+};
+
+// All known widget definitions (module -> icon SVG + label + extra classes)
+const WIDGET_DEFS = {
+  chat:   { svg: '<svg viewBox="0 0 24 24" fill="url(#redGrad)"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>', label: 'MESSENGER', iconClass: 'active-glow' },
+  phone:  { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>', label: 'KOMM', iconClass: '' },
+  email:  { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>', label: 'E-MAIL', iconClass: '' },
+  files:  { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>', label: 'DATEIEN', iconClass: '' },
+  sos:    { svg: '<svg viewBox="0 0 24 24" fill="#e63946"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>', label: 'SOS', iconClass: 'sos' },
+  future: { svg: '<svg viewBox="0 0 24 24" fill="#444"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>', label: 'BALD', iconClass: '', futureStyle: true },
+  home:   { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>', label: 'HOME', iconClass: '' },
+  video:  { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>', label: 'VIDEO', iconClass: '' },
+  tools:  { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>', label: 'TOOLS', iconClass: '' },
+  agents: { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>', label: 'MEHR', iconClass: '' },
+};
+
+// Nav tab SVGs (smaller, for bottom bar)
+function getNavSvg(mod) {
+  const def = WIDGET_DEFS[mod];
+  if (!def) return '';
+  // Return just the SVG (tab-btn uses fill:currentColor via CSS)
+  return def.svg.replace(/fill="[^"]*"/g, '');
+}
+
+function createGhost(sourceEl) {
+  const ghost = document.createElement('div');
+  ghost.id = 'drag-ghost';
+  // Clone just the icon part
+  const iconEl = sourceEl.querySelector('.widget-icon') || sourceEl;
+  const clone = iconEl.cloneNode(true);
+  clone.style.width = '72px';
+  clone.style.height = '72px';
+  ghost.appendChild(clone);
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
+function moveGhost(x, y) {
+  if (!dragState.ghost) return;
+  dragState.ghost.style.left = (x - dragState.offsetX) + 'px';
+  dragState.ghost.style.top = (y - dragState.offsetY) + 'px';
+}
+
+function getDropTarget(x, y) {
+  // Temporarily hide ghost to get element below
+  if (dragState.ghost) dragState.ghost.style.display = 'none';
+  const el = document.elementFromPoint(x, y);
+  if (dragState.ghost) dragState.ghost.style.display = '';
+
+  if (!el) return null;
+  // Check if it's a widget in the grid
+  const widget = el.closest('.widget');
+  if (widget && widget !== dragState.source && widget.closest('#widget-grid')) {
+    return { el: widget, zone: 'grid' };
+  }
+  // Check if it's a tab-btn in the nav
+  const tabBtn = el.closest('.tab-btn');
+  if (tabBtn && tabBtn !== dragState.source) {
+    return { el: tabBtn, zone: 'nav' };
+  }
+  // Check if hovering over bottom-nav area generally (for grid->nav drops)
+  const nav = el.closest('#bottom-nav');
+  if (nav && dragState.sourceZone === 'grid') {
+    // Find nearest tab-btn
+    const btns = Array.from(document.querySelectorAll('.tab-btn'));
+    let nearest = null, minDist = Infinity;
+    btns.forEach(b => {
+      const r = b.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const d = Math.abs(x - cx) + Math.abs(y - cy);
+      if (d < minDist) { minDist = d; nearest = b; }
+    });
+    if (nearest) return { el: nearest, zone: 'nav' };
+  }
+  return null;
+}
+
+function clearDropHighlights() {
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+
+function startDrag(sourceEl, sourceZone, x, y) {
+  dragState.active = true;
+  dragState.wasDragging = true;
+  dragState.source = sourceEl;
+  dragState.sourceZone = sourceZone;
+
+  const rect = sourceEl.getBoundingClientRect();
+  dragState.offsetX = 36; // center ghost on finger
+  dragState.offsetY = 36;
+
+  sourceEl.classList.add('dragging');
+  dragState.ghost = createGhost(sourceEl);
+  moveGhost(x, y);
+  haptic();
+}
+
+function endDrag() {
+  if (!dragState.active) return;
+  const target = dragState.dropTarget;
+
+  if (target && target.el !== dragState.source) {
+    performSwap(dragState.source, dragState.sourceZone, target.el, target.zone);
+  }
+
+  // Cleanup
+  dragState.source.classList.remove('dragging');
+  clearDropHighlights();
+  if (dragState.ghost) { dragState.ghost.remove(); dragState.ghost = null; }
+  dragState.active = false;
+  dragState.source = null;
+  dragState.sourceZone = null;
+  dragState.dropTarget = null;
+  // Reset wasDragging after a tick so click handler can check it
+  setTimeout(() => { dragState.wasDragging = false; }, 50);
+}
+
+function performSwap(srcEl, srcZone, tgtEl, tgtZone) {
+  if (srcZone === 'grid' && tgtZone === 'grid') {
+    // Swap positions in grid
+    const parent = srcEl.parentNode;
+    const srcNext = srcEl.nextElementSibling;
+    const tgtNext = tgtEl.nextElementSibling;
+    if (srcNext === tgtEl) {
+      parent.insertBefore(tgtEl, srcEl);
+    } else if (tgtNext === srcEl) {
+      parent.insertBefore(srcEl, tgtEl);
+    } else {
+      parent.insertBefore(srcEl, tgtNext);
+      parent.insertBefore(tgtEl, srcNext);
+    }
+  } else if (srcZone === 'nav' && tgtZone === 'nav') {
+    // Swap positions in nav
+    const parent = srcEl.parentNode;
+    const srcNext = srcEl.nextElementSibling;
+    const tgtNext = tgtEl.nextElementSibling;
+    if (srcNext === tgtEl) {
+      parent.insertBefore(tgtEl, srcEl);
+    } else if (tgtNext === srcEl) {
+      parent.insertBefore(srcEl, tgtEl);
+    } else {
+      parent.insertBefore(srcEl, tgtNext);
+      parent.insertBefore(tgtEl, srcNext);
+    }
+  } else {
+    // Cross-zone swap: grid <-> nav
+    const srcMod = srcEl.dataset.module;
+    const tgtMod = tgtEl.dataset.module;
+    if (!srcMod || !tgtMod) return;
+
+    // Swap the data-module attributes and rebuild content
+    if (srcZone === 'grid' && tgtZone === 'nav') {
+      rebuildWidget(srcEl, tgtMod);
+      rebuildNavBtn(tgtEl, srcMod);
+    } else {
+      rebuildNavBtn(srcEl, tgtMod);
+      rebuildWidget(tgtEl, srcMod);
+    }
+  }
+  haptic();
+  saveLayout();
+}
+
+function rebuildWidget(el, mod) {
+  const def = WIDGET_DEFS[mod];
+  if (!def) return;
+  el.dataset.module = mod;
+  if (mod === 'sos') { el.id = 'sos-widget'; } else if (el.id === 'sos-widget') { el.id = ''; }
+  const iconDiv = el.querySelector('.widget-icon');
+  iconDiv.className = 'widget-icon' + (def.iconClass ? ' ' + def.iconClass : '');
+  iconDiv.innerHTML = def.svg;
+  if (def.futureStyle) {
+    iconDiv.style.borderStyle = 'dashed';
+    iconDiv.style.borderColor = '#333';
+    iconDiv.style.opacity = '.5';
+  } else {
+    iconDiv.style.borderStyle = '';
+    iconDiv.style.borderColor = '';
+    iconDiv.style.opacity = '';
+  }
+  const labelDiv = el.querySelector('.widget-label');
+  labelDiv.textContent = def.label;
+  labelDiv.style.color = def.futureStyle ? '#444' : '';
+  el.className = 'widget' + (def.futureStyle ? ' widget-future' : '');
+}
+
+function rebuildNavBtn(el, mod) {
+  const def = WIDGET_DEFS[mod];
+  if (!def) return;
+  el.dataset.module = mod;
+  // Keep IDs mapped
+  const idMap = { home: 'tab-home', video: 'tab-video', tools: 'tab-tools', agents: 'tab-more' };
+  // Clear old ID mappings from all nav btns if needed
+  el.id = idMap[mod] || 'tab-' + mod;
+  // Rebuild inner SVG + label
+  const svgStr = def.svg.replace(/fill="[^"]*"/g, 'fill="currentColor"');
+  el.innerHTML = svgStr + '<span>' + def.label + '</span>';
+}
+
+// ---- TOUCH EVENTS ----
+function onTouchStart(e) {
+  if (dragState.active) return;
+  const widget = e.target.closest('.widget');
+  const tabBtn = e.target.closest('.tab-btn');
+  const target = widget || tabBtn;
+  if (!target) return;
+
+  const touch = e.touches[0];
+  dragState.startX = touch.clientX;
+  dragState.startY = touch.clientY;
+  dragState.wasDragging = false;
+
+  const zone = widget ? 'grid' : 'nav';
+  // Long-press to start drag (400ms)
+  dragState.longPressTimer = setTimeout(() => {
+    startDrag(target, zone, touch.clientX, touch.clientY);
+  }, 400);
+}
+
+function onTouchMove(e) {
+  const touch = e.touches[0];
+  // If not yet dragging, check if moved enough to cancel long-press
+  if (!dragState.active) {
+    const dx = Math.abs(touch.clientX - dragState.startX);
+    const dy = Math.abs(touch.clientY - dragState.startY);
+    if (dx > 10 || dy > 10) {
+      clearTimeout(dragState.longPressTimer);
+    }
+    return;
+  }
+  e.preventDefault();
+  moveGhost(touch.clientX, touch.clientY);
+
+  // Highlight drop target
+  clearDropHighlights();
+  const target = getDropTarget(touch.clientX, touch.clientY);
+  dragState.dropTarget = target;
+  if (target) target.el.classList.add('drag-over');
+}
+
+function onTouchEnd(e) {
+  clearTimeout(dragState.longPressTimer);
+  if (dragState.active) {
+    e.preventDefault();
+    endDrag();
+  }
+}
+
+// ---- MOUSE EVENTS (for desktop testing) ----
+let mouseDown = false;
+function onMouseDown(e) {
+  const widget = e.target.closest('.widget');
+  const tabBtn = e.target.closest('.tab-btn');
+  const target = widget || tabBtn;
+  if (!target) return;
+
+  mouseDown = true;
+  dragState.startX = e.clientX;
+  dragState.startY = e.clientY;
+  dragState.wasDragging = false;
+
+  const zone = widget ? 'grid' : 'nav';
+  dragState.longPressTimer = setTimeout(() => {
+    if (!mouseDown) return;
+    startDrag(target, zone, e.clientX, e.clientY);
+  }, 400);
+}
+
+function onMouseMove(e) {
+  if (!mouseDown && !dragState.active) return;
+  if (!dragState.active) {
+    const dx = Math.abs(e.clientX - dragState.startX);
+    const dy = Math.abs(e.clientY - dragState.startY);
+    if (dx > 10 || dy > 10) { clearTimeout(dragState.longPressTimer); }
+    return;
+  }
+  e.preventDefault();
+  moveGhost(e.clientX, e.clientY);
+  clearDropHighlights();
+  const target = getDropTarget(e.clientX, e.clientY);
+  dragState.dropTarget = target;
+  if (target) target.el.classList.add('drag-over');
+}
+
+function onMouseUp(e) {
+  mouseDown = false;
+  clearTimeout(dragState.longPressTimer);
+  if (dragState.active) { endDrag(); }
+}
+
+// ---- ATTACH EVENTS ----
+document.addEventListener('touchstart', onTouchStart, { passive: false });
+document.addEventListener('touchmove', onTouchMove, { passive: false });
+document.addEventListener('touchend', onTouchEnd, { passive: false });
+document.addEventListener('mousedown', onMouseDown);
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+
+// =========================================
+// LAYOUT PERSISTENCE
+// =========================================
+function saveLayout() {
+  try {
+    const gridOrder = Array.from(document.querySelectorAll('#widget-grid .widget')).map(w => w.dataset.module);
+    const navOrder = Array.from(document.querySelectorAll('#tab-bar .tab-btn')).map(b => b.dataset.module);
+    localStorage.setItem('kimanus-layout', JSON.stringify({ gridOrder, navOrder }));
+  } catch(e) {}
+}
+
+function loadLayout() {
+  try {
+    const data = JSON.parse(localStorage.getItem('kimanus-layout'));
+    if (!data) return;
+
+    if (data.gridOrder && data.gridOrder.length > 0) {
+      const grid = document.getElementById('widget-grid');
+      const widgets = Array.from(grid.querySelectorAll('.widget'));
+      // Only apply if counts match
+      if (widgets.length === data.gridOrder.length) {
+        data.gridOrder.forEach((mod, i) => {
+          rebuildWidget(widgets[i], mod);
+        });
+      }
+    }
+
+    if (data.navOrder && data.navOrder.length > 0) {
+      const bar = document.getElementById('tab-bar');
+      const btns = Array.from(bar.querySelectorAll('.tab-btn'));
+      if (btns.length === data.navOrder.length) {
+        data.navOrder.forEach((mod, i) => {
+          rebuildNavBtn(btns[i], mod);
+        });
+      }
+      // Re-highlight active tab
+      setActiveTab(document.querySelector('.tab-btn[data-module="home"]') || btns[0]);
+    }
+  } catch(e) {}
+}
+
+// Load saved layout on startup
+loadLayout();
+
+// Force Reload - loescht Cache und laedt komplett neu
+function forceReload() {
+  haptic();
+  // Cache-busting: alle caches loeschen falls vorhanden
+  if ('caches' in window) {
+    caches.keys().then(function(names) {
+      names.forEach(function(name) { caches.delete(name); });
+    });
+  }
+  // Hard reload ohne Cache
+  window.location.href = window.location.pathname + '?_=' + Date.now();
+}
 </script>
 </body>
 </html>

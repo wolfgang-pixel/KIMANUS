@@ -1,7 +1,7 @@
 {
-  "name": "KIMANUS OS",
-  "short_name": "KIMANUS",
-  "description": "Kommandozentrale - Dein souveraenes KI-Oekosystem",
+  "name": "KIM Chat",
+  "short_name": "KIM",
+  "description": "Deine persoenliche Assistentin - Chat, Voice, alles in einem",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
