@@ -424,7 +424,10 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .msg-bot .bubble pre{background:#0e0e0e;padding:10px;border-radius:6px;overflow-x:auto;margin:8px 0;border:1px solid #222}
 .msg-bot .bubble pre code{background:none;padding:0}
 .msg-agent{font-size:10px;color:#555;margin-bottom:2px;letter-spacing:1px;text-transform:uppercase}
-.msg-time{font-size:10px;color:#444;margin-top:2px}
+.msg-time{font-size:10px;color:#444;margin-top:2px;display:flex;align-items:center;gap:6px}
+.msg-tts-btn{background:none;border:none;color:#555;cursor:pointer;padding:2px;display:inline-flex;align-items:center;border-radius:4px;transition:all .15s}
+.msg-tts-btn:active{color:#e63946;transform:scale(.9)}
+.msg-tts-btn.tts-playing{color:#e63946}
 .typing{margin-bottom:16px;animation:fadeIn .3s ease}
 .typing-bubble{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 18px 18px 18px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
 .typing-dots{display:flex;gap:5px}
@@ -749,7 +752,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       <div class="ch-name" id="ch-agent-name">KIM · P.A4MY</div>
       <div class="ch-status" id="ch-agent-status">Online</div>
     </div>
-    <button class="ch-toggle active" id="tts-toggle" onclick="toggleTTS()" title="Sprachausgabe"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>
+    <button class="ch-toggle" id="tts-toggle" onclick="toggleTTS()" title="Sprachausgabe" style="display:none"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>
     <button class="ch-toggle" id="phone-toggle" onclick="togglePhoneMode()" title="Telefon-Modus"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button>
     <button class="ch-toggle" id="demo-toggle" onclick="toggleDemo()" title="Demo-Modus (Premium)"><svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></button>
   </div>
@@ -1247,7 +1250,7 @@ let history = JSON.parse(localStorage.getItem('kimanus-history') || '[]');
 const sessionId = 'kimanus-' + Date.now();
 
 // === TTS (Text-to-Speech) ===
-let ttsEnabled = localStorage.getItem('kimanus-tts') !== 'off'; // Standard: an
+let ttsEnabled = false; // TTS nur noch per Button pro Nachricht
 
 // Stimmen-Einstellungen laden
 let voiceKai = localStorage.getItem('kimanus-voice-kai') || 'onyx';
@@ -2365,10 +2368,7 @@ async function sendMessage() {
     renderMessage('bot', answer, currentAgent, ansTime, true, modelUsed);
     history.push({role:'bot', content:answer, agent:currentAgent, time:ansTime, model:modelUsed});
     saveHistory();
-    // Automatische Sprachausgabe wenn TTS aktiviert
-    if (ttsEnabled && answer) {
-      speakText(answer, currentAgent);
-    }
+    // TTS nur noch per Button an einzelner Nachricht
   } catch(err) {
     hideTyping(); isTyping = false;
     renderMessage('bot', 'Verbindungsfehler: ' + err.message, currentAgent, now);
@@ -2384,7 +2384,8 @@ function renderMessage(role, content, agent, time, scroll=true, modelUsed='') {
   if (role === 'user') {
     div.innerHTML = `<div class="msg-agent">${agentLabel}</div><div class="bubble">${escapeHtml(content)}</div><div class="msg-time">${time}</div>`;
   } else {
-    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}</div><div class="msg-time">${time}</div>`;
+    const ttsBtn = `<button class="msg-tts-btn" onclick="speakText(this.closest('.msg').dataset.rawContent,'${agent}',this)" title="Vorlesen"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>`;
+    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}</div><div class="msg-time">${time} ${ttsBtn}</div>`;
     div.dataset.rawContent = content;
   }
   container.appendChild(div);
