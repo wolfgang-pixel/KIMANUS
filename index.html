@@ -1569,36 +1569,41 @@ async function saveVideoAnalysis() {
 }
 
 // Kapitel aus Analyse-Text extrahieren
-// Erkennt Muster: "00:00 - 02:30 | Thema", "00:00 - 02:30: Thema", "**00:00** Thema", "- 00:00 Thema"
+// Erkennt viele Formate: "- 00:00 - 02:30 | Thema", "00:00-02:30: Thema", "**00:00** Thema", "1. 00:00 Thema"
 function parseChapters(analysisText) {
   var chapters = [];
   var lines = analysisText.split('\n');
-  // Regex: Zeile mit Timestamp am Anfang (nach optionalem -, *, Zahl.)
-  var chapterRe = /^[\s\-\*\d.]*\*{0,2}(\d{1,2}:\d{2}(?::\d{2})?)\*{0,2}\s*[\-–|:]+\s*\*{0,2}(\d{1,2}:\d{2}(?::\d{2})?)\*{0,2}\s*[\-–|:]*\s*(.+)/;
-  // Fallback: Nur Start-Timestamp
-  var simpleRe = /^[\s\-\*\d.]*\*{0,2}(\d{1,2}:\d{2}(?::\d{2})?)\*{0,2}\s*[\-–|:]+\s*(.+)/;
-  var contentLines = {};
-  var currentChapterIdx = -1;
 
   for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].trim();
-    if (!line) continue;
-    var m = line.match(chapterRe);
-    if (m) {
-      var title = m[3].replace(/\*+/g, '').replace(/^\s*[\-–|:]\s*/, '').trim();
-      chapters.push({startTime: m[1], endTime: m[2], title: title, startSecs: tsToSecs(m[1]), endSecs: tsToSecs(m[2]), content: ''});
-      currentChapterIdx = chapters.length - 1;
+    var line = lines[i];
+    // Alles was kein Kapitel-Zeile sein kann, skippen
+    var clean = line.replace(/\*+/g, '').replace(/^[\s\-\*\d.)]+/, '').trim();
+    if (!clean) continue;
+
+    // Pattern 1: "00:00 - 03:15 | Thema" oder "00:00 – 03:15 | Thema" oder "00:00-03:15: Thema"
+    var m1 = clean.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-–]\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-–]\s*(.+)/);
+    if (m1) {
+      chapters.push({startTime: m1[1], endTime: m1[2], title: m1[3].trim(), startSecs: tsToSecs(m1[1]), endSecs: tsToSecs(m1[2])});
       continue;
     }
-    var m2 = line.match(simpleRe);
-    if (m2) {
-      var title2 = m2[2].replace(/\*+/g, '').replace(/^\s*[\-–|:]\s*/, '').trim();
-      chapters.push({startTime: m2[1], endTime: null, title: title2, startSecs: tsToSecs(m2[1]), endSecs: null, content: ''});
-      currentChapterIdx = chapters.length - 1;
+
+    // Pattern 2: "00:00 | Thema" oder "00:00: Thema" oder "00:00 - Thema" (nur Start-Timestamp)
+    var m2 = clean.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-–]\s*(.+)/);
+    if (m2 && m2[2].length > 3) {
+      chapters.push({startTime: m2[1], endTime: null, title: m2[2].trim(), startSecs: tsToSecs(m2[1]), endSecs: null});
+      continue;
+    }
+
+    // Pattern 3: Im Raw-Text mit Markdown: "**00:00 - 03:15** | Thema"
+    var rawLine = line.replace(/^[\s\-\*\d.)]+/, '');
+    var m3 = rawLine.match(/\*{0,2}(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-–]\s*(\d{1,2}:\d{2}(?::\d{2})?)\*{0,2}\s*[|:\-–]?\s*(.+)/);
+    if (m3 && m3[3].replace(/\*/g,'').trim().length > 3) {
+      chapters.push({startTime: m3[1], endTime: m3[2], title: m3[3].replace(/\*/g,'').trim(), startSecs: tsToSecs(m3[1]), endSecs: tsToSecs(m3[2])});
       continue;
     }
   }
-  // EndSecs auffuellen: naechstes Kapitel-Start oder null
+
+  // EndSecs auffuellen: naechstes Kapitel-Start
   for (var j = 0; j < chapters.length; j++) {
     if (!chapters[j].endSecs && j < chapters.length - 1) {
       chapters[j].endSecs = chapters[j+1].startSecs;
@@ -1627,6 +1632,20 @@ function renderAnalysisWithChapters(title, channel, duration, metaExtra, vidId, 
   html += '<div style="font-size:11px;color:#666;margin-bottom:12px">' + channel + ' &middot; ' + duration + ' &middot; ' + metaExtra + '</div>';
 
   // === KAPITEL-INDEX ===
+  if (chapters.length === 0) {
+    // Keine Kapitel gefunden - zeige volle Analyse direkt
+    var analysisHtml2 = markdownToHtml(rawAnalysis || 'Keine Analyse');
+    if (vidId) {
+      analysisHtml2 = analysisHtml2.replace(/(\d{1,2}:\d{2}(?::\d{2})?)/g, function(match) {
+        var parts = match.split(':').map(Number);
+        var secs = 0;
+        if (parts.length === 3) secs = parts[0]*3600 + parts[1]*60 + parts[2];
+        else secs = parts[0]*60 + parts[1];
+        return '<a href="#" onclick="event.preventDefault();jumpToVideoTime(\'' + vidId + '\',' + secs + ')" style="color:#e63946;text-decoration:none;border-bottom:1px dotted #e63946">' + match + '</a>';
+      });
+    }
+    html += '<div style="font-size:14px;line-height:1.7;color:#ccc">' + analysisHtml2 + '</div>';
+  }
   if (chapters.length > 0) {
     html += '<div style="margin-bottom:14px">';
     html += '<div style="font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase">KAPITEL &middot; ' + chapters.length + ' ABSCHNITTE</div>';
