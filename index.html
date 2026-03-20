@@ -94,7 +94,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #view-label{text-align:center;padding:2px 0;display:flex;align-items:center;justify-content:center;gap:8px}
 #view-label span{font-size:7px;letter-spacing:5px;color:#444;text-transform:uppercase}
 #canvas{
-  flex:1;overflow-y:hidden;overflow-x:hidden;
+  flex:1;overflow-y:auto;overflow-x:hidden;
   border-radius:8px;padding:0;margin:0;
   background:transparent;
   border:none;
@@ -425,9 +425,10 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .msg-bot .bubble pre code{background:none;padding:0}
 .msg-agent{font-size:10px;color:#555;margin-bottom:2px;letter-spacing:1px;text-transform:uppercase}
 .msg-time{font-size:10px;color:#444;margin-top:2px;display:flex;align-items:center;gap:6px}
-.msg-tts-btn{background:none;border:none;color:#555;cursor:pointer;padding:2px;display:inline-flex;align-items:center;border-radius:4px;transition:all .15s}
-.msg-tts-btn:active{color:#e63946;transform:scale(.9)}
-.msg-tts-btn.tts-playing{color:#e63946}
+.msg-bot .bubble{position:relative;padding-bottom:28px}
+.msg-tts-btn{position:absolute;bottom:4px;right:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#777;cursor:pointer;padding:4px 6px;display:inline-flex;align-items:center;gap:4px;border-radius:8px;transition:all .15s;font-size:9px;letter-spacing:.5px}
+.msg-tts-btn:active{color:#e63946;border-color:rgba(230,57,70,.3);transform:scale(.95)}
+.msg-tts-btn.tts-playing{color:#e63946;border-color:rgba(230,57,70,.3);background:rgba(230,57,70,.08)}
 .typing{margin-bottom:16px;animation:fadeIn .3s ease}
 .typing-bubble{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 18px 18px 18px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
 .typing-dots{display:flex;gap:5px}
@@ -2384,8 +2385,8 @@ function renderMessage(role, content, agent, time, scroll=true, modelUsed='') {
   if (role === 'user') {
     div.innerHTML = `<div class="msg-agent">${agentLabel}</div><div class="bubble">${escapeHtml(content)}</div><div class="msg-time">${time}</div>`;
   } else {
-    const ttsBtn = `<button class="msg-tts-btn" onclick="speakText(this.closest('.msg').dataset.rawContent,'${agent}',this)" title="Vorlesen"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>`;
-    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}</div><div class="msg-time">${time} ${ttsBtn}</div>`;
+    const ttsBtn = `<button class="msg-tts-btn" onclick="speakText(this.closest('.msg').dataset.rawContent,'${agent}',this)" title="Vorlesen"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg> H\u00f6ren</button>`;
+    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}${ttsBtn}</div><div class="msg-time">${time}</div>`;
     div.dataset.rawContent = content;
   }
   container.appendChild(div);
