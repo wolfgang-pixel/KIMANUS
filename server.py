@@ -1201,6 +1201,141 @@ async def handle_video_chat(request):
 
 SEARXNG_URL = "http://searxng:8080"
 
+
+# =========================================
+# KIMANUS SEARCH (SearXNG Proxy)
+# =========================================
+
+async def handle_search(request):
+    """POST /api/search - Allgemeine Websuche via SearXNG."""
+    try:
+        body = await request.json()
+    except Exception:
+        return web.json_response({"error": "Ungueltiger JSON-Body"}, status=400)
+
+    query = body.get("q", "").strip()
+    category = body.get("category", "general").strip()
+    if not query:
+        return web.json_response({"error": "Kein Suchbegriff"}, status=400)
+
+    log.info(f"KIMANUS Search: q={query}, category={category}")
+
+    # Map categories to SearXNG engines/categories
+    engines = ""
+    categories = category
+    if category == "images":
+        categories = "images"
+    elif category == "news":
+        categories = "news"
+    else:
+        categories = "general"
+
+    try:
+        import urllib.parse
+        search_url = (
+            f"{SEARXNG_URL}/search?"
+            f"q={urllib.parse.quote(query)}"
+            f"&format=json"
+            f"&categories={categories}"
+        )
+        import urllib.request
+        req = urllib.request.Request(search_url, headers={"Accept": "application/json"})
+        def _fetch():
+            resp = urllib.request.urlopen(req, timeout=15)
+            return json.loads(resp.read())
+        data = await asyncio.to_thread(_fetch)
+
+        results = []
+        for r in data.get("results", [])[:15]:
+            result = {
+                "title": r.get("title", ""),
+                "url": r.get("url", ""),
+                "snippet": r.get("content", ""),
+            }
+            if category == "images":
+                result["thumbnail"] = r.get("img_src", "") or r.get("thumbnail", "")
+            else:
+                result["thumbnail"] = r.get("thumbnail", "")
+            results.append(result)
+
+        return web.json_response({"query": query, "category": category, "results": results})
+    except Exception as e:
+        log.error(f"Search error: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+# =========================================
+# IPHONE HELP ASSISTANT
+# =========================================
+
+IPHONE_HELP_SYSTEM = (
+    "Du bist ein iPhone-Experte bei KIMANUS OS. Du hilfst Wolfgang mit allen "
+    "iPhone-Einstellungen und Problemen. Antworte auf Deutsch, Schritt fuer Schritt, "
+    "kurz und klar. Wenn ein Screenshot gesendet wird, analysiere was du siehst und "
+    "sage genau wohin getippt werden muss.\n\n"
+    "Formatiere deine Antwort als nummerierte Schritte (1. 2. 3. etc.).\n"
+    "Halte dich kurz. Maximal 5-8 Schritte. Keine langen Erklaerungen.\n"
+    "Wenn du unsicher bist, sag es. Nenne die iOS-Version wenn relevant."
+)
+
+async def handle_iphone_help(request):
+    """POST /api/iphone-help - iPhone Help Assistant mit optionalem Screenshot."""
+    try:
+        body = await request.json()
+    except Exception:
+        return web.json_response({"error": "Ungueltiger JSON-Body"}, status=400)
+
+    question = body.get("question", "").strip()
+    screenshot = body.get("screenshot", "")  # base64 image
+
+    if not question and not screenshot:
+        return web.json_response({"error": "Keine Frage gestellt"}, status=400)
+
+    log.info(f"iPhone Help: q={question[:60]}..., screenshot={'ja' if screenshot else 'nein'}")
+
+    messages = [{"role": "system", "content": IPHONE_HELP_SYSTEM}]
+
+    if screenshot:
+        # Vision request with image - use Gemini Flash via LiteLLM
+        # Ensure the base64 data has the right prefix
+        if not screenshot.startswith("data:"):
+            screenshot = f"data:image/jpeg;base64,{screenshot}"
+
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": question or "Was siehst du auf diesem iPhone-Screenshot? Erklaere was hier eingestellt werden kann."
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {"url": screenshot}
+                }
+            ]
+        })
+        model = "gemini-flash"  # Gemini 2.5 Flash for vision
+    else:
+        # Text-only request
+        messages.append({"role": "user", "content": question})
+        model = "gemini-flash"  # Fast and good for instructions
+
+    try:
+        answer, err = await call_llm(model, messages, 1500)
+        if err:
+            log.error(f"iPhone Help LLM error: {err}")
+            # Fallback to DeepSeek for text-only
+            if not screenshot:
+                answer, err = await call_llm("deepseek", messages, 1500)
+            if err:
+                return web.json_response({"error": f"KI-Fehler: {err}"}, status=500)
+
+        return web.json_response({"answer": answer, "model": model})
+    except Exception as e:
+        log.error(f"iPhone Help error: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
 async def handle_video_search(request):
     """GET /api/video-search?q=... - YouTube-Suche via SearXNG."""
     query = request.query.get("q", "").strip()
@@ -1687,6 +1822,8 @@ def create_app():
     app.router.add_post("/api/video-analyze", handle_video_analyze)
     app.router.add_post("/api/video-chat", handle_video_chat)
     app.router.add_get("/api/video-search", handle_video_search)
+    app.router.add_post("/api/search", handle_search)
+    app.router.add_post("/api/iphone-help", handle_iphone_help)
     app.router.add_get("/", handle_index)
     app.router.add_static("/", STATIC_DIR)
     return app
@@ -1706,6 +1843,6 @@ if __name__ == "__main__":
     else:
         tts_info = "Edge TTS (gratis)"
     log.info(f"TTS Engine: {TTS_ENGINE} ({tts_info})")
-    log.info(f"Features: Chat, Voice Pipeline, TTS, Auto-Routing")
+    log.info(f"Features: Chat, Voice Pipeline, TTS, Auto-Routing, Search, iPhone Help")
     app = create_app()
     web.run_app(app, host="0.0.0.0", port=3000)

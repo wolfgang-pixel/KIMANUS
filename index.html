@@ -611,6 +611,70 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 /* Spacer for KIM button */
 .tab-bar .kim-spacer{width:48px;flex-shrink:0;flex-grow:0}
 
+/* =========================================
+   SEARCH MODULE
+   ========================================= */
+.search-tab{
+  padding:6px 14px;border-radius:16px;border:1px solid #333;
+  background:#1a1a1a;color:#777;font-size:12px;font-weight:500;
+  letter-spacing:.5px;cursor:pointer;transition:all .2s;
+}
+.search-tab.active{background:#1a2e1a;border-color:#50dc78;color:#50dc78}
+.search-result-card{
+  padding:12px;margin-bottom:8px;
+  background:linear-gradient(160deg,#1e1e1e 0%,#181818 100%);
+  border:1px solid #2a2a2a;border-radius:10px;
+  cursor:pointer;transition:all .15s;
+}
+.search-result-card:active{transform:scale(.98);border-color:#444}
+.search-result-title{font-size:14px;font-weight:500;color:#4fc3f7;line-height:1.3;margin-bottom:4px}
+.search-result-url{font-size:10px;color:#50dc78;letter-spacing:.3px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.search-result-snippet{font-size:12px;color:#999;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.search-img-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.search-img-card{border-radius:8px;overflow:hidden;background:#111;border:1px solid #222;cursor:pointer;transition:all .15s}
+.search-img-card:active{transform:scale(.96)}
+.search-img-card img{width:100%;height:120px;object-fit:cover;display:block}
+.search-img-card .img-title{padding:6px 8px;font-size:10px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* =========================================
+   IPHONE HELP MODULE
+   ========================================= */
+.iphone-quick-btn{
+  padding:6px 12px;border-radius:16px;border:1px solid #333;
+  background:#1a1a1a;color:#888;font-size:11px;font-weight:500;
+  cursor:pointer;transition:all .2s;
+}
+.iphone-quick-btn:active{background:#1a2e1a;border-color:#50dc78;color:#50dc78;transform:scale(.95)}
+.iphone-msg{margin-bottom:12px;animation:fadeIn .3s ease}
+.iphone-msg-user{text-align:right}
+.iphone-msg-user .iphone-bubble{
+  display:inline-block;max-width:80%;padding:10px 14px;
+  background:linear-gradient(135deg,#1b5e20,#2e7d32);
+  border-radius:16px 16px 4px 16px;text-align:left;
+  font-size:14px;line-height:1.5;color:#fff;
+  box-shadow:0 2px 8px rgba(46,125,50,.3);
+}
+.iphone-msg-bot{text-align:left}
+.iphone-msg-bot .iphone-bubble{
+  display:inline-block;max-width:90%;padding:12px 14px;
+  background:linear-gradient(135deg,#252525,#1e1e1e);
+  border:1px solid #333;border-radius:4px 16px 16px 16px;
+  text-align:left;font-size:14px;line-height:1.6;color:#ddd;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.iphone-msg-bot .iphone-bubble strong{color:#50dc78}
+.iphone-step{
+  display:flex;gap:10px;align-items:flex-start;margin:8px 0;
+}
+.iphone-step-num{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#50dc78,#2e7d32);
+  color:#fff;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(80,220,120,.3);
+}
+.iphone-step-text{font-size:13px;color:#ccc;line-height:1.5;padding-top:2px}
+
 @media(min-width:500px){#app{max-width:430px;margin:0 auto;border-left:1px solid #1a1a1a;border-right:1px solid #1a1a1a}}
 
 /* =========================================
@@ -776,6 +840,8 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><div class="widget-label">Music DJ</div></div>
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></div><div class="widget-label">BuenaVista</div></div>
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.94s4.18 1.36 4.18 3.85c0 1.89-1.44 2.98-3.12 3.19z"/></svg></div><div class="widget-label">Cap-Coin</div></div>
+              <div class="widget" data-module="search" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div><div class="widget-label">Suche</div></div>
+              <div class="widget" data-module="iphone" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg></div><div class="widget-label">iPhone</div></div>
             </div>
           </div>
           <div class="mini-dock" data-dock="kommunikation">
@@ -901,6 +967,81 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       <div id="module-files" class="module-view"><div style="text-align:center;padding-top:12vh"><svg width="48" height="48" viewBox="0 0 24 24" fill="#555"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><h2 style="font-size:18px;color:#555;letter-spacing:4px;margin:16px 0 8px">DATEIEN</h2><p style="color:#444;font-size:13px">PDFs, Bilder & Dokumente<br>Kommt bald</p></div></div>
       <div id="module-future" class="module-view"><div style="text-align:center;padding-top:12vh"><svg width="48" height="48" viewBox="0 0 24 24" fill="#333"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><h2 style="font-size:18px;color:#444;letter-spacing:4px;margin:16px 0 8px">NEUES MODUL</h2><p style="color:#333;font-size:13px">Platz fuer zukuenftige Funktionen</p></div></div>
 
+      <!-- KIMANUS SUCHE -->
+      <div id="module-search" class="module-view">
+        <div style="padding:8px 8px 0;display:flex;flex-direction:column;height:100%">
+          <!-- Search Header -->
+          <div style="text-align:center;padding:8px 0 12px">
+            <div style="font-size:10px;letter-spacing:4px;color:#50dc78;text-transform:uppercase;font-weight:600">KIMANUS</div>
+            <div style="font-size:18px;font-weight:700;color:#ccc;letter-spacing:2px;margin-top:2px">SUCHE</div>
+          </div>
+          <!-- Search Input -->
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <div style="flex:1;display:flex;align-items:center;background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:0 12px;transition:border-color .2s" id="search-input-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#555" style="flex-shrink:0"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input id="search-input" type="text" placeholder="Was suchst du?" style="flex:1;padding:10px 8px;background:transparent;border:none;color:#ddd;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')kimanusSearch()" onfocus="document.getElementById('search-input-wrap').style.borderColor='#50dc78'" onblur="document.getElementById('search-input-wrap').style.borderColor='#333'">
+            </div>
+            <button onclick="kimanusSearch()" style="padding:10px 16px;background:linear-gradient(135deg,#2e7d32,#1b5e20);border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(46,125,50,.3)">Suchen</button>
+          </div>
+          <!-- Category Tabs -->
+          <div style="display:flex;gap:6px;margin-bottom:10px;padding:0 2px" id="search-tabs">
+            <button class="search-tab active" data-cat="general" onclick="setSearchTab(this)">Alle</button>
+            <button class="search-tab" data-cat="images" onclick="setSearchTab(this)">Bilder</button>
+            <button class="search-tab" data-cat="news" onclick="setSearchTab(this)">News</button>
+          </div>
+          <!-- Results -->
+          <div id="search-results" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px"></div>
+        </div>
+      </div>
+
+      <!-- IPHONE HILFE -->
+      <div id="module-iphone" class="module-view">
+        <div style="padding:8px 8px 0;display:flex;flex-direction:column;height:100%">
+          <!-- iPhone Help Header -->
+          <div style="text-align:center;padding:6px 0 10px">
+            <div style="font-size:10px;letter-spacing:4px;color:#50dc78;text-transform:uppercase;font-weight:600">KIMANUS</div>
+            <div style="font-size:18px;font-weight:700;color:#ccc;letter-spacing:2px;margin-top:2px">iPHONE HILFE</div>
+          </div>
+          <!-- Quick Actions -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;justify-content:center" id="iphone-quick-actions">
+            <button class="iphone-quick-btn" onclick="iphoneQuickAsk('Wie aendere ich den Standard-Browser auf dem iPhone?')">Safari &auml;ndern</button>
+            <button class="iphone-quick-btn" onclick="iphoneQuickAsk('Wie verbinde ich mich mit einem WLAN-Netzwerk?')">WLAN</button>
+            <button class="iphone-quick-btn" onclick="iphoneQuickAsk('Wie koppele ich ein Bluetooth-Geraet?')">Bluetooth</button>
+            <button class="iphone-quick-btn" onclick="iphoneQuickAsk('Wie stelle ich Benachrichtigungen fuer eine App ein?')">Benachricht.</button>
+            <button class="iphone-quick-btn" onclick="iphoneQuickAsk('Wie pruefe und raeume ich iPhone Speicher auf?')">Speicher</button>
+            <button class="iphone-quick-btn" onclick="iphoneQuickAsk('Wie mache ich ein Bildschirmfoto und wo finde ich es?')">Screenshot</button>
+          </div>
+          <!-- Chat Messages -->
+          <div id="iphone-messages" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">
+            <div style="text-align:center;padding:20px 10px">
+              <div style="font-size:36px;margin-bottom:10px">&#x1f4f1;</div>
+              <div style="font-size:13px;color:#666;line-height:1.6">Frag mich alles rund ums iPhone!<br>Du kannst auch Screenshots schicken.</div>
+            </div>
+          </div>
+          <!-- Input Area -->
+          <div style="display:flex;gap:6px;padding:8px 0 12px;border-top:1px solid #222;flex-shrink:0">
+            <button id="iphone-cam-btn" onclick="iphoneAttachScreenshot()" style="width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#1a1a1a;color:#666;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+            </button>
+            <input type="file" id="iphone-file-input" accept="image/*" style="display:none" onchange="iphoneFileSelected(this)">
+            <div style="flex:1;display:flex;align-items:center;background:#1a1a1a;border:1px solid #333;border-radius:22px;padding:0 12px;transition:border-color .2s" id="iphone-input-wrap">
+              <input id="iphone-input" type="text" placeholder="iPhone-Frage stellen..." style="flex:1;padding:9px 4px;background:transparent;border:none;color:#ddd;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')sendIphoneHelp()" onfocus="document.getElementById('iphone-input-wrap').style.borderColor='#50dc78'" onblur="document.getElementById('iphone-input-wrap').style.borderColor='#333'">
+            </div>
+            <button onclick="sendIphoneHelp()" style="width:40px;height:40px;border-radius:50%;border:none;background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(46,125,50,.3)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <!-- Screenshot Preview -->
+          <div id="iphone-screenshot-preview" style="display:none;padding:4px 0 8px;flex-shrink:0">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:6px 10px">
+              <img id="iphone-screenshot-thumb" src="" style="width:40px;height:40px;border-radius:4px;object-fit:cover">
+              <span style="font-size:11px;color:#888">Screenshot angehangen</span>
+              <button onclick="clearIphoneScreenshot()" style="background:none;border:none;color:#e63946;cursor:pointer;font-size:16px;padding:2px">&times;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- TOOLS ÜBERSICHT -->
       <div id="module-tools" class="module-view">
         <div style="padding:10px 4px">
@@ -957,6 +1098,24 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
                 <div class="agent-card-info">
                   <div class="agent-card-name">Video Analyzer</div>
                   <div class="agent-card-role">YouTube Analyse Tool</div>
+                </div>
+                <div class="agent-card-status online"></div>
+                <div class="agent-card-chevron">&#x203a;</div>
+              </div>
+              <div class="agent-card" onclick="openModule('search')">
+                <div class="agent-card-icon tool" style="background:linear-gradient(135deg,#1a2e1a,#152515);border:1px solid #50dc78">&#x1f50d;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">KIMANUS Suche</div>
+                  <div class="agent-card-role">Web, Bilder &amp; News Suche</div>
+                </div>
+                <div class="agent-card-status online"></div>
+                <div class="agent-card-chevron">&#x203a;</div>
+              </div>
+              <div class="agent-card" onclick="openModule('iphone')">
+                <div class="agent-card-icon tool" style="background:linear-gradient(135deg,#1a2e1a,#152515);border:1px solid #50dc78">&#x1f4f1;</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">iPhone Hilfe</div>
+                  <div class="agent-card-role">iPhone-Experte mit Screenshot-Analyse</div>
                 </div>
                 <div class="agent-card-status online"></div>
                 <div class="agent-card-chevron">&#x203a;</div>
@@ -2170,7 +2329,7 @@ function openModule(name) {
   const mod = document.getElementById('module-' + name);
   if (mod) mod.classList.add('active');
   document.getElementById('back-btn').classList.add('visible');
-  const titles = {chat:'MESSENGER',phone:'KOMMUNIKATION',email:'E-MAIL',sos:'SOS',files:'DATEIEN',future:'NEUES MODUL',agents:'ALL AGENTS',video:'VIDEO ANALYZER',tools:'ALL TOOLS','private':'PROFIL & PRIVAT'};
+  const titles = {chat:'MESSENGER',phone:'KOMMUNIKATION',email:'E-MAIL',sos:'SOS',files:'DATEIEN',future:'NEUES MODUL',agents:'ALL AGENTS',video:'VIDEO ANALYZER',tools:'ALL TOOLS','private':'PROFIL & PRIVAT',search:'KIMANUS SUCHE',iphone:'iPHONE HILFE'};
   document.getElementById('view-title').textContent = titles[name] || name.toUpperCase();
   document.getElementById('input-bar').classList.toggle('active', name === 'chat');
   // Dock + Dots ausblenden wenn Modul offen
@@ -3691,6 +3850,185 @@ async function tryFlashlight(on) {
 function haptic() { if (navigator.vibrate) navigator.vibrate(10); }
 
 // =========================================
+// KIMANUS SUCHE
+// =========================================
+let searchCategory = 'general';
+
+function setSearchTab(btn) {
+  document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  searchCategory = btn.dataset.cat;
+  // Re-search if there's a query
+  const q = document.getElementById('search-input').value.trim();
+  if (q) kimanusSearch();
+}
+
+async function kimanusSearch() {
+  const input = document.getElementById('search-input');
+  const resultsDiv = document.getElementById('search-results');
+  const query = input.value.trim();
+  if (!query) return;
+
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="width:32px;height:32px;border:3px solid #333;border-top-color:#50dc78;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px"></div><p style="color:#666;font-size:12px">Suche nach "' + query + '"...</p></div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>';
+
+  try {
+    const resp = await fetch('/api/search', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({q: query, category: searchCategory})
+    });
+    if (!resp.ok) throw new Error('Suche fehlgeschlagen');
+    const data = await resp.json();
+
+    if (!data.results || data.results.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:28px;margin-bottom:8px">&#x1f50d;</div><p style="color:#666;font-size:13px">Keine Ergebnisse fuer "' + query + '"</p></div>';
+      return;
+    }
+
+    let html = '<div style="font-size:10px;color:#555;letter-spacing:1px;margin-bottom:8px;text-transform:uppercase">' + data.results.length + ' Ergebnisse</div>';
+
+    if (searchCategory === 'images') {
+      html += '<div class="search-img-grid">';
+      data.results.forEach(function(r) {
+        if (r.thumbnail) {
+          html += '<div class="search-img-card" onclick="window.open(\'' + r.url.replace(/'/g, "\\'") + '\',\'_blank\')">';
+          html += '<img src="' + r.thumbnail + '" onerror="this.parentElement.style.display=\'none\'" loading="lazy">';
+          html += '<div class="img-title">' + (r.title || '') + '</div>';
+          html += '</div>';
+        }
+      });
+      html += '</div>';
+    } else {
+      data.results.forEach(function(r) {
+        const domain = r.url ? new URL(r.url).hostname.replace('www.','') : '';
+        html += '<div class="search-result-card" onclick="window.open(\'' + r.url.replace(/'/g, "\\'") + '\',\'_blank\')">';
+        html += '<div class="search-result-url">' + domain + '</div>';
+        html += '<div class="search-result-title">' + (r.title || '') + '</div>';
+        if (r.snippet) html += '<div class="search-result-snippet">' + r.snippet + '</div>';
+        html += '</div>';
+      });
+    }
+
+    resultsDiv.innerHTML = html;
+  } catch(e) {
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px"><p style="color:#e63946;font-size:13px">Fehler: ' + e.message + '</p></div>';
+  }
+}
+
+// =========================================
+// iPHONE HILFE
+// =========================================
+let iphoneScreenshotBase64 = '';
+
+function iphoneQuickAsk(question) {
+  document.getElementById('iphone-input').value = question;
+  sendIphoneHelp();
+}
+
+function iphoneAttachScreenshot() {
+  document.getElementById('iphone-file-input').click();
+}
+
+function iphoneFileSelected(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    iphoneScreenshotBase64 = e.target.result;
+    document.getElementById('iphone-screenshot-thumb').src = iphoneScreenshotBase64;
+    document.getElementById('iphone-screenshot-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearIphoneScreenshot() {
+  iphoneScreenshotBase64 = '';
+  document.getElementById('iphone-screenshot-preview').style.display = 'none';
+  document.getElementById('iphone-file-input').value = '';
+}
+
+async function sendIphoneHelp() {
+  const input = document.getElementById('iphone-input');
+  const messagesDiv = document.getElementById('iphone-messages');
+  const question = input.value.trim();
+  if (!question && !iphoneScreenshotBase64) return;
+
+  // Show user message
+  let userHtml = '<div class="iphone-msg iphone-msg-user"><div class="iphone-bubble">';
+  if (iphoneScreenshotBase64) {
+    userHtml += '<img src="' + iphoneScreenshotBase64 + '" style="max-width:150px;border-radius:8px;display:block;margin-bottom:6px">';
+  }
+  userHtml += (question || 'Screenshot analysieren') + '</div></div>';
+  messagesDiv.innerHTML += userHtml;
+
+  // Scroll down
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  // Show typing indicator
+  messagesDiv.innerHTML += '<div id="iphone-typing" class="iphone-msg iphone-msg-bot"><div class="iphone-bubble" style="padding:12px 18px"><div style="display:flex;gap:5px"><span style="width:7px;height:7px;background:#50dc78;border-radius:50%;animation:typingPulse 1.4s infinite ease-in-out"></span><span style="width:7px;height:7px;background:#50dc78;border-radius:50%;animation:typingPulse 1.4s infinite ease-in-out;animation-delay:.2s"></span><span style="width:7px;height:7px;background:#50dc78;border-radius:50%;animation:typingPulse 1.4s infinite ease-in-out;animation-delay:.4s"></span></div></div></div>';
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  // Prepare request
+  const payload = {question: question || 'Was siehst du auf diesem Screenshot?'};
+  if (iphoneScreenshotBase64) {
+    payload.screenshot = iphoneScreenshotBase64;
+  }
+
+  // Clear input
+  input.value = '';
+  clearIphoneScreenshot();
+
+  try {
+    const resp = await fetch('/api/iphone-help', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+
+    // Remove typing indicator
+    const typing = document.getElementById('iphone-typing');
+    if (typing) typing.remove();
+
+    if (!resp.ok) throw new Error('Anfrage fehlgeschlagen');
+    const data = await resp.json();
+
+    if (data.error) throw new Error(data.error);
+
+    // Format answer with step numbers
+    let answer = data.answer || 'Keine Antwort erhalten.';
+    answer = formatIphoneAnswer(answer);
+
+    messagesDiv.innerHTML += '<div class="iphone-msg iphone-msg-bot"><div class="iphone-bubble">' + answer + '</div></div>';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  } catch(e) {
+    const typing = document.getElementById('iphone-typing');
+    if (typing) typing.remove();
+    messagesDiv.innerHTML += '<div class="iphone-msg iphone-msg-bot"><div class="iphone-bubble" style="border-color:#e63946">Fehler: ' + e.message + '</div></div>';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+}
+
+function formatIphoneAnswer(text) {
+  // Convert markdown-style numbered steps to styled HTML
+  let html = text;
+  // Code blocks
+  html = html.replace(/```([^`]*)```/gs, '<pre style="background:#0a0a0a;padding:8px;border-radius:6px;overflow-x:auto;margin:6px 0;border:1px solid #222"><code style="color:#c8d6e5;font-size:12px">$1</code></pre>');
+  // Bold
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#50dc78">$1</strong>');
+  // Numbered steps: "1. " -> styled step
+  html = html.replace(/^(\d+)\.\s+(.+)$/gm, function(match, num, text) {
+    return '<div class="iphone-step"><div class="iphone-step-num">' + num + '</div><div class="iphone-step-text">' + text + '</div></div>';
+  });
+  // Bullet lists
+  html = html.replace(/^[-*]\s+(.+)$/gm, '<div style="padding-left:16px;margin:3px 0">\u2022 $1</div>');
+  // Line breaks
+  html = html.replace(/\n/g, '<br>');
+  // Clean up double <br> after steps
+  html = html.replace(/<\/div><br>/g, '</div>');
+  return html;
+}
+
+// =========================================
 // NAV TAB CLICK HANDLER
 // =========================================
 function navTabClick(btn) {
@@ -3783,6 +4121,8 @@ const WIDGET_DEFS = {
   'private':{ svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>', label: 'Profil', iconClass: '' },
   sos:      { svg: '<svg viewBox="0 0 24 24" fill="#e63946"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>', label: 'SOS', iconClass: 'sos' },
   settings: { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>', label: 'Einstell.', iconClass: '' },
+  search:   { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>', label: 'Suche', iconClass: '' },
+  iphone:   { svg: '<svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg>', label: 'iPhone', iconClass: '' },
   future:   { svg: '<svg viewBox="0 0 24 24" fill="#444"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>', label: 'BALD', iconClass: 'coming', futureStyle: true },
 };
 
