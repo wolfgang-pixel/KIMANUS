@@ -1509,10 +1509,17 @@ async function analyzeVideo() {
 
     // Kapitel aus Analyse extrahieren und rendern
     var chapters = parseChapters(data.analysis || '');
+    console.log('[YT Scout] Kapitel gefunden:', chapters.length, chapters);
     window._lastVideoAnalysis = {title: data.title||'', channel: data.channel||'', duration: data.duration||'', url: url, analysis: data.analysis||'', chapters: chapters, date: new Date().toISOString()};
 
     resultDiv.dataset.videoUrl = url;
-    resultDiv.innerHTML = renderAnalysisWithChapters(data.title||'', data.channel||'', data.duration||'', (data.elapsed_seconds||'?')+'s Analyse', vidId, chapters, data.analysis||'');
+    try {
+      resultDiv.innerHTML = renderAnalysisWithChapters(data.title||'', data.channel||'', data.duration||'', (data.elapsed_seconds||'?')+'s Analyse', vidId, chapters, data.analysis||'');
+      console.log('[YT Scout] Render OK');
+    } catch(renderErr) {
+      console.error('[YT Scout] Render Fehler:', renderErr);
+      resultDiv.innerHTML = '<p style="color:#e63946">Render-Fehler: ' + renderErr.message + '</p><pre style="color:#666;font-size:10px;white-space:pre-wrap">' + (data.analysis||'').substring(0,500) + '</pre>';
+    }
   } catch(e) {
     resultDiv.innerHTML = '<p style="color:#e63946">Fehler: ' + e.message + '</p>';
   }
@@ -1580,7 +1587,7 @@ function parseChapters(analysisText) {
 
     // Suche nach Timestamp-Pattern irgendwo in der Zeile
     // Pattern 1: "00:00 - 03:15 | Thema" (mit Start+End)
-    var m1 = line.match(/(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-–]\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-–]\s*(.+)/);
+    var m1 = line.match(/(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-\u2013]\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-\u2013]\s*(.+)/);
     if (m1 && m1[3].trim().length > 2) {
       chapters.push({startTime: m1[1], endTime: m1[2], title: m1[3].trim(), startSecs: tsToSecs(m1[1]), endSecs: tsToSecs(m1[2])});
       continue;
@@ -1616,6 +1623,8 @@ function secsToTs(secs) {
   return m + ':' + (s < 10 ? '0' : '') + s;
 }
 
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
 // Analyse mit Kapitel-Index oben rendern
 function renderAnalysisWithChapters(title, channel, duration, metaExtra, vidId, chapters, rawAnalysis) {
   var html = '';
@@ -1650,7 +1659,7 @@ function renderAnalysisWithChapters(title, channel, duration, metaExtra, vidId, 
       html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
       html += '<div style="flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#c62828;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff">' + num + '</div>';
       html += '<div style="flex:1;min-width:0">';
-      html += '<div style="font-size:15px;font-weight:500;color:#ddd;line-height:1.3">' + ch.title + '</div>';
+      html += '<div style="font-size:15px;font-weight:500;color:#ddd;line-height:1.3">' + escHtml(ch.title) + '</div>';
       html += '<div style="font-size:11px;color:#666;margin-top:2px">' + ch.startTime + (ch.endTime ? ' – ' + ch.endTime : '') + '</div>';
       html += '</div>';
       html += '</div>';
