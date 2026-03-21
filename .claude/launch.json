@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "kimanus-local",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8090", "--directory", "C:/Users/wolfg/kimanus-app"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["http-server", "C:/Users/wolfg/kimanus-app", "-p", "8090", "-c-1", "--cors"],
       "port": 8090
     }
   ]

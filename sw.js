@@ -1,7 +1,7 @@
 // KIMANUS Service Worker v1.0
 // Minimal SW fuer PWA Install-Prompt + Offline-Grundschutz
 
-const CACHE_NAME = 'kimanus-v6';
+const CACHE_NAME = 'kimanus-v27';
 const OFFLINE_URL = '/';
 
 // Install: Startseite cachen fuer Offline-Grundschutz
