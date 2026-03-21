@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>KIMANUS – Büro-Konzept</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#1a1a1a;--glass:rgba(255,255,255,.06);--border:rgba(255,255,255,.1);--text:#e8e8e8;--dim:#888;--pink:#ff6b9d;--blue:#4a9eff;--gold:#d4a853;--green:#4caf50;--red:#e63946;--sab:env(safe-area-inset-bottom)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* === NAV TABS === */
+.nav{display:flex;gap:0;background:rgba(30,30,30,.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top,44px)}
+.nav-tab{flex:1;padding:14px 8px;text-align:center;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--dim);cursor:pointer;transition:all .3s;border-bottom:2px solid transparent}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.nav-tab:hover{color:var(--text)}
+
+/* === SECTIONS === */
+.section{display:none;padding:20px 16px calc(20px + var(--sab));min-height:calc(100vh - 50px)}
+.section.active{display:block}
+.section-title{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.section-sub{font-size:22px;font-weight:700;margin-bottom:20px}
+
+/* ==========================================
+   1. ROLODEX KARUSSELL
+   ========================================== */
+.rolodex-container{perspective:800px;position:relative;display:flex;align-items:stretch;justify-content:center;overflow:hidden;gap:0}
+.rolodex-frame{width:100%;max-width:360px;min-height:520px;background:linear-gradient(145deg,#2a2520,#1a1510);border-radius:16px;border:2px solid rgba(180,150,100,.3);box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden;padding:12px;display:flex;flex-direction:column}
+.rolodex-header{text-align:center;padding:8px 0 10px;border-bottom:1px solid rgba(180,150,100,.2);margin-bottom:8px;flex-shrink:0}
+.rolodex-header span{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(180,150,100,.7)}
+.rolodex-knob{display:none}
+
+.rolodex-cards{position:relative;flex:1;overflow:hidden}
+
+/* === DREHRAD / SCROLL-RAD (echtes Karussell-Rad) === */
+.rolodex-wheel{width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;margin-left:-2px}
+.rolodex-wheel-track{width:36px;height:400px;background:linear-gradient(180deg,#2a2520,#1a1510);border-radius:18px;border:2px solid rgba(180,150,100,.3);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;box-shadow:inset 0 4px 12px rgba(0,0,0,.5)}
+.rolodex-wheel-knob{width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,#776644,#554422);border:2px solid rgba(180,150,100,.4);box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);position:absolute;transition:top .3s ease;cursor:grab;display:flex;align-items:center;justify-content:center;z-index:5}
+.rolodex-wheel-knob::after{content:'';width:12px;height:2px;background:rgba(180,150,100,.5);border-radius:1px}
+.rolodex-wheel-lines{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;pointer-events:none}
+.rolodex-wheel-lines span{width:16px;height:1px;background:rgba(180,150,100,.15)}
+.rolodex-wheel-label{font-size:8px;color:rgba(180,150,100,.4);letter-spacing:1px;writing-mode:vertical-rl;text-orientation:mixed;margin-top:8px}
+.rolodex-card{position:absolute;width:calc(100% - 8px);left:4px;height:90px;background:linear-gradient(135deg,#f5f0e8,#e8e0d0);border-radius:4px 12px 12px 4px;padding:12px 14px;transition:all .4s cubic-bezier(.25,.8,.25,1);cursor:pointer;border-left:5px solid var(--gold);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.rolodex-card .vk-name{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:2px}
+.rolodex-card .vk-role{font-size:11px;color:#666;margin-bottom:4px}
+.rolodex-card .vk-contact{font-size:10px;color:#888;display:flex;gap:12px}
+.rolodex-card .vk-contact span{display:flex;align-items:center;gap:3px}
+.rolodex-card .vk-llm{position:absolute;top:10px;right:12px;font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.08);color:#555;font-weight:600}
+.rolodex-card.agent-kim{border-left-color:var(--pink)}
+.rolodex-card.agent-kai{border-left-color:var(--blue)}
+.rolodex-card.agent-manus{border-left-color:var(--gold)}
+
+/* Alphabet sidebar - jetzt im Drehrad */
+.rolodex-alpha{display:none}
+
+/* Search */
+.rolodex-search{display:flex;gap:8px;margin-bottom:16px}
+.rolodex-search input{flex:1;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);font-size:14px;outline:none}
+.rolodex-search input::placeholder{color:var(--dim)}
+
+/* ==========================================
+   2. AKTENSCHRANK
+   ========================================== */
+.cabinet{max-width:340px;margin:0 auto;background:linear-gradient(180deg,#4a4540,#3a3530,#2a2520);border-radius:8px 8px 4px 4px;border:2px solid rgba(120,100,70,.4);box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden}
+.cabinet-top{height:12px;background:linear-gradient(180deg,#5a5550,#4a4540);border-bottom:1px solid rgba(0,0,0,.3)}
+.cabinet-label{text-align:center;padding:8px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,180,140,.6)}
+.drawer{margin:4px 8px;background:linear-gradient(180deg,#5a5045,#4a4035);border-radius:4px;border:1px solid rgba(120,100,70,.3);cursor:pointer;transition:all .3s;overflow:hidden}
+.drawer:hover{background:linear-gradient(180deg,#6a6055,#5a5045)}
+.drawer:active{transform:translateY(2px)}
+.drawer-front{padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative}
+.drawer-handle{width:40px;height:8px;border-radius:4px;background:linear-gradient(180deg,#998866,#776644);border:1px solid rgba(0,0,0,.3);box-shadow:0 1px 2px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.drawer-label-holder{flex:1;background:rgba(255,255,255,.08);border-radius:3px;padding:4px 10px}
+.drawer-label{font-size:13px;font-weight:600;color:rgba(220,200,160,.9)}
+.drawer-count{font-size:10px;color:rgba(200,180,140,.5)}
+.drawer-content{max-height:0;overflow:hidden;transition:max-height .4s ease;background:rgba(0,0,0,.2)}
+.drawer.open .drawer-content{max-height:400px}
+.drawer-inner{padding:10px 16px}
+
+/* Folder tabs inside drawer */
+.folder-tab{display:flex;align-items:center;gap:10px;padding:8px 12px;margin:4px 0;background:linear-gradient(135deg,#d4c8a0,#c4b890);border-radius:2px 8px 8px 2px;cursor:pointer;transition:all .2s}
+.folder-tab:hover{transform:translateX(4px);background:linear-gradient(135deg,#e4d8b0,#d4c8a0)}
+.folder-tab:active{transform:translateX(8px)}
+.folder-icon{font-size:20px}
+.folder-name{font-size:12px;font-weight:600;color:#3a3020}
+.folder-meta{font-size:9px;color:#8a7a60}
+
+/* ==========================================
+   3. TRESOR / SAFE
+   ========================================== */
+.safe-container{display:flex;flex-direction:column;align-items:center;gap:20px}
+.safe{width:300px;height:340px;background:linear-gradient(145deg,#4a4a4a,#2a2a2a,#1a1a1a);border-radius:12px;border:3px solid #555;box-shadow:0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden;transition:all .6s}
+.safe::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.01) 40px,rgba(255,255,255,.01) 41px);pointer-events:none}
+.safe-door{width:100%;height:100%;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+
+/* Dial */
+.safe-dial-container{position:relative;width:140px;height:140px}
+.safe-dial{width:140px;height:140px;border-radius:50%;background:linear-gradient(145deg,#555,#333);border:3px solid #666;box-shadow:0 4px 20px rgba(0,0,0,.5),inset 0 2px 4px rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .5s cubic-bezier(.25,.8,.25,1);position:relative}
+.safe-dial::after{content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);width:3px;height:20px;background:var(--red);border-radius:2px}
+.safe-dial-inner{width:60px;height:60px;border-radius:50%;background:linear-gradient(145deg,#444,#222);border:2px solid #555;display:flex;align-items:center;justify-content:center}
+.safe-dial-logo{font-size:18px;font-weight:800;color:var(--gold);letter-spacing:-1px}
+
+/* Lock indicators */
+.safe-locks{display:flex;gap:12px}
+.safe-lock{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);min-width:60px;cursor:pointer;transition:all .3s}
+.safe-lock:active{transform:scale(.95)}
+.safe-lock-icon{font-size:20px;filter:grayscale(1);opacity:.4;transition:all .4s}
+.safe-lock.unlocked .safe-lock-icon{filter:grayscale(0);opacity:1}
+.safe-lock-label{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+.safe-lock .dot{width:6px;height:6px;border-radius:50%;background:#333;transition:background .4s}
+.safe-lock.unlocked .dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+
+/* Handle */
+.safe-handle{width:80px;height:30px;border-radius:4px;background:linear-gradient(180deg,#666,#444);border:2px solid #555;box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer;transition:all .3s;margin-top:4px}
+.safe-handle:active{transform:rotate(-20deg)}
+
+/* Safe opened */
+.safe-inner{display:none;width:300px;min-height:200px;background:linear-gradient(180deg,#2a2a2a,#1a1a1a);border-radius:8px;border:2px solid #444;padding:16px}
+.safe-inner.visible{display:block;animation:slideUp .4s ease}
+.safe-shelf{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.safe-shelf:last-child{border-bottom:none}
+.safe-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer;transition:background .2s}
+.safe-item:hover{background:rgba(255,255,255,.05)}
+.safe-item-icon{font-size:24px}
+.safe-item-name{font-size:13px;font-weight:600}
+.safe-item-meta{font-size:10px;color:var(--dim)}
+
+/* NFC Badge */
+.nfc-badge{display:flex;align-items:center;gap:12px;padding:12px 16px;background:linear-gradient(135deg,rgba(212,168,83,.1),rgba(212,168,83,.05));border:1px solid rgba(212,168,83,.3);border-radius:12px;margin-top:8px}
+.nfc-badge-icon{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#b8922e);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 8px rgba(212,168,83,.3)}
+.nfc-badge-text{flex:1}
+.nfc-badge-title{font-size:12px;font-weight:700;color:var(--gold)}
+.nfc-badge-sub{font-size:10px;color:var(--dim)}
+
+/* ==========================================
+   4. VIDEO ARCHIV (VHS)
+   ========================================== */
+.vhs-shelf-row{display:flex;gap:6px;justify-content:center;margin-bottom:12px;padding:8px 4px;background:linear-gradient(180deg,rgba(80,60,40,.3),rgba(60,40,20,.2));border-radius:4px;border-bottom:3px solid rgba(80,60,40,.4)}
+.vhs-tape{width:70px;height:115px;border-radius:3px;background:linear-gradient(180deg,#1a1a1a,#111);border:1px solid #333;padding:4px;cursor:pointer;transition:all .3s;position:relative;display:flex;flex-direction:column}
+.vhs-tape:hover{transform:translateY(-8px);box-shadow:0 12px 24px rgba(0,0,0,.6)}
+.vhs-tape:active{transform:translateY(-12px) scale(1.05)}
+.vhs-tape-label{flex:1;border-radius:2px;padding:4px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.vhs-tape-title{font-size:7px;font-weight:700;color:rgba(255,255,255,.9);line-height:1.3}
+.vhs-tape-date{font-size:6px;color:rgba(255,255,255,.5);margin-top:3px}
+.vhs-tape-window{width:80%;height:14px;margin:3px auto 0;border-radius:2px;background:linear-gradient(180deg,#0a0a0a,#1a1a1a);border:1px solid #222;position:relative;overflow:hidden}
+.vhs-tape-window::after{content:'';position:absolute;top:3px;left:15%;right:15%;bottom:3px;border-radius:50%;background:rgba(60,40,20,.4)}
+.vhs-tape-brand{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:5px;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase}
+
+/* Animations */
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.section.active{animation:slideUp .3s ease}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-tab" onclick="history.back()" style="max-width:44px;color:var(--text);font-size:18px">‹</div>
+  <div class="nav-tab active" onclick="showSection('rolodex',this)">🪪 Rolodex</div>
+  <div class="nav-tab" onclick="showSection('cabinet',this)">🗄️ Akten</div>
+  <div class="nav-tab" onclick="showSection('safe',this)">🔐 Tresor</div>
+  <div class="nav-tab" onclick="showSection('archive',this)">📼 Archiv</div>
+</nav>
+
+<!-- ==========================================
+     SECTION 1: ROLODEX KARUSSELL
+     ========================================== -->
+<div class="section active" id="sec-rolodex">
+  <div class="section-title">Visitenkarten</div>
+  <div class="section-sub">Rolodex-Karussell</div>
+
+  <div class="rolodex-search">
+    <input type="text" placeholder="Suche: Name, Kategorie oder A-Z..." id="rolodex-input" oninput="filterRolodex(this.value)">
+  </div>
+
+  <div class="rolodex-container">
+    <div class="rolodex-frame">
+      <div class="rolodex-header">
+        <span>KIMANUS · Kontakte</span>
+      </div>
+      <div class="rolodex-cards" id="rolodex-cards"></div>
+    </div>
+    <div class="rolodex-wheel" id="rolodex-wheel">
+      <div class="rolodex-wheel-track" id="wheel-track">
+        <div class="rolodex-wheel-lines" id="wheel-lines"></div>
+        <div class="rolodex-wheel-knob" id="wheel-knob"></div>
+      </div>
+      <div class="rolodex-wheel-label">DREHEN</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SECTION 2: AKTENSCHRANK
+     ========================================== -->
+<div class="section" id="sec-cabinet">
+  <div class="section-title">Dokumente & Projekte</div>
+  <div class="section-sub">Aktenschrank</div>
+
+  <div class="cabinet">
+    <div class="cabinet-top"></div>
+    <div class="cabinet-label">KIMANUS · Ablage</div>
+
+    <div class="drawer" onclick="toggleDrawer(this)">
+      <div class="drawer-front">
+        <div class="drawer-handle"></div>
+        <div class="drawer-label-holder">
+          <div class="drawer-label">📁 Projekte</div>
+          <div class="drawer-count">3 Ordner</div>
+        </div>
+      </div>
+      <div class="drawer-content"><div class="drawer-inner">
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">KIMANUS Entwicklung</div><div class="folder-meta">12 Dokumente · Aktualisiert heute</div></div></div>
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">kimanus.de Website</div><div class="folder-meta">3 Dokumente · 18.03.2026</div></div></div>
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Marketing & Launch</div><div class="folder-meta">0 Dokumente · Neu</div></div></div>
+      </div></div>
+    </div>
+
+    <div class="drawer" onclick="toggleDrawer(this)">
+      <div class="drawer-front">
+        <div class="drawer-handle"></div>
+        <div class="drawer-label-holder">
+          <div class="drawer-label">📋 Versicherungen</div>
+          <div class="drawer-count">2 Ordner</div>
+        </div>
+      </div>
+      <div class="drawer-content"><div class="drawer-inner">
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Krankenversicherung</div><div class="folder-meta">Laufend · AOK</div></div></div>
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Haftpflicht & Rechtsschutz</div><div class="folder-meta">Laufend</div></div></div>
+      </div></div>
+    </div>
+
+    <div class="drawer" onclick="toggleDrawer(this)">
+      <div class="drawer-front">
+        <div class="drawer-handle"></div>
+        <div class="drawer-label-holder">
+          <div class="drawer-label">📝 Verträge</div>
+          <div class="drawer-count">4 Ordner</div>
+        </div>
+      </div>
+      <div class="drawer-content"><div class="drawer-inner">
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Hostinger VPS</div><div class="folder-meta">Server-Vertrag · Läuft</div></div></div>
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Anthropic API</div><div class="folder-meta">Claude Credits · Aktiv</div></div></div>
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">ElevenLabs</div><div class="folder-meta">TTS Abo · Aktiv</div></div></div>
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Domain-Registrierung</div><div class="folder-meta">kimanus.de · Läuft</div></div></div>
+      </div></div>
+    </div>
+
+    <div class="drawer" onclick="toggleDrawer(this)">
+      <div class="drawer-front">
+        <div class="drawer-handle"></div>
+        <div class="drawer-label-holder">
+          <div class="drawer-label">💼 Business</div>
+          <div class="drawer-count">1 Ordner</div>
+        </div>
+      </div>
+      <div class="drawer-content"><div class="drawer-inner">
+        <div class="folder-tab" onclick="event.stopPropagation()"><span class="folder-icon">📂</span><div><div class="folder-name">Geschäftsplan KIMANUS</div><div class="folder-meta">In Arbeit</div></div></div>
+      </div></div>
+    </div>
+
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SECTION 3: TRESOR
+     ========================================== -->
+<div class="section" id="sec-safe">
+  <div class="section-title">Sicherheitsbereich</div>
+  <div class="section-sub">Tresor</div>
+
+  <div class="safe-container">
+    <div class="safe" id="safe-door">
+      <div class="safe-door">
+        <div class="safe-dial-container">
+          <div class="safe-dial" id="safe-dial" onclick="rotateDial()">
+            <div class="safe-dial-inner">
+              <div class="safe-dial-logo">K</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="safe-locks">
+          <div class="safe-lock" id="lock-voice" onclick="unlockStep('voice')">
+            <span class="safe-lock-icon">🎤</span>
+            <span class="dot"></span>
+            <span class="safe-lock-label">Stimme</span>
+          </div>
+          <div class="safe-lock" id="lock-device" onclick="unlockStep('device')">
+            <span class="safe-lock-icon">📱</span>
+            <span class="dot"></span>
+            <span class="safe-lock-label">Handy</span>
+          </div>
+          <div class="safe-lock" id="lock-face" onclick="unlockStep('face')">
+            <span class="safe-lock-icon">👤</span>
+            <span class="dot"></span>
+            <span class="safe-lock-label">Gesicht</span>
+          </div>
+          <div class="safe-lock" id="lock-nfc" onclick="unlockStep('nfc')">
+            <span class="safe-lock-icon">🕊️</span>
+            <span class="dot"></span>
+            <span class="safe-lock-label">NFC</span>
+          </div>
+        </div>
+
+        <div class="safe-handle" onclick="openSafe()"></div>
+      </div>
+    </div>
+
+    <div class="nfc-badge">
+      <div class="nfc-badge-icon">🕊️</div>
+      <div class="nfc-badge-text">
+        <div class="nfc-badge-title">KIMANUS NFC-Taube</div>
+        <div class="nfc-badge-sub">Physischer Schlüssel · Beantragung per Post · Wie eine Amex Black Card</div>
+      </div>
+    </div>
+
+    <div class="safe-inner" id="safe-inner">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:12px;text-align:center">🔓 Tresor geöffnet</div>
+      <div class="safe-shelf">
+        <div class="safe-item"><span class="safe-item-icon">🔑</span><div><div class="safe-item-name">Zugangsdaten</div><div class="safe-item-meta">Server, APIs, Datenbanken</div></div></div>
+        <div class="safe-item"><span class="safe-item-icon">💳</span><div><div class="safe-item-name">Finanzen</div><div class="safe-item-meta">Konten, Kreditkarten, Rechnungen</div></div></div>
+      </div>
+      <div class="safe-shelf">
+        <div class="safe-item"><span class="safe-item-icon">📸</span><div><div class="safe-item-name">Private Fotoalben</div><div class="safe-item-meta">Familie, Erinnerungen</div></div></div>
+        <div class="safe-item"><span class="safe-item-icon">📔</span><div><div class="safe-item-name">Tagebuch</div><div class="safe-item-meta">Persönliche Einträge</div></div></div>
+      </div>
+      <div class="safe-shelf">
+        <div class="safe-item"><span class="safe-item-icon">📜</span><div><div class="safe-item-name">Testament & Vollmachten</div><div class="safe-item-meta">Wichtige Dokumente</div></div></div>
+        <div class="safe-item"><span class="safe-item-icon">🏠</span><div><div class="safe-item-name">Immobilien</div><div class="safe-item-meta">Grundbuch, Kaufverträge</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SECTION 4: VIDEO-ARCHIV (VHS)
+     ========================================== -->
+<div class="section" id="sec-archive">
+  <div class="section-title">Video-Bibliothek</div>
+  <div class="section-sub">Videoarchiv</div>
+  <div style="text-align:center;color:var(--dim);font-size:12px;margin-bottom:16px">Zieh eine Kassette aus dem Regal</div>
+  <div id="vhs-shelf"></div>
+</div>
+
+<script>
+// ==========================================
+// ROLODEX
+// ==========================================
+var contacts = [
+  {name:'KIM',role:'Persönliche Assistentin',phone:'Anruf',email:'kim@kimanus.de',llm:'🧠 Claude 3.5 · 🗣️ ElevenLabs Sarah',color:'var(--pink)',cat:'KI-Agent',cls:'agent-kim'},
+  {name:'KAI',role:'Technischer Direktor',phone:'Anruf',email:'kai@kimanus.de',llm:'🧠 Gemini 2.5 · 🗣️ ElevenLabs Adam',color:'var(--blue)',cat:'KI-Agent',cls:'agent-kai'},
+  {name:'MANUS',role:'Concierge & Business',phone:'Anruf',email:'manus@kimanus.de',llm:'🧠 Claude Opus · 🗣️ ElevenLabs Daniel',color:'var(--gold)',cat:'KI-Agent',cls:'agent-manus'},
+  {name:'Dr. Müller',role:'Rechtsanwalt · IP & GEMA',phone:'+49 171 ...',email:'mueller@kanzlei.de',llm:'',color:'',cat:'Recht'},
+  {name:'Steuerberater Koch',role:'Steuerberatung · GmbH',phone:'+49 172 ...',email:'koch@stb.de',llm:'',color:'',cat:'Finanzen'},
+  {name:'Hostinger Support',role:'VPS & Domain Support',phone:'Live Chat',email:'support@hostinger.com',llm:'',color:'',cat:'Tech'},
+  {name:'Julian Ivanov',role:'n8n & KI-Automatisierung · YouTube',phone:'YouTube',email:'kontakt@julian.de',llm:'',color:'',cat:'Wissen'},
+  {name:'Anthropic',role:'Claude API · Enterprise Support',phone:'Support',email:'support@anthropic.com',llm:'',color:'',cat:'Tech'},
+  {name:'ElevenLabs',role:'Text-to-Speech · Voice AI',phone:'Dashboard',email:'support@elevenlabs.io',llm:'',color:'',cat:'Tech'},
+  {name:'Mistral AI',role:'LLM · Forge · Europäisch',phone:'Contact',email:'contact@mistral.ai',llm:'',color:'',cat:'Tech'},
+];
+
+var currentCardIndex = 0;
+var filteredContacts = contacts.slice();
+
+var visibleCards = 5;
+
+function renderRolodex() {
+  var container = document.getElementById('rolodex-cards');
+  container.innerHTML = '';
+  filteredContacts.forEach(function(c, i) {
+    var offset = i - currentCardIndex;
+    var card = document.createElement('div');
+    card.className = 'rolodex-card ' + (c.cls || '');
+    if (c.color) card.style.borderLeftColor = c.color;
+    var visible = offset >= 0 && offset < visibleCards;
+    card.style.top = (offset * 82) + 'px';
+    card.style.opacity = visible ? Math.max(0, 1 - offset * 0.15) : 0;
+    card.style.transform = 'scale(' + (1 - Math.max(0,offset) * 0.015) + ')';
+    card.style.zIndex = 100 - i;
+    card.style.pointerEvents = offset === 0 ? 'auto' : 'none';
+    card.innerHTML = '<div class="vk-name">' + c.name + '</div><div class="vk-role">' + c.role + '</div><div class="vk-contact"><span>📞 ' + c.phone + '</span><span>✉️ ' + c.email + '</span></div>' + (c.llm ? '<div class="vk-llm">' + c.llm + '</div>' : '<div class="vk-llm">' + c.cat + '</div>');
+    card.onclick = function() { currentCardIndex = Math.min(currentCardIndex + 1, filteredContacts.length - 1); renderRolodex(); };
+    container.appendChild(card);
+  });
+  updateWheel();
+}
+
+function filterRolodex(q) {
+  q = q.toLowerCase();
+  filteredContacts = q ? contacts.filter(function(c) { return c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q) || c.cat.toLowerCase().includes(q); }) : contacts.slice();
+  currentCardIndex = 0;
+  renderRolodex();
+}
+
+// === DREHRAD (Wheel) ===
+function initWheel() {
+  var track = document.getElementById('wheel-track');
+  var lines = document.getElementById('wheel-lines');
+  // Linien im Rad
+  for (var i = 0; i < 30; i++) {
+    var s = document.createElement('span');
+    lines.appendChild(s);
+  }
+}
+initWheel();
+
+function updateWheel() {
+  var knob = document.getElementById('wheel-knob');
+  if (!knob || filteredContacts.length <= 1) return;
+  var trackH = 400;
+  var knobSize = 28;
+  var range = trackH - knobSize - 20;
+  var pos = (currentCardIndex / (filteredContacts.length - 1)) * range + 10;
+  knob.style.top = pos + 'px';
+}
+
+// Wheel touch drag
+(function() {
+  var track = document.getElementById('wheel-track');
+  var dragging = false;
+  var startY = 0;
+  var startIndex = 0;
+
+  track.addEventListener('touchstart', function(e) {
+    dragging = true;
+    startY = e.touches[0].clientY;
+    startIndex = currentCardIndex;
+    e.preventDefault();
+  });
+  document.addEventListener('touchmove', function(e) {
+    if (!dragging) return;
+    var dy = e.touches[0].clientY - startY;
+    var step = Math.round(dy / 40);
+    var newIdx = Math.max(0, Math.min(filteredContacts.length - 1, startIndex + step));
+    if (newIdx !== currentCardIndex) {
+      currentCardIndex = newIdx;
+      renderRolodex();
+    }
+  });
+  document.addEventListener('touchend', function() { dragging = false; });
+
+  // Mouse drag too
+  track.addEventListener('mousedown', function(e) {
+    dragging = true;
+    startY = e.clientY;
+    startIndex = currentCardIndex;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    var dy = e.clientY - startY;
+    var step = Math.round(dy / 40);
+    var newIdx = Math.max(0, Math.min(filteredContacts.length - 1, startIndex + step));
+    if (newIdx !== currentCardIndex) {
+      currentCardIndex = newIdx;
+      renderRolodex();
+    }
+  });
+  document.addEventListener('mouseup', function() { dragging = false; });
+})();
+
+renderRolodex();
+
+// Touch swipe on cards too
+var touchStartY = 0;
+document.getElementById('rolodex-cards').addEventListener('touchstart', function(e) { touchStartY = e.touches[0].clientY; });
+document.getElementById('rolodex-cards').addEventListener('touchend', function(e) {
+  var diff = touchStartY - e.changedTouches[0].clientY;
+  if (diff > 30) { currentCardIndex = Math.min(currentCardIndex + 1, filteredContacts.length - 1); renderRolodex(); }
+  else if (diff < -30) { currentCardIndex = Math.max(currentCardIndex - 1, 0); renderRolodex(); }
+});
+
+// ==========================================
+// AKTENSCHRANK
+// ==========================================
+function toggleDrawer(el) { el.classList.toggle('open'); }
+
+// ==========================================
+// TRESOR
+// ==========================================
+var dialAngle = 0, unlockedSteps = {};
+
+function rotateDial() { dialAngle += 90; document.getElementById('safe-dial').style.transform = 'rotate(' + dialAngle + 'deg)'; }
+
+function unlockStep(step) {
+  unlockedSteps[step] = true;
+  document.getElementById('lock-' + step).classList.add('unlocked');
+  if (unlockedSteps.voice && unlockedSteps.device && unlockedSteps.face && unlockedSteps.nfc) {
+    document.getElementById('safe-door').style.borderColor = 'var(--green)';
+    document.getElementById('safe-door').style.boxShadow = '0 0 30px rgba(76,175,80,.3)';
+  }
+}
+
+function openSafe() {
+  if (unlockedSteps.voice && unlockedSteps.device && unlockedSteps.face && unlockedSteps.nfc) {
+    document.getElementById('safe-door').style.transform = 'perspective(600px) rotateY(-60deg)';
+    document.getElementById('safe-door').style.opacity = '0.2';
+    document.getElementById('safe-inner').classList.add('visible');
+  } else {
+    var safe = document.getElementById('safe-door');
+    safe.style.animation = 'none'; safe.offsetHeight; safe.style.animation = 'shake .4s';
+    var missing = [];
+    if (!unlockedSteps.voice) missing.push('Stimme');
+    if (!unlockedSteps.device) missing.push('Handy');
+    if (!unlockedSteps.face) missing.push('Gesicht');
+    if (!unlockedSteps.nfc) missing.push('NFC-Taube');
+    alert('🔒 Zugang verweigert!\n\nFehlende Freigabe:\n· ' + missing.join('\n· '));
+  }
+}
+
+// ==========================================
+// VIDEO-ARCHIV (VHS Kassetten)
+// ==========================================
+var vhsTapes = [
+  {title:'Claude Code\nSkills & Plugins',date:'21.03',color:'#2a4a6a',brand:'JULIAN'},
+  {title:'Claude Code\n+ n8n',date:'21.03',color:'#4a2a6a',brand:'JULIAN'},
+  {title:'KI-Agenten\nTeam in n8n',date:'21.03',color:'#2a6a4a',brand:'JULIAN'},
+  {title:'WhatsApp\n+ KI + n8n',date:'21.03',color:'#6a4a2a',brand:'JULIAN'},
+  {title:'RAG System\nSupabase',date:'21.03',color:'#6a2a3a',brand:'JULIAN'},
+  {title:'KI-News\nder Woche',date:'21.03',color:'#3a5a3a',brand:'NEULAND'},
+  {title:'Website\nDesign + KI',date:'18.03',color:'#5a3a2a',brand:'JULIAN'},
+  {title:'Mistral\nForge',date:'21.03',color:'#2a3a6a',brand:'NEULAND'},
+];
+
+var shelf = document.getElementById('vhs-shelf');
+// 4 tapes per shelf row
+for (var r = 0; r < Math.ceil(vhsTapes.length / 4); r++) {
+  var row = document.createElement('div');
+  row.className = 'vhs-shelf-row';
+  for (var c = r * 4; c < Math.min((r + 1) * 4, vhsTapes.length); c++) {
+    var tape = vhsTapes[c];
+    var el = document.createElement('div');
+    el.className = 'vhs-tape';
+    el.innerHTML = '<div class="vhs-tape-label" style="background:' + tape.color + '"><div class="vhs-tape-title">' + tape.title.replace(/\n/g,'<br>') + '</div><div class="vhs-tape-date">' + tape.date + '</div></div><div class="vhs-tape-window"></div><div class="vhs-tape-brand">' + tape.brand + '</div>';
+    (function(t) { el.onclick = function() { alert('📼 ' + t.title.replace(/\n/g,' ') + '\n\n▶ Kassette einlegen...'); }; })(tape);
+    row.appendChild(el);
+  }
+  shelf.appendChild(row);
+}
+
+// ==========================================
+// NAVIGATION
+// ==========================================
+function showSection(name, tab) {
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('sec-' + name).classList.add('active');
+  tab.classList.add('active');
+}
+</script>
+</body>
+</html>
