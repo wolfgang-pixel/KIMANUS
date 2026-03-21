@@ -1708,6 +1708,111 @@ async def handle_video_load(request):
         return web.json_response({"error": str(e)}, status=500)
 
 
+async def handle_video_folders(request):
+    """GET /api/video-folders - Liste aller Aktenordner."""
+    folders_dir = os.path.join(WORKSPACE, "video-ordner")
+    os.makedirs(folders_dir, exist_ok=True)
+    folders = []
+    for name in sorted(os.listdir(folders_dir)):
+        fpath = os.path.join(folders_dir, name)
+        if os.path.isdir(fpath):
+            count = len([f for f in os.listdir(fpath) if f.endswith('.md')])
+            folders.append({"name": name, "count": count})
+    return web.json_response({"folders": folders})
+
+
+async def handle_video_folder_create(request):
+    """POST /api/video-folder-create - Neuen Aktenordner anlegen."""
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    name = re.sub(r'[^\w\s\-äöüÄÖÜß]', '', data.get("name", "").strip())[:50]
+    if not name:
+        return web.json_response({"error": "Kein Name angegeben"}, status=400)
+    folder_path = os.path.join(WORKSPACE, "video-ordner", name)
+    os.makedirs(folder_path, exist_ok=True)
+    log.info(f"Ordner erstellt: {name}")
+    return web.json_response({"ok": True, "name": name})
+
+
+async def handle_video_move_to_folder(request):
+    """POST /api/video-move - Video in Aktenordner verschieben (kopieren)."""
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    filename = data.get("filename", "")
+    folder = data.get("folder", "")
+    if not filename or not folder or ".." in filename or ".." in folder:
+        return web.json_response({"error": "Ungueltige Parameter"}, status=400)
+
+    src = os.path.join(WORKSPACE, "video-analysen", filename)
+    dst_dir = os.path.join(WORKSPACE, "video-ordner", folder)
+    os.makedirs(dst_dir, exist_ok=True)
+    dst = os.path.join(dst_dir, filename)
+
+    if not os.path.isfile(src):
+        return web.json_response({"error": "Datei nicht gefunden"}, status=404)
+
+    import shutil
+    shutil.copy2(src, dst)
+    log.info(f"Video archiviert: {filename} -> {folder}")
+    return web.json_response({"ok": True})
+
+
+async def handle_video_delete(request):
+    """POST /api/video-delete - Video aus Bibliothek loeschen."""
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    filename = data.get("filename", "")
+    if not filename or ".." in filename or "/" in filename or "\\" in filename:
+        return web.json_response({"error": "Ungueltige Datei"}, status=400)
+
+    fpath = os.path.join(WORKSPACE, "video-analysen", filename)
+    if os.path.isfile(fpath):
+        os.remove(fpath)
+        log.info(f"Video geloescht: {filename}")
+        return web.json_response({"ok": True})
+    return web.json_response({"error": "Datei nicht gefunden"}, status=404)
+
+
+async def handle_video_folder_list(request):
+    """GET /api/video-folder-list?folder=Name - Videos in einem Aktenordner."""
+    folder = request.query.get("folder", "")
+    if not folder or ".." in folder:
+        return web.json_response({"error": "Ungueltig"}, status=400)
+    folder_dir = os.path.join(WORKSPACE, "video-ordner", folder)
+    if not os.path.isdir(folder_dir):
+        return web.json_response({"videos": []})
+    videos = []
+    for fname in sorted(os.listdir(folder_dir), reverse=True):
+        if not fname.endswith(".md"):
+            continue
+        fpath = os.path.join(folder_dir, fname)
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                content = f.read(2000)
+            title = channel = url = duration = date_str = ""
+            for line in content.split("\n"):
+                if line.startswith("# ") and not title:
+                    title = line[2:].strip()
+                elif line.startswith("- **Kanal:**"):
+                    channel = line.split("**Kanal:**")[1].strip()
+                elif line.startswith("- **URL:**"):
+                    url = line.split("**URL:**")[1].strip()
+                elif line.startswith("- **Dauer:**"):
+                    duration = line.split("**Dauer:**")[1].strip()
+                elif line.startswith("- **Analysiert:**"):
+                    date_str = line.split("**Analysiert:**")[1].strip()
+            videos.append({"filename": fname, "title": title, "channel": channel, "url": url, "duration": duration, "date": date_str})
+        except Exception as e:
+            log.warning(f"Ordner-Liste: Fehler bei {fname}: {e}")
+    return web.json_response({"videos": videos})
+
+
 async def handle_realtime_session(request):
     """POST /api/realtime/session - Erstellt einen ephemeral Token fuer WebRTC.
 
@@ -1818,6 +1923,11 @@ def create_app():
     app.router.add_post("/api/video-save", handle_video_save)
     app.router.add_get("/api/video-list", handle_video_list)
     app.router.add_get("/api/video-load", handle_video_load)
+    app.router.add_get("/api/video-folders", handle_video_folders)
+    app.router.add_post("/api/video-folder-create", handle_video_folder_create)
+    app.router.add_post("/api/video-move", handle_video_move_to_folder)
+    app.router.add_post("/api/video-delete", handle_video_delete)
+    app.router.add_get("/api/video-folder-list", handle_video_folder_list)
     app.router.add_post("/api/realtime/session", handle_realtime_session)
     app.router.add_post("/api/video-analyze", handle_video_analyze)
     app.router.add_post("/api/video-chat", handle_video_chat)

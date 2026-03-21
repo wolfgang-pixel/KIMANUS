@@ -2068,14 +2068,39 @@ async function loadVideoLibrary() {
   resultDiv.innerHTML = '';
   resultsDiv.innerHTML = '<div style="text-align:center;padding:20px 0"><div style="font-size:20px;margin-bottom:8px;animation:spin 1s linear infinite;display:inline-block">&#x1f4da;</div><p style="color:#666;font-size:12px">Bibliothek wird geladen...</p></div>';
   try {
-    const resp = await fetch('/api/video-list');
-    if (!resp.ok) throw new Error('Laden fehlgeschlagen');
-    const data = await resp.json();
+    // Lade Videos UND Ordner parallel
+    var [vidResp, folderResp] = await Promise.all([fetch('/api/video-list'), fetch('/api/video-folders')]);
+    var data = await vidResp.json();
+    var folderData = await folderResp.json();
+    var folders = folderData.folders || [];
+
+    var html = '';
+
+    // === AKTENORDNER-LEISTE ===
+    html += '<div style="margin-bottom:14px">';
+    html += '<div style="font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase">&#x1f5c4;&#xfe0f; AKTENORDNER</div>';
+    html += '<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch">';
+    // Ordner als physische Ordner-Icons
+    folders.forEach(function(f) {
+      html += '<div onclick="openVideoFolder(\'' + f.name.replace(/'/g,"\\'") + '\')" style="flex-shrink:0;width:80px;text-align:center;cursor:pointer;padding:6px 4px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">';
+      html += '<div style="font-size:32px;margin-bottom:2px">&#x1f4c2;</div>';
+      html += '<div style="font-size:10px;color:#ccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + f.name + '</div>';
+      html += '<div style="font-size:9px;color:#666">' + f.count + ' Dok.</div>';
+      html += '</div>';
+    });
+    // Neuer Ordner Button
+    html += '<div onclick="createVideoFolder()" style="flex-shrink:0;width:80px;text-align:center;cursor:pointer;padding:6px 4px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.1)">';
+    html += '<div style="font-size:28px;margin-bottom:4px;color:#555">&#x2795;</div>';
+    html += '<div style="font-size:10px;color:#555">Neu</div>';
+    html += '</div>';
+    html += '</div></div>';
+
+    // === VIDEOS IN BIBLIOTHEK ===
     if (!data.videos || data.videos.length === 0) {
-      resultsDiv.innerHTML = '<p style="color:#666;text-align:center;padding:16px">Noch keine Videos gespeichert</p>';
+      html += '<p style="color:#666;text-align:center;padding:16px">Noch keine Videos gespeichert</p>';
+      resultsDiv.innerHTML = html;
       return;
     }
-    // Gruppiere: Videos mit "//" im Titel sind Kapitel-Lesezeichen
     var fullVideos = [];
     var bookmarks = [];
     data.videos.forEach(function(v) {
@@ -2083,24 +2108,32 @@ async function loadVideoLibrary() {
       else fullVideos.push(v);
     });
 
-    var html = '';
-    // Volle Videos
+    // Volle Videos mit Archiv + Loeschen
     if (fullVideos.length > 0) {
       html += '<div style="font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase">&#x1f3ac; VIDEOS &middot; ' + fullVideos.length + '</div>';
       fullVideos.forEach(function(v) {
         var vidId = extractVideoId(v.url || '');
         var thumb = vidId ? 'https://img.youtube.com/vi/' + vidId + '/mqdefault.jpg' : '';
-        html += '<div style="display:flex;gap:10px;padding:8px;margin-bottom:4px;background:#1a1a1a;border:1px solid #222;border-radius:8px;cursor:pointer" onclick="loadSavedVideo(\'' + encodeURIComponent(v.filename) + '\')">';
+        var encName = encodeURIComponent(v.filename);
+        html += '<div style="display:flex;gap:8px;padding:8px;margin-bottom:4px;background:#1a1a1a;border:1px solid #222;border-radius:10px;align-items:center">';
+        // Thumbnail + Klick zum Oeffnen
+        html += '<div style="flex:1;display:flex;gap:8px;cursor:pointer;min-width:0" onclick="loadSavedVideo(\'' + encName + '\')">';
         if (thumb) {
-          html += '<div style="flex-shrink:0;width:100px;height:56px;border-radius:6px;overflow:hidden;background:#111"><img src="' + thumb + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
+          html += '<div style="flex-shrink:0;width:80px;height:45px;border-radius:6px;overflow:hidden;background:#111"><img src="' + thumb + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
         }
         html += '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">';
-        html += '<div style="font-size:12px;font-weight:500;color:#ddd;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + (v.title || '') + '</div>';
-        html += '<div style="font-size:10px;color:#666;margin-top:2px">' + (v.channel || '') + ' &middot; ' + (v.date || '') + '</div>';
+        html += '<div style="font-size:11px;font-weight:500;color:#ddd;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + (v.title || '') + '</div>';
+        html += '<div style="font-size:9px;color:#666;margin-top:2px">' + (v.channel || '') + ' &middot; ' + (v.date || '') + '</div>';
         html += '</div></div>';
+        // Archiv + Loeschen Buttons
+        html += '<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">';
+        html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(212,168,83,.2);background:rgba(212,168,83,.08);color:#d4a853;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="In Ordner archivieren">&#x1f4c2;</button>';
+        html += '<button onclick="event.stopPropagation();deleteVideo(\'' + encName + '\')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(230,57,70,.15);background:rgba(230,57,70,.06);color:#e63946;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Loeschen">&#x1f5d1;</button>';
+        html += '</div>';
+        html += '</div>';
       });
     }
-    // Lesezeichen / Kapitel
+    // Lesezeichen mit Archiv + Loeschen
     if (bookmarks.length > 0) {
       html += '<div style="font-size:10px;color:#555;letter-spacing:1.5px;margin:12px 0 8px;text-transform:uppercase">&#x1f516; LESEZEICHEN &middot; ' + bookmarks.length + '</div>';
       bookmarks.forEach(function(v) {
@@ -2108,22 +2141,120 @@ async function loadVideoLibrary() {
         var videoTitle = parts[0] || '';
         var chapterTitle = parts[1] || '';
         var vidId = extractVideoId(v.url || '');
-        // Timestamp aus URL extrahieren (&t=123)
         var tMatch = (v.url||'').match(/[&?]t=(\d+)/);
         var startSecs = tMatch ? parseInt(tMatch[1]) : 0;
-        html += '<div style="display:flex;gap:8px;padding:7px 10px;margin-bottom:3px;background:#1a1a1a;border:1px solid #222;border-radius:8px;cursor:pointer;align-items:center" onclick="' + (vidId ? "jumpToVideoTime('" + vidId + "'," + startSecs + ")" : "loadSavedVideo('" + encodeURIComponent(v.filename) + "')") + '">';
+        var encName = encodeURIComponent(v.filename);
+        html += '<div style="display:flex;gap:6px;padding:7px 10px;margin-bottom:3px;background:#1a1a1a;border:1px solid #222;border-radius:8px;align-items:center">';
+        // Play + Text
+        html += '<div style="flex:1;display:flex;gap:8px;align-items:center;cursor:pointer;min-width:0" onclick="' + (vidId ? "jumpToVideoTime('" + vidId + "'," + startSecs + ")" : "loadSavedVideo('" + encName + "')") + '">';
         html += '<div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#c62828;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">&#x25B6;</div>';
         html += '<div style="flex:1;min-width:0">';
-        html += '<div style="font-size:12px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + chapterTitle + '</div>';
-        html += '<div style="font-size:9px;color:#555;margin-top:1px">' + videoTitle + ' &middot; ' + (v.duration || '') + '</div>';
+        html += '<div style="font-size:11px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + chapterTitle + '</div>';
+        html += '<div style="font-size:9px;color:#555;margin-top:1px">' + videoTitle + '</div>';
         html += '</div></div>';
+        // Buttons
+        html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(212,168,83,.15);background:rgba(212,168,83,.06);color:#d4a853;font-size:13px;cursor:pointer;flex-shrink:0" title="Archivieren">&#x1f4c2;</button>';
+        html += '<button onclick="event.stopPropagation();deleteVideo(\'' + encName + '\')" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(230,57,70,.12);background:rgba(230,57,70,.05);color:#e63946;font-size:12px;cursor:pointer;flex-shrink:0" title="Loeschen">&#x1f5d1;</button>';
+        html += '</div>';
       });
     }
-    if (!html) html = '<p style="color:#666;text-align:center;padding:16px">Noch nichts gespeichert</p>';
+    if (!fullVideos.length && !bookmarks.length) html += '<p style="color:#666;text-align:center;padding:16px">Noch nichts gespeichert</p>';
     resultsDiv.innerHTML = html;
   } catch(e) {
     resultsDiv.innerHTML = '<p style="color:#e63946;padding:8px">Fehler: ' + e.message + '</p>';
   }
+}
+
+// Ordner-Verwaltung
+async function createVideoFolder() {
+  var name = prompt('Ordnername eingeben:');
+  if (!name || !name.trim()) return;
+  try {
+    var resp = await fetch('/api/video-folder-create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:name.trim()})});
+    if (resp.ok) loadVideoLibrary();
+    else alert('Fehler beim Erstellen');
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function openVideoFolder(folderName) {
+  var resultsDiv = document.getElementById('video-search-results');
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:20px;animation:spin 1s linear infinite;display:inline-block">&#x1f4c2;</div></div>';
+  try {
+    var resp = await fetch('/api/video-folder-list?folder=' + encodeURIComponent(folderName));
+    var data = await resp.json();
+    var html = '';
+    // Zurueck-Button
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
+    html += '<button onclick="loadVideoLibrary()" style="padding:6px 12px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#ddd;font-size:12px;cursor:pointer">&#x2190; Zurueck</button>';
+    html += '<div style="font-size:14px;font-weight:600;color:#d4a853">&#x1f4c2; ' + folderName + '</div>';
+    html += '</div>';
+
+    if (!data.videos || data.videos.length === 0) {
+      html += '<p style="color:#666;text-align:center;padding:20px">Ordner ist noch leer</p>';
+    } else {
+      html += '<div style="font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase">&#x1f4c4; ' + data.videos.length + ' DOKUMENTE</div>';
+      data.videos.forEach(function(v) {
+        var vidId = extractVideoId(v.url || '');
+        var thumb = vidId ? 'https://img.youtube.com/vi/' + vidId + '/mqdefault.jpg' : '';
+        var isBookmark = v.title && v.title.indexOf(' // ') !== -1;
+        html += '<div style="display:flex;gap:8px;padding:8px;margin-bottom:4px;background:#1a1a1a;border:1px solid rgba(212,168,83,.1);border-radius:10px;cursor:pointer;align-items:center" onclick="loadSavedVideo(\'' + encodeURIComponent(v.filename) + '\')">';
+        if (thumb && !isBookmark) {
+          html += '<div style="flex-shrink:0;width:80px;height:45px;border-radius:6px;overflow:hidden;background:#111"><img src="' + thumb + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"></div>';
+        } else {
+          html += '<div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:' + (isBookmark ? '#c62828' : 'rgba(212,168,83,.15)') + ';display:flex;align-items:center;justify-content:center;font-size:13px;color:' + (isBookmark ? '#fff' : '#d4a853') + '">' + (isBookmark ? '&#x25B6;' : '&#x1f4c4;') + '</div>';
+        }
+        html += '<div style="flex:1;min-width:0">';
+        if (isBookmark) {
+          var parts = v.title.split(' // ');
+          html += '<div style="font-size:11px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (parts[1]||'') + '</div>';
+          html += '<div style="font-size:9px;color:#555;margin-top:1px">' + (parts[0]||'') + '</div>';
+        } else {
+          html += '<div style="font-size:11px;font-weight:500;color:#ddd;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + (v.title || '') + '</div>';
+          html += '<div style="font-size:9px;color:#666;margin-top:2px">' + (v.channel || '') + ' &middot; ' + (v.date || '') + '</div>';
+        }
+        html += '</div></div>';
+      });
+    }
+    resultsDiv.innerHTML = html;
+  } catch(e) { resultsDiv.innerHTML = '<p style="color:#e63946">Fehler: ' + e.message + '</p>'; }
+}
+
+async function archiveVideo(encFilename) {
+  // Lade Ordner und zeige Auswahl
+  try {
+    var resp = await fetch('/api/video-folders');
+    var data = await resp.json();
+    var folders = data.folders || [];
+    if (folders.length === 0) {
+      var newName = prompt('Noch keine Ordner vorhanden.\nNeuen Ordner anlegen:');
+      if (!newName || !newName.trim()) return;
+      await fetch('/api/video-folder-create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:newName.trim()})});
+      folders = [{name: newName.trim()}];
+    }
+    // Ordner-Auswahl
+    var choices = folders.map(function(f,i) { return (i+1) + '. ' + f.name; }).join('\n');
+    var pick = prompt('In welchen Ordner archivieren?\n\n' + choices + '\n\nNummer eingeben:');
+    if (!pick) return;
+    var idx = parseInt(pick) - 1;
+    if (idx < 0 || idx >= folders.length) { alert('Ungueltige Auswahl'); return; }
+    var folderName = folders[idx].name;
+    var filename = decodeURIComponent(encFilename);
+    var moveResp = await fetch('/api/video-move', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({filename: filename, folder: folderName})});
+    if (moveResp.ok) {
+      alert('Archiviert in: ' + folderName);
+      loadVideoLibrary();
+    } else { alert('Fehler beim Archivieren'); }
+  } catch(e) { alert('Fehler: ' + e.message); }
+}
+
+async function deleteVideo(encFilename) {
+  if (!confirm('Video aus der Bibliothek loeschen?\n(Archivierte Kopien bleiben erhalten)')) return;
+  try {
+    var filename = decodeURIComponent(encFilename);
+    var resp = await fetch('/api/video-delete', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({filename: filename})});
+    if (resp.ok) loadVideoLibrary();
+    else alert('Fehler beim Loeschen');
+  } catch(e) { alert('Fehler: ' + e.message); }
 }
 
 // Gespeichertes Video laden und Analyse anzeigen
