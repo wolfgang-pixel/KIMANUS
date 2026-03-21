@@ -1620,6 +1620,17 @@ async def handle_video_list(request):
     if not os.path.isdir(save_dir):
         return web.json_response({"videos": []})
 
+    # Sammle alle archivierten Dateinamen fuer "archived" Flag
+    archived_files = set()
+    folders_dir = os.path.join(WORKSPACE, "video-ordner")
+    if os.path.isdir(folders_dir):
+        for folder_name in os.listdir(folders_dir):
+            folder_path = os.path.join(folders_dir, folder_name)
+            if os.path.isdir(folder_path):
+                for f in os.listdir(folder_path):
+                    if f.endswith('.md'):
+                        archived_files.add(f)
+
     videos = []
     for fname in sorted(os.listdir(save_dir), reverse=True):
         if not fname.endswith(".md"):
@@ -1650,7 +1661,8 @@ async def handle_video_list(request):
                 "channel": channel,
                 "url": url,
                 "duration": duration,
-                "date": date_str
+                "date": date_str,
+                "archived": fname in archived_files
             })
         except Exception as e:
             log.warning(f"Video-Liste: Fehler bei {fname}: {e}")

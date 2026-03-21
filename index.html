@@ -2076,6 +2076,12 @@ async function loadVideoLibrary() {
 
     var html = '';
 
+    // === ZURUECK-BUTTON ===
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
+    html += '<button onclick="document.getElementById(\'video-search-results\').style.display=\'none\';document.getElementById(\'video-result\').innerHTML=\'\'" style="padding:7px 14px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#ddd;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px"><span style="font-size:14px">&#x2190;</span> Zurueck</button>';
+    html += '<div style="font-size:13px;font-weight:600;color:#ddd">&#x1f4da; Meine Bibliothek</div>';
+    html += '</div>';
+
     // === AKTENORDNER-LEISTE ===
     html += '<div style="margin-bottom:14px">';
     html += '<div style="font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:8px;text-transform:uppercase">&#x1f5c4;&#xfe0f; AKTENORDNER</div>';
@@ -2115,7 +2121,8 @@ async function loadVideoLibrary() {
         var vidId = extractVideoId(v.url || '');
         var thumb = vidId ? 'https://img.youtube.com/vi/' + vidId + '/mqdefault.jpg' : '';
         var encName = encodeURIComponent(v.filename);
-        html += '<div style="display:flex;gap:8px;padding:8px;margin-bottom:4px;background:#1a1a1a;border:1px solid #222;border-radius:10px;align-items:center">';
+        var isArchived = v.archived === true;
+        html += '<div style="display:flex;gap:8px;padding:8px;margin-bottom:4px;background:#1a1a1a;border:1px solid ' + (isArchived ? 'rgba(76,175,80,.2)' : '#222') + ';border-radius:10px;align-items:center">';
         // Thumbnail + Klick zum Oeffnen
         html += '<div style="flex:1;display:flex;gap:8px;cursor:pointer;min-width:0" onclick="loadSavedVideo(\'' + encName + '\')">';
         if (thumb) {
@@ -2123,11 +2130,15 @@ async function loadVideoLibrary() {
         }
         html += '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">';
         html += '<div style="font-size:11px;font-weight:500;color:#ddd;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">' + (v.title || '') + '</div>';
-        html += '<div style="font-size:9px;color:#666;margin-top:2px">' + (v.channel || '') + ' &middot; ' + (v.date || '') + '</div>';
+        html += '<div style="font-size:9px;color:#666;margin-top:2px">' + (v.channel || '') + ' &middot; ' + (v.date || '') + (isArchived ? ' <span style="color:#4caf50">&#x2713; archiviert</span>' : '') + '</div>';
         html += '</div></div>';
         // Archiv + Loeschen Buttons
         html += '<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">';
-        html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(212,168,83,.2);background:rgba(212,168,83,.08);color:#d4a853;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="In Ordner archivieren">&#x1f4c2;</button>';
+        if (isArchived) {
+          html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(76,175,80,.25);background:rgba(76,175,80,.12);color:#4caf50;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Bereits archiviert &#x2713;">&#x2705;</button>';
+        } else {
+          html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(212,168,83,.2);background:rgba(212,168,83,.08);color:#d4a853;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="In Ordner archivieren">&#x1f4c2;</button>';
+        }
         html += '<button onclick="event.stopPropagation();deleteVideo(\'' + encName + '\')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(230,57,70,.15);background:rgba(230,57,70,.06);color:#e63946;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Loeschen">&#x1f5d1;</button>';
         html += '</div>';
         html += '</div>';
@@ -2144,16 +2155,21 @@ async function loadVideoLibrary() {
         var tMatch = (v.url||'').match(/[&?]t=(\d+)/);
         var startSecs = tMatch ? parseInt(tMatch[1]) : 0;
         var encName = encodeURIComponent(v.filename);
-        html += '<div style="display:flex;gap:6px;padding:7px 10px;margin-bottom:3px;background:#1a1a1a;border:1px solid #222;border-radius:8px;align-items:center">';
+        var isArchived = v.archived === true;
+        html += '<div style="display:flex;gap:6px;padding:7px 10px;margin-bottom:3px;background:#1a1a1a;border:1px solid ' + (isArchived ? 'rgba(76,175,80,.2)' : '#222') + ';border-radius:8px;align-items:center">';
         // Play + Text
         html += '<div style="flex:1;display:flex;gap:8px;align-items:center;cursor:pointer;min-width:0" onclick="' + (vidId ? "jumpToVideoTime('" + vidId + "'," + startSecs + ")" : "loadSavedVideo('" + encName + "')") + '">';
         html += '<div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#c62828;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">&#x25B6;</div>';
         html += '<div style="flex:1;min-width:0">';
-        html += '<div style="font-size:11px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + chapterTitle + '</div>';
+        html += '<div style="font-size:11px;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + chapterTitle + (isArchived ? ' <span style="color:#4caf50">&#x2713;</span>' : '') + '</div>';
         html += '<div style="font-size:9px;color:#555;margin-top:1px">' + videoTitle + '</div>';
         html += '</div></div>';
         // Buttons
-        html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(212,168,83,.15);background:rgba(212,168,83,.06);color:#d4a853;font-size:13px;cursor:pointer;flex-shrink:0" title="Archivieren">&#x1f4c2;</button>';
+        if (isArchived) {
+          html += '<button style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(76,175,80,.2);background:rgba(76,175,80,.1);color:#4caf50;font-size:13px;cursor:default;flex-shrink:0" title="Archiviert">&#x2705;</button>';
+        } else {
+          html += '<button onclick="event.stopPropagation();archiveVideo(\'' + encName + '\')" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(212,168,83,.15);background:rgba(212,168,83,.06);color:#d4a853;font-size:13px;cursor:pointer;flex-shrink:0" title="Archivieren">&#x1f4c2;</button>';
+        }
         html += '<button onclick="event.stopPropagation();deleteVideo(\'' + encName + '\')" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(230,57,70,.12);background:rgba(230,57,70,.05);color:#e63946;font-size:12px;cursor:pointer;flex-shrink:0" title="Loeschen">&#x1f5d1;</button>';
         html += '</div>';
       });
