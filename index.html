@@ -1575,30 +1575,21 @@ function parseChapters(analysisText) {
   var lines = analysisText.split('\n');
 
   for (var i = 0; i < lines.length; i++) {
-    var line = lines[i];
-    // Alles was kein Kapitel-Zeile sein kann, skippen
-    var clean = line.replace(/\*+/g, '').replace(/^[\s\-\*\d.)]+/, '').trim();
-    if (!clean) continue;
+    var line = lines[i].replace(/\*+/g, '').trim();
+    if (!line) continue;
 
-    // Pattern 1: "00:00 - 03:15 | Thema" oder "00:00 – 03:15 | Thema" oder "00:00-03:15: Thema"
-    var m1 = clean.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-–]\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-–]\s*(.+)/);
-    if (m1) {
+    // Suche nach Timestamp-Pattern irgendwo in der Zeile
+    // Pattern 1: "00:00 - 03:15 | Thema" (mit Start+End)
+    var m1 = line.match(/(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-–]\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-–]\s*(.+)/);
+    if (m1 && m1[3].trim().length > 2) {
       chapters.push({startTime: m1[1], endTime: m1[2], title: m1[3].trim(), startSecs: tsToSecs(m1[1]), endSecs: tsToSecs(m1[2])});
       continue;
     }
 
-    // Pattern 2: "00:00 | Thema" oder "00:00: Thema" oder "00:00 - Thema" (nur Start-Timestamp)
-    var m2 = clean.match(/^(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:\-–]\s*(.+)/);
-    if (m2 && m2[2].length > 3) {
+    // Pattern 2: "00:00 | Thema" oder "00:00: Thema" (nur Start)
+    var m2 = line.match(/(\d{1,2}:\d{2}(?::\d{2})?)\s*[|:]\s*(.+)/);
+    if (m2 && m2[2].trim().length > 3 && !/^\d{1,2}:\d{2}/.test(m2[2].trim())) {
       chapters.push({startTime: m2[1], endTime: null, title: m2[2].trim(), startSecs: tsToSecs(m2[1]), endSecs: null});
-      continue;
-    }
-
-    // Pattern 3: Im Raw-Text mit Markdown: "**00:00 - 03:15** | Thema"
-    var rawLine = line.replace(/^[\s\-\*\d.)]+/, '');
-    var m3 = rawLine.match(/\*{0,2}(\d{1,2}:\d{2}(?::\d{2})?)\s*[\-–]\s*(\d{1,2}:\d{2}(?::\d{2})?)\*{0,2}\s*[|:\-–]?\s*(.+)/);
-    if (m3 && m3[3].replace(/\*/g,'').trim().length > 3) {
-      chapters.push({startTime: m3[1], endTime: m3[2], title: m3[3].replace(/\*/g,'').trim(), startSecs: tsToSecs(m3[1]), endSecs: tsToSecs(m3[2])});
       continue;
     }
   }
