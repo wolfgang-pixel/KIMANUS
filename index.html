@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS App v3.0 - Build 20260320 - Die helfende Hand -->
+<!-- KIMANUS App v3.1 - Build 20260321 - Single Page + Comm Bar -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -95,7 +95,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #view-label span{font-size:7px;letter-spacing:5px;color:#444;text-transform:uppercase}
 #canvas{
   flex:1;overflow-y:auto;overflow-x:hidden;
-  border-radius:8px;padding:0;margin:0;
+  border-radius:8px;padding:0 0 120px;margin:0;
   background:transparent;
   border:none;
   box-shadow:none;
@@ -118,18 +118,10 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
    APP GRID (iPhone-Style Homescreen mit Seiten)
    ========================================= */
 #widget-grid{
-  display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;height:100%;
+  display:flex;flex-direction:column;
+  padding:6px 10px;gap:8px;
 }
 #widget-grid::-webkit-scrollbar{display:none}
-/* Jede Seite */
-.app-page{
-  flex:0 0 100%;scroll-snap-align:start;
-  display:flex;flex-direction:column;
-  padding:6px 10px;gap:8px;overflow-y:hidden;
-}
-.app-page-label{display:none}
 /* Mini-Dock Container (jede Gruppe) */
 .mini-dock{
   padding:10px 10px 10px;
@@ -302,6 +294,34 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #dock .widget{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
 #dock .widget-icon{width:64px;height:64px;border-radius:16px}
 #dock .widget-icon svg{width:32px;height:32px}
+/* =========================================
+   COMMUNICATION BAR (fixed bottom)
+   ========================================= */
+#comm-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(25,25,25,.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+  z-index:200;
+}
+#agent-selector{display:flex;gap:6px;margin-bottom:8px;justify-content:center}
+.agent-btn{
+  padding:6px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);color:#888;font-size:12px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .3s;
+  font-family:inherit;
+}
+.agent-btn.active{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.2)}
+.agent-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+#comm-buttons{display:flex;gap:8px;justify-content:center}
+.comm-btn{
+  flex:1;max-width:90px;padding:10px 8px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);
+  color:#ccc;font-size:10px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:4px;transition:all .2s;font-family:inherit;
+}
+.comm-btn svg{width:22px;height:22px;fill:currentColor}
+.comm-btn:active{transform:scale(.95);background:rgba(255,255,255,.1)}
 /* KI-Agent Avatare (runde Gesichter) */
 .widget-icon.avatar-kim{
   background:linear-gradient(145deg,#3a1a1a,#2a1015,#1a0a0a)!important;
@@ -865,45 +885,8 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     <div id="canvas">
       <!-- Widget Grid (Home/Baukasten) -->
       <div id="widget-grid">
-        <!-- === SEITE 1: Tools + Kommunikation + KI-Partner === -->
-        <div class="app-page" data-page="0">
-          <div class="mini-dock" data-dock="tools">
-            <div class="mini-dock-handle"><div class="grip"></div></div>
-            <div class="mini-dock-label">Tools</div>
-            <div class="mini-dock-grid app-page-grid">
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h14v3H5z"/></svg></div><div class="widget-label">Regio-Frame</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="widget-label">Safe Home</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><div class="widget-label">Music DJ</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></div><div class="widget-label">BuenaVista</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.94s4.18 1.36 4.18 3.85c0 1.89-1.44 2.98-3.12 3.19z"/></svg></div><div class="widget-label">Cap-Coin</div></div>
-              <div class="widget" data-module="search" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div><div class="widget-label">Suche</div></div>
-              <div class="widget" data-module="iphone" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg></div><div class="widget-label">iPhone</div></div>
-            </div>
-          </div>
-          <div class="mini-dock" data-dock="kommunikation">
-            <div class="mini-dock-handle"><div class="grip"></div></div>
-            <div class="mini-dock-label">Kommunikation</div>
-            <div class="mini-dock-grid app-page-grid">
-              <div class="widget" data-module="chat" onclick="widgetClick(this)">
-                <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
-                <div class="widget-label">Chat</div>
-              </div>
-              <div class="widget" data-module="email" onclick="widgetClick(this)">
-                <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
-                <div class="widget-label">E-Mail</div>
-              </div>
-              <div class="widget" data-module="phone" onclick="widgetClick(this)">
-                <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
-                <div class="widget-label">Telefon</div>
-              </div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)">
-                <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z"/></svg></div>
-                <div class="widget-label">Walkie-T.</div>
-              </div>
-            </div>
-          </div>
+          <!-- === KI-Partner (Visitenkarten) === -->
           <div class="mini-dock" data-dock="ki-partner">
-            <div class="mini-dock-handle"><div class="grip"></div></div>
             <div class="mini-dock-label">Deine KI-Partner</div>
             <div class="vk-scroll">
               <div class="visitenkarte vk-kim" data-module="kim" onclick="widgetClick(this)">
@@ -953,63 +936,36 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- === SEITE 2: Privat === -->
-        <div class="app-page" data-page="1">
-          <div class="mini-dock" data-dock="privat">
-            <div class="mini-dock-handle"><div class="grip"></div></div>
-            <div class="mini-dock-label">Privat</div>
-            <div class="mini-dock-grid app-page-grid">
-              <div class="widget" data-module="private" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="widget-label">Profil</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/></svg></div><div class="widget-label">Kalender</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg></div><div class="widget-label">Fitness</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg></div><div class="widget-label">Einkauf</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div><div class="widget-label">Reise</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"/></svg></div><div class="widget-label">News</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></div><div class="widget-label">B&uuml;cherregal</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg></div><div class="widget-label">Fotoalben</div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- === SEITE 3: Business === -->
-        <div class="app-page" data-page="2">
-          <div class="mini-dock" data-dock="business">
-            <div class="mini-dock-handle"><div class="grip"></div></div>
-            <div class="mini-dock-label">Business</div>
-            <div class="mini-dock-grid app-page-grid">
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div><div class="widget-label">Kalkulation</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><div class="widget-label">Preise</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 2H4c-1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1.1-1-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4h16v3z"/></svg></div><div class="widget-label">Lager</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg></div><div class="widget-label">Bestell.</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div><div class="widget-label">Finanzen</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div><div class="widget-label">Steuer</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="widget-label">DEHOGA</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z"/></svg></div><div class="widget-label">Marketing</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div><div class="widget-label">Recht</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></div><div class="widget-label">Security</div></div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg></div><div class="widget-label">Hausm.</div></div>
-            </div>
-          </div>
+          <!-- === B&uuml;ro === -->
           <div class="mini-dock" data-dock="buero">
-            <div class="mini-dock-handle"><div class="grip"></div></div>
             <div class="mini-dock-label">B&uuml;ro</div>
-            <div class="mini-dock-grid app-page-grid">
+            <div class="mini-dock-grid">
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="widget-label">Mitarbeiter</div></div>
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg></div><div class="widget-label">Abteilungen</div></div>
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></div><div class="widget-label">Archiv</div></div>
               <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div><div class="widget-label">Tresor</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></div><div class="widget-label">B&uuml;cherregal</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"/></svg></div><div class="widget-label">Fotoalben</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(212,168,83,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg></div><div class="widget-label">Videoarchiv</div></div>
+              <div class="widget" data-module="search" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div><div class="widget-label">Suche</div></div>
             </div>
           </div>
-        </div>
 
-      </div>
-      <!-- Page dots -->
-      <div id="page-dots">
-        <div class="page-dot active" data-page="0"></div>
-        <div class="page-dot" data-page="1"></div>
-        <div class="page-dot" data-page="2"></div>
+          <!-- === Tools === -->
+          <div class="mini-dock" data-dock="tools">
+            <div class="mini-dock-label">Tools</div>
+            <div class="mini-dock-grid">
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h14v3H5z"/></svg></div><div class="widget-label">Regio-Frame</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div><div class="widget-label">Safe Home</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div><div class="widget-label">Music DJ</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></div><div class="widget-label">BuenaVista</div></div>
+              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.94s4.18 1.36 4.18 3.85c0 1.89-1.44 2.98-3.12 3.19z"/></svg></div><div class="widget-label">Cap-Coin</div></div>
+              <div class="widget" data-module="video" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg></div><div class="widget-label">YT Scout</div></div>
+              <div class="widget" data-module="iphone" onclick="widgetClick(this)"><div class="widget-icon" style="border-color:rgba(80,220,120,.4)"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/></svg></div><div class="widget-label">iPhone</div></div>
+            </div>
+          </div>
+
       </div>
       <!-- Chat Module -->
       <div id="module-chat" class="module-view"><div id="messages"></div></div>
@@ -1304,25 +1260,32 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     </div>
   </div>
 
-  <!-- iPhone DOCK (4 Favoriten unten, austauschbar via Drag&Drop) -->
-  <div id="dock">
-    <div class="dock-grid" id="dock-grid">
-      <div class="widget" data-module="files" onclick="widgetClick(this)">
-        <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></div>
-        <div class="widget-label">Dateien</div>
-      </div>
-      <div class="widget" data-module="sos" id="sos-widget" onclick="widgetClick(this)">
-        <div class="widget-icon sos"><span style="font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;text-shadow:0 1px 3px rgba(0,0,0,.4);position:relative;z-index:1">SOS</span></div>
-        <div class="widget-label">SOS</div>
-      </div>
-      <div class="widget" data-module="video" onclick="widgetClick(this)">
-        <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg></div>
-        <div class="widget-label">YT Scout</div>
-      </div>
-      <div class="widget" data-module="settings" onclick="widgetClick(this)">
-        <div class="widget-icon"><svg viewBox="0 0 24 24" fill="url(#metalGrad)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg></div>
-        <div class="widget-label">Einstell.</div>
-      </div>
+  <!-- COMMUNICATION BAR (fixed bottom) -->
+  <div id="comm-bar">
+    <div id="agent-selector">
+      <button class="agent-btn active" data-agent="kim" onclick="selectAgent('kim')">
+        <span class="agent-dot" style="background:#ff6b9d"></span> KIM
+      </button>
+      <button class="agent-btn" data-agent="kai" onclick="selectAgent('kai')">
+        <span class="agent-dot" style="background:#4a9eff"></span> KAI
+      </button>
+      <button class="agent-btn" data-agent="manus" onclick="selectAgent('manus')">
+        <span class="agent-dot" style="background:#d4a853"></span> MANUS
+      </button>
+    </div>
+    <div id="comm-buttons">
+      <button class="comm-btn" data-module="chat" onclick="widgetClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Chat
+      </button>
+      <button class="comm-btn" data-module="email" onclick="widgetClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg> E-Mail
+      </button>
+      <button class="comm-btn" data-module="phone" onclick="widgetClick(this)">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg> Telefon
+      </button>
+      <button class="comm-btn" onclick="startPTT()">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg> PTT
+      </button>
     </div>
   </div>
 </div>
@@ -2606,11 +2569,9 @@ function openModule(name) {
   const titles = {chat:'MESSENGER',phone:'KOMMUNIKATION',email:'E-MAIL',sos:'SOS',files:'DATEIEN',future:'NEUES MODUL',agents:'ALL AGENTS',video:'VIDEO ANALYZER',tools:'ALL TOOLS','private':'PROFIL & PRIVAT',search:'KIMANUS SUCHE',iphone:'iPHONE HILFE'};
   document.getElementById('view-title').textContent = titles[name] || name.toUpperCase();
   document.getElementById('input-bar').classList.toggle('active', name === 'chat');
-  // Dock + Dots ausblenden wenn Modul offen
-  const dock = document.getElementById('dock');
-  if (dock) dock.style.display = 'none';
-  const dots = document.getElementById('page-dots');
-  if (dots) dots.style.display = 'none';
+  // Comm-bar ausblenden wenn Modul offen
+  const commBar = document.getElementById('comm-bar');
+  if (commBar) commBar.style.display = 'none';
 
   if (name === 'chat') {
     // WhatsApp Fullscreen-Modus
@@ -2827,37 +2788,43 @@ function renderAgentsView() {
 function showHome() {
   currentModule = 'home';
   document.getElementById('app').classList.remove('chat-fullscreen');
-  document.getElementById('widget-grid').style.display = 'flex';
+  document.getElementById('widget-grid').style.display = '';
   document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
   document.getElementById('back-btn').classList.remove('visible');
   document.getElementById('view-title').textContent = '';
   document.getElementById('input-bar').classList.remove('active');
-  // Dock + Dots wieder einblenden
-  const dock = document.getElementById('dock');
-  if (dock) dock.style.display = '';
-  const dots = document.getElementById('page-dots');
-  if (dots) dots.style.display = '';
+  // Comm-bar wieder einblenden
+  const commBar = document.getElementById('comm-bar');
+  if (commBar) commBar.style.display = '';
   haptic();
 }
 
-// Page dots update on scroll
+// Agent selector (comm-bar)
+var selectedAgent = localStorage.getItem('selectedAgent') || 'kim';
+
+function selectAgent(agent) {
+  selectedAgent = agent;
+  localStorage.setItem('selectedAgent', agent);
+  document.querySelectorAll('.agent-btn').forEach(function(b) { b.classList.remove('active'); });
+  var btn = document.querySelector('.agent-btn[data-agent="'+agent+'"]');
+  if (btn) btn.classList.add('active');
+  // Also set the current agent for chat/phone
+  setAgent(agent);
+}
+
+// Push-to-Talk placeholder
+function startPTT() {
+  // Use selectedAgent for PTT
+  selectAgent(selectedAgent);
+  openModule('phone');
+}
+
+// Initialize agent selector on load
 (function() {
-  const grid = document.getElementById('widget-grid');
-  if (!grid) return;
-  grid.addEventListener('scroll', function() {
-    const pageWidth = grid.offsetWidth;
-    const currentPage = Math.round(grid.scrollLeft / pageWidth);
-    document.querySelectorAll('.page-dot').forEach(dot => {
-      dot.classList.toggle('active', parseInt(dot.dataset.page) === currentPage);
-    });
-  });
-  // Click on dot to jump to page
-  document.querySelectorAll('.page-dot').forEach(dot => {
-    dot.addEventListener('click', function() {
-      const page = parseInt(this.dataset.page);
-      grid.scrollTo({ left: page * grid.offsetWidth, behavior: 'smooth' });
-    });
-  });
+  var saved = localStorage.getItem('selectedAgent') || 'kim';
+  document.querySelectorAll('.agent-btn').forEach(function(b) { b.classList.remove('active'); });
+  var btn = document.querySelector('.agent-btn[data-agent="'+saved+'"]');
+  if (btn) btn.classList.add('active');
 })();
 
 function setActiveTab(el) {
@@ -3035,11 +3002,18 @@ function resetOnboarding() {
 
 function setAgent(agent) {
   currentAgent = agent;
-  document.getElementById('btn-kai').classList.toggle('active', agent === 'kai');
-  document.getElementById('btn-kim').classList.toggle('active', agent === 'kim');
+  // Update agent selector buttons in comm-bar
+  document.querySelectorAll('.agent-btn').forEach(function(b) { b.classList.remove('active'); });
+  var agentBtn = document.querySelector('.agent-btn[data-agent="'+agent+'"]');
+  if (agentBtn) agentBtn.classList.add('active');
+  // Legacy btn-kim/btn-kai (if present)
+  var btnKai = document.getElementById('btn-kai');
+  var btnKim = document.getElementById('btn-kim');
+  if (btnKai) btnKai.classList.toggle('active', agent === 'kai');
+  if (btnKim) btnKim.classList.toggle('active', agent === 'kim');
   // Chat-Header Agent-Name aktualisieren
-  const agentName = agent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
-  document.getElementById('ch-agent-name').textContent = agentName;
+  var agentNames = {kim: 'KIM \u00b7 P.A4MY', kai: 'KAI \u00b7 A4BIS', manus: 'MANUS \u00b7 Concierge'};
+  document.getElementById('ch-agent-name').textContent = agentNames[agent] || agent.toUpperCase();
   // KIM Blink stoppen und begruessen
   if (agent === 'kim') {
     stopKimBlink();
@@ -4345,7 +4319,7 @@ function enterJiggleMode() {
   jiggleMode = true;
   haptic();
   // Add jiggle class to all containers
-  document.querySelectorAll('.mini-dock-grid, .app-page-grid, #dock-grid').forEach(c => c.classList.add('jiggle-mode'));
+  document.querySelectorAll('.mini-dock-grid').forEach(c => c.classList.add('jiggle-mode'));
   // Randomize jiggle delays for natural look
   document.querySelectorAll('.widget').forEach((w, i) => {
     w.style.setProperty('--jiggle-delay', String(Math.floor(Math.random() * 8)));
@@ -4360,7 +4334,7 @@ function exitJiggleMode() {
   if (!jiggleMode) return;
   jiggleMode = false;
   haptic();
-  document.querySelectorAll('.mini-dock-grid, .app-page-grid, #dock-grid').forEach(c => c.classList.remove('jiggle-mode'));
+  document.querySelectorAll('.mini-dock-grid').forEach(c => c.classList.remove('jiggle-mode'));
   document.getElementById('jiggle-done').classList.remove('visible');
   // Re-enable page swiping
   document.getElementById('widget-grid').style.overflowX = 'auto';
