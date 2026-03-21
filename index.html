@@ -161,6 +161,34 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   box-shadow:0 6px 16px rgba(0,0,0,.6),0 0 14px rgba(230,57,70,.3),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(0,0,0,.4);
   border-color:rgba(230,57,70,.4);
 }
+/* === VISITENKARTEN (KI-Partner Cards) === */
+.vk-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.vk-scroll::-webkit-scrollbar{display:none}
+.visitenkarte{
+  min-width:160px;max-width:180px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(26,26,46,.9),rgba(22,33,62,.9));
+  border:1px solid rgba(255,255,255,.08);
+  position:relative;overflow:hidden;flex-shrink:0;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;scroll-snap-align:start;
+}
+.visitenkarte:active{transform:scale(.97)}
+.visitenkarte::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.vk-kim::before{background:linear-gradient(90deg,#ff6b9d,#ff8ec4)}
+.vk-kai::before{background:linear-gradient(90deg,#4a9eff,#6db3ff)}
+.vk-manus::before{background:linear-gradient(90deg,#d4a853,#f0c97a)}
+.vk-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.vk-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.vk-kim .vk-avatar{background:rgba(255,107,157,.15);border:2px solid rgba(255,107,157,.3)}
+.vk-kai .vk-avatar{background:rgba(74,158,255,.15);border:2px solid rgba(74,158,255,.3)}
+.vk-manus .vk-avatar{background:rgba(212,168,83,.15);border:2px solid rgba(212,168,83,.3)}
+.vk-info{flex:1;min-width:0}
+.vk-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px}
+.vk-status{width:7px;height:7px;border-radius:50%;background:#4caf50;box-shadow:0 0 6px rgba(76,175,80,.6);flex-shrink:0}
+.vk-role{font-size:9px;color:#666;letter-spacing:.8px;text-transform:uppercase;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vk-skills{display:flex;flex-wrap:wrap;gap:3px}
+.vk-skill{font-size:9px;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.05);color:#888}
 .mini-dock[data-dock="privat"]{
   border-color:rgba(160,120,255,.35);
   box-shadow:0 0 22px rgba(160,120,255,.12),inset 0 1px 0 rgba(255,255,255,.06),0 4px 20px rgba(0,0,0,.3);
@@ -869,20 +897,52 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
           <div class="mini-dock" data-dock="ki-partner">
             <div class="mini-dock-handle"><div class="grip"></div></div>
             <div class="mini-dock-label">Deine KI-Partner</div>
-            <div class="mini-dock-grid app-page-grid">
-              <div class="widget" data-module="kim" onclick="widgetClick(this)">
-                <div class="widget-icon avatar-kim"><svg viewBox="0 0 48 48" fill="none" stroke="#e63946" stroke-width="1.5" stroke-linecap="round" style="width:36px;height:36px;position:relative;z-index:1"><circle cx="24" cy="16" r="8"/><path d="M10 42c0-7.7 6.3-14 14-14s14 6.3 14 14"/><path d="M28 14c1 1.5.5 3-1 4" opacity=".5"/></svg></div>
-                <div class="widget-label">KIM</div>
+            <div class="vk-scroll">
+              <div class="visitenkarte vk-kim" data-module="kim" onclick="widgetClick(this)">
+                <div class="vk-header">
+                  <div class="vk-avatar">&#x1f469;</div>
+                  <div class="vk-info">
+                    <div class="vk-name">KIM <span class="vk-status"></span></div>
+                    <div class="vk-role">Pers&ouml;nliche Assistentin</div>
+                  </div>
+                </div>
+                <div class="vk-skills">
+                  <span class="vk-skill">Alltag</span>
+                  <span class="vk-skill">Erinnerungen</span>
+                  <span class="vk-skill">Chat</span>
+                  <span class="vk-skill">Telefon</span>
+                </div>
               </div>
-              <div class="widget" data-module="kai" onclick="widgetClick(this)">
-                <div class="widget-icon avatar-kai"><svg viewBox="0 0 48 48" fill="none" stroke="#6488e6" stroke-width="1.5" stroke-linecap="round" style="width:36px;height:36px;position:relative;z-index:1"><circle cx="24" cy="16" r="8"/><path d="M10 42c0-7.7 6.3-14 14-14s14 6.3 14 14"/><path d="M18 12c0-3 2.7-5 6-5s6 2 6 5" opacity=".4"/></svg></div>
-                <div class="widget-label">KAI</div>
+              <div class="visitenkarte vk-kai" data-module="kai" onclick="widgetClick(this)">
+                <div class="vk-header">
+                  <div class="vk-avatar">&#x1f9d1;&#x200d;&#x1f4bb;</div>
+                  <div class="vk-info">
+                    <div class="vk-name">KAI <span class="vk-status"></span></div>
+                    <div class="vk-role">Technischer Direktor</div>
+                  </div>
+                </div>
+                <div class="vk-skills">
+                  <span class="vk-skill">Code</span>
+                  <span class="vk-skill">Server</span>
+                  <span class="vk-skill">Analyse</span>
+                  <span class="vk-skill">Recherche</span>
+                </div>
               </div>
-              <div class="widget" data-module="manus" onclick="widgetClick(this)">
-                <div class="widget-icon avatar-manus"><svg viewBox="0 0 48 48" fill="none" stroke="#66cc66" stroke-width="1.5" stroke-linecap="round" style="width:36px;height:36px;position:relative;z-index:1"><circle cx="24" cy="16" r="8"/><path d="M10 42c0-7.7 6.3-14 14-14s14 6.3 14 14"/><path d="M32 28l4-4m-4 4l-2-2" opacity=".5"/><circle cx="36" cy="24" r="2" opacity=".5"/></svg></div>
-                <div class="widget-label">MANUS</div>
+              <div class="visitenkarte vk-manus" data-module="manus" onclick="widgetClick(this)">
+                <div class="vk-header">
+                  <div class="vk-avatar">&#x1f3a9;</div>
+                  <div class="vk-info">
+                    <div class="vk-name">MANUS <span class="vk-status"></span></div>
+                    <div class="vk-role">Concierge</div>
+                  </div>
+                </div>
+                <div class="vk-skills">
+                  <span class="vk-skill">Routing</span>
+                  <span class="vk-skill">Delegation</span>
+                  <span class="vk-skill">&Uuml;berwachung</span>
+                  <span class="vk-skill">Qualit&auml;t</span>
+                </div>
               </div>
-              <div class="widget" data-module="future" onclick="widgetClick(this)"><div class="widget-icon coming"><svg viewBox="0 0 24 24" fill="#444"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div><div class="widget-label" style="color:#444">BALD</div></div>
             </div>
           </div>
         </div>
