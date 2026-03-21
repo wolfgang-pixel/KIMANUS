@@ -1707,6 +1707,46 @@ async function analyzeVideo() {
   const url = urlInput.value.trim();
   if (!url) { resultDiv.innerHTML = '<p style="color:#e63946">Bitte YouTube URL eingeben</p>'; return; }
 
+  const vidId = extractVideoId(url);
+
+  // === CACHE-CHECK: Wurde dieses Video schon analysiert? ===
+  resultDiv.innerHTML = '<div style="text-align:center;padding:20px 0"><p style="color:#666;font-size:12px">Pruefe Bibliothek...</p></div>';
+  try {
+    var listResp = await fetch('/api/video-list');
+    if (listResp.ok) {
+      var listData = await listResp.json();
+      if (listData.videos && listData.videos.length > 0) {
+        // Suche nach gleicher Video-URL (Video-ID vergleichen)
+        var found = null;
+        for (var vi = 0; vi < listData.videos.length; vi++) {
+          var savedVidId = extractVideoId(listData.videos[vi].url || '');
+          if (vidId && savedVidId && vidId === savedVidId && listData.videos[vi].title.indexOf(' // ') === -1) {
+            found = listData.videos[vi];
+            break;
+          }
+        }
+        if (found) {
+          console.log('[YT Scout] Cache-Treffer:', found.filename);
+          // Lade gespeicherte Analyse statt neu zu analysieren
+          var loadResp = await fetch('/api/video-load?file=' + encodeURIComponent(found.filename));
+          if (loadResp.ok) {
+            var cached = await loadResp.json();
+            if (vidId) showVideoThumb(vidId, '');
+            var chapters = parseChapters(cached.analysis || '');
+            window._lastVideoAnalysis = {title: cached.title||'', channel: cached.channel||'', duration: cached.duration||'', url: url, analysis: cached.analysis||'', chapters: chapters, date: cached.date||''};
+            resultDiv.dataset.videoUrl = url;
+            resultDiv.innerHTML = renderAnalysisWithChapters(cached.title||'', cached.channel||'', cached.duration||'', '&#x26a1; Aus Bibliothek', vidId, chapters, cached.analysis||'');
+            document.getElementById('video-search-results').style.display = 'none';
+            return; // Fertig - keine neue Analyse noetig!
+          }
+        }
+      }
+    }
+  } catch(cacheErr) {
+    console.log('[YT Scout] Cache-Check fehlgeschlagen, analysiere neu:', cacheErr);
+  }
+
+  // === NEUE ANALYSE ===
   resultDiv.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:24px;margin-bottom:12px;animation:spin 1s linear infinite;display:inline-block">&#x1f3ac;</div><p style="color:#666;font-size:13px">Video wird analysiert...<br>Gemini sieht das Video (1-3 Min)</p></div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>';
 
   try {
@@ -1719,7 +1759,6 @@ async function analyzeVideo() {
     var data = await resp.json();
 
     // Thumbnail oben im Player-Bereich anzeigen (mit Play-Button)
-    const vidId = extractVideoId(url);
     const iframeContainer = document.getElementById('video-iframe-container');
     const playerAlreadyPlaying = iframeContainer && iframeContainer.style.display !== 'none';
     if (vidId && !playerAlreadyPlaying) {
