@@ -2286,17 +2286,27 @@ async function archiveVideo(encFilename) {
       await fetch('/api/video-folder-create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:newName.trim()})});
       folders = [{name: newName.trim()}];
     }
-    // Ordner-Auswahl
-    var choices = folders.map(function(f,i) { return (i+1) + '. ' + f.name; }).join('\n');
-    var pick = prompt('In welchen Ordner archivieren?\n\n' + choices + '\n\nNummer eingeben:');
-    if (!pick) return;
-    var idx = parseInt(pick) - 1;
-    if (idx < 0 || idx >= folders.length) { alert('Ungueltige Auswahl'); return; }
-    var folderName = folders[idx].name;
+    var folderName = '';
+    if (folders.length === 1) {
+      // Nur 1 Ordner - direkt verwenden, kein Fragen
+      folderName = folders[0].name;
+    } else {
+      var choices = folders.map(function(f,i) { return (i+1) + '. ' + f.name; }).join('\n');
+      var pick = prompt('In welchen Ordner?\n\n' + choices + '\n\nNummer oder Name:');
+      if (!pick) return;
+      var idx = parseInt(pick);
+      if (!isNaN(idx) && idx >= 1 && idx <= folders.length) {
+        folderName = folders[idx - 1].name;
+      } else {
+        var found = folders.find(function(f) { return f.name.toLowerCase().indexOf(pick.trim().toLowerCase()) !== -1; });
+        if (found) folderName = found.name;
+        else { alert('Ordner "' + pick + '" nicht gefunden'); return; }
+      }
+    }
     var filename = decodeURIComponent(encFilename);
     var moveResp = await fetch('/api/video-move', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({filename: filename, folder: folderName})});
     if (moveResp.ok) {
-      alert('Archiviert in: ' + folderName);
+      alert('Archiviert in: ' + folderName + ' \u2705');
       loadVideoLibrary();
     } else { alert('Fehler beim Archivieren'); }
   } catch(e) { alert('Fehler: ' + e.message); }
