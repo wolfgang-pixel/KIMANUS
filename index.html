@@ -170,7 +170,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #view-label span{font-size:7px;letter-spacing:5px;color:#444;text-transform:uppercase}
 #canvas{
   flex:1;overflow-y:auto;overflow-x:hidden;
-  border-radius:8px;padding:0 0 85px;margin:0;
+  border-radius:8px;padding:0 0 120px;margin:0;
   background:transparent;
   border:none;
   box-shadow:none;
@@ -375,18 +375,45 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #comm-bar{
   position:fixed;bottom:0;left:0;right:0;
   z-index:200;
-  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
-  background:rgba(30,30,30,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(20,20,20,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-top:1px solid rgba(255,255,255,.06);
 }
 #comm-buttons{
-  display:flex;gap:10px;justify-content:center;max-width:400px;margin:0 auto;
+  display:flex;gap:20px;justify-content:center;align-items:flex-end;max-width:320px;margin:0 auto;
 }
 .comm-slot{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.comm-slot-side .comm-btn{
+  width:56px;height:56px;border-radius:14px;
+  padding:0;
+}
+.comm-slot-side .comm-btn svg{
+  width:28px;height:28px;
+}
+.comm-slot-center .comm-btn{
+  width:72px;height:72px;border-radius:50%;
+  padding:0;
+  background:linear-gradient(145deg,#c0392b 0%,#e74c3c 30%,#c0392b 60%,#a93226 100%);
+  border:2px solid rgba(255,255,255,.2);
+  box-shadow:
+    0 4px 20px rgba(231,76,60,.4),
+    0 2px 8px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.3),
+    inset 0 -2px 0 rgba(0,0,0,.3);
+  color:#fff;
+}
+.comm-slot-center .comm-btn:active{
+  transform:scale(.9);
+  background:linear-gradient(145deg,#a93226 0%,#c0392b 50%,#922b21 100%);
+  box-shadow:0 1px 6px rgba(231,76,60,.3),inset 0 2px 6px rgba(0,0,0,.4);
+}
+.comm-slot-center .comm-btn svg{
+  width:36px;height:36px;
 }
 .comm-btn{
-  width:100%;padding:12px 4px;border-radius:14px;
+  padding:14px 4px;border-radius:14px;
   background:linear-gradient(145deg,#4a4a4a 0%,#404040 10%,#383838 25%,#2e2e2e 50%,#282828 75%,#2a2a2a 90%,#333 100%);
   border:1px solid rgba(255,255,255,.15);
   box-shadow:
@@ -411,10 +438,13 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   color:#e63946;
 }
 .comm-label{
-  font-size:13px;font-weight:700;letter-spacing:.8px;
+  font-size:11px;font-weight:700;letter-spacing:.8px;
   color:#888;text-transform:uppercase;
   text-shadow:0 1px 2px rgba(0,0,0,.5);
   font-family:inherit;
+}
+.comm-slot-center .comm-label{
+  color:#e74c3c;font-size:12px;
 }
 /* Wallet Container Styling */
 .mini-dock[data-dock="wallet"]{
@@ -435,21 +465,55 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #agent-picker-mode{font-size:20px;font-weight:700;margin-bottom:20px;color:#fff}
 .agent-card-pick{
   width:100%;max-width:360px;display:flex;align-items:center;gap:14px;
-  padding:14px 16px;margin-bottom:10px;border-radius:16px;
+  padding:16px 16px;margin-bottom:12px;border-radius:18px;
   background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  cursor:pointer;transition:all .3s;
+  cursor:pointer;transition:all .3s;position:relative;
 }
 .agent-card-pick:active{transform:scale(.97);background:rgba(255,255,255,.12)}
-.agent-card-pick .vk-left{flex:1;min-width:0}
-.agent-card-pick .vk-name{font-size:16px;font-weight:700;margin-bottom:2px}
-.agent-card-pick .vk-role{font-size:11px;color:#888;margin-bottom:4px}
-.agent-card-pick .vk-details{font-size:9px;color:#666;line-height:1.5}
-.agent-card-pick .vk-color{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0}
-.agent-card-pick .avatar-placeholder{
-  width:64px;height:64px;border-radius:16px;flex-shrink:0;
-  background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.15);
+.agent-pick-info{flex:1;min-width:0}
+.agent-card-pick .vk-name{font-size:20px;font-weight:700;margin-bottom:3px}
+.agent-card-pick .vk-role{font-size:12px;color:#999}
+.agent-avatar{
+  width:68px;height:68px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;color:rgba(255,255,255,.2);text-align:center;line-height:1.2;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+.agent-info-btn{
+  position:absolute;top:10px;right:10px;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  color:#aaa;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+}
+.agent-info-btn:active{background:rgba(255,255,255,.2);color:#fff}
+/* Memory Items */
+.memory-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;margin-bottom:8px;border-radius:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+}
+.memory-item-content{flex:1;min-width:0}
+.memory-key{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.memory-value{font-size:14px;color:#ddd;line-height:1.4}
+.memory-actions{display:flex;gap:6px;flex-shrink:0}
+.memory-edit-btn,.memory-del-btn{
+  width:32px;height:32px;border-radius:8px;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;transition:all .15s;
+}
+.memory-edit-btn{background:rgba(74,158,255,.15);color:#4a9eff}
+.memory-edit-btn:active{background:rgba(74,158,255,.3)}
+.memory-del-btn{background:rgba(255,82,82,.12);color:#ff5252}
+.memory-del-btn:active{background:rgba(255,82,82,.25)}
+.agent-card-pick.active-agent{
+  border:2px solid #4caf50;
+  box-shadow:0 0 16px rgba(76,175,80,.3),inset 0 0 12px rgba(76,175,80,.08);
+}
+.agent-card-pick.active-agent::after{
+  content:'AKTIV';position:absolute;bottom:8px;right:12px;
+  font-size:8px;font-weight:700;letter-spacing:1.5px;
+  color:#4caf50;text-transform:uppercase;
 }
 #agent-picker-close{
   margin-top:16px;padding:10px 32px;border-radius:20px;
@@ -995,7 +1059,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     <div id="header-qr" onclick="showQRCode()" title="Mein QR-Code">
       <svg viewBox="0 0 24 24" fill="#222"><path d="M3 11h2v2H3v-2zm4-8h2v4H7V3zm-4 0h4v4H3V3zm0 8h4v4H3v-4zm14-8h4v4h-4V3zm-6 0h4v2h-4V3zm6 6h2v4h-2V9zm-6 0h4v4h-4V9zm-2 6h2v2H9v-2zm4 0h2v4h-2v-4zm4 0h4v4h-4v-4zm0-10h2v2h-2V5zm-8 8h2v2H9v-2z"/></svg>
     </div>
-    <button class="hdr-btn" onclick="toggleMenu()" title="Men&uuml;" id="menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+    <button class="hdr-btn" onclick="toggleMenu()" title="Einstellungen" id="menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></button>
     <button class="hdr-btn" onclick="showHome()" title="Home" id="home-btn" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
   </div>
 
@@ -1007,11 +1071,19 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         <button id="menu-close" onclick="closeMenu()">&times;</button>
       </div>
       <div class="menu-section">
-        <div class="menu-section-label">KIM Konfiguration</div>
+        <div class="menu-section-label">Dein Assistent</div>
+        <div class="menu-item" onclick="switchAssistant()">
+          <div class="menu-item-icon" id="menu-agent-icon">&#x1f464;</div>
+          <div class="menu-item-text">
+            <div class="menu-item-name" id="menu-agent-name">Assistent w&auml;hlen</div>
+            <div class="menu-item-desc" id="menu-agent-desc">Tippe um zwischen KIM und KAI zu wechseln</div>
+          </div>
+          <div class="menu-item-chevron">&#x203a;</div>
+        </div>
         <div class="menu-item" onclick="openMenuModule('kim-settings')">
           <div class="menu-item-icon">&#x2699;</div>
           <div class="menu-item-text">
-            <div class="menu-item-name">Einstellungen f&uuml;r KIM</div>
+            <div class="menu-item-name">Einstellungen</div>
             <div class="menu-item-desc">LLM-Modell, Stimme, Verhalten</div>
           </div>
           <div class="menu-item-chevron">&#x203a;</div>
@@ -1019,8 +1091,8 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         <div class="menu-item" onclick="openMenuModule('notifications')">
           <div class="menu-item-icon">&#x1f514;</div>
           <div class="menu-item-text">
-            <div class="menu-item-name">Einstellungen &amp; Mitteilungen</div>
-            <div class="menu-item-desc">Benachrichtigungen, Sounds, Design</div>
+            <div class="menu-item-name">Mitteilungen</div>
+            <div class="menu-item-desc">Benachrichtigungen, Sounds</div>
           </div>
           <div class="menu-item-chevron">&#x203a;</div>
         </div>
@@ -1465,66 +1537,51 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   <!-- COMMUNICATION BAR (fixed bottom) -->
   <div id="comm-bar">
     <div id="comm-buttons">
-      <div class="comm-slot">
+      <div class="comm-slot comm-slot-center">
         <button class="comm-btn" onclick="openAgentPicker('chat')">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
         <div class="comm-label">Chat</div>
-      </div>
-      <div class="comm-slot">
-        <button class="comm-btn" onclick="openAgentPicker('email')">
-          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-        </button>
-        <div class="comm-label">E-Mail</div>
-      </div>
-      <div class="comm-slot">
-        <button class="comm-btn" onclick="openAgentPicker('phone')">
-          <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-        </button>
-        <div class="comm-label">Telefon</div>
-      </div>
-      <div class="comm-slot">
-        <button class="comm-btn" onclick="openAgentPicker('ptt')">
-          <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.93V20H8a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2h-3v-2.07A7 7 0 0 0 19 11z"/></svg>
-        </button>
-        <div class="comm-label">PTT</div>
       </div>
     </div>
   </div>
 
   <!-- AGENT PICKER OVERLAY -->
   <div id="agent-picker">
-    <div id="agent-picker-title">Wen m&ouml;chtest du erreichen?</div>
+    <div id="agent-picker-title">W&auml;hle deinen pers&ouml;nlichen Assistenten</div>
     <div id="agent-picker-mode"></div>
 
-    <div class="agent-card-pick" onclick="pickAgent('kim')">
-      <div class="vk-color" style="background:#ff6b9d"></div>
-      <div class="vk-left">
+    <div class="agent-card-pick" data-agent="kim" onclick="pickAgent('kim')">
+      <div class="agent-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff3d7f)">
+        <!-- Weibliche Silhouette -->
+        <svg width="48" height="48" viewBox="0 0 100 100" fill="rgba(255,255,255,.9)">
+          <circle cx="50" cy="30" r="16"/>
+          <path d="M50 14c-9 0-16 7-16 16s7 16 16 16 16-7 16-16-7-16-16-16z"/>
+          <path d="M34 28c-2 8 0 18 4 22-6 2-10 4-10 4l6 8c4-2 10-4 16-4s12 2 16 4l6-8s-4-2-10-4c4-4 6-14 4-22"/>
+          <ellipse cx="50" cy="76" rx="26" ry="18"/>
+        </svg>
+      </div>
+      <div class="agent-pick-info">
         <div class="vk-name" style="color:#ff6b9d">KIM</div>
-        <div class="vk-role">Pers&ouml;nliche Assistentin</div>
-        <div class="vk-details">&#x1f9e0; Claude 3.5 &middot; &#x1f5e3; ElevenLabs Sarah<br>Alltag &middot; Fragen &middot; Ideen &middot; Erinnerungen</div>
+        <div class="vk-role">Deine pers&ouml;nliche Assistentin</div>
       </div>
-      <div class="avatar-placeholder">Avatar<br>kommt</div>
+      <button class="agent-info-btn" onclick="event.stopPropagation();showAgentInfo('kim')">&#x2139;</button>
     </div>
 
-    <div class="agent-card-pick" onclick="pickAgent('kai')">
-      <div class="vk-color" style="background:#4a9eff"></div>
-      <div class="vk-left">
+    <div class="agent-card-pick" data-agent="kai" onclick="pickAgent('kai')">
+      <div class="agent-avatar" style="background:linear-gradient(135deg,#4a9eff,#2d7fd4)">
+        <!-- Maennliche Silhouette -->
+        <svg width="48" height="48" viewBox="0 0 100 100" fill="rgba(255,255,255,.9)">
+          <circle cx="50" cy="32" r="16"/>
+          <rect x="36" y="52" rx="4" width="28" height="6"/>
+          <path d="M26 62c0-8 10-14 24-14s24 6 24 14v8c0 4-2 8-6 10H32c-4-2-6-6-6-10v-8z"/>
+        </svg>
+      </div>
+      <div class="agent-pick-info">
         <div class="vk-name" style="color:#4a9eff">KAI</div>
-        <div class="vk-role">Technischer Direktor</div>
-        <div class="vk-details">&#x1f9e0; Gemini 2.5 &middot; &#x1f5e3; ElevenLabs Adam<br>Technik &middot; Recherche &middot; Analyse &middot; Code</div>
+        <div class="vk-role">Dein pers&ouml;nlicher Assistent</div>
       </div>
-      <div class="avatar-placeholder">Avatar<br>kommt</div>
-    </div>
-
-    <div class="agent-card-pick" onclick="pickAgent('manus')">
-      <div class="vk-color" style="background:#d4a853"></div>
-      <div class="vk-left">
-        <div class="vk-name" style="color:#d4a853">MANUS</div>
-        <div class="vk-role">Concierge &amp; Business</div>
-        <div class="vk-details">&#x1f9e0; Claude Opus &middot; &#x1f5e3; ElevenLabs Daniel<br>Business &middot; Projekte &middot; Planung &middot; Delegation</div>
-      </div>
-      <div class="avatar-placeholder">Avatar<br>kommt</div>
+      <button class="agent-info-btn" onclick="event.stopPropagation();showAgentInfo('kai')">&#x2139;</button>
     </div>
 
     <button id="agent-picker-close" onclick="closeAgentPicker()">Abbrechen</button>
@@ -3075,9 +3132,15 @@ var agentPickerMode = '';
 
 function openAgentPicker(mode) {
   agentPickerMode = mode;
-  var modeLabels = {chat:'Chat', email:'E-Mail', phone:'Telefon', ptt:'Push-to-Talk'};
-  var pickerMode = document.getElementById('agent-picker-mode');
-  if (pickerMode) pickerMode.textContent = modeLabels[mode] || mode;
+  // Wenn schon ein Agent gewaehlt ist, direkt Chat oeffnen
+  var saved = localStorage.getItem('selectedAgent');
+  if (saved) {
+    selectedAgent = saved;
+    setAgent(saved);
+    openModule('chat');
+    return;
+  }
+  // Erster Kontakt: Agent waehlen
   var picker = document.getElementById('agent-picker');
   if (picker) { picker.style.display = ''; picker.classList.add('visible'); }
   haptic();
@@ -3088,29 +3151,206 @@ function pickAgent(agent) {
   selectedAgent = agent;
   localStorage.setItem('selectedAgent', agent);
   setAgent(agent);
-  // Open the corresponding module
-  switch(agentPickerMode) {
-    case 'chat':
-      openModule('chat');
-      break;
-    case 'email':
-      openModule('email');
-      break;
-    case 'phone':
-      openModule('phone');
-      break;
-    case 'ptt':
-      openModule('phone');
-      break;
-    default:
-      openModule('chat');
-  }
+  openModule('chat');
 }
 
 function closeAgentPicker() {
   var picker = document.getElementById('agent-picker');
   if (picker) { picker.classList.remove('visible'); picker.style.display = ''; }
   haptic();
+}
+
+// =========================================
+// MEMORY VIEW - Was KIM/KAI ueber dich weiss
+// =========================================
+function openMemoryView() {
+  // Memory aus localStorage laden
+  var memories = JSON.parse(localStorage.getItem('kimanus-memories') || '[]');
+  var profile = null;
+  try { profile = JSON.parse(localStorage.getItem('kimanus-profile') || 'null'); } catch(e){}
+
+  var agent = localStorage.getItem('selectedAgent') || 'kim';
+  var agentName = agent === 'kim' ? 'KIM' : 'KAI';
+  var agentColor = agent === 'kim' ? '#ff6b9d' : '#4a9eff';
+
+  // Default-Eintraege wenn noch leer
+  if (memories.length === 0 && profile) {
+    if (profile.name) memories.push({key:'Name', value:profile.name, id:'m_name'});
+    if (profile.city) memories.push({key:'Stadt', value:profile.city, id:'m_city'});
+    if (profile.interests) memories.push({key:'Interessen', value:profile.interests, id:'m_interests'});
+    if (profile.style) memories.push({key:'Anrede', value:profile.style, id:'m_style'});
+  }
+
+  var itemsHtml = '';
+  if (memories.length === 0) {
+    itemsHtml = '<div style="text-align:center;padding:30px 10px;color:#666">' +
+      '<div style="font-size:36px;margin-bottom:12px">🧠</div>' +
+      '<div style="font-size:14px;margin-bottom:6px">Noch keine Erinnerungen</div>' +
+      '<div style="font-size:12px;color:#555">Chatte mit ' + agentName + ', damit ' + (agent==='kim'?'sie':'er') + ' dich kennenlernt!</div>' +
+      '</div>';
+  } else {
+    memories.forEach(function(m, i) {
+      itemsHtml += '<div class="memory-item" data-idx="' + i + '">' +
+        '<div class="memory-item-content">' +
+        '<div class="memory-key">' + (m.key || 'Info') + '</div>' +
+        '<div class="memory-value">' + (m.value || '') + '</div>' +
+        '</div>' +
+        '<div class="memory-actions">' +
+        '<button class="memory-edit-btn" onclick="editMemoryItem('+i+')">&#x270E;</button>' +
+        '<button class="memory-del-btn" onclick="deleteMemoryItem('+i+')">&#x2715;</button>' +
+        '</div></div>';
+    });
+  }
+
+  var html = '<div id="memory-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:500;background:rgba(10,10,10,.97);display:flex;flex-direction:column;overflow:hidden">' +
+    '<div style="padding:calc(env(safe-area-inset-top,44px) + 10px) 16px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(20,20,20,.95)">' +
+    '<button onclick="closeMemoryView();toggleMenu()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#ddd;font-size:14px;cursor:pointer;padding:8px 14px;display:flex;align-items:center;gap:4px"><span style="font-size:18px">&#x2039;</span> Zur&uuml;ck</button>' +
+    '<div style="flex:1;text-align:center;font-size:17px;font-weight:700;color:#e0e0e0">&#x1f9e0; Memory</div>' +
+    '<button onclick="closeMemoryView()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#ddd;font-size:18px;cursor:pointer;padding:6px 12px">&times;</button>' +
+    '</div>' +
+    '<div style="padding:10px 16px 6px;font-size:12px;color:#777">Was <span style="color:'+agentColor+';font-weight:700">'+agentName+'</span> &uuml;ber dich weiss</div>' +
+    '<div id="memory-list" style="flex:1;overflow-y:auto;padding:8px 16px">' + itemsHtml + '</div>' +
+    '<div style="padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.08);display:flex;gap:8px">' +
+    '<button onclick="addMemoryItem()" style="flex:1;padding:14px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#aaa;font-size:14px;cursor:pointer;font-weight:600">+ Neuen Eintrag hinzuf&uuml;gen</button>' +
+    '</div>' +
+    '</div>';
+
+  // Altes Overlay entfernen falls vorhanden
+  var old = document.getElementById('memory-overlay');
+  if (old) old.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+  haptic();
+}
+
+function closeMemoryView() {
+  var el = document.getElementById('memory-overlay');
+  if (el) el.remove();
+}
+
+function getMemories() {
+  return JSON.parse(localStorage.getItem('kimanus-memories') || '[]');
+}
+
+function saveMemories(memories) {
+  localStorage.setItem('kimanus-memories', JSON.stringify(memories));
+}
+
+function addMemoryItem() {
+  var key = prompt('Kategorie (z.B. Hobby, Beruf, Lieblingsessen):');
+  if (!key) return;
+  var value = prompt('Was soll sich ' + (localStorage.getItem('selectedAgent')==='kim'?'KIM':'KAI') + ' merken?');
+  if (!value) return;
+  var memories = getMemories();
+  memories.push({key: key, value: value, id: 'm_' + Date.now()});
+  saveMemories(memories);
+  closeMemoryView();
+  openMemoryView();
+  haptic();
+}
+
+function editMemoryItem(idx) {
+  var memories = getMemories();
+  if (!memories[idx]) return;
+  var newVal = prompt('Wert ändern für "' + memories[idx].key + '":', memories[idx].value);
+  if (newVal === null) return;
+  if (newVal === '') {
+    deleteMemoryItem(idx);
+    return;
+  }
+  memories[idx].value = newVal;
+  saveMemories(memories);
+  closeMemoryView();
+  openMemoryView();
+  haptic();
+}
+
+function deleteMemoryItem(idx) {
+  var memories = getMemories();
+  if (!memories[idx]) return;
+  if (confirm('"' + memories[idx].key + ': ' + memories[idx].value + '" wirklich löschen?')) {
+    memories.splice(idx, 1);
+    saveMemories(memories);
+    closeMemoryView();
+    openMemoryView();
+    haptic();
+  }
+}
+
+function showAgentInfo(agent) {
+  var info = {
+    kim: {
+      name: 'KIM',
+      model: 'Claude 3.5 Sonnet (Anthropic)',
+      stimme: 'ElevenLabs - Sarah',
+      memory: 'Persönliches Memory auf EU-Server',
+      skills: 'Chat, Recherche, Dokumente, Erinnerungen',
+      server: 'KIMANUS EU Server (Deutschland)'
+    },
+    kai: {
+      name: 'KAI',
+      model: 'Gemini 2.5 (Google)',
+      stimme: 'ElevenLabs - Adam',
+      memory: 'Persönliches Memory auf EU-Server',
+      skills: 'Chat, Recherche, Technik, Analyse, Code',
+      server: 'KIMANUS EU Server (Deutschland)'
+    }
+  };
+  var a = info[agent];
+  if (!a) return;
+  var html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:600;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px" onclick="this.remove()">' +
+    '<div style="background:#1a1a1a;border-radius:20px;padding:24px;max-width:320px;width:100%;border:1px solid rgba(255,255,255,.1)" onclick="event.stopPropagation()">' +
+    '<div style="font-size:20px;font-weight:700;margin-bottom:16px;color:' + (agent==='kim'?'#ff6b9d':'#4a9eff') + '">' + a.name + ' - Technik</div>' +
+    '<div style="display:flex;flex-direction:column;gap:12px">' +
+    '<div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">KI-Modell</div><div style="font-size:14px;color:#ddd">' + a.model + '</div></div>' +
+    '<div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Stimme</div><div style="font-size:14px;color:#ddd">' + a.stimme + '</div></div>' +
+    '<div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Memory</div><div style="font-size:14px;color:#ddd">' + a.memory + '</div></div>' +
+    '<div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Skills</div><div style="font-size:14px;color:#ddd">' + a.skills + '</div></div>' +
+    '<div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Server</div><div style="font-size:14px;color:#ddd">' + a.server + '</div></div>' +
+    '</div>' +
+    '<button style="margin-top:18px;width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#aaa;font-size:13px;cursor:pointer" onclick="this.closest(\'div[style*=fixed]\').remove()">Schlie&szlig;en</button>' +
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  haptic();
+}
+
+function switchAssistant() {
+  closeMenu();
+  showPickerWithActive();
+  haptic();
+}
+
+function showPickerWithActive() {
+  var current = localStorage.getItem('selectedAgent');
+  // Markiere aktiven Assistenten gruen
+  document.querySelectorAll('.agent-card-pick').forEach(function(card) {
+    card.classList.remove('active-agent');
+    if (card.getAttribute('data-agent') === current) {
+      card.classList.add('active-agent');
+    }
+  });
+  var picker = document.getElementById('agent-picker');
+  if (picker) { picker.style.display = ''; picker.classList.add('visible'); }
+}
+
+function updateMenuAgentInfo() {
+  var agent = localStorage.getItem('selectedAgent');
+  var nameEl = document.getElementById('menu-agent-name');
+  var descEl = document.getElementById('menu-agent-desc');
+  var iconEl = document.getElementById('menu-agent-icon');
+  if (!nameEl) return;
+  if (agent === 'kim') {
+    nameEl.textContent = 'KIM - Deine Assistentin';
+    descEl.textContent = 'Tippe um zu KAI zu wechseln';
+    iconEl.innerHTML = '&#x1f469;';
+  } else if (agent === 'kai') {
+    nameEl.textContent = 'KAI - Dein Assistent';
+    descEl.textContent = 'Tippe um zu KIM zu wechseln';
+    iconEl.innerHTML = '&#x1f468;';
+  } else {
+    nameEl.textContent = 'Assistent wählen';
+    descEl.textContent = 'Tippe um KIM oder KAI zu wählen';
+    iconEl.innerHTML = '&#x1f464;';
+  }
 }
 
 // =========================================
@@ -3121,6 +3361,7 @@ function toggleMenu() {
   if (overlay.classList.contains('visible')) {
     closeMenu();
   } else {
+    updateMenuAgentInfo();
     overlay.style.display = '';
     overlay.classList.add('visible');
     haptic();
@@ -3144,24 +3385,7 @@ function openMenuModule(section) {
       alert('Einstellungen & Mitteilungen\n\nHier kannst du bald einstellen:\n• Push-Benachrichtigungen\n• Sounds & Vibration\n• Design & Farben\n• Sprache');
       break;
     case 'personal':
-      // Was KIM über dich weiss anzeigen
-      var profile = localStorage.getItem('kimanus-profile');
-      if (profile) {
-        try {
-          var p = JSON.parse(profile);
-          var info = 'Was KIM über dich weiss:\n\n';
-          if (p.name) info += '• Name: ' + p.name + '\n';
-          if (p.city) info += '• Stadt: ' + p.city + '\n';
-          if (p.interests) info += '• Interessen: ' + p.interests + '\n';
-          if (p.style) info += '• Anrede: ' + p.style + '\n';
-          info += '\nDiese Infos kannst du bald hier ändern oder löschen.';
-          alert(info);
-        } catch(e) {
-          alert('Noch keine persönlichen Infos gespeichert.\nChatte mit KIM, damit sie dich kennenlernt!');
-        }
-      } else {
-        alert('Noch keine persönlichen Infos gespeichert.\nChatte mit KIM, damit sie dich kennenlernt!');
-      }
+      openMemoryView();
       break;
     case 'profile':
       openModule('private');
