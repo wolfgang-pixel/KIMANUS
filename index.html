@@ -654,11 +654,12 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 #chat-header .ch-back:active{transform:scale(.9);color:#e63946}
 #chat-header .ch-avatar{
   width:36px;height:36px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,#c62828,#8b0000);
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 2px 6px rgba(0,0,0,.4);
   overflow:hidden;
 }
+#chat-header .ch-avatar.kim-avatar{background:linear-gradient(135deg,#ff6b9d,#ff3d7f)}
+#chat-header .ch-avatar.kai-avatar{background:linear-gradient(135deg,#4a9eff,#2979ff)}
 #chat-header .ch-avatar svg{width:20px;height:20px}
 #chat-header .ch-info{flex:1;min-width:0}
 #chat-header .ch-name{font-size:14px;font-weight:600;color:#e0e0e0;letter-spacing:1px}
@@ -680,9 +681,11 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .msg-agent{font-size:10px;color:#555;margin-bottom:2px;letter-spacing:1px;text-transform:uppercase}
 .msg-time{font-size:10px;color:#444;margin-top:2px;display:flex;align-items:center;gap:6px}
 .msg-bot .bubble{position:relative;padding-bottom:28px}
-.msg-tts-btn{position:absolute;bottom:4px;right:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#777;cursor:pointer;padding:4px 6px;display:inline-flex;align-items:center;gap:4px;border-radius:8px;transition:all .15s;font-size:9px;letter-spacing:.5px}
+.msg-action-bar{position:absolute;bottom:4px;right:6px;display:flex;gap:4px}
+.msg-tts-btn,.msg-del-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#777;cursor:pointer;padding:4px 6px;display:inline-flex;align-items:center;gap:4px;border-radius:8px;transition:all .15s;font-size:9px;letter-spacing:.5px}
 .msg-tts-btn:active{color:#e63946;border-color:rgba(230,57,70,.3);transform:scale(.95)}
 .msg-tts-btn.tts-playing{color:#e63946;border-color:rgba(230,57,70,.3);background:rgba(230,57,70,.08)}
+.msg-del-btn:active{color:#ff5252;border-color:rgba(255,82,82,.3);transform:scale(.95)}
 .typing{margin-bottom:16px;animation:fadeIn .3s ease}
 .typing-bubble{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 18px 18px 18px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
 .typing-dots{display:flex;gap:5px}
@@ -779,22 +782,22 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   word-break:break-word;white-space:pre-wrap;
 }
 #chat-input:empty::before{content:attr(data-placeholder);color:#555;font-size:14px;pointer-events:none}
-/* Camera button inside input wrap */
-#cam-btn{
+/* Mic button inside input wrap */
+#mic-btn{
   width:34px;height:34px;border-radius:50%;border:none;
-  background:transparent;color:#666;cursor:pointer;flex-shrink:0;
+  background:transparent;color:#888;cursor:pointer;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   transition:all .2s;
 }
-#cam-btn:active{transform:scale(.9);color:#e63946}
-/* Mic button (right side, outside input wrap) */
-#mic-btn{
+#mic-btn:active{transform:scale(.9);color:#e63946}
+/* Camera button (right side, outside input wrap) */
+#cam-btn{
   width:40px;height:40px;border-radius:50%;border:none;
   background:transparent;color:#666;cursor:pointer;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   transition:all .2s;
 }
-#mic-btn:active{transform:scale(.9)}
+#cam-btn:active{transform:scale(.9)}
 #mic-btn.recording{color:#e63946;animation:recPulse 1s infinite}
 /* Send button (replaces mic when text present) */
 #send-btn{
@@ -1183,12 +1186,13 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   <!-- CHAT HEADER (WhatsApp-Style, nur im Fullscreen sichtbar) -->
   <div id="chat-header">
     <button class="ch-back" onclick="showHome()"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
-    <div class="ch-avatar"><svg viewBox="0 0 24 24" fill="rgba(255,255,255,.9)"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
-    <div class="ch-info">
-      <div class="ch-name" id="ch-agent-name">KIM · P.A4MY</div>
-      <div class="ch-status" id="ch-agent-status">Online</div>
+    <div class="ch-avatar kim-avatar" id="ch-avatar">
+      <svg viewBox="0 0 24 24" fill="rgba(255,255,255,.9)" width="20" height="20"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
     </div>
-    <!-- TTS, Phone-Toggle und Demo-Toggle entfernt - nicht mehr noetig -->
+    <div class="ch-info">
+      <div class="ch-name" id="ch-agent-name">KIM</div>
+      <div class="ch-status" id="ch-agent-status">Deine pers&ouml;nliche Assistentin</div>
+    </div>
   </div>
 
   <!-- VIEW CANVAS -->
@@ -1520,13 +1524,13 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
       </button>
       <div class="input-wrap">
         <div id="chat-input" contenteditable="plaintext-only" role="textbox" enterkeyhint="send" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" aria-placeholder="Nachricht eingeben..." data-placeholder="Nachricht eingeben..."></div>
-        <button id="cam-btn" onclick="handleCamBtn()" title="Kamera">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+        <button id="mic-btn" onclick="handleMicBtn()" title="Spracheingabe">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
         </button>
       </div>
       <div id="rec-timer"><span class="rec-dot"></span><span id="rec-time">0:00</span></div>
-      <button id="mic-btn" onclick="handleMicBtn()" title="Spracheingabe">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      <button id="cam-btn" onclick="handleCamBtn()" title="Kamera">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
       </button>
       <button id="send-btn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -2627,17 +2631,19 @@ async function loadSavedVideo(encodedFilename) {
 }
 
 function updateSendBtn() {
-  // WhatsApp-Style: Text vorhanden -> Send-Button, sonst Mic-Button
+  // Mikro im Input-Feld, Kamera aussen, Send ersetzt Kamera bei Text
   const micBtn = document.getElementById('mic-btn');
   const sendBtn = document.getElementById('send-btn');
   const camBtn = document.getElementById('cam-btn');
   if (!micBtn || !sendBtn) return;
   const hasText = getInputText().length > 0;
   if (hasText || isRecording) {
+    // Text da: Mikro verstecken, Send-Button anzeigen, Kamera verstecken
     micBtn.style.display = 'none';
     sendBtn.style.display = 'flex';
     if (camBtn) camBtn.style.display = 'none';
   } else {
+    // Kein Text: Mikro im Feld zeigen, Kamera aussen, Send verstecken
     sendBtn.style.display = 'none';
     if (camBtn) camBtn.style.display = 'flex';
     setTimeout(() => {
@@ -2883,6 +2889,23 @@ function openModule(name) {
     }
     setTimeout(() => document.getElementById('chat-input').focus(), 100);
     scrollToBottom();
+    // Onboarding: Begruessung beim ersten Chat
+    var userName = localStorage.getItem('kimanus-username');
+    var hasOnboarded = localStorage.getItem('kimanus-onboarded');
+    if (!hasOnboarded) {
+      localStorage.setItem('kimanus-onboarded', '1');
+      var agentN = currentAgent === 'kim' ? 'KIM' : 'KAI';
+      var pronoun = currentAgent === 'kim' ? 'deine persönliche Assistentin' : 'dein persönlicher Assistent';
+      var greeting = userName
+        ? 'Hallo ' + userName + '! Schön dich wiederzusehen. Was kann ich für dich tun? 😊'
+        : 'Hallo! Ich bin ' + agentN + ', ' + pronoun + '. Wie darf ich dich nennen?';
+      var greetTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+      setTimeout(function() {
+        renderMessage('bot', greeting, currentAgent, greetTime, true, '');
+        history.push({role:'bot', content:greeting, agent:currentAgent, time:greetTime});
+        saveHistory();
+      }, 500);
+    }
   } else {
     app.classList.remove('chat-fullscreen');
   }
@@ -3164,8 +3187,10 @@ function closeAgentPicker() {
 // MEMORY VIEW - Was KIM/KAI ueber dich weiss
 // =========================================
 function openMemoryView() {
-  // Memory aus localStorage laden
+  // Memory aus beiden Quellen laden: lokal + Server
   var memories = JSON.parse(localStorage.getItem('kimanus-memories') || '[]');
+  var serverMem = null;
+  try { serverMem = JSON.parse(localStorage.getItem('kimanus-server-memory') || 'null'); } catch(e){}
   var profile = null;
   try { profile = JSON.parse(localStorage.getItem('kimanus-profile') || 'null'); } catch(e){}
 
@@ -3173,12 +3198,45 @@ function openMemoryView() {
   var agentName = agent === 'kim' ? 'KIM' : 'KAI';
   var agentColor = agent === 'kim' ? '#ff6b9d' : '#4a9eff';
 
-  // Default-Eintraege wenn noch leer
-  if (memories.length === 0 && profile) {
-    if (profile.name) memories.push({key:'Name', value:profile.name, id:'m_name'});
-    if (profile.city) memories.push({key:'Stadt', value:profile.city, id:'m_city'});
-    if (profile.interests) memories.push({key:'Interessen', value:profile.interests, id:'m_interests'});
-    if (profile.style) memories.push({key:'Anrede', value:profile.style, id:'m_style'});
+  // Geloeschte Eintraege nicht wieder laden
+  var deleted = JSON.parse(localStorage.getItem('kimanus-memories-deleted') || '[]');
+
+  // Server-Memory ergaenzen (nur neue, nicht geloeschte Eintraege)
+  if (serverMem) {
+    var existingValues = memories.map(function(m){ return m.value; });
+    if (serverMem.facts) serverMem.facts.forEach(function(f){
+      if (existingValues.indexOf(f) === -1 && deleted.indexOf(f) === -1) memories.push({key:'Fakt', value:f, id:'sf_'+memories.length});
+    });
+    if (serverMem.preferences) serverMem.preferences.forEach(function(p){
+      if (existingValues.indexOf(p) === -1 && deleted.indexOf(p) === -1) memories.push({key:'Vorliebe', value:p, id:'sp_'+memories.length});
+    });
+    if (serverMem.important_dates) serverMem.important_dates.forEach(function(d){
+      if (existingValues.indexOf(d) === -1 && deleted.indexOf(d) === -1) memories.push({key:'Datum', value:d, id:'sd_'+memories.length});
+    });
+    if (serverMem.last_topics && serverMem.last_topics.length > 0) {
+      var topicsStr = serverMem.last_topics.join(', ');
+      if (existingValues.indexOf(topicsStr) === -1 && deleted.indexOf(topicsStr) === -1) memories.push({key:'Letzte Themen', value:topicsStr, id:'st_0'});
+    }
+  }
+
+  // Profil-Daten ergaenzen wenn vorhanden (nicht geloeschte)
+  if (profile) {
+    var existVals = memories.map(function(m){ return m.value; });
+    if (profile.name && existVals.indexOf(profile.name) === -1 && deleted.indexOf(profile.name) === -1) memories.push({key:'Name', value:profile.name, id:'m_name'});
+    if (profile.city && existVals.indexOf(profile.city) === -1 && deleted.indexOf(profile.city) === -1) memories.push({key:'Stadt', value:profile.city, id:'m_city'});
+    if (profile.interests && existVals.indexOf(profile.interests) === -1 && deleted.indexOf(profile.interests) === -1) memories.push({key:'Interessen', value:profile.interests, id:'m_interests'});
+    if (profile.style && existVals.indexOf(profile.style) === -1 && deleted.indexOf(profile.style) === -1) memories.push({key:'Anrede', value:profile.style, id:'m_style'});
+  }
+
+  // Username aus Onboarding ergaenzen
+  var userName = localStorage.getItem('kimanus-username');
+  if (memories.length === 0 && userName) {
+    memories.push({key:'Name', value:userName, id:'m_username'});
+  }
+
+  // Memories in localStorage speichern damit Edit/Delete funktioniert
+  if (memories.length > 0) {
+    localStorage.setItem('kimanus-memories', JSON.stringify(memories));
   }
 
   var itemsHtml = '';
@@ -3233,47 +3291,142 @@ function getMemories() {
 
 function saveMemories(memories) {
   localStorage.setItem('kimanus-memories', JSON.stringify(memories));
+  // Chat-Verlauf komplett leeren damit alte falsche Aussagen nicht mehr mitgeschickt werden
+  history = [];
+  localStorage.removeItem('kimanus-history');
+  var msgEl = document.getElementById('messages');
+  if (msgEl) msgEl.innerHTML = '';
+  // Memory zum Server synchen
+  syncMemoryToServer(memories);
+}
+
+function syncMemoryToServer(memories) {
+  // Memories in Server-Format umwandeln
+  var serverMem = { facts: [], preferences: [], important_dates: [], last_topics: [] };
+  memories.forEach(function(m) {
+    var k = (m.key || '').toLowerCase();
+    if (k === 'fakt' || k === 'name' || k === 'stadt' || k === 'info') {
+      serverMem.facts.push(m.value);
+    } else if (k === 'vorliebe' || k === 'interessen') {
+      serverMem.preferences.push(m.value);
+    } else if (k === 'datum') {
+      serverMem.important_dates.push(m.value);
+    } else if (k === 'letzte themen') {
+      serverMem.last_topics = m.value.split(', ');
+    } else {
+      // Alles andere als Fakt speichern
+      serverMem.facts.push(m.key + ': ' + m.value);
+    }
+  });
+  // Auch lokal das Server-Memory aktualisieren
+  localStorage.setItem('kimanus-server-memory', JSON.stringify(serverMem));
+  // An BEIDE Agenten-Webhooks senden, damit KIM und KAI synchron bleiben
+  var deviceToken = localStorage.getItem('kimanus-device-token') || 'default';
+  var userName = localStorage.getItem('kimanus-username') || '';
+  var payload = JSON.stringify({
+    message: '__restore__',
+    agent: 'sync',
+    session: deviceToken,
+    user_profile: { name: userName, tone: 'locker' },
+    restore_memory: serverMem
+  });
+  ['https://manus.kimanus.de/webhook/kim', 'https://manus.kimanus.de/webhook/kai'].forEach(function(url) {
+    fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: payload
+    }).then(function(r){ return r.json(); }).then(function(data){
+      console.log('Memory synced to ' + url + ':', data);
+    }).catch(function(e){ console.warn('Memory sync to ' + url + ' failed:', e); });
+  });
+}
+
+function showMemoryDialog(title, fields, onSave) {
+  var old = document.getElementById('mem-dialog');
+  if (old) old.remove();
+  var fieldsHtml = '';
+  fields.forEach(function(f) {
+    fieldsHtml += '<div style="margin-bottom:12px">' +
+      '<div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">' + f.label + '</div>' +
+      '<input type="text" id="mem-dlg-' + f.id + '" value="' + (f.value||'').replace(/"/g,'&quot;') + '" placeholder="' + (f.placeholder||'') + '" ' +
+      'style="width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e0e0e0;font-size:15px;outline:none;font-family:inherit">' +
+      '</div>';
+  });
+  var html = '<div id="mem-dialog" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:700;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px">' +
+    '<div style="background:#1a1a1a;border-radius:18px;padding:22px;max-width:320px;width:100%;border:1px solid rgba(255,255,255,.1)">' +
+    '<div style="font-size:17px;font-weight:700;color:#e0e0e0;margin-bottom:16px">' + title + '</div>' +
+    fieldsHtml +
+    '<div style="display:flex;gap:10px;margin-top:16px">' +
+    '<button onclick="document.getElementById(\'mem-dialog\').remove()" style="flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#888;font-size:14px;cursor:pointer">Abbrechen</button>' +
+    '<button id="mem-dlg-save" style="flex:1;padding:12px;border-radius:12px;background:rgba(76,175,80,.2);border:1px solid rgba(76,175,80,.3);color:#4caf50;font-size:14px;font-weight:700;cursor:pointer">Speichern</button>' +
+    '</div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  document.getElementById('mem-dlg-save').onclick = function() {
+    var values = {};
+    fields.forEach(function(f) { values[f.id] = document.getElementById('mem-dlg-'+f.id).value; });
+    document.getElementById('mem-dialog').remove();
+    onSave(values);
+  };
+  setTimeout(function(){ var first = document.getElementById('mem-dlg-'+fields[0].id); if(first) first.focus(); }, 100);
+  haptic();
 }
 
 function addMemoryItem() {
-  var key = prompt('Kategorie (z.B. Hobby, Beruf, Lieblingsessen):');
-  if (!key) return;
-  var value = prompt('Was soll sich ' + (localStorage.getItem('selectedAgent')==='kim'?'KIM':'KAI') + ' merken?');
-  if (!value) return;
-  var memories = getMemories();
-  memories.push({key: key, value: value, id: 'm_' + Date.now()});
-  saveMemories(memories);
-  closeMemoryView();
-  openMemoryView();
-  haptic();
+  showMemoryDialog('Neuer Eintrag', [
+    {id:'key', label:'Kategorie', placeholder:'z.B. Hobby, Beruf, Lieblingsessen', value:''},
+    {id:'val', label:'Was soll sich merken?', placeholder:'Eintrag eingeben...', value:''}
+  ], function(v) {
+    if (!v.key || !v.val) return;
+    var memories = getMemories();
+    memories.push({key: v.key, value: v.val, id: 'm_' + Date.now()});
+    saveMemories(memories);
+    closeMemoryView();
+    openMemoryView();
+  });
 }
 
 function editMemoryItem(idx) {
   var memories = getMemories();
   if (!memories[idx]) return;
-  var newVal = prompt('Wert ändern für "' + memories[idx].key + '":', memories[idx].value);
-  if (newVal === null) return;
-  if (newVal === '') {
-    deleteMemoryItem(idx);
-    return;
-  }
-  memories[idx].value = newVal;
-  saveMemories(memories);
-  closeMemoryView();
-  openMemoryView();
-  haptic();
+  showMemoryDialog(memories[idx].key + ' bearbeiten', [
+    {id:'val', label:memories[idx].key, placeholder:'Neuer Wert...', value:memories[idx].value}
+  ], function(v) {
+    if (!v.val) { deleteMemoryItem(idx); return; }
+    memories[idx].value = v.val;
+    saveMemories(memories);
+    closeMemoryView();
+    openMemoryView();
+  });
 }
 
 function deleteMemoryItem(idx) {
   var memories = getMemories();
   if (!memories[idx]) return;
-  if (confirm('"' + memories[idx].key + ': ' + memories[idx].value + '" wirklich löschen?')) {
+  var old = document.getElementById('mem-dialog');
+  if (old) old.remove();
+  var html = '<div id="mem-dialog" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:700;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px">' +
+    '<div style="background:#1a1a1a;border-radius:18px;padding:22px;max-width:320px;width:100%;border:1px solid rgba(255,255,255,.1);text-align:center">' +
+    '<div style="font-size:16px;font-weight:700;color:#e0e0e0;margin-bottom:8px">Eintrag l&ouml;schen?</div>' +
+    '<div style="font-size:13px;color:#888;margin-bottom:20px">' + memories[idx].key + ': ' + memories[idx].value + '</div>' +
+    '<div style="display:flex;gap:10px">' +
+    '<button onclick="document.getElementById(\'mem-dialog\').remove()" style="flex:1;padding:12px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#888;font-size:14px;cursor:pointer">Abbrechen</button>' +
+    '<button id="mem-dlg-del" style="flex:1;padding:12px;border-radius:12px;background:rgba(255,82,82,.15);border:1px solid rgba(255,82,82,.3);color:#ff5252;font-size:14px;font-weight:700;cursor:pointer">L&ouml;schen</button>' +
+    '</div></div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+  document.getElementById('mem-dlg-del').onclick = function() {
+    document.getElementById('mem-dialog').remove();
+    // Wert merken damit er nicht aus Server-Memory wieder geladen wird
+    var deletedVal = memories[idx].value;
+    var deletedList = JSON.parse(localStorage.getItem('kimanus-memories-deleted') || '[]');
+    if (deletedList.indexOf(deletedVal) === -1) deletedList.push(deletedVal);
+    localStorage.setItem('kimanus-memories-deleted', JSON.stringify(deletedList));
     memories.splice(idx, 1);
     saveMemories(memories);
     closeMemoryView();
     openMemoryView();
     haptic();
-  }
+  };
+  haptic();
 }
 
 function showAgentInfo(agent) {
@@ -3699,15 +3852,35 @@ function setAgent(agent) {
   var btnKim = document.getElementById('btn-kim');
   if (btnKai) btnKai.classList.toggle('active', agent === 'kai');
   if (btnKim) btnKim.classList.toggle('active', agent === 'kim');
-  // Chat-Header Agent-Name aktualisieren
-  var agentNames = {kim: 'KIM \u00b7 P.A4MY', kai: 'KAI \u00b7 A4BIS', manus: 'MANUS \u00b7 Concierge'};
-  document.getElementById('ch-agent-name').textContent = agentNames[agent] || agent.toUpperCase();
+  // Chat-Header dynamisch aktualisieren
+  updateChatHeader(agent);
   // KIM Blink stoppen und begruessen
   if (agent === 'kim') {
     stopKimBlink();
     kimGreeting();
   }
   haptic();
+}
+
+function updateChatHeader(agent) {
+  var nameEl = document.getElementById('ch-agent-name');
+  var statusEl = document.getElementById('ch-agent-status');
+  var avatarEl = document.getElementById('ch-avatar');
+  if (agent === 'kim') {
+    if (nameEl) nameEl.textContent = 'KIM';
+    if (statusEl) statusEl.textContent = 'Deine pers\u00f6nliche Assistentin';
+    if (avatarEl) { avatarEl.className = 'ch-avatar kim-avatar'; }
+    if (nameEl) nameEl.style.color = '#ff6b9d';
+  } else if (agent === 'kai') {
+    if (nameEl) nameEl.textContent = 'KAI';
+    if (statusEl) statusEl.textContent = 'Dein Business-Assistent';
+    if (avatarEl) { avatarEl.className = 'ch-avatar kai-avatar'; }
+    if (nameEl) nameEl.style.color = '#4a9eff';
+  } else {
+    if (nameEl) nameEl.textContent = agent.toUpperCase();
+    if (statusEl) statusEl.textContent = 'Online';
+    if (nameEl) nameEl.style.color = '#e0e0e0';
+  }
 }
 
 // Manus-Weiterleitung erkennen
@@ -3730,10 +3903,8 @@ function activateManusMode() {
 function deactivateManusMode() {
   manusMode = false;
   manusSessionId = '';
-  const agentName = currentAgent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS';
-  const header = document.getElementById('ch-agent-name');
-  if (header) header.textContent = agentName;
-  const chatHeader = document.querySelector('.chat-header');
+  updateChatHeader(currentAgent);
+  const chatHeader = document.getElementById('chat-header');
   if (chatHeader) chatHeader.style.borderBottom = '';
 }
 
@@ -3805,10 +3976,26 @@ async function sendMessage() {
 
   isTyping = true; showTyping();
   try {
-    const model = document.getElementById('setting-model').value;
-    const resp = await fetch('/api/chat', {
+    // Geraete-Token fuer Wiedererkennung
+    var deviceToken = localStorage.getItem('kimanus-device-token');
+    if (!deviceToken) {
+      deviceToken = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
+      localStorage.setItem('kimanus-device-token', deviceToken);
+    }
+    var userName = localStorage.getItem('kimanus-username') || '';
+    var webhookUrl = currentAgent === 'kai'
+      ? 'https://manus.kimanus.de/webhook/kai'
+      : 'https://manus.kimanus.de/webhook/kim';
+
+    const resp = await fetch(webhookUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:msg,agent:currentAgent,model:model,session:sessionId,timestamp:new Date().toISOString(),demo:demoMode})
+      body:JSON.stringify({
+        message: msg,
+        agent: currentAgent,
+        session: deviceToken,
+        user_profile: { name: userName, tone: 'locker' },
+        history: history.filter(h => h.role === 'user' || h.role === 'assistant').slice(-20).map(h => ({role: h.role === 'bot' ? 'assistant' : h.role, content: h.content}))
+      })
     });
     const data = await resp.json();
     const answer = data.output || data.response || data.answer || 'Keine Antwort erhalten.';
@@ -3818,7 +4005,19 @@ async function sendMessage() {
     renderMessage('bot', answer, currentAgent, ansTime, true, modelUsed);
     history.push({role:'bot', content:answer, agent:currentAgent, time:ansTime, model:modelUsed});
     saveHistory();
-    // TTS nur noch per Button an einzelner Nachricht
+
+    // Memory-Snapshot vom Server speichern
+    if (data.memory_snapshot) {
+      localStorage.setItem('kimanus-server-memory', JSON.stringify(data.memory_snapshot));
+    }
+
+    // Onboarding: Wenn KIM/KAI nach dem Namen fragt und User antwortet
+    if (!userName && msg.length < 30 && !msg.includes(' ') || msg.match(/^(ich bin |ich heisse |mein name ist |nenn mich )/i)) {
+      var possibleName = msg.replace(/^(ich bin |ich heisse |mein name ist |nenn mich )/i, '').trim();
+      if (possibleName && possibleName.length < 20) {
+        localStorage.setItem('kimanus-username', possibleName);
+      }
+    }
   } catch(err) {
     hideTyping(); isTyping = false;
     renderMessage('bot', 'Verbindungsfehler: ' + err.message, currentAgent, now);
@@ -3829,17 +4028,47 @@ function renderMessage(role, content, agent, time, scroll=true, modelUsed='') {
   const container = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = 'msg msg-' + (role === 'user' ? 'user' : 'bot');
-  const agentLabel = agent === 'manus' ? 'MANUS \u00b7 SERVER' : (agent === 'kim' ? 'KIM \u00b7 P.A4MY' : 'KAI \u00b7 A4BIS');
+  const agentLabel = agent === 'manus' ? 'MANUS' : (agent === 'kim' ? 'KIM' : 'KAI');
   const modelTag = modelUsed ? ` <span style="opacity:.5;font-size:9px">\u00b7 ${modelUsed}</span>` : '';
+  const msgIdx = container.children.length;
+  div.dataset.msgIdx = msgIdx;
   if (role === 'user') {
     div.innerHTML = `<div class="msg-agent">${agentLabel}</div><div class="bubble">${escapeHtml(content)}</div><div class="msg-time">${time}</div>`;
   } else {
     const ttsBtn = `<button class="msg-tts-btn" onclick="speakText(this.closest('.msg').dataset.rawContent,'${agent}',this)" title="Vorlesen"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg> H\u00f6ren</button>`;
-    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}${ttsBtn}</div><div class="msg-time">${time}</div>`;
+    const delBtn = `<button class="msg-del-btn" onclick="deleteMessage(this.closest('.msg'))" title="L\u00f6schen"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> L\u00f6schen</button>`;
+    div.innerHTML = `<div class="msg-agent">${agentLabel}${modelTag}</div><div class="bubble">${formatMarkdown(content)}<div class="msg-action-bar">${ttsBtn}${delBtn}</div></div><div class="msg-time">${time}</div>`;
     div.dataset.rawContent = content;
   }
   container.appendChild(div);
   if (scroll) scrollToBottom();
+}
+
+function deleteMessage(msgEl) {
+  if (!msgEl) return;
+  // Animation
+  msgEl.style.transition = 'opacity .3s, transform .3s';
+  msgEl.style.opacity = '0';
+  msgEl.style.transform = 'translateX(50px)';
+  setTimeout(function() {
+    msgEl.remove();
+    // History aktualisieren - aus DOM neu aufbauen
+    rebuildHistoryFromDOM();
+  }, 300);
+  haptic();
+}
+
+function rebuildHistoryFromDOM() {
+  history = [];
+  document.querySelectorAll('#messages .msg').forEach(function(el) {
+    var role = el.classList.contains('msg-user') ? 'user' : 'bot';
+    var content = role === 'user'
+      ? (el.querySelector('.bubble') ? el.querySelector('.bubble').textContent : '')
+      : (el.dataset.rawContent || '');
+    var time = el.querySelector('.msg-time') ? el.querySelector('.msg-time').textContent : '';
+    if (content) history.push({role: role, content: content, agent: currentAgent, time: time});
+  });
+  saveHistory();
 }
 
 // === TTS Funktionen ===
