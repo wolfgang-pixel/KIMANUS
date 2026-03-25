@@ -14,14 +14,14 @@
 <style>
 /* === RESET & BASE === */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--app-bg,#0e0e0e);background-size:cover;background-position:center;color:#e0e0e0;color-scheme:dark}
+html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--app-bg,#0e0e0e);background-size:cover;background-position:center;color:#e0e0e0;color-scheme:dark}
 
 :root{
   --sat:env(safe-area-inset-top,0px);
   --sab:env(safe-area-inset-bottom,0px);
 }
 
-#app{display:flex;flex-direction:column;height:100%;padding-top:var(--sat);padding-bottom:var(--sab)}
+#app{display:flex;flex-direction:column;height:100dvh;padding-top:var(--sat);padding-bottom:var(--sab);position:fixed;top:0;left:0;right:0;bottom:0}
 
 /* =========================================
    METALLIC 3D DESIGN SYSTEM
@@ -81,8 +81,82 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   display:flex;align-items:center;justify-content:center;
 }
 #header-qr svg{width:100%;height:100%}
-#header .hdr-btn{background:none;border:none;color:#666;cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .2s}
-#header .hdr-btn:active{color:#e63946;background:rgba(230,57,70,.1)}
+#header .hdr-btn{
+  width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  background:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+  color:#222;transition:all .2s;
+}
+#header .hdr-btn:active{transform:scale(.93);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* =========================================
+   AGENT BAR + VISITENKARTE
+   ========================================= */
+#agent-bar{
+  flex-shrink:0;display:none;align-items:center;gap:12px;
+  padding:12px 14px 10px;cursor:pointer;
+  background:linear-gradient(135deg,rgba(30,30,30,.95),rgba(18,18,18,.98));
+  border-bottom:1px solid rgba(255,255,255,.06);
+  transition:all .2s;
+}
+#app.chat-fullscreen #agent-bar{display:flex}
+#agent-bar:active{background:rgba(40,40,40,.95)}
+#agent-bar .ab-avatar{
+  width:48px;height:48px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 12px rgba(0,0,0,.4);
+  transition:background .3s;
+  font-size:20px;color:#fff;font-weight:700;letter-spacing:1px;
+}
+#agent-bar .ab-info{flex:1;min-width:0}
+#agent-bar .ab-name{font-size:18px;font-weight:700;letter-spacing:1px}
+#agent-bar .ab-role{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+#agent-bar .ab-status{width:8px;height:8px;border-radius:50%;background:#4caf50;flex-shrink:0;box-shadow:0 0 6px rgba(76,175,80,.5)}
+#agent-bar .ab-chevron-btn{
+  width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+  transition:all .3s;cursor:pointer;
+}
+#agent-bar .ab-chevron-btn svg{width:16px;height:16px;fill:#222;transition:transform .3s}
+#agent-bar .ab-trash-btn{background:transparent;border:1px solid rgba(230,57,70,.4);box-shadow:none}
+#agent-bar .ab-trash-btn svg{fill:#e63946}
+#agent-bar.expanded .ab-chevron-btn svg{transform:rotate(180deg)}
+
+/* Visitenkarte (aufklappbar, scrollbar) */
+#agent-vcard{
+  max-height:0;overflow:hidden;transition:max-height .4s ease, padding .3s ease;
+  background:linear-gradient(160deg,#1a1a1a,#141414);
+  border-bottom:1px solid transparent;
+  z-index:10;position:relative;
+}
+#agent-vcard.open{
+  max-height:calc(100vh - 180px);overflow-y:auto;padding:16px 14px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  -webkit-overflow-scrolling:touch;
+}
+.vcard-section{margin-bottom:14px}
+.vcard-section:last-child{margin-bottom:0}
+.vcard-label{font-size:8px;color:#555;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.vcard-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+.vcard-row-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.vcard-row-text{flex:1;font-size:13px;color:#ccc}
+.vcard-row-sub{font-size:10px;color:#666;margin-top:1px}
+.vcard-tags{display:flex;flex-wrap:wrap;gap:6px}
+.vcard-tag{padding:4px 10px;border-radius:20px;font-size:10px;letter-spacing:.5px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#999}
+.vcard-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0}
+.vcard-contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vcard-contact-btn{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border-radius:12px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);cursor:pointer;transition:all .15s;
+}
+.vcard-contact-btn:active{background:rgba(255,255,255,.08);transform:scale(.97)}
+.vcard-contact-btn .vcb-icon{font-size:16px}
+.vcard-contact-btn .vcb-label{font-size:11px;color:#aaa;letter-spacing:.5px}
 
 /* =========================================
    MENU OVERLAY
@@ -628,7 +702,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 /* =========================================
    FULLSCREEN CHAT MODE (WhatsApp-Style)
    ========================================= */
-#app.chat-fullscreen #header{display:none}
+#app.chat-fullscreen #header{display:flex}
 #app.chat-fullscreen #bottom-nav{display:none}
 #app.chat-fullscreen #view-section{padding:0}
 #app.chat-fullscreen #view-label{display:none}
@@ -643,7 +717,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   border-bottom:1px solid #333;
   box-shadow:0 2px 8px rgba(0,0,0,.4);
 }
-#app.chat-fullscreen #chat-header{display:flex}
+#app.chat-fullscreen #chat-header{display:none}
 #chat-header .ch-back{
   width:32px;height:32px;border:none;border-radius:50%;
   background:linear-gradient(145deg,#3a3a3a,#2e2e2e);cursor:pointer;
@@ -668,18 +742,19 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 /* =========================================
    CHAT
    ========================================= */
-.msg{margin-bottom:16px;animation:fadeIn .3s ease}
+.msg{margin-bottom:6px;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 .msg-user{text-align:right}
-.msg-user .bubble{display:inline-block;max-width:80%;padding:10px 14px;background:linear-gradient(135deg,#c62828,#a01010);border-radius:16px 16px 4px 16px;text-align:left;font-size:14px;line-height:1.5;color:#fff;box-shadow:0 2px 8px rgba(198,40,40,.3)}
+.msg-user .bubble{display:inline-block;max-width:80%;padding:8px 12px;background:linear-gradient(135deg,#c62828,#a01010);border-radius:16px 16px 4px 16px;text-align:left;font-size:14px;line-height:1.4;color:#fff;box-shadow:0 2px 8px rgba(198,40,40,.3)}
 .msg-bot{text-align:left}
-.msg-bot .bubble{display:inline-block;max-width:85%;padding:10px 14px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 16px 16px 16px;text-align:left;font-size:14px;line-height:1.6;color:#ddd;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.msg-bot .bubble{display:inline-block;max-width:85%;padding:8px 12px;background:linear-gradient(135deg,#252525,#1e1e1e);border:1px solid #333;border-radius:4px 16px 16px 16px;text-align:left;font-size:14px;line-height:1.4;color:#ddd;box-shadow:0 2px 6px rgba(0,0,0,.3)}
 .msg-bot .bubble strong{color:#e63946}
 .msg-bot .bubble code{background:#1a1a1a;padding:1px 5px;border-radius:3px;font-size:13px;color:#f0c040}
 .msg-bot .bubble pre{background:#0e0e0e;padding:10px;border-radius:6px;overflow-x:auto;margin:8px 0;border:1px solid #222}
 .msg-bot .bubble pre code{background:none;padding:0}
-.msg-agent{font-size:10px;color:#555;margin-bottom:2px;letter-spacing:1px;text-transform:uppercase}
-.msg-time{font-size:10px;color:#444;margin-top:2px;display:flex;align-items:center;gap:6px}
+.msg-agent{font-size:9px;color:#555;margin-bottom:1px;letter-spacing:1px;text-transform:uppercase}
+.msg-time{font-size:9px;color:#444;margin-top:1px;display:flex;align-items:center;gap:6px}
 .msg-bot .bubble{position:relative;padding-bottom:28px}
 .msg-action-bar{position:absolute;bottom:4px;right:6px;display:flex;gap:4px}
 .msg-tts-btn,.msg-del-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#777;cursor:pointer;padding:4px 6px;display:inline-flex;align-items:center;gap:4px;border-radius:8px;transition:all .15s;font-size:9px;letter-spacing:.5px}
@@ -775,13 +850,29 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   min-height:36px;max-height:120px;
   line-height:1.4;
   font-family:inherit;
-  color-scheme:dark;
+  color-scheme:dark !important;
   -webkit-appearance:none;
   -webkit-user-select:text;user-select:text;
   -webkit-user-modify:read-write-plaintext-only;
   word-break:break-word;white-space:pre-wrap;
+  -webkit-text-fill-color:#e0e0e0;
 }
-#chat-input:empty::before{content:attr(data-placeholder);color:#555;font-size:14px;pointer-events:none}
+/* Alle Inputs dunkel erzwingen fuer iOS */
+input,textarea,[contenteditable]{color-scheme:dark !important}
+/* Zurueck-Button (Floating, unten rechts) */
+#fab-home{
+  display:none;position:fixed;bottom:2px;right:2px;z-index:999;
+  width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#e63946,#8b0000);
+  color:#fff;opacity:.55;
+  box-shadow:0 2px 6px rgba(230,57,70,.25),0 1px 3px rgba(0,0,0,.3);
+  align-items:center;justify-content:center;
+  transition:transform .15s,opacity .2s;
+}
+#fab-home:active{transform:scale(.9);opacity:1}
+#fab-home svg{width:12px;height:12px}
+#fab-home.visible{display:flex}
+#chat-input:empty::before,#chat-input.is-empty::before{content:attr(data-placeholder);color:#555;font-size:14px;pointer-events:none}
 /* Mic button inside input wrap */
 #mic-btn{
   width:34px;height:34px;border-radius:50%;border:none;
@@ -832,7 +923,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 /* Settings */
 #settings-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:100;justify-content:center;align-items:flex-start;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #settings-overlay.open{display:flex}
-#settings-panel{width:100%;max-width:360px;border-radius:12px;padding:24px;background:linear-gradient(160deg,#2a2a2a,#1a1a1a);border:1px solid #444;box-shadow:0 8px 32px rgba(0,0,0,.6);margin:auto 0;flex-shrink:0}
+#settings-panel{width:100%;max-width:360px;border-radius:12px;padding:24px;background:linear-gradient(160deg,#2a2a2a,#1a1a1a);border:1px solid #444;box-shadow:0 8px 32px rgba(0,0,0,.6);margin:auto 0;flex-shrink:0;max-height:calc(100vh - 60px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #settings-panel h2{font-size:14px;letter-spacing:3px;color:#e63946;margin-bottom:16px;text-transform:uppercase;font-weight:500}
 .setting-row{margin-bottom:16px}
 .setting-row label{display:block;font-size:10px;letter-spacing:2px;color:#666;text-transform:uppercase;margin-bottom:6px}
@@ -1064,6 +1155,23 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     </div>
     <button class="hdr-btn" onclick="toggleMenu()" title="Einstellungen" id="menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></button>
     <button class="hdr-btn" onclick="showHome()" title="Home" id="home-btn" style="display:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+  </div>
+
+  <!-- AGENT BAR (immer sichtbar, zeigt aktiven Agenten) -->
+  <div id="agent-bar" onclick="toggleAgentCard()">
+    <div class="ab-avatar" id="ab-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff3d7f)">K</div>
+    <div class="ab-info">
+      <div class="ab-name" id="ab-name" style="color:#ff6b9d">KIM</div>
+      <div class="ab-role" id="ab-role">Deine pers&ouml;nliche Assistentin</div>
+    </div>
+    <div class="ab-status"></div>
+    <div class="ab-chevron-btn ab-trash-btn" onclick="event.stopPropagation();clearAgentChat()" title="Chat dieses Agenten loeschen"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
+    <div class="ab-chevron-btn" title="Visitenkarte aufklappen"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+  </div>
+
+  <!-- AGENT VISITENKARTE (aufklappbar) -->
+  <div id="agent-vcard">
+    <div id="vcard-content"></div>
   </div>
 
   <!-- MENU OVERLAY -->
@@ -1538,6 +1646,11 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
     </div>
   </div>
 
+  <!-- ZURUECK-BUTTON (fest unten rechts, nur in Unterseiten sichtbar) -->
+  <button id="fab-home" onclick="showHome()" title="Zur&uuml;ck zum Hauptmen&uuml;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+  </button>
+
   <!-- COMMUNICATION BAR (fixed bottom) -->
   <div id="comm-bar">
     <div id="comm-buttons">
@@ -1586,6 +1699,25 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
         <div class="vk-role">Dein pers&ouml;nlicher Assistent</div>
       </div>
       <button class="agent-info-btn" onclick="event.stopPropagation();showAgentInfo('kai')">&#x2139;</button>
+    </div>
+
+    <div style="width:100%;text-align:center;padding:8px 0;margin:4px 0"><span style="font-size:9px;color:#444;letter-spacing:3px;text-transform:uppercase">Business</span></div>
+
+    <div class="agent-card-pick" data-agent="manus" onclick="pickAgent('manus')">
+      <div class="agent-avatar" style="background:linear-gradient(135deg,#ffa726,#e65100)">
+        <!-- Business Silhouette -->
+        <svg width="48" height="48" viewBox="0 0 100 100" fill="rgba(255,255,255,.9)">
+          <circle cx="50" cy="28" r="14"/>
+          <path d="M30 58c0-8 9-14 20-14s20 6 20 14v12H30V58z"/>
+          <rect x="34" y="48" rx="2" width="32" height="8"/>
+          <path d="M42 44h16v6H42z"/>
+        </svg>
+      </div>
+      <div class="agent-pick-info">
+        <div class="vk-name" style="color:#ffa726">KI MANUS</div>
+        <div class="vk-role">Business &amp; Premium Agent</div>
+      </div>
+      <button class="agent-info-btn" onclick="event.stopPropagation();showAgentInfo('manus')">&#x2139;</button>
     </div>
 
     <button id="agent-picker-close" onclick="closeAgentPicker()">Abbrechen</button>
@@ -1819,7 +1951,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.execCommand('insertText', false, text);
   });
   // WhatsApp-Style: Mikrofon <-> Sende-Pfeil Wechsel + Auto-Resize
-  chatInput.addEventListener('input', () => { updateSendBtn(); autoResize(chatInput); });
+  chatInput.addEventListener('input', () => { chatInput.classList.remove('is-empty'); updateSendBtn(); autoResize(chatInput); });
   checkHealth();
   // KIM blinkt beim App-Start als Einladung
   startKimBlink();
@@ -1828,6 +1960,19 @@ window.addEventListener('DOMContentLoaded', () => {
   if (ttsBtn) ttsBtn.classList.toggle('active', ttsEnabled);
   // Stimmen-Einstellungen laden
   loadVoiceSettings();
+  // iOS Keyboard Fix: Header + Agent-Bar oben halten wenn Tastatur aufgeht
+  if (window.visualViewport) {
+    var appEl = document.getElementById('app');
+    function handleViewportResize() {
+      var vv = window.visualViewport;
+      appEl.style.height = vv.height + 'px';
+      appEl.style.top = vv.offsetTop + 'px';
+      // Scroll Chat nach unten wenn Tastatur offen
+      setTimeout(scrollToBottom, 50);
+    }
+    window.visualViewport.addEventListener('resize', handleViewportResize);
+    window.visualViewport.addEventListener('scroll', handleViewportResize);
+  }
 });
 
 // Helfer: contenteditable div Text lesen/schreiben
@@ -1837,10 +1982,31 @@ function getInputText() {
 function setInputText(text) {
   const el = document.getElementById('chat-input');
   if (!text) {
-    el.textContent = '';
+    // iOS Safari: Native Editing-Commands sind zuverlaessiger als DOM-Manipulation
+    el.focus();
+    if (document.queryCommandSupported && document.queryCommandSupported('selectAll')) {
+      document.execCommand('selectAll', false, null);
+      document.execCommand('delete', false, null);
+    }
+    // Zusaetzlich DOM direkt aufraeumen
     el.innerHTML = '';
+    el.textContent = '';
+    while (el.firstChild) el.removeChild(el.firstChild);
+    // Placeholder-Klasse erzwingen falls :empty nicht greift
+    el.classList.add('is-empty');
+    // Nochmal nach kurzem Delay sicherstellen (iOS Rendering-Cycle)
+    setTimeout(function() {
+      if (el.textContent.trim() || el.innerHTML.replace(/<br\s*\/?>/gi,'').trim()) {
+        el.innerHTML = '';
+        el.textContent = '';
+        while (el.firstChild) el.removeChild(el.firstChild);
+      }
+      el.classList.add('is-empty');
+      el.blur();
+    }, 50);
   } else {
     el.textContent = text;
+    el.classList.remove('is-empty');
   }
   autoResize(el);
 }
@@ -2876,6 +3042,9 @@ function openModule(name) {
   // Comm-bar ausblenden wenn Modul offen
   const commBar = document.getElementById('comm-bar');
   if (commBar) commBar.style.display = 'none';
+  // Zurueck-Button unten rechts anzeigen
+  var fabHome = document.getElementById('fab-home');
+  if (fabHome) fabHome.classList.add('visible');
 
   if (name === 'chat') {
     // WhatsApp Fullscreen-Modus
@@ -3117,6 +3286,14 @@ function showHome() {
   // Comm-bar wieder einblenden
   const commBar = document.getElementById('comm-bar');
   if (commBar) commBar.style.display = '';
+  // Home-Button verstecken (wir sind ja schon home)
+  var fabHome = document.getElementById('fab-home');
+  if (fabHome) fabHome.classList.remove('visible');
+  // Header zuruecksetzen
+  var headerSub = document.getElementById('header-user-sub');
+  var headerAvatar = document.getElementById('header-avatar');
+  if (headerSub) headerSub.textContent = 'Dein digitaler Assistent';
+  if (headerAvatar) headerAvatar.style.background = 'linear-gradient(135deg,#e63946,#8b0000)';
   haptic();
 }
 
@@ -3174,6 +3351,15 @@ function pickAgent(agent) {
   selectedAgent = agent;
   localStorage.setItem('selectedAgent', agent);
   setAgent(agent);
+  // Visitenkarte schliessen und Input-Bar inline-Style zuruecksetzen
+  var vcard = document.getElementById('agent-vcard');
+  var abar = document.getElementById('agent-bar');
+  var inputBar = document.getElementById('input-bar');
+  var canvas = document.getElementById('canvas');
+  if (vcard) vcard.classList.remove('open');
+  if (abar) abar.classList.remove('expanded');
+  if (inputBar) inputBar.style.display = '';
+  if (canvas) canvas.style.display = '';
   openModule('chat');
 }
 
@@ -3320,7 +3506,7 @@ function syncMemoryToServer(memories) {
   });
   // Auch lokal das Server-Memory aktualisieren
   localStorage.setItem('kimanus-server-memory', JSON.stringify(serverMem));
-  // An BEIDE Agenten-Webhooks senden, damit KIM und KAI synchron bleiben
+  // An ALLE 3 Agenten-Webhooks senden, damit KIM, KAI und KI MANUS synchron bleiben
   var deviceToken = localStorage.getItem('kimanus-device-token') || 'default';
   var userName = localStorage.getItem('kimanus-username') || '';
   var payload = JSON.stringify({
@@ -3330,7 +3516,7 @@ function syncMemoryToServer(memories) {
     user_profile: { name: userName, tone: 'locker' },
     restore_memory: serverMem
   });
-  ['https://manus.kimanus.de/webhook/kim', 'https://manus.kimanus.de/webhook/kai'].forEach(function(url) {
+  ['https://manus.kimanus.de/webhook/kim', 'https://manus.kimanus.de/webhook/kai', 'https://manus.kimanus.de/webhook/manus-ki'].forEach(function(url) {
     fetch(url, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -3863,24 +4049,336 @@ function setAgent(agent) {
 }
 
 function updateChatHeader(agent) {
-  var nameEl = document.getElementById('ch-agent-name');
-  var statusEl = document.getElementById('ch-agent-status');
-  var avatarEl = document.getElementById('ch-avatar');
+  // Agent-Bar aktualisieren (immer sichtbar)
+  var abName = document.getElementById('ab-name');
+  var abRole = document.getElementById('ab-role');
+  var abAvatar = document.getElementById('ab-avatar');
   if (agent === 'kim') {
-    if (nameEl) nameEl.textContent = 'KIM';
-    if (statusEl) statusEl.textContent = 'Deine pers\u00f6nliche Assistentin';
-    if (avatarEl) { avatarEl.className = 'ch-avatar kim-avatar'; }
-    if (nameEl) nameEl.style.color = '#ff6b9d';
+    if (abName) { abName.textContent = 'KIM'; abName.style.color = '#ff6b9d'; }
+    if (abRole) abRole.textContent = 'Deine pers\u00f6nliche Assistentin';
+    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#ff6b9d,#ff3d7f)'; abAvatar.textContent = 'K'; }
   } else if (agent === 'kai') {
-    if (nameEl) nameEl.textContent = 'KAI';
-    if (statusEl) statusEl.textContent = 'Dein Business-Assistent';
-    if (avatarEl) { avatarEl.className = 'ch-avatar kai-avatar'; }
-    if (nameEl) nameEl.style.color = '#4a9eff';
-  } else {
-    if (nameEl) nameEl.textContent = agent.toUpperCase();
-    if (statusEl) statusEl.textContent = 'Online';
-    if (nameEl) nameEl.style.color = '#e0e0e0';
+    if (abName) { abName.textContent = 'KAI'; abName.style.color = '#4a9eff'; }
+    if (abRole) abRole.textContent = 'Dein pers\u00f6nlicher Assistent';
+    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#4a9eff,#2979ff)'; abAvatar.textContent = 'K'; }
+  } else if (agent === 'manus') {
+    if (abName) { abName.textContent = 'KI MANUS'; abName.style.color = '#ffa726'; }
+    if (abRole) abRole.textContent = 'Business & Premium Agent';
+    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#ffa726,#e65100)'; abAvatar.textContent = 'M'; }
   }
+  // Visitenkarte schliessen bei Agent-Wechsel
+  var vcard = document.getElementById('agent-vcard');
+  var bar = document.getElementById('agent-bar');
+  if (vcard) vcard.classList.remove('open');
+  if (bar) bar.classList.remove('expanded');
+  // Nachrichten-Zaehler aktualisieren
+  updateMsgCounter();
+}
+
+function updateMsgCounter() {
+  // Zaehler wird in der Visitenkarte beim Oeffnen angezeigt
+}
+
+// === VISITENKARTE (aufklappbar) ===
+var agentCardData = {
+  kim: {
+    name: 'KIM', color: '#ff6b9d',
+    rolle: 'Pers\u00f6nliche Assistentin',
+    beschreibung: 'Kompetent, aufmerksam und zuverlaessig. Deine persoenliche Assistentin, die mitdenkt und organisiert.',
+    skills: ['Chat & Beratung', 'Erinnerungen', 'Termine', 'Recherche', 'Texte schreiben', 'Vorlesen'],
+    defaultModel: 'groq-llama',
+    kontakt: [
+      {icon: '\uD83D\uDD12', label: 'Chat', action: 'chat', desc: 'Eigener KIMANUS Chat \u00b7 Ende-zu-Ende verschluesselt \u00b7 Keine Daten an Dritte \u00b7 Laeuft auf unserem eigenen Server in Deutschland'},
+      {icon: '\uD83D\uDCDE', label: 'Telefon', action: 'phone', desc: 'Sprachanruf (kommt bald)'},
+      {icon: '\uD83D\uDCF1', label: 'WhatsApp', action: 'whatsapp', desc: 'WhatsApp-Kanal (kommt bald)'},
+      {icon: '\u2709\uFE0F', label: 'E-Mail', action: 'email', desc: 'E-Mail-Kontakt (kommt bald)'}
+    ],
+    server: 'KIMANUS EU Server \u00b7 Hetzner DE \u00b7 31.97.216.22'
+  },
+  kai: {
+    name: 'KAI', color: '#4a9eff',
+    rolle: 'Pers\u00f6nlicher Assistent',
+    beschreibung: 'Ruhig, zuverlaessig, mit trockenem Humor. Deine rechte Hand, die mitdenkt und anpackt.',
+    skills: ['Chat & Beratung', 'Erinnerungen', 'Termine', 'Recherche', 'Texte schreiben', 'Vorlesen'],
+    defaultModel: 'deepseek',
+    kontakt: [
+      {icon: '\uD83D\uDD12', label: 'Chat', action: 'chat', desc: 'Eigener KIMANUS Chat \u00b7 Ende-zu-Ende verschluesselt \u00b7 Keine Daten an Dritte \u00b7 Laeuft auf unserem eigenen Server in Deutschland'},
+      {icon: '\uD83D\uDCDE', label: 'Telefon', action: 'phone', desc: 'Sprachanruf (kommt bald)'},
+      {icon: '\uD83D\uDCF1', label: 'WhatsApp', action: 'whatsapp', desc: 'WhatsApp-Kanal (kommt bald)'},
+      {icon: '\u2709\uFE0F', label: 'E-Mail', action: 'email', desc: 'E-Mail-Kontakt (kommt bald)'}
+    ],
+    server: 'KIMANUS EU Server \u00b7 Hetzner DE \u00b7 31.97.216.22'
+  },
+  manus: {
+    name: 'KI MANUS', color: '#ffa726',
+    rolle: 'Business & Premium Agent',
+    beschreibung: 'Professionell, praezise, loesungsorientiert. Dein Top-Berater fuer komplexe Aufgaben und Geschaeftliches.',
+    skills: ['Analysen & Strategie', 'Kalkulationen', 'Marktanalyse', 'Prof. Texte', 'Projektmanagement', 'Code', 'Vertraege'],
+    defaultModel: 'deepseek',
+    kontakt: [
+      {icon: '\uD83D\uDD12', label: 'Chat', action: 'chat', desc: 'Eigener KIMANUS Chat \u00b7 Ende-zu-Ende verschluesselt \u00b7 Keine Daten an Dritte \u00b7 Laeuft auf unserem eigenen Server in Deutschland'},
+      {icon: '\uD83D\uDCDE', label: 'Telefon', action: 'phone', desc: 'Sprachanruf (kommt bald)'},
+      {icon: '\uD83D\uDCF1', label: 'WhatsApp', action: 'whatsapp', desc: 'WhatsApp-Kanal (kommt bald)'},
+      {icon: '\u2709\uFE0F', label: 'E-Mail', action: 'email', desc: 'E-Mail-Kontakt (kommt bald)'}
+    ],
+    server: 'KIMANUS EU Server \u00b7 Hetzner DE \u00b7 31.97.216.22'
+  }
+};
+
+// Verfuegbare Sprachmodelle mit Kosten
+var availableModels = [
+  {id:'groq-llama', name:'LLaMA 3.3 70B', provider:'Groq', speed:'\u26A1 Ultra-schnell', costPer1k: 0.001, offline: false},
+  {id:'deepseek', name:'DeepSeek V3', provider:'DeepSeek', speed:'\uD83D\uDCA1 Sehr schlau', costPer1k: 0.001, offline: false},
+  {id:'gemini-flash', name:'Gemini 2.5 Flash', provider:'Google', speed:'\uD83D\uDE80 Schnell + langer Kontext', costPer1k: 0.001, offline: false},
+  {id:'or-claude-sonnet', name:'Claude Sonnet 4', provider:'Anthropic (OpenRouter)', speed:'\uD83C\uDFC6 Premium-Qualit\u00e4t', costPer1k: 0.01, offline: false},
+  {id:'or-gpt4o', name:'GPT-4o', provider:'OpenAI (OpenRouter)', speed:'\uD83C\uDFC6 Premium-Qualit\u00e4t', costPer1k: 0.01, offline: false},
+  {id:'qwen-local', name:'Qwen 2.5 1.5B', provider:'Lokal (Ollama)', speed:'\uD83D\uDD12 Offline \u00b7 Kostenlos', costPer1k: 0, offline: true}
+];
+
+// Verfuegbare ElevenLabs Stimmen
+var availableVoices = {
+  kim: [
+    {id:'MGG5Irb57ATHvyIeTEYo', name:'Aktuelle Stimme', desc:'Wolfgangs Wahl'},
+    {id:'5Aahq892EEb6MdNwMM3p', name:'Laura', desc:'Jung, warm, vielseitig'},
+    {id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Sanft, freundlich'},
+    {id:'21m00Tcm4TlvDq8ikWAM', name:'Rachel', desc:'Ruhig, professionell'}
+  ],
+  kai: [
+    {id:'j6tJ8jbxXyUvoq0QGMNY', name:'Aktuelle Stimme', desc:'Wolfgangs Wahl'},
+    {id:'aduJlSmEKqbhRQAAMzV2', name:'Adrian', desc:'Tief, vertrauenswuerdig'},
+    {id:'VHYWoxffK1pFlM1dtRb0', name:'Thomas', desc:'Warm, gebildet'},
+    {id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Klar, bestimmt'}
+  ],
+  manus: [
+    {id:'VHYWoxffK1pFlM1dtRb0', name:'Thomas', desc:'Serioes, gebildet (Standard)'},
+    {id:'aduJlSmEKqbhRQAAMzV2', name:'Adrian', desc:'Tief, vertrauenswuerdig'},
+    {id:'j6tJ8jbxXyUvoq0QGMNY', name:'Custom Voice', desc:'Wolfgangs Wahl'},
+    {id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Klar, bestimmt'}
+  ]
+};
+
+// Gespeicherte Modell-Auswahl pro Agent
+var agentModels = {
+  kim: localStorage.getItem('kimanus-model-kim') || 'groq-llama',
+  kai: localStorage.getItem('kimanus-model-kai') || 'deepseek',
+  manus: localStorage.getItem('kimanus-model-manus') || 'or-claude-sonnet'
+};
+var agentVoices = {
+  kim: localStorage.getItem('kimanus-voice-11-kim') || 'MGG5Irb57ATHvyIeTEYo',
+  kai: localStorage.getItem('kimanus-voice-11-kai') || 'j6tJ8jbxXyUvoq0QGMNY',
+  manus: localStorage.getItem('kimanus-voice-11-manus') || 'VHYWoxffK1pFlM1dtRb0'
+};
+
+function toggleAgentCard() {
+  var vcard = document.getElementById('agent-vcard');
+  var bar = document.getElementById('agent-bar');
+  var inputBar = document.getElementById('input-bar');
+  var canvas = document.getElementById('canvas');
+  if (!vcard || !bar) return;
+  var isOpen = vcard.classList.contains('open');
+  if (isOpen) {
+    vcard.classList.remove('open');
+    bar.classList.remove('expanded');
+    if (inputBar) inputBar.style.display = '';
+    if (canvas) canvas.style.display = '';
+  } else {
+    renderAgentCard(currentAgent);
+    vcard.classList.add('open');
+    bar.classList.add('expanded');
+    if (inputBar) inputBar.style.display = 'none';
+    if (canvas) canvas.style.display = 'none';
+  }
+  haptic();
+}
+
+function renderAgentCard(agent) {
+  var data = agentCardData[agent];
+  if (!data) return;
+  var el = document.getElementById('vcard-content');
+  if (!el) return;
+
+  // Nachrichten + Kosten berechnen
+  var msgCount = document.querySelectorAll('#messages .msg').length;
+  var curModel = agentModels[agent] || data.defaultModel;
+  var modelInfo = availableModels.find(function(m){ return m.id === curModel; }) || availableModels[0];
+  var llmCost = Math.round(msgCount * modelInfo.costPer1k * 100) / 100;
+  var ttsCost = Math.round(msgCount * 0.005 * 100) / 100; // ~0.5ct pro TTS
+  var totalCost = Math.round((llmCost + ttsCost) * 100) / 100;
+
+  // Skills
+  var skillsHtml = data.skills.map(function(s){ return '<div class="vcard-tag">' + s + '</div>'; }).join('');
+
+  // Kontakt
+  var contactHtml = data.kontakt.map(function(c){
+    var hasDesc = c.desc ? 'true' : 'false';
+    return '<div class="vcard-contact-btn" onclick="vcardContactInfo(\'' + c.action + '\',' + hasDesc + ',\'' + encodeURIComponent(c.desc || '') + '\',\'' + encodeURIComponent(c.label) + '\',\'' + encodeURIComponent(c.icon) + '\');event.stopPropagation()">' +
+      '<span class="vcb-icon">' + c.icon + '</span>' +
+      '<span class="vcb-label">' + c.label + '</span></div>';
+  }).join('');
+
+  // Modell-Selector
+  var modelOpts = availableModels.map(function(m){
+    var sel = m.id === curModel ? ' selected' : '';
+    return '<option value="' + m.id + '"' + sel + '>' + m.name + ' (' + m.provider + ')' + (m.offline ? ' \uD83D\uDD12' : '') + '</option>';
+  }).join('');
+
+  // Stimmen-Selector
+  var curVoice = agentVoices[agent];
+  var voiceList = availableVoices[agent] || [];
+  var voiceOpts = voiceList.map(function(v){
+    var sel = v.id === curVoice ? ' selected' : '';
+    return '<option value="' + v.id + '"' + sel + '>' + v.name + ' \u2013 ' + v.desc + '</option>';
+  }).join('');
+
+  // Aktuelle Stimme Name finden
+  var curVoiceName = 'Custom Voice';
+  voiceList.forEach(function(v){ if(v.id === curVoice) curVoiceName = v.name; });
+
+  el.innerHTML =
+    // --- Zaehler + Kosten ---
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">' +
+      '<div><div style="font-size:20px;font-weight:700;color:#e0e0e0">' + msgCount + '</div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px">Nachrichten</div></div>' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#4caf50">' + totalCost.toFixed(2) + ' \u20AC</div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px">Gesamtkosten</div></div>' +
+      '<div style="text-align:right"><div style="font-size:13px;color:#888">' + modelInfo.costPer1k.toFixed(3) + ' \u20AC</div><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px">Pro Nachricht</div></div>' +
+    '</div>' +
+    // --- Beschreibung ---
+    '<div class="vcard-section">' +
+      '<div class="vcard-label">Beschreibung</div>' +
+      '<div style="font-size:13px;color:#bbb;line-height:1.5">' + data.beschreibung + '</div>' +
+    '</div>' +
+    '<div class="vcard-divider"></div>' +
+    // --- Skills ---
+    '<div class="vcard-section">' +
+      '<div class="vcard-label">Skills & F\u00e4higkeiten</div>' +
+      '<div class="vcard-tags">' + skillsHtml + '</div>' +
+    '</div>' +
+    '<div class="vcard-divider"></div>' +
+    // --- Kontakt ---
+    '<div class="vcard-section">' +
+      '<div class="vcard-label">Kontakt</div>' +
+      '<div class="vcard-contact-grid">' + contactHtml + '</div>' +
+    '</div>' +
+    '<div class="vcard-divider"></div>' +
+    // --- Sprachmodell (wechselbar) ---
+    '<div class="vcard-section">' +
+      '<div class="vcard-label">\uD83E\uDDE0 Sprachmodell</div>' +
+      '<select id="vcard-model-select" onchange="changeAgentModel(\'' + agent + '\',this.value);event.stopPropagation()" ' +
+        'style="width:100%;padding:10px 12px;border-radius:10px;background:#1a1a1a;border:1px solid rgba(255,255,255,.12);color:#e0e0e0;font-size:13px;outline:none;margin-bottom:4px;-webkit-appearance:auto">' +
+        modelOpts +
+      '</select>' +
+      '<div style="font-size:10px;color:#555;padding:2px 4px">' + modelInfo.speed + (modelInfo.offline ? ' \u00b7 Kein Internet n\u00f6tig' : ' \u00b7 Online') + '</div>' +
+    '</div>' +
+    '<div class="vcard-divider"></div>' +
+    // --- Stimme (wechselbar) ---
+    '<div class="vcard-section">' +
+      '<div class="vcard-label">\uD83D\uDD0A ElevenLabs Stimme</div>' +
+      '<select id="vcard-voice-select" onchange="changeAgentVoice(\'' + agent + '\',this.value);event.stopPropagation()" ' +
+        'style="width:100%;padding:10px 12px;border-radius:10px;background:#1a1a1a;border:1px solid rgba(255,255,255,.12);color:#e0e0e0;font-size:13px;outline:none;margin-bottom:4px;-webkit-appearance:auto">' +
+        voiceOpts +
+      '</select>' +
+      '<button onclick="testCurrentVoice(\'' + agent + '\');event.stopPropagation()" style="margin-top:4px;padding:6px 14px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#aaa;font-size:11px;cursor:pointer">\uD83D\uDD0A Stimme testen</button>' +
+    '</div>' +
+    '<div class="vcard-divider"></div>' +
+    // --- Server ---
+    '<div class="vcard-section">' +
+      '<div class="vcard-label">\uD83D\uDDA5\uFE0F Server & Infrastruktur</div>' +
+      '<div style="font-size:12px;color:#999;line-height:1.8">' +
+        data.server + '<br>' +
+        '10 Docker Container \u00b7 n8n Workflows \u00b7 LiteLLM Gateway<br>' +
+        'TTS: ElevenLabs + Grok + OpenAI (Fallback-Kette)' +
+      '</div>' +
+    '</div>' +
+    // --- Wechsel-Button ---
+    '<div style="text-align:center;margin-top:12px">' +
+      '<button onclick="switchAssistant();event.stopPropagation()" style="padding:10px 24px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#aaa;font-size:12px;cursor:pointer;letter-spacing:1px">Assistent wechseln</button>' +
+    '</div>';
+}
+
+function changeAgentModel(agent, modelId) {
+  agentModels[agent] = modelId;
+  localStorage.setItem('kimanus-model-' + agent, modelId);
+  // Visitenkarte neu rendern fuer Kosten-Update
+  renderAgentCard(agent);
+  haptic();
+}
+
+function changeAgentVoice(agent, voiceId) {
+  agentVoices[agent] = voiceId;
+  localStorage.setItem('kimanus-voice-11-' + agent, voiceId);
+  // Server-seitig updaten (ElevenLabs Voice wechseln)
+  fetch('/api/set-voice', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({agent: agent, voice_id: voiceId})
+  }).catch(function(){});
+  haptic();
+}
+
+function testCurrentVoice(agent) {
+  speakText('Hallo! Ich bin ' + (agent === 'kim' ? 'KIM, deine pers\u00f6nliche Assistentin.' : 'KAI, dein Business-Assistent.') + ' So klinge ich.', agent);
+}
+
+function vcardContactInfo(action, hasDesc, descEncoded, labelEncoded, iconEncoded) {
+  var desc = decodeURIComponent(descEncoded);
+  var label = decodeURIComponent(labelEncoded);
+  var icon = decodeURIComponent(iconEncoded);
+  haptic();
+
+  if (hasDesc && desc) {
+    // Info-Popup anzeigen
+    var existing = document.getElementById('contact-info-popup');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'contact-info-popup';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var features = desc.split(' \u00b7 ');
+    var featHtml = features.map(function(f) {
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0">' +
+        '<div style="width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0"></div>' +
+        '<span style="font-size:13px;color:#ccc">' + f + '</span></div>';
+    }).join('');
+
+    overlay.innerHTML =
+      '<div style="background:#1a1a1a;border:1px solid #333;border-radius:16px;max-width:320px;width:100%;padding:24px;animation:slideUp .3s">' +
+        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
+          '<div style="font-size:28px">' + icon + '</div>' +
+          '<div><div style="font-size:18px;font-weight:700;color:#e0e0e0">' + label + '</div>' +
+          '<div style="font-size:11px;color:#666">KIMANUS Privat-Chat</div></div>' +
+        '</div>' +
+        '<div style="background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);border-radius:12px;padding:14px;margin-bottom:16px">' +
+          featHtml +
+        '</div>' +
+        '<div style="font-size:11px;color:#555;line-height:1.5;margin-bottom:18px">' +
+          'Dein Gespraech laeuft ueber unseren eigenen KIMANUS Server in Deutschland. Kein Google, kein Meta, kein Mitlesen. Deine Daten gehoeren dir.' +
+        '</div>' +
+        '<button onclick="this.closest(\'#contact-info-popup\').remove()" style="width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e0e0e0;font-size:14px;font-weight:600;cursor:pointer">Verstanden</button>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+  } else {
+    // Kein Beschreibungstext: direkt ausfuehren
+    vcardAction(action);
+  }
+}
+
+function vcardAction(action) {
+  var vcard = document.getElementById('agent-vcard');
+  var bar = document.getElementById('agent-bar');
+  if (vcard) vcard.classList.remove('open');
+  if (bar) bar.classList.remove('expanded');
+  if (action === 'chat') {
+    openModule('chat');
+  } else if (action === 'phone') {
+    openModule('chat');
+  } else if (action === 'whatsapp') {
+    alert('WhatsApp-Kanal kommt bald!');
+  } else if (action === 'email') {
+    alert('E-Mail-Kanal kommt bald!');
+  }
+  haptic();
 }
 
 // Manus-Weiterleitung erkennen
@@ -3983,7 +4481,9 @@ async function sendMessage() {
       localStorage.setItem('kimanus-device-token', deviceToken);
     }
     var userName = localStorage.getItem('kimanus-username') || '';
-    var webhookUrl = currentAgent === 'kai'
+    var webhookUrl = currentAgent === 'manus'
+      ? 'https://manus.kimanus.de/webhook/manus-ki'
+      : currentAgent === 'kai'
       ? 'https://manus.kimanus.de/webhook/kai'
       : 'https://manus.kimanus.de/webhook/kim';
 
@@ -3993,8 +4493,9 @@ async function sendMessage() {
         message: msg,
         agent: currentAgent,
         session: deviceToken,
+        model: agentModels[currentAgent] || (currentAgent === 'kim' ? 'groq-llama' : 'deepseek'),
         user_profile: { name: userName, tone: 'locker' },
-        history: history.filter(h => h.role === 'user' || h.role === 'assistant').slice(-20).map(h => ({role: h.role === 'bot' ? 'assistant' : h.role, content: h.content}))
+        history: history.filter(h => (h.role === 'user' || h.role === 'bot') && h.agent === currentAgent).slice(-20).map(h => ({role: h.role === 'bot' ? 'assistant' : h.role, content: h.content}))
       })
     });
     const data = await resp.json();
@@ -4028,10 +4529,11 @@ function renderMessage(role, content, agent, time, scroll=true, modelUsed='') {
   const container = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = 'msg msg-' + (role === 'user' ? 'user' : 'bot');
-  const agentLabel = agent === 'manus' ? 'MANUS' : (agent === 'kim' ? 'KIM' : 'KAI');
+  const agentLabel = agent === 'manus' ? 'KI MANUS' : (agent === 'kim' ? 'KIM' : 'KAI');
   const modelTag = modelUsed ? ` <span style="opacity:.5;font-size:9px">\u00b7 ${modelUsed}</span>` : '';
   const msgIdx = container.children.length;
   div.dataset.msgIdx = msgIdx;
+  div.dataset.agent = agent;
   if (role === 'user') {
     div.innerHTML = `<div class="msg-agent">${agentLabel}</div><div class="bubble">${escapeHtml(content)}</div><div class="msg-time">${time}</div>`;
   } else {
@@ -4042,18 +4544,35 @@ function renderMessage(role, content, agent, time, scroll=true, modelUsed='') {
   }
   container.appendChild(div);
   if (scroll) scrollToBottom();
+  updateMsgCounter();
 }
 
 function deleteMessage(msgEl) {
   if (!msgEl) return;
-  // Animation
-  msgEl.style.transition = 'opacity .3s, transform .3s';
-  msgEl.style.opacity = '0';
-  msgEl.style.transform = 'translateX(50px)';
+  // Paar finden: Wenn Bot-Antwort geloescht wird, auch die User-Frage davor loeschen (und umgekehrt)
+  var partner = null;
+  if (msgEl.classList.contains('msg-bot')) {
+    // Bot-Antwort: vorherige User-Nachricht ist die Frage dazu
+    var prev = msgEl.previousElementSibling;
+    if (prev && prev.classList.contains('msg-user')) partner = prev;
+  } else if (msgEl.classList.contains('msg-user')) {
+    // User-Frage: naechste Bot-Nachricht ist die Antwort dazu
+    var next = msgEl.nextElementSibling;
+    if (next && next.classList.contains('msg-bot')) partner = next;
+  }
+  // Animation fuer beide
+  var toRemove = [msgEl];
+  if (partner) toRemove.push(partner);
+  toRemove.forEach(function(el) {
+    el.style.transition = 'opacity .3s, transform .3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(50px)';
+  });
   setTimeout(function() {
-    msgEl.remove();
+    toRemove.forEach(function(el) { el.remove(); });
     // History aktualisieren - aus DOM neu aufbauen
     rebuildHistoryFromDOM();
+    updateMsgCounter();
   }, 300);
   haptic();
 }
@@ -4066,7 +4585,8 @@ function rebuildHistoryFromDOM() {
       ? (el.querySelector('.bubble') ? el.querySelector('.bubble').textContent : '')
       : (el.dataset.rawContent || '');
     var time = el.querySelector('.msg-time') ? el.querySelector('.msg-time').textContent : '';
-    if (content) history.push({role: role, content: content, agent: currentAgent, time: time});
+    var msgAgent = el.dataset.agent || currentAgent;
+    if (content) history.push({role: role, content: content, agent: msgAgent, time: time});
   });
   saveHistory();
 }
@@ -4888,6 +5408,25 @@ function formatMarkdown(text) {
 function scrollToBottom() { const c = document.getElementById('canvas'); setTimeout(() => c.scrollTop = c.scrollHeight, 50); }
 function saveHistory() { localStorage.setItem('kimanus-history', JSON.stringify(history.slice(-50))); }
 function clearHistory() { history = []; localStorage.removeItem('kimanus-history'); document.getElementById('messages').innerHTML = ''; showHome(); closeSettings(); }
+function clearAgentChat() {
+  var agentName = currentAgent === 'manus' ? 'KI MANUS' : (currentAgent === 'kai' ? 'KAI' : 'KIM');
+  if (!confirm(agentName + '-Chat loeschen?\n\nDas Gedaechtnis bleibt erhalten.')) return;
+  // Nur Nachrichten dieses Agenten aus dem DOM entfernen
+  document.querySelectorAll('#messages .msg').forEach(function(el) {
+    if (el.dataset.agent === currentAgent) {
+      el.style.transition = 'opacity .3s, transform .3s';
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(50px)';
+      setTimeout(function() { el.remove(); }, 300);
+    }
+  });
+  // History nur fuer diesen Agenten loeschen
+  setTimeout(function() {
+    history = history.filter(function(h) { return h.agent !== currentAgent; });
+    saveHistory();
+  }, 350);
+  haptic();
+}
 
 // === PROFIL-BACKUP: Server <-> Handy Sync ===
 async function syncProfile() {
