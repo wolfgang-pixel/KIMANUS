@@ -110,6 +110,14 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   font-size:20px;color:#fff;font-weight:700;letter-spacing:1px;
 }
 #agent-bar .ab-info{flex:1;min-width:0}
+.ab-name-row{display:flex;align-items:center;gap:10px}
+.ab-mode-badge{
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  padding:2px 8px;border-radius:4px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:#888;
+}
+#agent-bar .ab-avatar svg,#ptt-agent-bar .ab-avatar svg{width:28px;height:28px;fill:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 #agent-bar .ab-name{font-size:18px;font-weight:700;letter-spacing:1px}
 #agent-bar .ab-role{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 #agent-bar .ab-status{width:8px;height:8px;border-radius:50%;background:#4caf50;flex-shrink:0;box-shadow:0 0 6px rgba(76,175,80,.5)}
@@ -124,6 +132,150 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 #agent-bar .ab-trash-btn{background:transparent;border:1px solid rgba(230,57,70,.4);box-shadow:none}
 #agent-bar .ab-trash-btn svg{fill:#e63946}
 #agent-bar.expanded .ab-chevron-btn svg{transform:rotate(180deg)}
+/* Hint dot on chevron button */
+.ab-hint-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:#e63946;box-shadow:0 0 6px rgba(230,57,70,.6);animation:hintPulse 2s infinite}
+#agent-bar .ab-chevron-btn{position:relative}
+#agent-bar.expanded .ab-hint-dot{display:none}
+@keyframes hintPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+/* ===== WALKIE-TALKIE SCREEN ===== */
+#ptt-screen{
+  display:none;position:fixed;left:0;right:0;bottom:0;z-index:300;
+  top:var(--ptt-top,70px);
+  flex-direction:column;
+  background:linear-gradient(180deg,#0a0f0a 0%,#0d150d 30%,#0a100a 60%,#080c08 100%);
+}
+#ptt-screen.active{display:flex}
+/* Agent-Bar im PTT (gleicher Style wie Chat) */
+#ptt-agent-bar{
+  flex-shrink:0;display:flex;align-items:center;gap:12px;
+  padding:12px 14px 10px;
+  background:linear-gradient(135deg,rgba(30,30,30,.95),rgba(18,18,18,.98));
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+#ptt-agent-bar .ab-avatar{
+  width:48px;height:48px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 12px rgba(0,0,0,.4);
+  font-size:20px;color:#fff;font-weight:700;letter-spacing:1px;
+}
+#ptt-agent-bar .ab-info{flex:1;min-width:0}
+#ptt-agent-bar .ab-name{font-size:18px;font-weight:700;letter-spacing:1px}
+#ptt-agent-bar .ab-role{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+#ptt-agent-bar .ab-status{width:8px;height:8px;border-radius:50%;background:#4caf50;flex-shrink:0;box-shadow:0 0 6px rgba(76,175,80,.5)}
+#ptt-agent-bar .ab-chevron-btn{
+  width:44px;height:44px;border-radius:10px;flex-shrink:0;
+  background:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.4);
+  transition:all .3s;cursor:pointer;
+}
+#ptt-agent-bar .ab-chevron-btn svg{width:16px;height:16px;fill:#222}
+#ptt-agent-bar .ab-trash-btn{background:transparent;border:1px solid rgba(230,57,70,.4);box-shadow:none}
+#ptt-agent-bar .ab-trash-btn svg{fill:#e63946}
+/* PTT Visitenkarte (gleicher Style wie Chat-Vcard) */
+#ptt-vcard{
+  max-height:0;overflow:hidden;transition:max-height .4s ease, padding .3s ease;
+  background:linear-gradient(160deg,#1a1a1a,#141414);
+  border-bottom:1px solid transparent;
+}
+#ptt-vcard.open{
+  max-height:calc(100vh - 180px);overflow-y:auto;padding:16px 14px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  -webkit-overflow-scrolling:touch;
+}
+/* Home/X Button unten rechts im PTT Screen - gleicher Style wie fab-home */
+#ptt-home{
+  position:fixed;bottom:12px;right:12px;width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(145deg,#3a3a3a,#2a2a2a);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+  color:#888;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10001;
+}
+#ptt-home:active{transform:scale(.9);color:#e63946}
+/* ptt-agent-label und ptt-agent-name nutzen jetzt ab-role und ab-name Styles */
+#ptt-content{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+#ptt-status-text{
+  font-size:14px;color:#5a8;font-family:monospace;letter-spacing:1px;text-align:center;
+  padding:8px 16px;border-radius:8px;
+  background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.15);
+}
+#ptt-transcript{
+  font-size:16px;color:#ccc;text-align:center;min-height:24px;
+  padding:8px 16px;max-width:100%;word-wrap:break-word;
+}
+#ptt-transcript:empty{display:none}
+#ptt-answer-wrap{
+  width:100%;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  position:relative;
+}
+#ptt-answer-wrap:empty{display:none}
+#ptt-answer-wrap.has-answer{display:block}
+#ptt-answer{
+  font-size:15px;color:#e0e0e0;line-height:1.6;text-align:left;
+  padding:14px 14px 40px;width:100%;
+}
+#ptt-answer:empty{display:none}
+#ptt-answer-bar{
+  display:none;position:absolute;bottom:6px;right:8px;
+  gap:8px;align-items:center;
+}
+#ptt-answer-wrap.has-answer #ptt-answer-bar{display:flex}
+#ptt-speak-btn{
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(145deg,#2a2a2a,#333);
+  border:1px solid rgba(255,255,255,.15);
+  color:#4caf50;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);transition:all .2s;
+}
+#ptt-speak-btn:active{transform:scale(.9)}
+#ptt-speak-btn.speaking{color:#e63946;animation:speakPulse 1s infinite}
+#ptt-speak-btn.muted{color:#666}
+@keyframes speakPulse{0%,100%{box-shadow:0 0 4px rgba(230,57,70,.3)}50%{box-shadow:0 0 12px rgba(230,57,70,.6)}}
+#ptt-bottom{
+  text-align:center;padding:16px 0 8px;
+}
+#ptt-btn{
+  width:80px;height:80px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(145deg,#c0392b 0%,#e74c3c 30%,#c0392b 60%,#a93226 100%);
+  color:#fff;
+  box-shadow:0 4px 20px rgba(230,57,70,.4),0 0 40px rgba(230,57,70,.15);
+  transition:all .15s;display:flex;align-items:center;justify-content:center;
+  margin:0 auto;
+}
+#ptt-btn:active{transform:scale(.9)}
+#ptt-btn svg{width:32px;height:32px}
+#ptt-btn.recording{
+  background:linear-gradient(145deg,#ff4444,#cc0000);
+  animation:pttPulse 1s infinite;
+}
+#ptt-btn.thinking{
+  background:linear-gradient(145deg,#2e7d32,#4caf50,#2e7d32);
+  box-shadow:0 0 30px rgba(76,175,80,.4);
+  animation:pttThink 1s infinite;
+}
+#ptt-btn.speaking{
+  background:linear-gradient(145deg,#1565c0,#2196f3,#1565c0);
+  box-shadow:0 0 30px rgba(33,150,243,.4);
+  animation:pttSpeak 0.8s infinite;
+}
+@keyframes pttPulse{0%,100%{box-shadow:0 4px 20px rgba(230,57,70,.4)}50%{box-shadow:0 0 40px rgba(230,57,70,.8)}}
+@keyframes pttThink{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes pttSpeak{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+#ptt-hint{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-top:10px;font-family:monospace}
+/* Mode toggle in input bar */
+#mode-toggle{
+  width:34px;height:34px;border-radius:50%;border:none;
+  background:transparent;color:#666;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+#mode-toggle:active{transform:scale(.9);color:#e63946}
+#mode-toggle.ptt-active{color:#e63946}
 
 /* Visitenkarte (aufklappbar, scrollbar) */
 #agent-vcard{
@@ -454,21 +606,27 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border-top:1px solid rgba(255,255,255,.06);
 }
 #comm-buttons{
-  display:flex;gap:20px;justify-content:center;align-items:flex-end;max-width:320px;margin:0 auto;
+  display:flex;gap:16px;justify-content:center;align-items:center;max-width:320px;margin:0 auto;
 }
-.comm-slot{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
+/* Kleine Modus-Buttons links/rechts */
+.comm-mode-btn{
+  width:44px;height:44px;border-radius:50%;padding:0;cursor:pointer;
+  background:linear-gradient(145deg,#3a3a3a 0%,#2a2a2a 50%,#333 100%);
+  border:2px solid rgba(255,255,255,.1);
+  box-shadow:0 3px 10px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
+  color:#666;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
 }
-.comm-slot-side .comm-btn{
-  width:56px;height:56px;border-radius:14px;
-  padding:0;
+.comm-mode-btn svg{width:20px;height:20px;fill:currentColor}
+.comm-mode-btn:active{transform:scale(.9)}
+.comm-mode-btn.active{
+  border-color:#4caf50;color:#4caf50;
+  box-shadow:0 0 12px rgba(76,175,80,.3),0 3px 10px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
 }
-.comm-slot-side .comm-btn svg{
-  width:28px;height:28px;
-}
-.comm-slot-center .comm-btn{
-  width:72px;height:72px;border-radius:50%;
-  padding:0;
+/* Grosser roter Action-Button Mitte */
+.comm-action{
+  width:72px;height:72px;border-radius:50%;padding:0;cursor:pointer;
   background:linear-gradient(145deg,#c0392b 0%,#e74c3c 30%,#c0392b 60%,#a93226 100%);
   border:2px solid rgba(255,255,255,.2);
   box-shadow:
@@ -477,48 +635,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     inset 0 1px 0 rgba(255,255,255,.3),
     inset 0 -2px 0 rgba(0,0,0,.3);
   color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
 }
-.comm-slot-center .comm-btn:active{
+.comm-action:active{
   transform:scale(.9);
   background:linear-gradient(145deg,#a93226 0%,#c0392b 50%,#922b21 100%);
   box-shadow:0 1px 6px rgba(231,76,60,.3),inset 0 2px 6px rgba(0,0,0,.4);
-}
-.comm-slot-center .comm-btn svg{
-  width:36px;height:36px;
-}
-.comm-btn{
-  padding:14px 4px;border-radius:14px;
-  background:linear-gradient(145deg,#4a4a4a 0%,#404040 10%,#383838 25%,#2e2e2e 50%,#282828 75%,#2a2a2a 90%,#333 100%);
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:
-    0 4px 12px rgba(0,0,0,.5),
-    0 2px 4px rgba(0,0,0,.3),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -1px 0 rgba(0,0,0,.4),
-    inset 0 0 8px rgba(0,0,0,.15);
-  color:#aaa;
-  cursor:pointer;display:flex;
-  align-items:center;justify-content:center;
-  transition:all .15s;
-}
-.comm-btn svg{
-  width:36px;height:36px;fill:currentColor;
-  filter:drop-shadow(1px 2px 3px rgba(0,0,0,.6));
-}
-.comm-btn:active{
-  transform:scale(.93);
-  background:linear-gradient(145deg,#333 0%,#2a2a2a 40%,#252525 100%);
-  box-shadow:0 1px 4px rgba(0,0,0,.4),inset 0 2px 6px rgba(0,0,0,.4);
-  color:#e63946;
-}
-.comm-label{
-  font-size:11px;font-weight:700;letter-spacing:.8px;
-  color:#888;text-transform:uppercase;
-  text-shadow:0 1px 2px rgba(0,0,0,.5);
-  font-family:inherit;
-}
-.comm-slot-center .comm-label{
-  color:#e74c3c;font-size:12px;
 }
 /* Wallet Container Styling */
 .mini-dock[data-dock="wallet"]{
@@ -817,7 +940,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
    INPUT BAR
    ========================================= */
 #input-bar{display:none;flex-shrink:0;padding:4px 6px 6px}
-#input-bar.active{display:block}
+#input-bar.active{display:block !important}
 .input-bar-frame{
   display:flex;align-items:flex-end;gap:6px;padding:6px 8px;
   background:linear-gradient(180deg,#2a2a2a 0%,#222 100%);
@@ -861,16 +984,17 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 input,textarea,[contenteditable]{color-scheme:dark !important}
 /* Zurueck-Button (Floating, unten rechts) */
 #fab-home{
-  display:none;position:fixed;bottom:2px;right:2px;z-index:999;
-  width:28px;height:28px;border-radius:8px;border:none;cursor:pointer;
-  background:linear-gradient(135deg,#e63946,#8b0000);
-  color:#fff;opacity:.55;
-  box-shadow:0 2px 6px rgba(230,57,70,.25),0 1px 3px rgba(0,0,0,.3);
+  display:none;position:fixed;bottom:96px;right:8px;z-index:999;
+  width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(145deg,#3a3a3a,#2a2a2a);
+  border:1px solid rgba(255,255,255,.15);
+  color:#888;
+  box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
   align-items:center;justify-content:center;
-  transition:transform .15s,opacity .2s;
+  transition:transform .15s;
 }
-#fab-home:active{transform:scale(.9);opacity:1}
-#fab-home svg{width:12px;height:12px}
+#fab-home:active{transform:scale(.9);color:#e63946}
+#fab-home svg{width:16px;height:16px}
 #fab-home.visible{display:flex}
 #chat-input:empty::before,#chat-input.is-empty::before{content:attr(data-placeholder);color:#555;font-size:14px;pointer-events:none}
 /* Mic button inside input wrap */
@@ -1159,14 +1283,14 @@ input,textarea,[contenteditable]{color-scheme:dark !important}
 
   <!-- AGENT BAR (immer sichtbar, zeigt aktiven Agenten) -->
   <div id="agent-bar" onclick="toggleAgentCard()">
-    <div class="ab-avatar" id="ab-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff3d7f)">K</div>
+    <div class="ab-avatar" id="ab-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff3d7f)"></div>
     <div class="ab-info">
-      <div class="ab-name" id="ab-name" style="color:#ff6b9d">KIM</div>
-      <div class="ab-role" id="ab-role">Deine pers&ouml;nliche Assistentin</div>
+      <div class="ab-name-row"><span class="ab-name" id="ab-name" style="color:#ff6b9d">KIM</span><span class="ab-mode-badge" id="ab-mode-badge">CHAT</span></div>
+      <div class="ab-role" id="ab-role">Dein pers&ouml;nlicher Assistent</div>
     </div>
     <div class="ab-status"></div>
     <div class="ab-chevron-btn ab-trash-btn" onclick="event.stopPropagation();clearAgentChat()" title="Chat dieses Agenten loeschen"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
-    <div class="ab-chevron-btn" title="Visitenkarte aufklappen"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+    <div class="ab-chevron-btn" title="Visitenkarte aufklappen"><span class="ab-hint-dot"></span><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
   </div>
 
   <!-- AGENT VISITENKARTE (aufklappbar) -->
@@ -1299,7 +1423,7 @@ input,textarea,[contenteditable]{color-scheme:dark !important}
     </div>
     <div class="ch-info">
       <div class="ch-name" id="ch-agent-name">KIM</div>
-      <div class="ch-status" id="ch-agent-status">Deine pers&ouml;nliche Assistentin</div>
+      <div class="ch-status" id="ch-agent-status">Dein pers&ouml;nlicher Assistent</div>
     </div>
   </div>
 
@@ -1640,26 +1764,70 @@ input,textarea,[contenteditable]{color-scheme:dark !important}
       <button id="cam-btn" onclick="handleCamBtn()" title="Kamera">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
       </button>
+      <!-- PTT Button jetzt im Comm-Bar auf der Hauptseite -->
       <button id="send-btn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
   </div>
 
+  <!-- WALKIE-TALKIE VOLLBILD -->
+  <div id="ptt-screen">
+    <!-- Agent-Bar wie im Chat -->
+    <div id="ptt-agent-bar">
+      <div class="ab-avatar" id="ptt-ab-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff3d7f)"></div>
+      <div class="ab-info">
+        <div class="ab-name-row"><span class="ab-name" id="ptt-agent-name" style="color:#ff6b9d">KIM</span><span class="ab-mode-badge" id="ptt-mode-badge">FUNK</span></div>
+        <div class="ab-role" id="ptt-agent-label">Dein pers&ouml;nlicher Assistent</div>
+      </div>
+      <div class="ab-status" id="ptt-ab-status"></div>
+      <div class="ab-chevron-btn ab-trash-btn" onclick="event.stopPropagation();clearPTTHistory()" title="Funk-Verlauf loeschen"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
+      <div class="ab-chevron-btn" onclick="event.stopPropagation();togglePTTSettings()" title="Einstellungen"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></div>
+    </div>
+    <div id="ptt-vcard">
+      <div id="ptt-vcard-content"></div>
+    </div>
+    <div id="ptt-content">
+      <div id="ptt-status-text">Roten Button halten zum Sprechen</div>
+      <div id="ptt-transcript"></div>
+      <div id="ptt-answer-wrap">
+        <div id="ptt-answer"></div>
+        <div id="ptt-answer-bar">
+          <button id="ptt-speak-btn" onclick="pttToggleSpeak()" title="Antwort vorlesen">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="ptt-bottom">
+      <button id="ptt-btn" onmousedown="pttStart()" onmouseup="pttStop()" ontouchstart="pttStart();event.preventDefault()" ontouchend="pttStop();event.preventDefault()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      </button>
+      <div id="ptt-hint">Halten zum Sprechen</div>
+    </div>
+    <!-- Home/Zurueck Button unten rechts (wie auf allen Seiten) -->
+    <button id="ptt-home" onclick="closePTTScreen()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
+
   <!-- ZURUECK-BUTTON (fest unten rechts, nur in Unterseiten sichtbar) -->
-  <button id="fab-home" onclick="showHome()" title="Zur&uuml;ck zum Hauptmen&uuml;">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+  <button id="fab-home" onclick="showHome()" title="Zur&uuml;ck">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
   </button>
 
   <!-- COMMUNICATION BAR (fixed bottom) -->
   <div id="comm-bar">
     <div id="comm-buttons">
-      <div class="comm-slot comm-slot-center">
-        <button class="comm-btn" onclick="openAgentPicker('chat')">
-          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        </button>
-        <div class="comm-label">Chat</div>
-      </div>
+      <button id="comm-mode-funk" class="comm-mode-btn" onclick="setCommMode('funk')" title="Walkie-Talkie">
+        <!-- Walkie-Talkie Icon -->
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 2h2v4h-2zM6.5 6.5l1.42 1.42L6.5 9.34 5.08 7.92zM17.5 6.5l1.42 1.42-1.42 1.42-1.42-1.42zM12 8a4 4 0 0 0-4 4v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-5a4 4 0 0 0-4-4zm-1 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm-1 3h4v1h-4v-1zm0 2h4v1h-4v-1z"/></svg>
+      </button>
+      <button id="comm-action-btn" class="comm-action" onclick="commAction()">
+        <!-- Papierflieger (Chat-Standard) -->
+        <svg id="comm-action-icon" viewBox="0 0 24 24" fill="currentColor" style="width:36px;height:36px"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+      <div id="comm-mode-indicator" style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:9px;color:#888;letter-spacing:1px;text-transform:uppercase"></div>
     </div>
   </div>
 
@@ -1670,17 +1838,15 @@ input,textarea,[contenteditable]{color-scheme:dark !important}
 
     <div class="agent-card-pick" data-agent="kim" onclick="pickAgent('kim')">
       <div class="agent-avatar" style="background:linear-gradient(135deg,#ff6b9d,#ff3d7f)">
-        <!-- Weibliche Silhouette -->
+        <!-- Neutrale Silhouette -->
         <svg width="48" height="48" viewBox="0 0 100 100" fill="rgba(255,255,255,.9)">
           <circle cx="50" cy="30" r="16"/>
-          <path d="M50 14c-9 0-16 7-16 16s7 16 16 16 16-7 16-16-7-16-16-16z"/>
-          <path d="M34 28c-2 8 0 18 4 22-6 2-10 4-10 4l6 8c4-2 10-4 16-4s12 2 16 4l6-8s-4-2-10-4c4-4 6-14 4-22"/>
-          <ellipse cx="50" cy="76" rx="26" ry="18"/>
+          <ellipse cx="50" cy="72" rx="24" ry="20"/>
         </svg>
       </div>
       <div class="agent-pick-info">
         <div class="vk-name" style="color:#ff6b9d">KIM</div>
-        <div class="vk-role">Deine pers&ouml;nliche Assistentin</div>
+        <div class="vk-role" id="kim-pick-role">Deine pers&ouml;nliche Assistentin</div>
       </div>
       <button class="agent-info-btn" onclick="event.stopPropagation();showAgentInfo('kim')">&#x2139;</button>
     </div>
@@ -1696,7 +1862,7 @@ input,textarea,[contenteditable]{color-scheme:dark !important}
       </div>
       <div class="agent-pick-info">
         <div class="vk-name" style="color:#4a9eff">KAI</div>
-        <div class="vk-role">Dein pers&ouml;nlicher Assistent</div>
+        <div class="vk-role">Dein Business-Berater</div>
       </div>
       <button class="agent-info-btn" onclick="event.stopPropagation();showAgentInfo('kai')">&#x2139;</button>
     </div>
@@ -1891,6 +2057,48 @@ let ttsEnabled = false; // TTS nur noch per Button pro Nachricht
 let voiceKai = localStorage.getItem('kimanus-voice-kai') || 'onyx';
 let voiceKim = localStorage.getItem('kimanus-voice-kim') || 'nova';
 
+// Weibliche Stimmen (fuer Geschlechts-Erkennung)
+// OpenAI + Edge TTS Namen + ElevenLabs IDs
+const femaleVoices = ['nova','shimmer','coral','sage','marin','de-DE-SeraphinaMultilingualNeural','de-DE-KatjaNeural','de-DE-AmalaNeural','MGG5Irb57ATHvyIeTEYo','5Aahq892EEb6MdNwMM3p','EXAVITQu4vr4xnSDxMaL','21m00Tcm4TlvDq8ikWAM'];
+
+function isKimFemale() {
+  // Pruefe ElevenLabs Stimme (Visitenkarte)
+  var elevenVoice = localStorage.getItem('kimanus-voice-11-kim') || '';
+  if (elevenVoice) return femaleVoices.includes(elevenVoice);
+  // Fallback: OpenAI/Edge Stimme (Einstellungen)
+  return femaleVoices.includes(voiceKim);
+}
+
+function getKimGenderLabel() {
+  return isKimFemale() ? 'Deine pers\u00f6nliche Assistentin' : 'Dein pers\u00f6nlicher Assistent';
+}
+
+// SVG Profil-Icons fuer Avatar (maennlich/weiblich)
+function getAvatarSVG(agent) {
+  if (agent === 'kai') {
+    // Business-Profil (Anzug-Silhouette)
+    return '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+  }
+  if (agent === 'manus') {
+    return '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+  }
+  // KIM: maennlich oder weiblich
+  if (isKimFemale()) {
+    // Weibliches Profil - runder Kopf, Haare laenger
+    return '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4 0-8 2-8 4v2h16v-2c0-2-4-4-8-4z"/><path d="M7.5 7c0-3.5 2-6 4.5-6s4.5 2.5 4.5 6c0 0-.5-3-4.5-3S7.5 7 7.5 7z" opacity=".3"/></svg>';
+  } else {
+    // Maennliches Profil - Standard-Silhouette
+    return '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+  }
+}
+
+function updateAvatarIcons() {
+  var chatAvatar = document.getElementById('ab-avatar');
+  var pttAvatar = document.getElementById('ptt-ab-avatar');
+  if (chatAvatar) chatAvatar.innerHTML = getAvatarSVG(currentAgent);
+  if (pttAvatar) pttAvatar.innerHTML = getAvatarSVG(currentAgent);
+}
+
 function getSelectedVoice() {
   return currentAgent === 'kim' ? voiceKim : voiceKai;
 }
@@ -1900,6 +2108,8 @@ function saveVoiceSetting() {
   voiceKim = document.getElementById('setting-voice-kim').value;
   localStorage.setItem('kimanus-voice-kai', voiceKai);
   localStorage.setItem('kimanus-voice-kim', voiceKim);
+  // Labels an Geschlecht anpassen wenn KIM aktiv
+  if (currentAgent === 'kim') updateChatHeader('kim');
 }
 
 function loadVoiceSettings() {
@@ -1960,6 +2170,8 @@ window.addEventListener('DOMContentLoaded', () => {
   if (ttsBtn) ttsBtn.classList.toggle('active', ttsEnabled);
   // Stimmen-Einstellungen laden
   loadVoiceSettings();
+  // Avatar-Icons initial setzen (nach Voice-Settings geladen)
+  updateAvatarIcons();
   // iOS Keyboard Fix: Header + Agent-Bar oben halten wenn Tastatur aufgeht
   if (window.visualViewport) {
     var appEl = document.getElementById('app');
@@ -1982,28 +2194,34 @@ function getInputText() {
 function setInputText(text) {
   const el = document.getElementById('chat-input');
   if (!text) {
-    // iOS Safari: Native Editing-Commands sind zuverlaessiger als DOM-Manipulation
-    el.focus();
-    if (document.queryCommandSupported && document.queryCommandSupported('selectAll')) {
+    // Aggressiv leeren - alle Methoden gleichzeitig
+    try {
+      el.focus();
       document.execCommand('selectAll', false, null);
       document.execCommand('delete', false, null);
-    }
-    // Zusaetzlich DOM direkt aufraeumen
+    } catch(e) {}
     el.innerHTML = '';
     el.textContent = '';
+    el.innerText = '';
     while (el.firstChild) el.removeChild(el.firstChild);
-    // Placeholder-Klasse erzwingen falls :empty nicht greift
     el.classList.add('is-empty');
-    // Nochmal nach kurzem Delay sicherstellen (iOS Rendering-Cycle)
+    // Doppelt sicherstellen nach Render-Cycle (iOS + Android)
     setTimeout(function() {
-      if (el.textContent.trim() || el.innerHTML.replace(/<br\s*\/?>/gi,'').trim()) {
-        el.innerHTML = '';
-        el.textContent = '';
-        while (el.firstChild) el.removeChild(el.firstChild);
-      }
+      el.innerHTML = '';
+      el.textContent = '';
+      el.innerText = '';
+      while (el.firstChild) el.removeChild(el.firstChild);
       el.classList.add('is-empty');
       el.blur();
-    }, 50);
+    }, 30);
+    // Dritter Versuch fuer hartnaeckige Browser
+    setTimeout(function() {
+      if (el.textContent.trim()) {
+        el.innerHTML = '';
+        el.textContent = '';
+        el.classList.add('is-empty');
+      }
+    }, 150);
   } else {
     el.textContent = text;
     el.classList.remove('is-empty');
@@ -2847,6 +3065,525 @@ function handleCamBtn() {
   fileInput.click();
 }
 
+// ===== KOMMUNIKATIONSMODUS (Chat / Funk) =====
+var commMode = 'chat';
+var pttRecognition = null;
+var pttTranscript = '';
+var pttIsRecording = false;
+var pttBusy = false;
+var pttGen = 0; // Generation: alte Timeouts ignorieren
+
+function setCommMode(mode) {
+  commMode = mode;
+  document.getElementById('comm-mode-funk').classList.toggle('active', mode === 'funk');
+  haptic();
+  if (mode === 'funk') {
+    openPTTScreen();
+  } else {
+    closePTTScreen();
+    // Zurueck zum Chat
+    openAgentPicker('chat');
+  }
+}
+
+function commAction() {
+  if (commMode === 'chat') {
+    openAgentPicker('chat');
+  }
+  // Im Funk-Modus macht der rote Button nichts bei Click
+  // (PTT ist auf dem ptt-btn im Screen)
+}
+
+function openPTTScreen() {
+  var screen = document.getElementById('ptt-screen');
+  // Header-Hoehe messen damit PTT darunter startet
+  var header = document.getElementById('header');
+  if (header) {
+    var hh = header.getBoundingClientRect().bottom;
+    screen.style.setProperty('--ptt-top', hh + 'px');
+  }
+  screen.classList.add('active');
+  var agentColors = {kim:'#ff6b9d', kai:'#ff8c00', manus:'#2196f3'};
+  var agentNames = {kim:'KIM', kai:'KAI', manus:'KI MANUS'};
+  var agentBgs = {kim:'linear-gradient(135deg,#ff6b9d,#ff3d7f)', kai:'linear-gradient(135deg,#ff8c00,#e67300)', manus:'linear-gradient(135deg,#2196f3,#1565c0)'};
+  var agentLetters = {kim:'K', kai:'KA', manus:'M'};
+  var agentRoles = {kim: isKimFemale() ? 'Deine pers\u00f6nliche Assistentin' : 'Dein pers\u00f6nlicher Assistent', kai: 'Dein Business-Berater', manus: 'Dein Premium Agent'};
+  document.getElementById('ptt-agent-name').textContent = agentNames[currentAgent] || 'KIM';
+  document.getElementById('ptt-agent-name').style.color = agentColors[currentAgent] || '#ff6b9d';
+  document.getElementById('ptt-agent-label').textContent = agentRoles[currentAgent] || agentRoles.kim;
+  document.getElementById('ptt-ab-avatar').innerHTML = getAvatarSVG(currentAgent);
+  document.getElementById('ptt-ab-avatar').style.background = agentBgs[currentAgent] || agentBgs.kim;
+  var pttBadge = document.getElementById('ptt-mode-badge');
+  if (pttBadge) pttBadge.textContent = 'FUNK';
+  document.getElementById('ptt-status-text').textContent = 'Roten Button halten zum Sprechen';
+  document.getElementById('ptt-transcript').textContent = '';
+  pttClearAnswer();
+  document.getElementById('ptt-btn').className = '';
+  haptic();
+}
+
+function closePTTScreen() {
+  if (pttIsRecording) pttStop();
+  // PTT Visitenkarte schliessen falls offen
+  var pttVcard = document.getElementById('ptt-vcard');
+  if (pttVcard) pttVcard.classList.remove('open');
+  document.getElementById('ptt-screen').classList.remove('active');
+  commMode = 'chat';
+  document.getElementById('comm-mode-funk').classList.remove('active');
+  // Chat-Nachrichten neu rendern (Funk-Nachrichten synchronisieren)
+  reRenderChat();
+  haptic();
+}
+
+function reRenderChat() {
+  var container = document.getElementById('messages');
+  if (!container) return;
+  container.innerHTML = '';
+  history.forEach(function(m) {
+    renderMessage(m.role, m.content, m.agent, m.time, false, m.model || '');
+  });
+  scrollToBottom();
+}
+
+function clearPTTHistory() {
+  document.getElementById('ptt-transcript').textContent = '';
+  pttClearAnswer();
+  document.getElementById('ptt-status-text').textContent = 'Roten Button halten zum Sprechen';
+  pttReady();
+  haptic();
+}
+
+function togglePTTSettings() {
+  var vcard = document.getElementById('ptt-vcard');
+  if (!vcard) return;
+  var isOpen = vcard.classList.contains('open');
+  if (isOpen) {
+    vcard.classList.remove('open');
+  } else {
+    // Gleiche Visitenkarte rendern wie im Chat
+    renderAgentCard(currentAgent, 'ptt-vcard-content');
+    vcard.classList.add('open');
+  }
+  haptic();
+}
+
+// Audio-Element fuer PTT-Antwort
+var pttAudioEl = null;
+
+function pttClearAnswer() {
+  document.getElementById('ptt-answer').textContent = '';
+  var wrap = document.getElementById('ptt-answer-wrap');
+  if (wrap) wrap.classList.remove('has-answer');
+  window.pttLastAnswer = '';
+  var speakBtn = document.getElementById('ptt-speak-btn');
+  if (speakBtn) speakBtn.classList.remove('speaking');
+}
+
+function pttReady() {
+  pttBusy = false;
+  pttIsRecording = false;
+  var btn = document.getElementById('ptt-btn');
+  if (btn) {
+    btn.classList.remove('recording','thinking','speaking');
+  }
+  document.getElementById('ptt-status-text').textContent = 'Erneut halten zum Sprechen';
+  document.getElementById('ptt-hint').textContent = 'Halten zum Sprechen';
+  // Agent-Bar Status - Rolle anzeigen wie im Chat
+  var label = document.getElementById('ptt-agent-label');
+  var pttRoles = {kim: isKimFemale() ? 'Deine pers\u00f6nliche Assistentin' : 'Dein pers\u00f6nlicher Assistent', kai: 'Dein Business-Berater', manus: 'Dein Premium Agent'};
+  if (label) label.textContent = pttRoles[currentAgent] || pttRoles.kim;
+  var dot = document.getElementById('ptt-ab-status');
+  if (dot) { dot.style.background = '#4caf50'; dot.style.boxShadow = '0 0 6px rgba(76,175,80,.5)'; }
+}
+
+function pttStart() {
+  if (pttIsRecording) return;
+  // Falls vorherige Antwort noch laeuft: sofort stoppen und freigeben
+  if (pttBusy) {
+    console.log('PTT: vorherige Sitzung noch aktiv - wird zurueckgesetzt');
+    if (pttAudioEl) { try { pttAudioEl.pause(); pttAudioEl.src = ''; } catch(e){} }
+    pttBusy = false;
+    var btn2 = document.getElementById('ptt-btn');
+    if (btn2) btn2.classList.remove('recording','thinking','speaking');
+  }
+  pttIsRecording = true;
+  pttTranscript = '';
+  pttGen++; // Neue Generation - alte Timeouts werden ignoriert
+  // Alte Recognition sauber stoppen falls noch vorhanden
+  if (pttRecognition) {
+    try { pttRecognition.onend = null; pttRecognition.stop(); } catch(e){}
+    pttRecognition = null;
+  }
+
+  var btn = document.getElementById('ptt-btn');
+  btn.classList.add('recording');
+  document.getElementById('ptt-status-text').textContent = '\uD83C\uDF99\uFE0F Mikrofon wird gestartet...';
+  document.getElementById('ptt-transcript').textContent = '';
+  pttClearAnswer();
+  document.getElementById('ptt-hint').textContent = 'Loslassen zum Senden';
+  // Agent-Bar Status-Punkt rot faerben (Aufnahme)
+  var dot = document.getElementById('ptt-ab-status');
+  if (dot) { dot.style.background = '#e63946'; dot.style.boxShadow = '0 0 6px rgba(230,57,70,.5)'; }
+  haptic();
+
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('ptt-status-text').textContent = '\u274C Spracheingabe nicht unterst\u00fctzt in diesem Browser';
+    pttIsRecording = false;
+    btn.classList.remove('recording');
+    return;
+  }
+  var isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+  // Gesammelte Teile ueber Safari-Neustarts hinweg
+  var pttParts = [];
+  var pttCurrentInterim = '';
+
+  function createRecognition() {
+    var rec = new SpeechRecognition();
+    rec.lang = 'de-DE';
+    rec.continuous = !isSafari;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = function() {
+      console.log('PTT Recognition gestartet');
+      document.getElementById('ptt-status-text').textContent = '\uD83D\uDD34 Spreche jetzt...';
+      // Kurzes Vibrations-Feedback: Mikro ist bereit!
+      if (navigator.vibrate) navigator.vibrate(50);
+    };
+
+    rec.onaudiostart = function() {
+      console.log('PTT Audio-Aufnahme aktiv');
+    };
+
+    rec.onresult = function(e) {
+      // Finalisierte + Interim-Ergebnisse sammeln
+      var finalText = '';
+      var interimText = '';
+      for (var i = 0; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          finalText += e.results[i][0].transcript;
+        } else {
+          interimText += e.results[i][0].transcript;
+        }
+      }
+      // Finalisierte Teile speichern
+      if (finalText) {
+        // Bei Safari-Neustart: vorherige Parts + neues Final
+        pttCurrentInterim = '';
+        // Nur hinzufuegen wenn nicht schon drin (Safari sendet manchmal doppelt)
+        var combined = pttParts.join(' ') + ' ' + finalText;
+        pttParts = [combined.trim()];
+      }
+      pttCurrentInterim = interimText;
+      // Anzeige: alle bisherigen Parts + aktuelles Interim
+      var display = (pttParts.join(' ') + ' ' + pttCurrentInterim).trim();
+      pttTranscript = display;
+      document.getElementById('ptt-transcript').textContent = display || '...';
+    };
+
+    rec.onend = function() {
+      console.log('PTT Recognition ended, still recording:', pttIsRecording);
+      // Safari stoppt automatisch nach jeder Phrase
+      if (pttIsRecording) {
+        // Finales Ergebnis sichern bevor Neustart
+        if (pttCurrentInterim) {
+          pttParts.push(pttCurrentInterim);
+          pttCurrentInterim = '';
+          pttTranscript = pttParts.join(' ').trim();
+        }
+        // Neu starten (Safari braucht kurze Pause)
+        setTimeout(function() {
+          if (pttIsRecording) {
+            try {
+              var newRec = createRecognition();
+              pttRecognition = newRec;
+              newRec.start();
+            } catch(e) { console.warn('PTT restart failed:', e); }
+          }
+        }, 100);
+      }
+    };
+
+    rec.onerror = function(e) {
+      console.log('PTT error:', e.error);
+      if (e.error === 'not-allowed') {
+        document.getElementById('ptt-status-text').textContent = '\u274C Mikrofon-Zugriff verweigert. Bitte in Einstellungen erlauben.';
+        pttIsRecording = false;
+        btn.classList.remove('recording');
+      } else if (e.error === 'no-speech') {
+        // Nicht abbrechen! Einfach weiterlaufen lassen - User spricht vielleicht gleich
+        console.log('PTT: no-speech, weiter lauschen...');
+      } else if (e.error === 'aborted') {
+        // Normal beim Stoppen - ignorieren
+      } else {
+        console.warn('PTT Speech error:', e.error);
+      }
+    };
+
+    return rec;
+  }
+
+  try {
+    pttRecognition = createRecognition();
+    pttRecognition.start();
+  } catch(e) {
+    console.warn('PTT erster Start fehlgeschlagen, versuche nochmal:', e);
+    // iOS braucht manchmal einen zweiten Versuch
+    setTimeout(function() {
+      if (!pttIsRecording) return;
+      try {
+        pttRecognition = createRecognition();
+        pttRecognition.start();
+      } catch(e2) {
+        document.getElementById('ptt-status-text').textContent = '\u274C Spracherkennung nicht verfuegbar';
+        pttIsRecording = false;
+        btn.classList.remove('recording');
+      }
+    }, 300);
+  }
+}
+
+function pttStop() {
+  if (!pttIsRecording) return;
+  pttIsRecording = false;
+  var btn = document.getElementById('ptt-btn');
+  btn.classList.remove('recording');
+  document.getElementById('ptt-hint').textContent = 'Wird verarbeitet...';
+  document.getElementById('ptt-status-text').textContent = '\u23F3 Erkenne Sprache...';
+  haptic();
+
+  // iOS Audio-Unlock JETZT beim Loslassen (touchend = User-Gesture)
+  // Mikrofon ist jetzt fertig, also kann Audio-Session sicher gewechselt werden
+  pttAudioEl = new Audio();
+  pttAudioEl.src = 'data:audio/mp3;base64,/+NIxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVV/+NIxAsAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+  pttAudioEl.play().then(function(){ pttAudioEl.pause(); }).catch(function(){});
+
+  // Recognition stoppen - aber WARTEN auf letzte Ergebnisse
+  var stopRec = pttRecognition;
+  if (stopRec) {
+    try { stopRec.onend = null; stopRec.stop(); } catch(e) {}
+  }
+
+  // Generation merken - wenn pttStart inzwischen nochmal aufgerufen wird, ignorieren
+  var myGen = pttGen;
+
+  // Warten damit letzte Ergebnisse noch ankommen (besonders auf iOS)
+  setTimeout(function() {
+    // Pruefen ob inzwischen eine neue Aufnahme gestartet wurde
+    if (myGen !== pttGen) return; // Veraltet - ignorieren!
+
+    pttRecognition = null;
+    var msg = pttTranscript.trim();
+    if (!msg) {
+      document.getElementById('ptt-status-text').textContent = 'Nichts erkannt \u2013 Button halten & laut sprechen';
+      document.getElementById('ptt-hint').textContent = 'Halten zum Sprechen';
+      pttBusy = false;
+      return;
+    }
+    document.getElementById('ptt-status-text').textContent = '\uD83D\uDCE4 Sende: ' + msg.substring(0, 40) + '...';
+    pttSendMessage(msg);
+  }, 1200);
+}
+
+async function pttSendMessage(msg) {
+  pttBusy = true;
+  var btn = document.getElementById('ptt-btn');
+  var deviceToken = localStorage.getItem('kimanus-device-token') || 'default';
+  var userName = localStorage.getItem('kimanus-username') || '';
+  var agentName = currentAgent === 'kai' ? 'KAI' : currentAgent === 'manus' ? 'KI MANUS' : 'KIM';
+
+  btn.classList.add('thinking');
+  document.getElementById('ptt-status-text').textContent = '\uD83D\uDCA1 ' + agentName + ' denkt nach...';
+  document.getElementById('ptt-transcript').textContent = '\u00BB ' + msg + ' \u00AB';
+  pttClearAnswer();
+
+  // In Chat-Verlauf speichern (ohne renderMessage - Chat ist nicht sichtbar)
+  var now = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+  history.push({role:'user', content:msg, agent:currentAgent, time:now});
+  saveHistory();
+
+  var webhookUrl = currentAgent === 'manus'
+    ? 'https://manus.kimanus.de/webhook/manus-ki'
+    : currentAgent === 'kai'
+    ? 'https://manus.kimanus.de/webhook/kai'
+    : 'https://manus.kimanus.de/webhook/kim';
+
+  try {
+    var resp = await fetch(webhookUrl, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: msg,
+        agent: currentAgent,
+        session: deviceToken,
+        model: agentModels[currentAgent] || (currentAgent === 'kim' ? 'groq-llama' : 'deepseek'),
+        user_profile: { name: userName, tone: 'locker' },
+        history: history.filter(function(h){ return (h.role === 'user' || h.role === 'bot') && h.agent === currentAgent; }).slice(-20).map(function(h){ return {role: h.role === 'bot' ? 'assistant' : h.role, content: h.content}; })
+      })
+    });
+
+    if (!resp.ok) {
+      throw new Error('Server-Fehler: ' + resp.status);
+    }
+
+    // Antwort-Text holen - erst als Text, dann JSON parsen (sicherer)
+    var respText = await resp.text();
+    var data;
+    try {
+      data = JSON.parse(respText);
+    } catch(parseErr) {
+      // Falls kein JSON: Klartext als Antwort nehmen
+      data = { output: respText };
+    }
+
+    var answer = data.output || data.response || data.answer || 'Keine Antwort erhalten.';
+    var modelUsed = data.model_name || data.model || '';
+
+    // Antwort anzeigen auf dem PTT-Screen
+    var cleanAnswer = answer
+      .replace(/\[MEMORY_UPDATE\][\s\S]*?\[\/MEMORY_UPDATE\]/g, '')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')   // **fett** → fett
+      .replace(/\*([^*]+)\*/g, '$1')        // *kursiv* → kursiv
+      .replace(/__([^_]+)__/g, '$1')        // __fett__ → fett
+      .replace(/_([^_]+)_/g, '$1')          // _kursiv_ → kursiv
+      .replace(/#{1,3}\s?/g, '')            // ### Ueberschriften → entfernen
+      .replace(/`([^`]+)`/g, '$1')          // `code` → code
+      .replace(/~~/g, '')                   // ~~durchgestrichen~~
+      .trim();
+    document.getElementById('ptt-answer').textContent = cleanAnswer;
+    // Answer-Wrap sichtbar machen + Speaker-Button zeigen
+    var wrap = document.getElementById('ptt-answer-wrap');
+    if (wrap) wrap.classList.add('has-answer');
+    // Letzten Antworttext merken fuer Speaker-Button
+    window.pttLastAnswer = cleanAnswer;
+    window.pttLastAgent = currentAgent;
+
+    // In Chat-Verlauf speichern
+    var ansTime = new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+    history.push({role:'bot', content:answer, agent:currentAgent, time:ansTime, model:modelUsed});
+    saveHistory();
+
+    if (data.memory_snapshot) {
+      localStorage.setItem('kimanus-memory-' + (data.session || deviceToken), JSON.stringify(data.memory_snapshot));
+    }
+
+    // Fertig - sofort bereit fuer naechste Frage
+    btn.classList.remove('thinking');
+    // Auto-Speak wenn aktiviert, sonst nur Text anzeigen
+    if (localStorage.getItem('kimanus-ptt-autospeak') === '1') {
+      btn.classList.add('speaking');
+      document.getElementById('ptt-status-text').textContent = '\uD83D\uDD0A ' + agentName + ' spricht...';
+      var speakBtn = document.getElementById('ptt-speak-btn');
+      if (speakBtn) speakBtn.classList.add('speaking');
+      pttSpeak(cleanAnswer, currentAgent, function() {
+        if (speakBtn) speakBtn.classList.remove('speaking');
+        pttReady();
+      });
+      setTimeout(function() { if (pttBusy) pttReady(); }, 20000);
+    } else {
+      document.getElementById('ptt-status-text').textContent = '\uD83D\uDD0A Antippen zum Anh\u00f6ren';
+      pttReady();
+    }
+
+  } catch(err) {
+    console.error('PTT Fehler:', err);
+    document.getElementById('ptt-status-text').textContent = 'Verbindungsfehler \u2013 nochmal versuchen';
+    document.getElementById('ptt-answer').textContent = err.message || String(err);
+    btn.classList.remove('thinking');
+    // WICHTIG: sofort freigeben damit naechster Versuch moeglich
+    pttBusy = false;
+    pttIsRecording = false;
+  }
+}
+
+function pttSpeak(text, agent, onDone) {
+  var cleanText = text.replace(/\[MEMORY_UPDATE\][\s\S]*?\[\/MEMORY_UPDATE\]/g, '').replace(/[*#_`]/g, '').trim();
+  if (!cleanText) { if (onDone) onDone(); return; }
+
+  // Voice-ID holen (ElevenLabs-Voice aus Visitenkarte oder Fallback)
+  var elevenKey = agent === 'kai' ? 'kimanus-voice-11-kai' : 'kimanus-voice-11-kim';
+  var voice = localStorage.getItem(elevenKey) || (agent === 'kai' ? (typeof voiceKai !== 'undefined' ? voiceKai : 'onyx') : (typeof voiceKim !== 'undefined' ? voiceKim : 'nova'));
+
+  // Das bereits beim pttStart() geunlockte Audio-Element verwenden!
+  var audio = pttAudioEl || new Audio();
+  var doneCalled = false;
+  function callDone() { if (!doneCalled) { doneCalled = true; if (onDone) onDone(); } }
+
+  // Sicherheitsnetz: nach 15s TTS-Timeout immer freigeben
+  var ttsTimeout = setTimeout(function() { console.warn('PTT TTS Timeout'); callDone(); }, 15000);
+
+  fetch('/api/tts', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text: cleanText, agent: agent, voice: voice})
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('TTS Status ' + r.status);
+    return r.blob();
+  })
+  .then(function(blob) {
+    var url = URL.createObjectURL(blob);
+    audio.src = url;
+    audio.volume = 1.0;
+    audio.onended = function() {
+      clearTimeout(ttsTimeout);
+      URL.revokeObjectURL(url);
+      callDone();
+    };
+    audio.onerror = function() {
+      clearTimeout(ttsTimeout);
+      URL.revokeObjectURL(url);
+      callDone();
+    };
+    audio.play().catch(function(e) {
+      console.warn('PTT TTS play failed:', e);
+      clearTimeout(ttsTimeout);
+      callDone();
+    });
+  })
+  .catch(function(e) {
+    console.warn('PTT TTS fetch failed:', e);
+    clearTimeout(ttsTimeout);
+    // TTS geht nicht - Antwort wird trotzdem als Text angezeigt
+    document.getElementById('ptt-status-text').textContent = 'Antwort als Text (Sprache nicht verf\u00fcgbar)';
+    callDone();
+  });
+}
+// Speaker-Button: Antwort vorlesen per Tap (= User-Gesture = iOS-kompatibel)
+var pttSpeakingNow = false;
+function pttToggleSpeak() {
+  var speakBtn = document.getElementById('ptt-speak-btn');
+  // Falls gerade spricht: stoppen
+  if (pttSpeakingNow && pttAudioEl) {
+    try { pttAudioEl.pause(); pttAudioEl.src = ''; } catch(e){}
+    pttSpeakingNow = false;
+    if (speakBtn) speakBtn.classList.remove('speaking');
+    document.getElementById('ptt-status-text').textContent = 'Erneut halten zum Sprechen';
+    return;
+  }
+  // Antwort vorlesen
+  var text = window.pttLastAnswer;
+  var agent = window.pttLastAgent || currentAgent;
+  if (!text) return;
+
+  // Audio-Element erstellen (Tap = User-Gesture = iOS erlaubt play!)
+  pttAudioEl = new Audio();
+  pttAudioEl.src = 'data:audio/mp3;base64,/+NIxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVV/+NIxAsAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+  pttAudioEl.play().then(function(){ pttAudioEl.pause(); }).catch(function(){});
+
+  pttSpeakingNow = true;
+  if (speakBtn) speakBtn.classList.add('speaking');
+  document.getElementById('ptt-status-text').textContent = '\uD83D\uDD0A Wird vorgelesen...';
+
+  pttSpeak(text, agent, function() {
+    pttSpeakingNow = false;
+    if (speakBtn) speakBtn.classList.remove('speaking');
+    document.getElementById('ptt-status-text').textContent = 'Erneut halten zum Sprechen';
+  });
+}
+
+// ===== END WALKIE-TALKIE =====
+
 let micBtnCooldown = false;
 function handleMicBtn(e) {
   if (e) e.preventDefault();
@@ -3049,6 +3786,10 @@ function openModule(name) {
   if (name === 'chat') {
     // WhatsApp Fullscreen-Modus
     app.classList.add('chat-fullscreen');
+    // Avatar-Icon + Mode-Badge aktualisieren
+    updateAvatarIcons();
+    var chatBadge = document.getElementById('ab-mode-badge');
+    if (chatBadge) chatBadge.textContent = 'CHAT';
     // Agent-Name im Chat-Header setzen
     if (manusMode || currentAgent === 'manus') {
       document.getElementById('ch-agent-name').innerHTML = 'MANUS <span style="font-size:10px;color:#ffa500;vertical-align:middle">&#x1f7e0; LIVE</span>';
@@ -3064,7 +3805,7 @@ function openModule(name) {
     if (!hasOnboarded) {
       localStorage.setItem('kimanus-onboarded', '1');
       var agentN = currentAgent === 'kim' ? 'KIM' : 'KAI';
-      var pronoun = currentAgent === 'kim' ? 'deine persönliche Assistentin' : 'dein persönlicher Assistent';
+      var pronoun = currentAgent === 'kai' ? 'dein Business-Berater' : currentAgent === 'manus' ? 'dein Premium-Agent' : (isKimFemale() ? 'deine persönliche Assistentin' : 'dein persönlicher Assistent');
       var greeting = userName
         ? 'Hallo ' + userName + '! Schön dich wiederzusehen. Was kann ich für dich tun? 😊'
         : 'Hallo! Ich bin ' + agentN + ', ' + pronoun + '. Wie darf ich dich nennen?';
@@ -3358,7 +4099,7 @@ function pickAgent(agent) {
   var canvas = document.getElementById('canvas');
   if (vcard) vcard.classList.remove('open');
   if (abar) abar.classList.remove('expanded');
-  if (inputBar) inputBar.style.display = '';
+  if (inputBar) { inputBar.style.display = ''; inputBar.classList.add('active'); }
   if (canvas) canvas.style.display = '';
   openModule('chat');
 }
@@ -3678,7 +4419,7 @@ function updateMenuAgentInfo() {
   var iconEl = document.getElementById('menu-agent-icon');
   if (!nameEl) return;
   if (agent === 'kim') {
-    nameEl.textContent = 'KIM - Deine Assistentin';
+    nameEl.textContent = isKimFemale() ? 'KIM - Deine Assistentin' : 'KIM - Dein Assistent';
     descEl.textContent = 'Tippe um zu KAI zu wechseln';
     iconEl.innerHTML = '&#x1f469;';
   } else if (agent === 'kai') {
@@ -3851,7 +4592,7 @@ function resetBg() {
 })();
 
 function showAppInfo() {
-  alert('KIMANUS OS\nVersion 3.2 · Build 20260321\n\nDein digitaler Assistent\n\n• KIM · Persönliche Assistentin\n• KAI · Technischer Direktor\n• MANUS · Concierge\n\n© 2026 KIMANUS');
+  alert('KIMANUS OS\nVersion 3.3 · Build 20260326\n\nDein digitaler Assistent\n\n• KIM · Dein Assistent\n• KAI · Business-Berater\n• KI MANUS · Premium Agent\n\n© 2026 KIMANUS');
 }
 
 function setActiveTab(el) {
@@ -4055,22 +4796,28 @@ function updateChatHeader(agent) {
   var abAvatar = document.getElementById('ab-avatar');
   if (agent === 'kim') {
     if (abName) { abName.textContent = 'KIM'; abName.style.color = '#ff6b9d'; }
-    if (abRole) abRole.textContent = 'Deine pers\u00f6nliche Assistentin';
-    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#ff6b9d,#ff3d7f)'; abAvatar.textContent = 'K'; }
+    if (abRole) abRole.textContent = getKimGenderLabel();
+    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#ff6b9d,#ff3d7f)'; abAvatar.innerHTML = getAvatarSVG('kim'); }
   } else if (agent === 'kai') {
     if (abName) { abName.textContent = 'KAI'; abName.style.color = '#4a9eff'; }
-    if (abRole) abRole.textContent = 'Dein pers\u00f6nlicher Assistent';
-    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#4a9eff,#2979ff)'; abAvatar.textContent = 'K'; }
+    if (abRole) abRole.textContent = 'Dein Business-Berater';
+    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#4a9eff,#2979ff)'; abAvatar.innerHTML = getAvatarSVG('kai'); }
   } else if (agent === 'manus') {
     if (abName) { abName.textContent = 'KI MANUS'; abName.style.color = '#ffa726'; }
     if (abRole) abRole.textContent = 'Business & Premium Agent';
-    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#ffa726,#e65100)'; abAvatar.textContent = 'M'; }
+    if (abAvatar) { abAvatar.style.background = 'linear-gradient(135deg,#ffa726,#e65100)'; abAvatar.innerHTML = getAvatarSVG('manus'); }
   }
-  // Visitenkarte schliessen bei Agent-Wechsel
+  // Visitenkarte schliessen bei Agent-Wechsel + Input-Bar wiederherstellen
   var vcard = document.getElementById('agent-vcard');
   var bar = document.getElementById('agent-bar');
-  if (vcard) vcard.classList.remove('open');
-  if (bar) bar.classList.remove('expanded');
+  var inputBar = document.getElementById('input-bar');
+  var canvas = document.getElementById('canvas');
+  if (vcard && vcard.classList.contains('open')) {
+    vcard.classList.remove('open');
+    if (bar) bar.classList.remove('expanded');
+    if (inputBar) { inputBar.style.display = ''; inputBar.classList.add('active'); }
+    if (canvas) canvas.style.display = '';
+  }
   // Nachrichten-Zaehler aktualisieren
   updateMsgCounter();
 }
@@ -4083,8 +4830,8 @@ function updateMsgCounter() {
 var agentCardData = {
   kim: {
     name: 'KIM', color: '#ff6b9d',
-    rolle: 'Pers\u00f6nliche Assistentin',
-    beschreibung: 'Kompetent, aufmerksam und zuverlaessig. Deine persoenliche Assistentin, die mitdenkt und organisiert.',
+    rolle: 'Pers\u00f6nlicher Assistent',
+    beschreibung: 'Kompetent, aufmerksam und zuverlaessig. Dein persoenlicher Assistent, der mitdenkt und organisiert.',
     skills: ['Chat & Beratung', 'Erinnerungen', 'Termine', 'Recherche', 'Texte schreiben', 'Vorlesen'],
     defaultModel: 'groq-llama',
     kontakt: [
@@ -4097,8 +4844,8 @@ var agentCardData = {
   },
   kai: {
     name: 'KAI', color: '#4a9eff',
-    rolle: 'Pers\u00f6nlicher Assistent',
-    beschreibung: 'Ruhig, zuverlaessig, mit trockenem Humor. Deine rechte Hand, die mitdenkt und anpackt.',
+    rolle: 'Business-Berater',
+    beschreibung: 'Strategisch, kompetent und loesungsorientiert. Dein Business-Berater fuer Geschaeftliches und B2B.',
     skills: ['Chat & Beratung', 'Erinnerungen', 'Termine', 'Recherche', 'Texte schreiben', 'Vorlesen'],
     defaultModel: 'deepseek',
     kontakt: [
@@ -4127,21 +4874,27 @@ var agentCardData = {
 
 // Verfuegbare Sprachmodelle mit Kosten
 var availableModels = [
-  {id:'groq-llama', name:'LLaMA 3.3 70B', provider:'Groq', speed:'\u26A1 Ultra-schnell', costPer1k: 0.001, offline: false},
-  {id:'deepseek', name:'DeepSeek V3', provider:'DeepSeek', speed:'\uD83D\uDCA1 Sehr schlau', costPer1k: 0.001, offline: false},
-  {id:'gemini-flash', name:'Gemini 2.5 Flash', provider:'Google', speed:'\uD83D\uDE80 Schnell + langer Kontext', costPer1k: 0.001, offline: false},
-  {id:'or-claude-sonnet', name:'Claude Sonnet 4', provider:'Anthropic (OpenRouter)', speed:'\uD83C\uDFC6 Premium-Qualit\u00e4t', costPer1k: 0.01, offline: false},
-  {id:'or-gpt4o', name:'GPT-4o', provider:'OpenAI (OpenRouter)', speed:'\uD83C\uDFC6 Premium-Qualit\u00e4t', costPer1k: 0.01, offline: false},
-  {id:'qwen-local', name:'Qwen 2.5 1.5B', provider:'Lokal (Ollama)', speed:'\uD83D\uDD12 Offline \u00b7 Kostenlos', costPer1k: 0, offline: true}
+  {id:'groq-llama', name:'LLaMA 3.3 70B', provider:'Groq', speed:'\u26A1 Ultra-schnell', costPer1k: 0.001, costIn: 0.00, costOut: 0.00, offline: false},
+  {id:'mistral-small', name:'Mistral Small 4', provider:'Mistral \uD83C\uDDEA\uD83C\uDDFA', speed:'\u26A1 Schnell + EU-Daten', costPer1k: 0.002, costIn: 0.15, costOut: 0.60, offline: false},
+  {id:'deepseek', name:'DeepSeek V3', provider:'DeepSeek', speed:'\uD83D\uDCA1 Sehr schlau', costPer1k: 0.001, costIn: 0.27, costOut: 1.10, offline: false},
+  {id:'mistral-medium', name:'Mistral Medium 3.1', provider:'Mistral \uD83C\uDDEA\uD83C\uDDFA', speed:'\uD83C\uDFC6 Frontier EU', costPer1k: 0.005, costIn: 0.40, costOut: 2.00, offline: false},
+  {id:'mistral-large', name:'Mistral Large 3', provider:'Mistral \uD83C\uDDEA\uD83C\uDDFA', speed:'\uD83C\uDFC6 Premium EU', costPer1k: 0.005, costIn: 0.50, costOut: 1.50, offline: false},
+  {id:'gemini-flash', name:'Gemini 2.5 Flash', provider:'Google', speed:'\uD83D\uDE80 Schnell + langer Kontext', costPer1k: 0.001, costIn: 0.15, costOut: 0.60, offline: false},
+  {id:'or-claude-sonnet', name:'Claude Sonnet 4', provider:'Anthropic (OpenRouter)', speed:'\uD83C\uDFC6 Premium-Qualit\u00e4t', costPer1k: 0.01, costIn: 3.00, costOut: 15.00, offline: false},
+  {id:'or-gpt4o', name:'GPT-4o', provider:'OpenAI (OpenRouter)', speed:'\uD83C\uDFC6 Premium-Qualit\u00e4t', costPer1k: 0.01, costIn: 2.50, costOut: 10.00, offline: false},
+  {id:'qwen-local', name:'Qwen 2.5 1.5B', provider:'Lokal (Ollama)', speed:'\uD83D\uDD12 Offline \u00b7 Kostenlos', costPer1k: 0, costIn: 0.00, costOut: 0.00, offline: true}
 ];
 
 // Verfuegbare ElevenLabs Stimmen
 var availableVoices = {
   kim: [
-    {id:'MGG5Irb57ATHvyIeTEYo', name:'Aktuelle Stimme', desc:'Wolfgangs Wahl'},
-    {id:'5Aahq892EEb6MdNwMM3p', name:'Laura', desc:'Jung, warm, vielseitig'},
-    {id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Sanft, freundlich'},
-    {id:'21m00Tcm4TlvDq8ikWAM', name:'Rachel', desc:'Ruhig, professionell'}
+    {id:'MGG5Irb57ATHvyIeTEYo', name:'Aktuelle Stimme', desc:'Wolfgangs Wahl', gender:'f'},
+    {id:'5Aahq892EEb6MdNwMM3p', name:'Laura', desc:'Jung, warm, vielseitig', gender:'f'},
+    {id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Sanft, freundlich', gender:'f'},
+    {id:'21m00Tcm4TlvDq8ikWAM', name:'Rachel', desc:'Ruhig, professionell', gender:'f'},
+    {id:'aduJlSmEKqbhRQAAMzV2', name:'Adrian', desc:'Tief, vertrauenswuerdig', gender:'m'},
+    {id:'VHYWoxffK1pFlM1dtRb0', name:'Thomas', desc:'Warm, gebildet', gender:'m'},
+    {id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Klar, bestimmt', gender:'m'}
   ],
   kai: [
     {id:'j6tJ8jbxXyUvoq0QGMNY', name:'Aktuelle Stimme', desc:'Wolfgangs Wahl'},
@@ -4179,22 +4932,27 @@ function toggleAgentCard() {
   if (isOpen) {
     vcard.classList.remove('open');
     bar.classList.remove('expanded');
-    if (inputBar) inputBar.style.display = '';
+    if (inputBar) { inputBar.style.display = ''; inputBar.classList.add('active'); }
     if (canvas) canvas.style.display = '';
   } else {
     renderAgentCard(currentAgent);
     vcard.classList.add('open');
     bar.classList.add('expanded');
-    if (inputBar) inputBar.style.display = 'none';
+    if (inputBar) { inputBar.style.display = ''; inputBar.classList.remove('active'); }
     if (canvas) canvas.style.display = 'none';
   }
   haptic();
 }
 
-function renderAgentCard(agent) {
+function renderAgentCard(agent, targetId) {
   var data = agentCardData[agent];
   if (!data) return;
-  var el = document.getElementById('vcard-content');
+  // KIM: Rolle/Beschreibung dynamisch nach Stimme
+  if (agent === 'kim') {
+    data.rolle = isKimFemale() ? 'Pers\u00f6nliche Assistentin' : 'Pers\u00f6nlicher Assistent';
+    data.beschreibung = isKimFemale() ? 'Kompetent, aufmerksam und zuverlaessig. Deine persoenliche Assistentin, die mitdenkt und organisiert.' : 'Kompetent, aufmerksam und zuverlaessig. Dein persoenlicher Assistent, der mitdenkt und organisiert.';
+  }
+  var el = document.getElementById(targetId || 'vcard-content');
   if (!el) return;
 
   // Nachrichten + Kosten berechnen
@@ -4267,6 +5025,11 @@ function renderAgentCard(agent) {
         modelOpts +
       '</select>' +
       '<div style="font-size:10px;color:#555;padding:2px 4px">' + modelInfo.speed + (modelInfo.offline ? ' \u00b7 Kein Internet n\u00f6tig' : ' \u00b7 Online') + '</div>' +
+      '<div style="font-size:10px;color:#666;padding:4px;margin-top:4px;background:rgba(255,255,255,.02);border-radius:6px;display:flex;justify-content:space-around">' +
+        '<span>\uD83D\uDCE5 $' + (modelInfo.costIn || 0).toFixed(2) + '/M</span>' +
+        '<span>\uD83D\uDCE4 $' + (modelInfo.costOut || 0).toFixed(2) + '/M</span>' +
+        '<span style="color:' + (modelInfo.provider.includes('Mistral') ? '#4caf50' : '#666') + '">' + (modelInfo.provider.includes('Mistral') ? '\uD83C\uDDEA\uD83C\uDDFA EU' : modelInfo.provider.includes('Lokal') ? '\uD83D\uDD12 Lokal' : '\uD83C\uDF10 Global') + '</span>' +
+      '</div>' +
     '</div>' +
     '<div class="vcard-divider"></div>' +
     // --- Stimme (wechselbar) ---
@@ -4311,11 +5074,17 @@ function changeAgentVoice(agent, voiceId) {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({agent: agent, voice_id: voiceId})
   }).catch(function(){});
+  // Bei KIM: Visitenkarte neu rendern (ohne zu schliessen) + Header-Text updaten
+  if (agent === 'kim') {
+    renderAgentCard('kim');
+    var abRole = document.getElementById('ab-role');
+    if (abRole) abRole.textContent = getKimGenderLabel();
+  }
   haptic();
 }
 
 function testCurrentVoice(agent) {
-  speakText('Hallo! Ich bin ' + (agent === 'kim' ? 'KIM, deine pers\u00f6nliche Assistentin.' : 'KAI, dein Business-Assistent.') + ' So klinge ich.', agent);
+  speakText('Hallo! Ich bin ' + (agent === 'kim' ? ('KIM, ' + (isKimFemale() ? 'deine pers\u00f6nliche Assistentin.' : 'dein pers\u00f6nlicher Assistent.')) : agent === 'kai' ? 'KAI, dein Business-Berater.' : 'KI MANUS, dein Premium Agent.') + ' So klinge ich.', agent);
 }
 
 function vcardContactInfo(action, hasDesc, descEncoded, labelEncoded, iconEncoded) {
@@ -4367,8 +5136,12 @@ function vcardContactInfo(action, hasDesc, descEncoded, labelEncoded, iconEncode
 function vcardAction(action) {
   var vcard = document.getElementById('agent-vcard');
   var bar = document.getElementById('agent-bar');
+  var inputBar = document.getElementById('input-bar');
+  var canvas = document.getElementById('canvas');
   if (vcard) vcard.classList.remove('open');
   if (bar) bar.classList.remove('expanded');
+  if (inputBar) { inputBar.style.display = ''; inputBar.classList.add('active'); }
+  if (canvas) canvas.style.display = '';
   if (action === 'chat') {
     openModule('chat');
   } else if (action === 'phone') {
