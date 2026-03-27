@@ -43,7 +43,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
    ========================================= */
 #header{
   display:flex;align-items:center;gap:8px;
-  padding:8px 12px;
+  padding:12px 12px;
   background:linear-gradient(180deg,#363636 0%,#2a2a2a 30%,#2e2e2e 70%,#333 100%);
   border-bottom:1px solid #444;
   box-shadow:0 4px 16px rgba(0,0,0,.6);
@@ -71,7 +71,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
    ========================================= */
 #status-bar{
   display:flex;align-items:center;gap:8px;
-  padding:6px 12px;
+  padding:10px 12px;
   background:linear-gradient(90deg,rgba(74,144,217,.15) 0%,rgba(74,144,217,.05) 100%);
   border-bottom:1px solid var(--border-subtle);
   flex-shrink:0;cursor:pointer;
@@ -677,18 +677,16 @@ const SHELVES = {
     {label:'Versich.', color:'blue', size:'normal'},
     {label:'Steuern', color:'red', size:'extra'},
     {label:'Vertraege', color:'gold', size:'normal'},
-    {label:'Rezepte', color:'purple', size:'thin'},
+    {label:'Rezepte', color:'purple', size:'normal'},
     {label:'Archiv', color:'gray', size:'extra'},
-    {label:'Gesundh.', color:'blue', size:'thin'},
+    {label:'Gesundh.', color:'blue', size:'normal'},
     {label:'Reise', color:'green', size:'normal'},
-    {label:'Auto', color:'red', size:'thin'},
+    {label:'Auto', color:'red', size:'normal'},
     {label:'Wohnung', color:'gold', size:'thick'},
     {label:'Finanzen', color:'blue', size:'normal'},
-    {label:'Schule', color:'green', size:'thin'},
     {label:'Hobby', color:'purple', size:'normal'},
     {label:'Familie', color:'red', size:'thick'},
     {label:'Arbeit', color:'gray', size:'extra'},
-    {label:'Garantie', color:'gold', size:'thin'},
     {label:'Fotos', color:'blue', size:'normal'},
   ],
   alben: [
@@ -785,6 +783,7 @@ function switchShelf(name, tabEl) {
 
 function renderCards() {
   const grid = document.getElementById('card-grid');
+  grid.dataset.infinite = 'false';// Reset
   const items = CATEGORIES[currentCategory] || [];
   grid.innerHTML = items.map(item => `
     <div class="card-item" data-type="${item.type}" onclick="cardClick('${item.id}')">
@@ -793,14 +792,13 @@ function renderCards() {
     </div>
   `).join('');
   grid.scrollLeft = 0;
-  // Endlos-Scroll im Kreis
-  if (items.length > 12) {
-    setupInfiniteScroll(grid);
-  }
+  // Endlos-Scroll auch fuer Karten
+  setTimeout(() => setupInfiniteScroll(grid), 100);
 }
 
 function renderShelf() {
   const row = document.getElementById('shelf-row');
+  row.dataset.infinite = 'false';
   const books = SHELVES[currentShelf] || [];
   row.innerHTML = books.map(book => `
     <div class="book ${book.color} ${book.size || 'normal'}" onclick="alert('${book.label} oeffnen')">
@@ -809,27 +807,95 @@ function renderShelf() {
       </div>
     </div>
   `).join('');
-  // Endlos-Scroll aktivieren
-  setupInfiniteScroll(row);
+  row.scrollLeft = 0;
+  setTimeout(() => setupInfiniteScroll(row), 100);
 }
 
-// Endlos-Scroll (Kreis) fuer Buecherregal
+// Drag-to-Scroll + Endlos-Karussell
 function setupInfiniteScroll(el) {
   if (!el || el.scrollWidth <= el.clientWidth) return;
-  // Items verdoppeln fuer nahtlosen Loop
-  const original = el.innerHTML;
-  el.innerHTML = original + original;
+  if (el.dataset.infinite === 'true') return;
+  el.dataset.infinite = 'true';
 
-  el.addEventListener('scroll', function() {
-    const half = el.scrollWidth / 2;
-    if (el.scrollLeft >= half) {
-      el.scrollLeft -= half;
-    } else if (el.scrollLeft <= 0) {
-      el.scrollLeft += half;
-    }
+  // === DRAG-TO-SCROLL (Maus + Touch) ===
+  let isDragging = false, startX = 0, startScroll = 0;
+
+  el.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.pageX;
+    startScroll = el.scrollLeft;
+    el.style.cursor = 'grabbing';
+    el.style.scrollSnapType = 'none';
+    e.preventDefault();
   });
-  // Start in der Mitte
-  el.scrollLeft = 1;
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.pageX - startX;
+    el.scrollLeft = startScroll - dx;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    el.style.cursor = 'grab';
+    el.style.scrollSnapType = 'x mandatory';
+    // Endlos-Check nach Drag
+    setTimeout(() => loopCheck(el), 200);
+  });
+
+  el.style.cursor = 'grab';
+
+  // === ENDLOS-LOOP ===
+  function loopCheck(container) {
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    const threshold = 50;
+
+    if (container.scrollLeft >= maxScroll - threshold) {
+      // Am Ende: erste 4 Elemente ans Ende schieben
+      container.style.scrollSnapType = 'none';
+      container.style.scrollBehavior = 'auto';
+      for (let i = 0; i < 4; i++) {
+        if (container.children.length < 2) break;
+        const first = container.children[0];
+        const w = first.getBoundingClientRect().width + 4;
+        container.appendChild(first);
+        container.scrollLeft = Math.max(0, container.scrollLeft - w);
+      }
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          container.style.scrollSnapType = 'x mandatory';
+          container.style.scrollBehavior = '';
+        });
+      });
+    } else if (container.scrollLeft <= threshold) {
+      // Am Anfang: letzte 4 Elemente an den Anfang
+      container.style.scrollSnapType = 'none';
+      container.style.scrollBehavior = 'auto';
+      for (let i = 0; i < 4; i++) {
+        if (container.children.length < 2) break;
+        const last = container.children[container.children.length - 1];
+        const w = last.getBoundingClientRect().width + 4;
+        container.insertBefore(last, container.children[0]);
+        container.scrollLeft = container.scrollLeft + w;
+      }
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          container.style.scrollSnapType = 'x mandatory';
+          container.style.scrollBehavior = '';
+        });
+      });
+    }
+  }
+
+  // Auch bei normalem Scroll (Touchscreen, Trackpad)
+  let scrollTimer = null;
+  el.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      if (!isDragging) loopCheck(el);
+    }, 250);
+  });
 }
 
 function scrollCarousel(tabsId, dir) {
