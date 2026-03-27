@@ -187,20 +187,9 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   margin-top:-1px;
   box-shadow:inset 0 1px 1px rgba(0,0,0,.8);
 }
-/* Postfach = blaeulicher Stahl */
-.postfach-locker .locker-door{
-  background:linear-gradient(180deg,#3a4555 0%,#2e3a48 15%,#334050 30%,#2c3645 50%,#303c4c 70%,#2a3442 85%,#2e3848 100%);
-  border-color:#4a6080;border-top-color:#5a7090;
-}
-.postfach-locker .locker-label{color:rgba(140,180,220,.9)}
-.postfach-locker .locker-sublabel{color:rgba(140,180,220,.4)}
-/* Schliessfach = goldener Stahl */
-.schliessfach-locker .locker-door{
-  background:linear-gradient(180deg,#4a4535 0%,#3a3828 15%,#404030 30%,#383528 50%,#3c3a2c 70%,#353225 85%,#3a3828 100%);
-  border-color:#6a6040;border-top-color:#7a7050;
-}
-.schliessfach-locker .locker-label{color:rgba(220,200,140,.9)}
-.schliessfach-locker .locker-sublabel{color:rgba(220,200,140,.4)}
+/* Beide Schliessfaecher gleicher Metall-Look */
+.postfach-locker .locker-label,.schliessfach-locker .locker-label{color:rgba(255,255,255,.6)}
+.postfach-locker .locker-sublabel,.schliessfach-locker .locker-sublabel{color:rgba(255,255,255,.3)}
 
 /* =========================================
    5. KARUSSELL (wiederverwendbar)
@@ -315,19 +304,53 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   padding:4px 0;
 }
 /* Buch-Farben */
-/* Alle Ordner gleiche Hoehe, unterschiedliche Breite - dezente Farben */
-.book .book-spine{height:130px}
-.book.green .book-spine{background:linear-gradient(180deg,#243d24 0%,#1a2d1a 100%)}
-.book.blue .book-spine{background:linear-gradient(180deg,#243040 0%,#1a2430 100%)}
-.book.red .book-spine{background:linear-gradient(180deg,#3d2424 0%,#2d1a1a 100%)}
-.book.gold .book-spine{background:linear-gradient(180deg,#3d3524 0%,#2d281a 100%)}
-.book.purple .book-spine{background:linear-gradient(180deg,#302440 0%,#241a30 100%)}
-.book.gray .book-spine{background:linear-gradient(180deg,#333 0%,#282828 100%)}
-/* Breiten-Varianten (schmaler, naeher zusammen) */
-.book.thin{width:20px}
-.book.normal{width:30px}
-.book.thick{width:40px}
-.book.extra{width:50px}
+/* Ordner - einheitliches Grau, 2 Groessen */
+.book .book-spine{
+  height:130px;
+  background:linear-gradient(180deg,#404040 0%,#383838 20%,#3c3c3c 50%,#353535 80%,#3a3a3a 100%);
+  border:1px solid #4a4a4a;
+  border-right:2px solid #2a2a2a;
+  position:relative;
+}
+/* Buerststreifen auf dem Ordner */
+.book .book-spine::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(255,255,255,.02) 3px,rgba(255,255,255,.02) 4px);
+  pointer-events:none;
+}
+/* Griffloch unten */
+.book .book-spine::after{
+  content:'';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  width:12px;height:18px;
+  background:radial-gradient(ellipse,#1a1a1a 60%,#252525 100%);
+  border-radius:6px;
+  border:1px solid #333;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.6);
+}
+/* Beschriftung oben (Schildchen) */
+.book-tag{
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  width:80%;height:14px;
+  background:linear-gradient(180deg,#e8e0d0 0%,#d8d0c0 100%);
+  border-radius:1px;
+  border:1px solid #b0a890;
+  display:flex;align-items:center;justify-content:center;
+}
+.book-tag-text{
+  font-size:5px;font-weight:700;color:#333;letter-spacing:.3px;
+  text-transform:uppercase;
+}
+/* Ruecken-Schrift groesser */
+.book-label{
+  font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.7);writing-mode:vertical-lr;text-orientation:mixed;
+  padding:4px 0;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+/* Nur 2 Groessen: normal und gross */
+.book.normal{width:34px}
+.book.thick{width:48px}
+.book.extra{width:48px}
 
 
 /* =========================================
@@ -348,43 +371,30 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .ablage-tray{
   height:30px;
-  background:linear-gradient(180deg,#2a2a2a 0%,#222 60%,#1e1e1e 100%);
-  border:1px solid var(--border-subtle);
-  border-radius:3px;
+  border-radius:2px;
   position:relative;
-  display:flex;align-items:center;padding:0 8px;gap:6px;
+  display:flex;align-items:center;justify-content:center;
   cursor:pointer;
   transition:background .15s;
+  /* Gebuerstetes Metall - gleich wie Schliessfach */
+  background:linear-gradient(180deg,#3a3a3a 0%,#333 15%,#363636 30%,#313131 50%,#343434 70%,#303030 85%,#333 100%);
+  border:1px solid #444;
+  border-top:1px solid #4a4a4a;
+  border-bottom:2px solid #252525;
+  box-shadow:0 2px 4px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);
 }
-.ablage-tray:active{background:#2e2e2e}
-/* Vorderkante/Lippe wie echte Briefablage */
 .ablage-tray::before{
-  content:'';position:absolute;bottom:0;left:0;right:0;
-  height:3px;border-radius:0 0 3px 3px;
-  background:linear-gradient(180deg,#444 0%,#333 100%);
-  box-shadow:0 2px 3px rgba(0,0,0,.3);
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 3px);
+  border-radius:2px;pointer-events:none;
 }
-/* Griff-Ausschnitt */
-.ablage-tray::after{
-  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:36px;height:5px;
-  background:linear-gradient(180deg,#1a1a1a 0%,#111 100%);
-  border-radius:5px 5px 0 0;
-  border:1px solid var(--border-subtle);border-bottom:none;
-}
-.ablage-tray .tray-icon{font-size:12px;flex-shrink:0}
+.ablage-tray:active{opacity:.8}
 .ablage-tray .tray-label{
-  font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
-  color:var(--text-dim);flex:1;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
 }
-.ablage-tray .badge{
-  background:rgba(230,57,70,.5);color:rgba(255,255,255,.8);font-size:7px;font-weight:700;
-  padding:1px 4px;border-radius:8px;min-width:14px;text-align:center;flex-shrink:0;
-}
-/* Postfach = gold/sicher */
-.ablage-tray.postfach{border-left:2px solid rgba(212,160,23,.4)}
-.ablage-tray.postfach .tray-label{color:rgba(212,160,23,.6)}
+.ablage-tray.postfach .tray-label{color:rgba(255,255,255,.5)}
 
 /* =========================================
    9. COMM-BAR (fest unten)
@@ -672,22 +682,22 @@ const CATEGORIES = {
 // Buecherregal-Daten
 const SHELVES = {
   ordner: [
-    {label:'Projekt', color:'green', size:'thick'},
-    {label:'Cap-Coin', color:'green', size:'thick'},
-    {label:'Versich.', color:'blue', size:'normal'},
-    {label:'Steuern', color:'red', size:'extra'},
-    {label:'Vertraege', color:'gold', size:'normal'},
-    {label:'Rezepte', color:'purple', size:'normal'},
-    {label:'Archiv', color:'gray', size:'extra'},
-    {label:'Gesundh.', color:'blue', size:'normal'},
-    {label:'Reise', color:'green', size:'normal'},
-    {label:'Auto', color:'red', size:'normal'},
-    {label:'Wohnung', color:'gold', size:'thick'},
-    {label:'Finanzen', color:'blue', size:'normal'},
-    {label:'Hobby', color:'purple', size:'normal'},
-    {label:'Familie', color:'red', size:'thick'},
-    {label:'Arbeit', color:'gray', size:'extra'},
-    {label:'Fotos', color:'blue', size:'normal'},
+    {label:'Projekt', size:'thick'},
+    {label:'Cap-Coin', size:'thick'},
+    {label:'Versich.', size:'normal'},
+    {label:'Steuern', size:'thick'},
+    {label:'Vertraege', size:'normal'},
+    {label:'Rezepte', size:'normal'},
+    {label:'Archiv', size:'thick'},
+    {label:'Gesundh.', size:'normal'},
+    {label:'Reise', size:'normal'},
+    {label:'Auto', size:'normal'},
+    {label:'Wohnung', size:'thick'},
+    {label:'Finanzen', size:'normal'},
+    {label:'Hobby', size:'normal'},
+    {label:'Familie', size:'thick'},
+    {label:'Arbeit', size:'thick'},
+    {label:'Fotos', size:'normal'},
   ],
   alben: [
     {label:'Urlaub 24', color:'blue'},
@@ -801,8 +811,9 @@ function renderShelf() {
   row.dataset.infinite = 'false';
   const books = SHELVES[currentShelf] || [];
   row.innerHTML = books.map(book => `
-    <div class="book ${book.color} ${book.size || 'normal'}" onclick="alert('${book.label} oeffnen')">
+    <div class="book ${book.size || 'normal'}" onclick="alert('${book.label} oeffnen')">
       <div class="book-spine">
+        <div class="book-tag"><span class="book-tag-text">${book.label}</span></div>
         <span class="book-label">${book.label}</span>
       </div>
     </div>
@@ -941,18 +952,15 @@ function cardClick(id) {
 
 function renderMail() {
   const grid = document.getElementById('ablage-grid');
-  // Feste 4 Ablagefaecher (2x2)
   const trays = [
-    {id:'email', label:'E-Mail', icon:'📧', badge:3, secure:false},
-    {id:'post', label:'Post', icon:'📬', badge:1, secure:false},
-    {id:'rechnungen', label:'Rechnungen', icon:'🧾', badge:2, secure:false},
-    {id:'allgemein', label:'Allgemein', icon:'📥', badge:0, secure:false},
+    {id:'email', label:'E-Mail'},
+    {id:'post', label:'Post'},
+    {id:'rechnungen', label:'Rechnungen'},
+    {id:'allgemein', label:'Allgemein'},
   ];
   grid.innerHTML = trays.map(item => `
-    <div class="ablage-tray ${item.secure ? 'postfach' : ''}" onclick="alert('${item.label} oeffnen${item.secure ? ' - NFC noetig' : ''}')">
-      <span class="tray-icon">${item.icon}</span>
+    <div class="ablage-tray" onclick="alert('${item.label} oeffnen')">
       <span class="tray-label">${item.label}</span>
-      ${item.badge > 0 ? '<span class="badge">' + item.badge + '</span>' : ''}
     </div>
   `).join('');
 }
