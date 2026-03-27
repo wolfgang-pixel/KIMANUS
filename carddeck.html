@@ -238,11 +238,47 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* =========================================
    6. CARD GRID (3x3)
    ========================================= */
+.card-grid-wrap{padding:0 10px}
 .card-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
-  padding:6px 10px;
-  max-height:none;/* 2x4 = 8 Karten */
+  display:grid;grid-template-rows:1fr 1fr 1fr;grid-template-columns:repeat(4,1fr);
+  grid-auto-flow:dense;
+  gap:6px;
+  padding:6px 0;
 }
+/* Wenn mehr als 12 Karten: scrollbar */
+.card-grid.scrollable{
+  grid-template-columns:none;
+  grid-auto-columns:calc((100% - 18px) / 4);
+  grid-auto-flow:column;
+  overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory;
+}
+.card-grid.scrollable::-webkit-scrollbar{display:none}
+.card-grid.scrollable .card-item{scroll-snap-align:start}
+/* Card Slider */
+.card-slider{
+  width:40%;height:12px;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;
+}
+.card-slider:active{cursor:grabbing}
+.card-slider-track{
+  width:100%;height:3px;
+  background:#1a1a1a;border-radius:2px;
+  position:relative;
+}
+.card-slider-thumb{
+  position:absolute;top:-3px;
+  width:36px;height:8px;
+  background:linear-gradient(180deg,#555 0%,#3a3a3a 100%);
+  border:1px solid #555;
+  border-radius:4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
+  cursor:grab;
+  background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,.08) 3px,rgba(255,255,255,.08) 4px);
+}
+.card-slider-thumb:active{cursor:grabbing}
 .card-item{
   aspect-ratio:85.6/54;border-radius:var(--radius-sm);/* EC-Karten-Format 85.6x54mm */
   background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
@@ -335,7 +371,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .shelf-slider:active{cursor:grabbing}
 .shelf-slider-track{
-  width:100%;height:3px;
+  width:40%;height:3px;
   background:#1a1a1a;border-radius:2px;
   position:relative;
 }
@@ -509,9 +545,16 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       </div>
     </div>
 
-    <!-- B5. CARD GRID (Visitenkarten-Format 85x55mm) -->
-    <div class="card-grid" id="card-grid">
-      <!-- Wird dynamisch befuellt via JS -->
+    <!-- B5. CARD GRID (Visitenkarten-Format, scrollbar mit Slider) -->
+    <div class="card-grid-wrap">
+      <div class="card-grid" id="card-grid">
+        <!-- Wird dynamisch befuellt via JS -->
+      </div>
+    </div>
+    <div class="card-slider" id="card-slider-wrap">
+      <div class="card-slider-track">
+        <div class="card-slider-thumb" id="card-thumb"></div>
+      </div>
     </div>
 
   </div><!-- /main-scroll -->
@@ -635,8 +678,12 @@ const AGENTS = [
   {id:'animateur', label:'Animateur', type:'agent', icon:'🎯'},
   {id:'sekretaer', label:'Sekretaer', type:'agent', icon:'📋'},
   {id:'kalkulierer', label:'Kalkulierer', type:'agent', icon:'🧮'},
+  {id:'einkaufer', label:'Einkaufer', type:'agent', icon:'🛒'},
+  {id:'lagerist', label:'Lagerist', type:'agent', icon:'📦'},
+  {id:'dolmetscher', label:'Dolmetscher', type:'agent', icon:'🌍'},
+  {id:'bibliothekar', label:'Bibliothekar', type:'agent', icon:'📚'},
   {id:'add', label:'+ Neu', type:'add', icon:'+'},
-];/* 2x4=8 Karten */
+];/* 3x4=12 Karten */
 
 const CLUBCARDS = [
   {id:'capcoin', label:'Cap-Coin', type:'kim', icon:'C'},
@@ -794,12 +841,20 @@ function switchShelf(name, tabEl) {
 function renderCards() {
   const grid = document.getElementById('card-grid');
   const items = CATEGORIES[currentCategory] || [];
+  // Max 12 sichtbar (3x4), Rest scrollbar
+  if (items.length > 12) {
+    grid.classList.add('scrollable');
+  } else {
+    grid.classList.remove('scrollable');
+  }
   grid.innerHTML = items.map(item => `
     <div class="card-item" data-type="${item.type}" onclick="cardClick('${item.id}')">
       <div class="card-icon">${item.icon}</div>
       <div class="card-label">${item.label}</div>
     </div>
   `).join('');
+  grid.scrollLeft = 0;
+  setTimeout(updateCardSlider, 50);
 }
 
 function renderShelf() {
@@ -943,11 +998,60 @@ function toggleKimMode() {
   }
 }
 
+// Card Slider
+function updateCardSlider() {
+  const grid = document.getElementById('card-grid');
+  const thumb = document.getElementById('card-thumb');
+  const track = thumb.parentElement;
+  if (grid.scrollWidth <= grid.clientWidth) {
+    thumb.style.display = 'none';
+    return;
+  }
+  thumb.style.display = '';
+  const ratio = grid.clientWidth / grid.scrollWidth;
+  const thumbW = Math.max(30, track.clientWidth * ratio);
+  thumb.style.width = thumbW + 'px';
+  const scrollRatio = grid.scrollLeft / (grid.scrollWidth - grid.clientWidth);
+  thumb.style.left = (scrollRatio * (track.clientWidth - thumbW)) + 'px';
+}
+
+(function() {
+  let dragging = false, startX = 0, startScroll = 0;
+  const thumb = document.getElementById('card-thumb');
+  const grid = document.getElementById('card-grid');
+
+  function onDown(e) {
+    dragging = true;
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    startScroll = grid.scrollLeft;
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = x - startX;
+    const track = thumb.parentElement;
+    const ratio = (grid.scrollWidth - grid.clientWidth) / (track.clientWidth - thumb.clientWidth);
+    grid.scrollLeft = startScroll + dx * ratio;
+    updateCardSlider();
+  }
+  function onUp() { dragging = false; }
+
+  thumb.addEventListener('mousedown', onDown);
+  thumb.addEventListener('touchstart', onDown, {passive:false});
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
+  grid.addEventListener('scroll', updateCardSlider);
+})();
+
 // ===== INIT =====
 renderCards();
 renderShelf();
 renderMail();
 updateStatusBar();
+setTimeout(updateCardSlider, 100);
 </script>
 
 </body>
