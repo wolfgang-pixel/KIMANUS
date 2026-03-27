@@ -241,33 +241,44 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .card-grid::-webkit-scrollbar{display:none}
 .card-item{scroll-snap-align:start}/* Jede Karte = Rasterpunkt */
 .card-item{
-  aspect-ratio:85.6/54;border-radius:var(--radius-sm);/* EC-Karten-Format 85.6x54mm */
-  background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
-  border:1px solid var(--border-subtle);
-  box-shadow:inset 0 3px 10px rgba(0,0,0,.6);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  cursor:pointer;transition:transform .15s,border-color .2s;
-  padding:8px;overflow:hidden;
+  aspect-ratio:85.6/54;border-radius:4px;
+  background:linear-gradient(145deg,#2a2a2a 0%,#222 50%,#252525 100%);
+  border:1px solid #3a3a3a;
+  box-shadow:0 2px 6px rgba(0,0,0,.4);
+  display:flex;flex-direction:row;align-items:stretch;
+  cursor:pointer;transition:transform .15s;
+  overflow:hidden;position:relative;
 }
-.card-item:active{transform:scale(.95);border-color:var(--border-light)}
-.card-item .card-icon{
-  width:32px;height:32px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;
+.card-item:active{transform:scale(.96)}
+/* Farbstreifen links */
+.card-item::before{
+  content:'';width:4px;flex-shrink:0;
+  background:#444;
 }
-.card-item .card-icon svg{width:18px;height:18px;fill:currentColor}
-.card-item .card-label{
-  font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
-  color:var(--text-dim);text-align:center;line-height:1.1;
-  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-/* Agent-Karten Farben - dezent, einheitlich */
-.card-item[data-type="kim"] .card-icon{background:rgba(230,57,70,.12);color:var(--kim-red)}
-.card-item[data-type="kai"] .card-icon{background:rgba(74,144,217,.12);color:var(--kai-blue)}
-.card-item[data-type="manus"] .card-icon{background:rgba(212,160,23,.12);color:var(--manus-gold)}
-.card-item[data-type="agent"] .card-icon{background:rgba(255,255,255,.06);color:var(--text-dim)}
+.card-item[data-type="kim"]::before{background:var(--kim-red)}
+.card-item[data-type="kai"]::before{background:var(--kai-blue)}
+.card-item[data-type="manus"]::before{background:var(--manus-gold)}
+.card-item[data-type="agent"]::before{background:#555}
+.card-item[data-type="add"]::before{background:transparent}
 .card-item[data-type="add"]{border-style:dashed;border-color:var(--text-muted)}
-.card-item[data-type="add"] .card-icon{color:var(--text-muted);font-size:28px}
+/* Karten-Inhalt */
+.card-body{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:4px 6px;min-width:0;
+}
+.card-item .card-icon{
+  font-size:14px;line-height:1;
+}
+.card-item .card-label{
+  font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.7);line-height:1.1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.card-item .card-role{
+  font-size:6px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.3);margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 
 /* =========================================
    7. BUECHERREGAL
@@ -318,14 +329,14 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   background:repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(255,255,255,.02) 3px,rgba(255,255,255,.02) 4px);
   pointer-events:none;
 }
-/* Griffloch unten */
+/* Griffloch unten - rund */
 .book .book-spine::after{
-  content:'';position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-  width:12px;height:18px;
-  background:radial-gradient(ellipse,#1a1a1a 60%,#252525 100%);
-  border-radius:6px;
+  content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  width:14px;height:14px;
+  background:radial-gradient(circle,#1a1a1a 50%,#222 100%);
+  border-radius:50%;
   border:1px solid #333;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,.6);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.7);
 }
 /* Beschriftung oben (Schildchen) */
 .book-tag{
@@ -408,9 +419,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   flex-shrink:0;z-index:10;
 }
 .comm-group{
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:6px;
 }
-.comm-group.center{gap:10px}
+.comm-group.center{gap:8px}
+/* Linke Gruppe: Setup ganz links, KAI naeher zur Mitte */
+.comm-group:first-child{gap:10px}
+/* Rechte Gruppe: KIM naeher zur Mitte, Home ganz rechts */
+.comm-group:last-child{gap:10px}
 .comm-btn{
   display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
 }
@@ -425,18 +440,22 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* Kleine Buttons (Setup, Mikro, Chat, Home) */
 .comm-btn .btn-circle-sm{
   width:32px;height:32px;border-radius:50%;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  border:2px solid rgba(255,255,255,.1);
   display:flex;align-items:center;justify-content:center;
-  transition:transform .15s,background .15s;
+  transition:transform .15s,border-color .2s;
 }
-.comm-btn:active .btn-circle-sm{background:rgba(255,255,255,.15)}
-/* KAI = blau */
-.comm-btn.kai .btn-circle{background:var(--kai-blue);box-shadow:0 2px 8px rgba(74,144,217,.3);font-size:12px}
-/* KIM rechts = rot */
-.comm-btn.kim-right .btn-circle{background:var(--kim-red);box-shadow:0 2px 8px rgba(230,57,70,.3);font-size:11px}
-/* Eck-Buttons (Setup + Home) kleiner */
-.comm-btn.corner-btn .btn-circle-sm{width:28px;height:28px}
+.comm-btn:active .btn-circle-sm{background:rgba(255,255,255,.12)}
+/* Mikro/Chat: gruen umrandet wenn aktiv */
+.comm-btn.mic.active .btn-circle-sm,.comm-btn.chat.active .btn-circle-sm{
+  border-color:#4caf50;box-shadow:0 0 8px rgba(76,175,80,.3);
+}
+/* KAI + KIM = dezentes Grau */
+.comm-btn.kai .btn-circle{background:#444;border:1px solid #555;box-shadow:0 2px 6px rgba(0,0,0,.3);font-size:11px}
+.comm-btn.kim-right .btn-circle{background:#444;border:1px solid #555;box-shadow:0 2px 6px rgba(0,0,0,.3);font-size:10px}
+/* Eck-Buttons (Setup + Home) ganz in die Ecken */
+.comm-btn.corner-btn .btn-circle-sm{width:26px;height:26px;opacity:.5}
+.comm-btn.corner-btn:active .btn-circle-sm{opacity:.8}
 /* Grosser KIM-Button in der Mitte */
 .comm-btn.kim-main .btn-circle{
   width:56px;height:56px;
@@ -586,7 +605,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
         </div>
       </div>
       <div class="comm-btn kim-main" onclick="setAgent('kim')">
-        <div class="btn-circle">K</div>
+        <div class="btn-circle"></div>
       </div>
       <div class="comm-btn chat" onclick="alert('Chat oeffnen')">
         <div class="btn-circle-sm">
@@ -613,31 +632,34 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 <script>
 // ===== DATEN =====
 const AGENTS = [
-  {id:'kim', label:'KIM', type:'kim', icon:'K'},
-  {id:'kai', label:'KAI', type:'kai', icon:'KAI'},
-  {id:'manus', label:'MANUS', type:'manus', icon:'M'},
-  {id:'wetterfrosch', label:'Wetter', type:'agent', icon:'☀️'},
-  {id:'animateur', label:'Animateur', type:'agent', icon:'🎯'},
-  {id:'sekretaer', label:'Sekretaer', type:'agent', icon:'📋'},
-  {id:'kalkulierer', label:'Kalkulierer', type:'agent', icon:'🧮'},
-  {id:'einkaufer', label:'Einkaufer', type:'agent', icon:'🛒'},
-  {id:'lagerist', label:'Lagerist', type:'agent', icon:'📦'},
-  {id:'dolmetscher', label:'Dolmetscher', type:'agent', icon:'🌍'},
-  {id:'bibliothekar', label:'Bibliothekar', type:'agent', icon:'📚'},
-  {id:'tresorwart', label:'Tresorwart', type:'agent', icon:'🔐'},
-  {id:'nachtfahrer', label:'Nachtfahrer', type:'agent', icon:'🚕'},
-  {id:'dj', label:'DJ', type:'agent', icon:'🎵'},
-  {id:'gastro', label:'Gastro', type:'agent', icon:'🍽️'},
-  {id:'marketing', label:'Marketing', type:'agent', icon:'📢'},
-  {id:'ithilfe', label:'IT-Hilfe', type:'agent', icon:'💻'},
-  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+  {id:'kim', label:'KIM', type:'kim', icon:'K', role:'Privatassistent'},
+  {id:'kai', label:'KAI', type:'kai', icon:'K', role:'Business-Agent'},
+  {id:'manus', label:'MANUS', type:'manus', icon:'M', role:'Dirigent'},
+  {id:'wetterfrosch', label:'Wetter', type:'agent', icon:'☀️', role:'Meteorologe'},
+  {id:'animateur', label:'Animateur', type:'agent', icon:'🎯', role:'Freizeit & Events'},
+  {id:'sekretaer', label:'Sekretaer', type:'agent', icon:'📋', role:'Termine'},
+  {id:'kalkulierer', label:'Kalkulierer', type:'agent', icon:'🧮', role:'Rohaufschlag'},
+  {id:'einkaufer', label:'Einkaufer', type:'agent', icon:'🛒', role:'Preisvergleich'},
+  {id:'lagerist', label:'Lagerist', type:'agent', icon:'📦', role:'Bestand'},
+  {id:'dolmetscher', label:'Dolmetscher', type:'agent', icon:'🌍', role:'Sprachen'},
+  {id:'bibliothekar', label:'Bibliothekar', type:'agent', icon:'📚', role:'Wissen & RAG'},
+  {id:'tresorwart', label:'Tresorwart', type:'agent', icon:'🔐', role:'Sicherheit'},
+  {id:'nachtfahrer', label:'Safe Home', type:'agent', icon:'🚕', role:'Taxi & Sicherheit'},
+  {id:'dj', label:'DJ', type:'agent', icon:'🎵', role:'Musik & Stimmung'},
+  {id:'gastro', label:'Gastro', type:'agent', icon:'🍽️', role:'Beratung'},
+  {id:'marketing', label:'Marketing', type:'agent', icon:'📢', role:'Werbung'},
+  {id:'ithilfe', label:'IT-Hilfe', type:'agent', icon:'💻', role:'Tech-Support'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+', role:'Hinzufuegen'},
 ];
 
 const CLUBCARDS = [
-  {id:'capcoin', label:'Cap-Coin', type:'kim', icon:'C'},
-  {id:'club1', label:'Lieblingsbar', type:'agent', icon:'🍺'},
-  {id:'club2', label:'Fitness', type:'agent', icon:'💪'},
-  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+  {id:'capcoin', label:'Cap-Coin', type:'kim', icon:'🪙', role:'Loyalty-System'},
+  {id:'club1', label:'Lieblingsbar', type:'agent', icon:'🍺', role:'Mitglied seit 2024'},
+  {id:'club2', label:'Fitness', type:'agent', icon:'💪', role:'Premium-Mitglied'},
+  {id:'club3', label:'ADAC', type:'agent', icon:'🚗', role:'Nr. 4711-2026'},
+  {id:'club4', label:'Bahn Card', type:'agent', icon:'🚄', role:'BahnCard 50'},
+  {id:'club5', label:'Payback', type:'agent', icon:'💳', role:'12.450 Punkte'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+', role:'Karte hinzufuegen'},
 ];
 
 const WEBSEITEN = [
@@ -797,8 +819,11 @@ function renderCards() {
   const items = CATEGORIES[currentCategory] || [];
   grid.innerHTML = items.map(item => `
     <div class="card-item" data-type="${item.type}" onclick="cardClick('${item.id}')">
-      <div class="card-icon">${item.icon}</div>
-      <div class="card-label">${item.label}</div>
+      <div class="card-body">
+        <div class="card-icon">${item.icon}</div>
+        <div class="card-label">${item.label}</div>
+        <div class="card-role">${item.role || ''}</div>
+      </div>
     </div>
   `).join('');
   grid.scrollLeft = 0;
