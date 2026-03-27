@@ -119,6 +119,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
   color:var(--text-dim);padding:2px 10px 1px;
   flex-shrink:0;
+  visibility:hidden;/* Text weg, Abstand bleibt */
 }
 .locker-row{
   display:grid;grid-template-columns:1fr 1fr;gap:4px;
@@ -280,14 +281,14 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .book{scroll-snap-align:start}/* Jeder Ordner = Rasterpunkt */
 .shelf-row::-webkit-scrollbar{display:none}
 .book{
-  flex-shrink:0;width:50px;border-radius:3px;
+  flex-shrink:0;width:50px;border-radius:0;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
   cursor:pointer;transition:transform .15s;
   padding:4px 2px;position:relative;
 }
 .book:active{transform:translateY(-4px)}
 .book-spine{
-  width:100%;border-radius:3px;
+  width:100%;border-radius:0;
   display:flex;align-items:center;justify-content:center;
   box-shadow:2px 0 4px rgba(0,0,0,.4),-1px 0 2px rgba(255,255,255,.05);
 }
@@ -333,6 +334,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
   color:var(--text-dim);padding:2px 10px 1px;
   flex-shrink:0;
+}
+/* Feine Trennlinie zwischen Bereichen */
+.divider-line{
+  height:0;flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.06);
+  margin:3px 10px;
 }
 /* Ablage = festes 2x2 Grid, gleiche Breite wie Karten */
 .ablage-grid{
@@ -497,10 +504,16 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     </div>
   </div>
 
+  <!-- Trennlinie Ordner/Ablage -->
+  <div class="divider-line"></div>
+
   <!-- B8. ABLAGE (fest, oberhalb der Schliessfaecher) -->
   <div class="ablage-grid" id="ablage-grid">
     <!-- 2x2 feste Ablagefaecher -->
   </div>
+
+  <!-- Trennlinie Ablage/Schliessfach -->
+  <div class="divider-line"></div>
 
   <!-- B3. POSTFACH + SCHLIESSFACH (Metalltuer-Look) -->
   <div class="locker-header">TEXT TEXT TEXT</div>
