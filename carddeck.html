@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<!-- KIMANUS Card-Deck Prototyp v1.1 - Buero-Metapher Hauptscreen -->
+<!-- BEREICHE: B1=Header, B2=Status, B3=Schnellzugriff, B4=Karussell1, B5=CardGrid, B6=Karussell2, B7=Buecherregal, B8=Karussell3+Ablage, B9=CommBar -->
+<html lang="de" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#111111">
+<title>KIMANUS - Card Deck</title>
+<style>
+/* === RESET & BASE === */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0e0e0e;color:#e0e0e0;color-scheme:dark}
+
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --kim-red:#e63946;
+  --kai-blue:#4a90d9;
+  --manus-gold:#d4a017;
+  --bg-dark:#0e0e0e;
+  --panel-bg:#141414;
+  --border-subtle:rgba(255,255,255,0.08);
+  --border-light:rgba(255,255,255,0.15);
+  --text-primary:#e0e0e0;
+  --text-dim:#888;
+  --text-muted:#555;
+  --radius:10px;
+  --radius-sm:6px;
+}
+
+#app{
+  display:flex;flex-direction:column;height:100dvh;
+  padding-top:var(--sat);padding-bottom:var(--sab);
+  max-width:430px;margin:0 auto;
+  position:relative;overflow:hidden;
+}
+
+/* =========================================
+   1. HEADER
+   ========================================= */
+#header{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  background:linear-gradient(180deg,#363636 0%,#2a2a2a 30%,#2e2e2e 70%,#333 100%);
+  border-bottom:1px solid #444;
+  box-shadow:0 4px 16px rgba(0,0,0,.6);
+  flex-shrink:0;z-index:10;
+}
+.logo-circle{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--kim-red);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:18px;color:#fff;
+  box-shadow:0 2px 8px rgba(230,57,70,.4);
+  flex-shrink:0;
+}
+#header .title{flex:1;font-size:18px;font-weight:800;letter-spacing:3px;text-transform:uppercase}
+.hdr-btn{
+  width:36px;height:36px;border-radius:8px;border:none;
+  background:transparent;color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.hdr-btn:active{transform:scale(.9);opacity:.7}
+.hdr-btn svg{width:22px;height:22px;fill:currentColor}
+
+/* =========================================
+   2. STATUS-LEISTE
+   ========================================= */
+#status-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;
+  background:linear-gradient(90deg,rgba(74,144,217,.15) 0%,rgba(74,144,217,.05) 100%);
+  border-bottom:1px solid var(--border-subtle);
+  flex-shrink:0;cursor:pointer;
+  transition:background .3s;
+}
+#status-bar:active{background:rgba(255,255,255,.05)}
+#status-bar .agent-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#4caf50;flex-shrink:0;
+  box-shadow:0 0 6px rgba(76,175,80,.5);
+}
+#status-bar .agent-icon{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
+}
+#status-bar .agent-name{font-size:13px;font-weight:600;letter-spacing:1px;flex:1}
+#status-bar .agent-role{font-size:10px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase}
+
+/* Agent-Farben fuer Status-Leiste */
+#status-bar[data-agent="kim"]{background:linear-gradient(90deg,rgba(230,57,70,.15) 0%,rgba(230,57,70,.03) 100%)}
+#status-bar[data-agent="kim"] .agent-icon{background:var(--kim-red)}
+#status-bar[data-agent="kai"]{background:linear-gradient(90deg,rgba(74,144,217,.15) 0%,rgba(74,144,217,.03) 100%)}
+#status-bar[data-agent="kai"] .agent-icon{background:var(--kai-blue)}
+#status-bar[data-agent="manus"]{background:linear-gradient(90deg,rgba(212,160,23,.15) 0%,rgba(212,160,23,.03) 100%)}
+#status-bar[data-agent="manus"] .agent-icon{background:var(--manus-gold)}
+
+/* =========================================
+   3. SCROLLABLE CONTENT
+   ========================================= */
+#main-scroll{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:8px 10px;
+  display:flex;flex-direction:column;gap:8px;
+}
+
+/* =========================================
+   4. SCHNELLZUGRIFF
+   ========================================= */
+.quick-access{
+  display:flex;gap:8px;
+}
+.quick-btn{
+  flex:1;padding:8px;border-radius:var(--radius-sm);
+  border:1px solid #444;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-primary);
+  background:linear-gradient(145deg,#3a3a3a 0%,#333 25%,#2e2e2e 50%,#333 75%,#383838 100%);
+  box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+  transition:transform .15s;
+}
+.quick-btn:active{transform:scale(.96);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.quick-btn svg{width:14px;height:14px;fill:currentColor}
+.quick-btn.postfach-btn{border-color:var(--kai-blue);color:var(--kai-blue)}
+.quick-btn.tresor{border-color:var(--manus-gold);color:var(--manus-gold)}
+
+/* =========================================
+   5. KARUSSELL (wiederverwendbar)
+   ========================================= */
+.carousel{margin:0 -10px}
+.carousel-header{
+  display:flex;align-items:center;padding:0 10px;
+}
+.carousel-tabs{
+  display:flex;gap:0;overflow-x:auto;flex:1;
+  scrollbar-width:none;-ms-overflow-style:none;
+  scroll-snap-type:x mandatory;
+  padding:4px 0;
+}
+.carousel-tabs::-webkit-scrollbar{display:none}
+.carousel-tab{
+  flex-shrink:0;padding:6px 14px;
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-dim);cursor:pointer;
+  border-bottom:2px solid transparent;
+  scroll-snap-align:start;
+  white-space:nowrap;
+  transition:color .2s,border-color .2s;
+}
+.carousel-tab:hover{color:var(--text-primary)}
+.carousel-tab.active{color:var(--kim-red);border-bottom-color:var(--kim-red)}
+.carousel-arrow{
+  width:28px;height:28px;border:none;background:transparent;
+  color:var(--text-dim);cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.carousel-arrow:active{color:var(--text-primary)}
+
+/* =========================================
+   6. CARD GRID (3x3)
+   ========================================= */
+.card-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  padding:6px 10px;
+  max-height:none;/* 2x4 = 8 Karten */
+}
+.card-item{
+  aspect-ratio:85.6/54;border-radius:var(--radius-sm);/* EC-Karten-Format 85.6x54mm */
+  background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
+  border:1px solid var(--border-subtle);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;transition:transform .15s,border-color .2s;
+  padding:8px;overflow:hidden;
+}
+.card-item:active{transform:scale(.95);border-color:var(--border-light)}
+.card-item .card-icon{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.card-item .card-icon svg{width:18px;height:18px;fill:currentColor}
+.card-item .card-label{
+  font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--text-dim);text-align:center;line-height:1.1;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+/* Agent-Karten Farben */
+.card-item[data-type="kim"] .card-icon{background:rgba(230,57,70,.2);color:var(--kim-red)}
+.card-item[data-type="kai"] .card-icon{background:rgba(74,144,217,.2);color:var(--kai-blue)}
+.card-item[data-type="manus"] .card-icon{background:rgba(212,160,23,.2);color:var(--manus-gold)}
+.card-item[data-type="agent"] .card-icon{background:rgba(76,175,80,.2);color:#4caf50}
+.card-item[data-type="add"]{border-style:dashed;border-color:var(--text-muted)}
+.card-item[data-type="add"] .card-icon{color:var(--text-muted);font-size:28px}
+
+/* =========================================
+   7. BUECHERREGAL
+   ========================================= */
+.bookshelf{
+  background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.6);
+  padding:10px;min-height:150px;
+  position:relative;overflow:hidden;
+  flex:1;/* Nimmt restlichen Platz ein */
+}
+.shelf-row{
+  display:flex;gap:8px;align-items:flex-end;
+  padding-bottom:8px;
+  border-bottom:4px solid #2a2a2a;
+  box-shadow:0 4px 8px rgba(0,0,0,.5);
+  overflow-x:auto;scrollbar-width:none;
+  min-height:120px;height:100%;
+}
+.shelf-row::-webkit-scrollbar{display:none}
+.book{
+  flex-shrink:0;width:50px;border-radius:3px;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  cursor:pointer;transition:transform .15s;
+  padding:4px 2px;position:relative;
+}
+.book:active{transform:translateY(-4px)}
+.book-spine{
+  width:100%;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:2px 0 4px rgba(0,0,0,.4),-1px 0 2px rgba(255,255,255,.05);
+}
+.book-label{
+  font-size:7px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.9);writing-mode:vertical-lr;text-orientation:mixed;
+  padding:4px 0;
+}
+/* Buch-Farben */
+.book.green .book-spine{background:linear-gradient(180deg,#2d6a2d 0%,#1e4d1e 100%);height:110px}
+.book.blue .book-spine{background:linear-gradient(180deg,#2d4a6a 0%,#1e3350 100%);height:95px}
+.book.red .book-spine{background:linear-gradient(180deg,#6a2d2d 0%,#501e1e 100%);height:100px}
+.book.gold .book-spine{background:linear-gradient(180deg,#6a5a2d 0%,#504420 100%);height:88px}
+.book.purple .book-spine{background:linear-gradient(180deg,#4a2d6a 0%,#351e50 100%);height:98px}
+.book.gray .book-spine{background:linear-gradient(180deg,#444 0%,#333 100%);height:92px}
+
+/* =========================================
+   8. ABLAGE
+   ========================================= */
+/* Ablage-Header */
+.ablage-header{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-dim);padding:4px 12px 2px;
+}
+/* Ablage = festes 2x2 Grid */
+.ablage-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  padding:0 10px;
+  align-content:end;
+}
+.ablage-tray{
+  height:34px;
+  background:linear-gradient(180deg,#2a2a2a 0%,#222 60%,#1e1e1e 100%);
+  border:1px solid var(--border-subtle);
+  border-radius:3px;
+  position:relative;
+  display:flex;align-items:center;padding:0 8px;gap:6px;
+  cursor:pointer;
+  transition:background .15s;
+}
+.ablage-tray:active{background:#2e2e2e}
+/* Vorderkante/Lippe wie echte Briefablage */
+.ablage-tray::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:3px;border-radius:0 0 3px 3px;
+  background:linear-gradient(180deg,#444 0%,#333 100%);
+  box-shadow:0 2px 3px rgba(0,0,0,.3);
+}
+/* Griff-Ausschnitt */
+.ablage-tray::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:36px;height:5px;
+  background:linear-gradient(180deg,#1a1a1a 0%,#111 100%);
+  border-radius:5px 5px 0 0;
+  border:1px solid var(--border-subtle);border-bottom:none;
+}
+.ablage-tray .tray-icon{font-size:12px;flex-shrink:0}
+.ablage-tray .tray-label{
+  font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--text-dim);flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ablage-tray .badge{
+  background:var(--kim-red);color:#fff;font-size:7px;font-weight:700;
+  padding:1px 4px;border-radius:8px;min-width:14px;text-align:center;flex-shrink:0;
+}
+/* Postfach = gold/sicher */
+.ablage-tray.postfach{border-left:3px solid var(--manus-gold)}
+.ablage-tray.postfach .tray-label{color:var(--manus-gold)}
+
+/* =========================================
+   9. COMM-BAR (fest unten)
+   ========================================= */
+#comm-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;padding-bottom:calc(8px + var(--sab));
+  background:linear-gradient(180deg,#2a2a2a 0%,#222 50%,#1e1e1e 100%);
+  border-top:1px solid #444;
+  box-shadow:0 -4px 16px rgba(0,0,0,.6);
+  flex-shrink:0;z-index:10;
+}
+.comm-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+}
+.comm-btn .btn-circle{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;color:#fff;
+  transition:transform .15s;
+}
+.comm-btn:active .btn-circle{transform:scale(.9)}
+.comm-btn .btn-label{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)}
+.comm-btn.kai .btn-circle{background:var(--kai-blue);box-shadow:0 2px 8px rgba(74,144,217,.3)}
+.comm-btn.kim-home .btn-circle{background:var(--kim-red);box-shadow:0 2px 8px rgba(230,57,70,.3)}
+
+/* Grosser KIM-Button in der Mitte */
+.comm-btn.kim-main .btn-circle{
+  width:60px;height:60px;
+  background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%);
+  box-shadow:0 4px 16px rgba(230,57,70,.5),0 0 30px rgba(230,57,70,.2);
+  font-size:22px;margin-top:-10px;
+  border:2px solid rgba(255,255,255,.15);
+}
+.comm-btn.kim-main:active .btn-circle{box-shadow:0 2px 8px rgba(230,57,70,.5);transform:scale(.92)}
+
+/* =========================================
+   UTILITY
+   ========================================= */
+.section-divider{
+  height:1px;background:var(--border-subtle);margin:2px 0;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- B1. HEADER -->
+  <div id="header">
+    <div class="logo-circle">K</div>
+    <span class="title">KIMANUS</span>
+    <button class="hdr-btn" onclick="alert('QR Scanner oeffnen')">
+      <svg viewBox="0 0 24 24"><path d="M3 11h2V9H3v2zm0-4h2V5h2V3H3v4zm4 12h2v-2H7v2zm8-16v2h2v2h2V3h-4zm-4 16h2v-2h-2v2zm-8 0h4v-2H5v-2H3v4zm16-4h2v4h-4v-2h2v-2zm0-4h2V9h-2v2zm0 0h-2v4h-2v2h2v-2h2v-4zm-8-2V7h2V5h-4v2h-2v2h4zm-4 8v2h4v-4h-2v2H9zm4-4h4V9h-2v2h-2v2zm2-8h2v2h-2V3z"/></svg>
+    </button>
+  </div>
+
+  <!-- B2. STATUS-LEISTE -->
+  <div id="status-bar" data-agent="kai" onclick="cycleAgent()">
+    <div class="agent-dot"></div>
+    <div class="agent-icon" id="status-icon">KAI</div>
+    <div style="display:flex;flex-direction:column;flex:1">
+      <span class="agent-name" id="status-name">KAI</span>
+      <span class="agent-role" id="status-role">Business-Agent</span>
+    </div>
+    <svg width="16" height="16" fill="#555" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+  </div>
+
+  <!-- 3-8. SCROLLABLE CONTENT -->
+  <div id="main-scroll">
+
+    <!-- B4. KARUSSELL 1 - Kategorien -->
+    <div class="carousel" id="carousel-1">
+      <div class="carousel-header">
+        <button class="carousel-arrow" onclick="scrollCarousel('cat-tabs',-1)">&lt;</button>
+        <div class="carousel-tabs" id="cat-tabs">
+          <div class="carousel-tab active" onclick="switchCategory('agenten',this)">Agenten</div>
+          <div class="carousel-tab" onclick="switchCategory('clubcard',this)">Clubcard</div>
+          <div class="carousel-tab" onclick="switchCategory('webseiten',this)">Webseiten</div>
+          <div class="carousel-tab" onclick="switchCategory('bilderrahmen',this)">Bilderrahmen</div>
+          <div class="carousel-tab" onclick="switchCategory('capcoin',this)">Cap-Coin</div>
+          <div class="carousel-tab" onclick="switchCategory('apps',this)">Meine Apps</div>
+        </div>
+        <button class="carousel-arrow" onclick="scrollCarousel('cat-tabs',1)">&gt;</button>
+      </div>
+    </div>
+
+    <!-- B5. CARD GRID (Visitenkarten-Format 85x55mm) -->
+    <div class="card-grid" id="card-grid">
+      <!-- Wird dynamisch befuellt via JS -->
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- B6. KARUSSELL 2 - Buecherregal -->
+    <div class="carousel" id="carousel-2">
+      <div class="carousel-header">
+        <button class="carousel-arrow" onclick="scrollCarousel('shelf-tabs',-1)">&lt;</button>
+        <div class="carousel-tabs" id="shelf-tabs">
+          <div class="carousel-tab active" onclick="switchShelf('ordner',this)">Ordner</div>
+          <div class="carousel-tab" onclick="switchShelf('alben',this)">Alben</div>
+          <div class="carousel-tab" onclick="switchShelf('buecher',this)">Buecher</div>
+          <div class="carousel-tab" onclick="switchShelf('filme',this)">Filme</div>
+          <div class="carousel-tab" onclick="switchShelf('cd',this)">CD</div>
+          <div class="carousel-tab" onclick="switchShelf('apps',this)">Apps</div>
+        </div>
+        <button class="carousel-arrow" onclick="scrollCarousel('shelf-tabs',1)">&gt;</button>
+      </div>
+    </div>
+
+    <!-- B7. BUECHERREGAL -->
+    <div class="bookshelf" id="bookshelf">
+      <div class="shelf-row" id="shelf-row">
+        <!-- Wird dynamisch befuellt via JS -->
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- B8. ABLAGE (feste Ueberschrift + 2x2 Faecher) -->
+    <div class="ablage-header">ABLAGE</div>
+    <div class="ablage-grid" id="ablage-grid">
+      <!-- 2x2 feste Ablagefaecher -->
+    </div>
+
+  </div><!-- /main-scroll -->
+
+  <!-- B3. SCHNELLZUGRIFF (unten, wie Schublade im Schreibtisch) -->
+  <div class="quick-access" style="padding:4px 10px;flex-shrink:0;border-top:1px solid var(--border-subtle)">
+    <button class="quick-btn postfach-btn" onclick="alert('Sicheres Postfach - NFC/Schluessel erforderlich')">
+      <!-- Schlüsselloch-Icon -->
+      <svg viewBox="0 0 24 24"><path d="M12 1C8.68 1 6 3.68 6 7v1H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2h-1V7c0-3.32-2.68-6-6-6zm0 2c2.21 0 4 1.79 4 4v1H8V7c0-2.21 1.79-4 4-4zm0 10c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>
+      Postfach
+    </button>
+    <button class="quick-btn tresor" onclick="alert('Schliessfach oeffnen - Tresor + Kasse')">
+      <!-- Tresor/Safe-Icon -->
+      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+      Schliessfach
+    </button>
+  </div>
+
+  <!-- B9. COMM-BAR -->
+  <div id="comm-bar">
+    <div class="comm-btn kai" onclick="setAgent('kai')">
+      <div class="btn-circle">KAI</div>
+      <span class="btn-label">Setup</span>
+    </div>
+    <div class="comm-btn kim-main" onclick="setAgent('kim')">
+      <div class="btn-circle">K</div>
+    </div>
+    <div class="comm-btn kim-home" onclick="alert('Home')">
+      <div class="btn-circle">
+        <svg width="20" height="20" fill="#fff" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      </div>
+      <span class="btn-label">Home</span>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ===== DATEN =====
+const AGENTS = [
+  {id:'kim', label:'KIM', type:'kim', icon:'K'},
+  {id:'kai', label:'KAI', type:'kai', icon:'KAI'},
+  {id:'manus', label:'MANUS', type:'manus', icon:'M'},
+  {id:'wetterfrosch', label:'Wetter', type:'agent', icon:'☀️'},
+  {id:'animateur', label:'Animateur', type:'agent', icon:'🎯'},
+  {id:'sekretaer', label:'Sekretaer', type:'agent', icon:'📋'},
+  {id:'kalkulierer', label:'Kalkulierer', type:'agent', icon:'🧮'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+];/* 2x4=8 Karten */
+
+const CLUBCARDS = [
+  {id:'capcoin', label:'Cap-Coin', type:'kim', icon:'C'},
+  {id:'club1', label:'Lieblingsbar', type:'agent', icon:'🍺'},
+  {id:'club2', label:'Fitness', type:'agent', icon:'💪'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+];
+
+const WEBSEITEN = [
+  {id:'w1', label:'Nickmedia', type:'kai', icon:'N'},
+  {id:'w2', label:'Bierland', type:'agent', icon:'🍻'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+];
+
+const BILDERRAHMEN = [
+  {id:'r1', label:'Wohnzimmer', type:'agent', icon:'🖼️'},
+  {id:'r2', label:'Oma & Opa', type:'kim', icon:'❤️'},
+  {id:'r3', label:'Restaurant', type:'kai', icon:'🍽️'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+];
+
+const CAPCOIN = [
+  {id:'cc1', label:'Meine Coins', type:'kim', icon:'C'},
+  {id:'cc2', label:'Einloesen', type:'agent', icon:'🎁'},
+  {id:'cc3', label:'Sammlung', type:'manus', icon:'🏆'},
+  {id:'cc4', label:'Partner', type:'agent', icon:'🤝'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+];
+
+const APPS = [
+  {id:'whatsapp', label:'WhatsApp', type:'agent', icon:'💬'},
+  {id:'maps', label:'Maps', type:'agent', icon:'📍'},
+  {id:'spotify', label:'Spotify', type:'agent', icon:'🎵'},
+  {id:'banking', label:'Banking', type:'kai', icon:'💳'},
+  {id:'flightradar', label:'FlightRadar', type:'agent', icon:'✈️'},
+  {id:'add', label:'+ Neu', type:'add', icon:'+'},
+];
+
+const CATEGORIES = {
+  agenten: AGENTS,
+  clubcard: CLUBCARDS,
+  webseiten: WEBSEITEN,
+  bilderrahmen: BILDERRAHMEN,
+  capcoin: CAPCOIN,
+  apps: APPS,
+};
+
+// Buecherregal-Daten
+const SHELVES = {
+  ordner: [
+    {label:'Projekt', color:'green'},
+    {label:'Cap-Coin', color:'green'},
+    {label:'Versich.', color:'blue'},
+    {label:'Steuern', color:'red'},
+    {label:'Vertraege', color:'gold'},
+    {label:'Rezepte', color:'purple'},
+    {label:'Archiv', color:'gray'},
+  ],
+  alben: [
+    {label:'Urlaub 24', color:'blue'},
+    {label:'Familie', color:'red'},
+    {label:'Events', color:'purple'},
+    {label:'Natur', color:'green'},
+  ],
+  buecher: [
+    {label:'Rezepte', color:'red'},
+    {label:'Roman', color:'blue'},
+    {label:'Fachbuch', color:'green'},
+    {label:'Krimi', color:'purple'},
+  ],
+  filme: [
+    {label:'Action', color:'red'},
+    {label:'Komoedie', color:'gold'},
+    {label:'Doku', color:'blue'},
+    {label:'Serien', color:'green'},
+  ],
+  cd: [
+    {label:'Rock', color:'red'},
+    {label:'Jazz', color:'blue'},
+    {label:'Klassik', color:'gold'},
+    {label:'Pop', color:'purple'},
+  ],
+  apps: [
+    {label:'Reise', color:'blue'},
+    {label:'Fitness', color:'green'},
+    {label:'Kochen', color:'red'},
+    {label:'Finanzen', color:'gold'},
+    {label:'Social', color:'purple'},
+  ],
+};
+
+const AGENT_INFO = {
+  kim: {name:'KIM', role:'Privatassistent', color:'var(--kim-red)'},
+  kai: {name:'KAI', role:'Business-Agent', color:'var(--kai-blue)'},
+  manus: {name:'KI MANUS', role:'Dirigent', color:'var(--manus-gold)'},
+};
+
+// Ablage-/Postfach-Daten
+const MAILBOXES = {
+  alle: [
+    {id:'email', label:'E-Mail', icon:'📧', badge:3, secure:false},
+    {id:'postfach', label:'Sicheres Postfach', icon:'🔒', badge:1, secure:true},
+    {id:'rechnungen', label:'Rechnungen', icon:'🧾', badge:2, secure:false},
+    {id:'benachrichtigungen', label:'Benachrichtigungen', icon:'🔔', badge:5, secure:false},
+    {id:'post', label:'Briefpost', icon:'📬', badge:0, secure:false},
+    {id:'termine', label:'Termine & Fristen', icon:'📅', badge:1, secure:false},
+    {id:'newsletter', label:'Newsletter', icon:'📰', badge:4, secure:false},
+    {id:'vertraege', label:'Vertraege', icon:'📋', badge:0, secure:true},
+  ],
+  email: [
+    {id:'email', label:'E-Mail', icon:'📧', badge:3, secure:false},
+  ],
+  postfach: [
+    {id:'postfach-privat', label:'Privat', icon:'🔒', badge:1, secure:true},
+    {id:'postfach-business', label:'Business', icon:'🔐', badge:0, secure:true},
+    {id:'postfach-familie', label:'Familie', icon:'🏠', badge:0, secure:true},
+    {id:'postfach-geheim', label:'Tresor-Post', icon:'🛡️', badge:0, secure:true},
+  ],
+  rechnungen: [
+    {id:'rech-offen', label:'Offen', icon:'⚠️', badge:2, secure:false},
+    {id:'rech-bezahlt', label:'Bezahlt', icon:'✅', badge:0, secure:false},
+    {id:'rech-archiv', label:'Archiv', icon:'📁', badge:0, secure:false},
+  ],
+  post: [
+    {id:'post-eingang', label:'Eingang', icon:'📬', badge:0, secure:false},
+    {id:'post-ausgang', label:'Ausgang', icon:'📤', badge:0, secure:false},
+  ],
+  benachrichtigungen: [
+    {id:'info-system', label:'System', icon:'⚙️', badge:2, secure:false},
+    {id:'info-agenten', label:'Agenten', icon:'🤖', badge:3, secure:false},
+    {id:'info-partner', label:'Partner', icon:'🤝', badge:0, secure:false},
+  ],
+};
+
+let currentAgent = 'kai';
+let currentCategory = 'agenten';
+let currentShelf = 'ordner';
+let currentMail = 'alle';
+
+// ===== FUNKTIONEN =====
+
+function switchCategory(name, tabEl) {
+  currentCategory = name;
+  // Aktiven Tab markieren
+  document.querySelectorAll('#carousel-1 .carousel-tab').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  renderCards();
+}
+
+function switchShelf(name, tabEl) {
+  currentShelf = name;
+  document.querySelectorAll('#carousel-2 .carousel-tab').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  renderShelf();
+}
+
+function renderCards() {
+  const grid = document.getElementById('card-grid');
+  const items = CATEGORIES[currentCategory] || [];
+  grid.innerHTML = items.map(item => `
+    <div class="card-item" data-type="${item.type}" onclick="cardClick('${item.id}')">
+      <div class="card-icon">${item.icon}</div>
+      <div class="card-label">${item.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderShelf() {
+  const row = document.getElementById('shelf-row');
+  const books = SHELVES[currentShelf] || [];
+  row.innerHTML = books.map(book => `
+    <div class="book ${book.color}" onclick="alert('${book.label} oeffnen')">
+      <div class="book-spine">
+        <span class="book-label">${book.label}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function scrollCarousel(tabsId, dir) {
+  const tabs = document.getElementById(tabsId);
+  tabs.scrollBy({left: dir * 120, behavior: 'smooth'});
+}
+
+function cycleAgent() {
+  const agents = ['kim','kai','manus'];
+  const idx = agents.indexOf(currentAgent);
+  currentAgent = agents[(idx + 1) % agents.length];
+  updateStatusBar();
+}
+
+function setAgent(name) {
+  currentAgent = name;
+  updateStatusBar();
+}
+
+function updateStatusBar() {
+  const bar = document.getElementById('status-bar');
+  const info = AGENT_INFO[currentAgent];
+  bar.dataset.agent = currentAgent;
+  document.getElementById('status-icon').textContent = info.name.charAt(0);
+  document.getElementById('status-icon').style.background = info.color;
+  document.getElementById('status-name').textContent = info.name;
+  document.getElementById('status-role').textContent = info.role;
+}
+
+function cardClick(id) {
+  if (id === 'add') {
+    alert('Neue Karte hinzufuegen');
+    return;
+  }
+  // Agent-Karten oeffnen Chat
+  if (['kim','kai','manus'].includes(id)) {
+    setAgent(id);
+    alert('Chat mit ' + AGENT_INFO[id].name + ' oeffnen');
+    return;
+  }
+  alert(id + ' oeffnen');
+}
+
+function renderMail() {
+  const grid = document.getElementById('ablage-grid');
+  // Feste 4 Ablagefaecher (2x2)
+  const trays = [
+    {id:'email', label:'E-Mail', icon:'📧', badge:3, secure:false},
+    {id:'post', label:'Post', icon:'📬', badge:1, secure:false},
+    {id:'rechnungen', label:'Rechnungen', icon:'🧾', badge:2, secure:false},
+    {id:'allgemein', label:'Allgemein', icon:'📥', badge:0, secure:false},
+  ];
+  grid.innerHTML = trays.map(item => `
+    <div class="ablage-tray ${item.secure ? 'postfach' : ''}" onclick="alert('${item.label} oeffnen${item.secure ? ' - NFC noetig' : ''}')">
+      <span class="tray-icon">${item.icon}</span>
+      <span class="tray-label">${item.label}</span>
+      ${item.badge > 0 ? '<span class="badge">' + item.badge + '</span>' : ''}
+    </div>
+  `).join('');
+}
+
+// ===== INIT =====
+renderCards();
+renderShelf();
+renderMail();
+updateStatusBar();
+</script>
+
+</body>
+</html>
