@@ -112,22 +112,95 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* =========================================
    4. SCHNELLZUGRIFF
    ========================================= */
-.quick-access{
-  display:flex;gap:8px;
+/* =========================================
+   B3. SCHLIESSFACH & POSTFACH (Metalltuer)
+   ========================================= */
+.locker-header{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-dim);padding:6px 20px 2px;
+  flex-shrink:0;
 }
-.quick-btn{
-  flex:1;padding:8px;border-radius:var(--radius-sm);
-  border:1px solid #444;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-primary);
-  background:linear-gradient(145deg,#3a3a3a 0%,#333 25%,#2e2e2e 50%,#333 75%,#383838 100%);
-  box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);
+.locker-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;
+  padding:4px 20px 6px;flex-shrink:0;
+  margin-bottom:10px;/* Spalt zwischen Schliessfach und Comm-Bar */
+}
+.locker{
+  flex:1;cursor:pointer;
   transition:transform .15s;
 }
-.quick-btn:active{transform:scale(.96);box-shadow:0 2px 6px rgba(0,0,0,.5)}
-.quick-btn svg{width:14px;height:14px;fill:currentColor}
-.quick-btn.postfach-btn{border-color:var(--kai-blue);color:var(--kai-blue)}
-.quick-btn.tresor{border-color:var(--manus-gold);color:var(--manus-gold)}
+.locker:active{transform:scale(.97)}
+.locker-door{
+  height:52px;
+  border-radius:2px;/* Eckig wie echtes Schliessfach! */
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  position:relative;
+  /* Gebuerstetes Metall */
+  background:linear-gradient(180deg,#4a4a4a 0%,#3a3a3a 15%,#404040 30%,#383838 50%,#3c3c3c 70%,#353535 85%,#3a3a3a 100%);
+  border:1px solid #555;
+  border-top:1px solid #666;
+  border-bottom:2px solid #2a2a2a;
+  box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.3);
+}
+/* Horizontale Buerststreifen */
+.locker-door::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,.02) 2px,
+    rgba(255,255,255,.02) 3px
+  );
+  border-radius:2px;
+  pointer-events:none;
+}
+.locker-label{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.7);
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+.locker-sublabel{
+  font-size:7px;font-weight:600;letter-spacing:1.5px;
+  color:rgba(255,255,255,.35);
+}
+/* Schluesselloch */
+.locker-keyhole{
+  display:flex;align-items:center;justify-content:center;
+}
+.keyhole-outer{
+  width:14px;height:14px;border-radius:50%;
+  background:linear-gradient(145deg,#555 0%,#333 100%);
+  border:1px solid #666;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.1);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;
+}
+.keyhole-inner{
+  width:4px;height:4px;border-radius:50%;
+  background:#1a1a1a;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.8);
+}
+.keyhole-slot{
+  width:2px;height:4px;
+  background:#1a1a1a;
+  margin-top:-1px;
+  box-shadow:inset 0 1px 1px rgba(0,0,0,.8);
+}
+/* Postfach = blaeulicher Stahl */
+.postfach-locker .locker-door{
+  background:linear-gradient(180deg,#3a4555 0%,#2e3a48 15%,#334050 30%,#2c3645 50%,#303c4c 70%,#2a3442 85%,#2e3848 100%);
+  border-color:#4a6080;border-top-color:#5a7090;
+}
+.postfach-locker .locker-label{color:rgba(140,180,220,.9)}
+.postfach-locker .locker-sublabel{color:rgba(140,180,220,.4)}
+/* Schliessfach = goldener Stahl */
+.schliessfach-locker .locker-door{
+  background:linear-gradient(180deg,#4a4535 0%,#3a3828 15%,#404030 30%,#383528 50%,#3c3a2c 70%,#353225 85%,#3a3828 100%);
+  border-color:#6a6040;border-top-color:#7a7050;
+}
+.schliessfach-locker .locker-label{color:rgba(220,200,140,.9)}
+.schliessfach-locker .locker-sublabel{color:rgba(220,200,140,.4)}
 
 /* =========================================
    5. KARUSSELL (wiederverwendbar)
@@ -207,17 +280,15 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border:1px solid var(--border-subtle);
   border-radius:var(--radius);
   box-shadow:inset 0 3px 10px rgba(0,0,0,.6);
-  padding:10px;min-height:150px;
+  padding:6px 10px 0;
   position:relative;overflow:hidden;
-  flex:1;/* Nimmt restlichen Platz ein */
 }
 .shelf-row{
   display:flex;gap:8px;align-items:flex-end;
-  padding-bottom:8px;
+  padding-bottom:6px;
   border-bottom:4px solid #2a2a2a;
   box-shadow:0 4px 8px rgba(0,0,0,.5);
   overflow-x:auto;scrollbar-width:none;
-  min-height:120px;height:100%;
 }
 .shelf-row::-webkit-scrollbar{display:none}
 .book{
@@ -251,13 +322,15 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* Ablage-Header */
 .ablage-header{
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--text-dim);padding:4px 12px 2px;
+  color:var(--text-dim);padding:4px 20px 2px;
+  flex-shrink:0;
 }
-/* Ablage = festes 2x2 Grid */
+/* Ablage = festes 2x2 Grid, gleiche Breite wie Schliessfaecher */
 .ablage-grid{
   display:grid;grid-template-columns:1fr 1fr;gap:4px;
-  padding:0 10px;
+  padding:0 20px;
   align-content:end;
+  flex-shrink:0;
 }
 .ablage-tray{
   height:34px;
@@ -304,35 +377,51 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
    ========================================= */
 #comm-bar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:8px 16px;padding-bottom:calc(8px + var(--sab));
+  padding:14px 8px;padding-bottom:calc(14px + var(--sab));
   background:linear-gradient(180deg,#2a2a2a 0%,#222 50%,#1e1e1e 100%);
   border-top:1px solid #444;
   box-shadow:0 -4px 16px rgba(0,0,0,.6);
   flex-shrink:0;z-index:10;
 }
+.comm-group{
+  display:flex;align-items:center;gap:8px;
+}
+.comm-group.center{gap:10px}
 .comm-btn{
   display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
 }
+.comm-btn:active{transform:scale(.9)}
+/* Grosse Buttons (KAI + KIM) */
 .comm-btn .btn-circle{
   width:40px;height:40px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   font-weight:800;font-size:14px;color:#fff;
   transition:transform .15s;
 }
-.comm-btn:active .btn-circle{transform:scale(.9)}
-.comm-btn .btn-label{font-size:8px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)}
-.comm-btn.kai .btn-circle{background:var(--kai-blue);box-shadow:0 2px 8px rgba(74,144,217,.3)}
-.comm-btn.kim-home .btn-circle{background:var(--kim-red);box-shadow:0 2px 8px rgba(230,57,70,.3)}
-
+/* Kleine Buttons (Setup, Mikro, Chat, Home) */
+.comm-btn .btn-circle-sm{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,background .15s;
+}
+.comm-btn:active .btn-circle-sm{background:rgba(255,255,255,.15)}
+/* KAI = blau */
+.comm-btn.kai .btn-circle{background:var(--kai-blue);box-shadow:0 2px 8px rgba(74,144,217,.3);font-size:12px}
+/* KIM rechts = rot */
+.comm-btn.kim-right .btn-circle{background:var(--kim-red);box-shadow:0 2px 8px rgba(230,57,70,.3);font-size:11px}
+/* Eck-Buttons (Setup + Home) kleiner */
+.comm-btn.corner-btn .btn-circle-sm{width:28px;height:28px}
 /* Grosser KIM-Button in der Mitte */
 .comm-btn.kim-main .btn-circle{
-  width:60px;height:60px;
+  width:56px;height:56px;
   background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%);
   box-shadow:0 4px 16px rgba(230,57,70,.5),0 0 30px rgba(230,57,70,.2);
-  font-size:22px;margin-top:-10px;
+  font-size:22px;margin-top:-8px;
   border:2px solid rgba(255,255,255,.15);
 }
-.comm-btn.kim-main:active .btn-circle{box-shadow:0 2px 8px rgba(230,57,70,.5);transform:scale(.92)}
+.comm-btn.kim-main:active .btn-circle{box-shadow:0 2px 8px rgba(230,57,70,.5)}
 
 /* =========================================
    UTILITY
@@ -417,42 +506,85 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
     <div class="section-divider"></div>
 
-    <!-- B8. ABLAGE (feste Ueberschrift + 2x2 Faecher) -->
-    <div class="ablage-header">ABLAGE</div>
-    <div class="ablage-grid" id="ablage-grid">
-      <!-- 2x2 feste Ablagefaecher -->
-    </div>
-
   </div><!-- /main-scroll -->
 
-  <!-- B3. SCHNELLZUGRIFF (unten, wie Schublade im Schreibtisch) -->
-  <div class="quick-access" style="padding:4px 10px;flex-shrink:0;border-top:1px solid var(--border-subtle)">
-    <button class="quick-btn postfach-btn" onclick="alert('Sicheres Postfach - NFC/Schluessel erforderlich')">
-      <!-- Schlüsselloch-Icon -->
-      <svg viewBox="0 0 24 24"><path d="M12 1C8.68 1 6 3.68 6 7v1H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2h-1V7c0-3.32-2.68-6-6-6zm0 2c2.21 0 4 1.79 4 4v1H8V7c0-2.21 1.79-4 4-4zm0 10c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>
-      Postfach
-    </button>
-    <button class="quick-btn tresor" onclick="alert('Schliessfach oeffnen - Tresor + Kasse')">
-      <!-- Tresor/Safe-Icon -->
-      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-      Schliessfach
-    </button>
+  <!-- B8. ABLAGE (fest, oberhalb der Schliessfaecher) -->
+  <div style="flex-shrink:0;height:12px"></div>
+  <div class="ablage-header">ABLAGE</div>
+  <div class="ablage-grid" id="ablage-grid">
+    <!-- 2x2 feste Ablagefaecher -->
   </div>
 
-  <!-- B9. COMM-BAR -->
-  <div id="comm-bar">
-    <div class="comm-btn kai" onclick="setAgent('kai')">
-      <div class="btn-circle">KAI</div>
-      <span class="btn-label">Setup</span>
-    </div>
-    <div class="comm-btn kim-main" onclick="setAgent('kim')">
-      <div class="btn-circle">K</div>
-    </div>
-    <div class="comm-btn kim-home" onclick="alert('Home')">
-      <div class="btn-circle">
-        <svg width="20" height="20" fill="#fff" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+  <!-- B3. POSTFACH + SCHLIESSFACH (Metalltuer-Look) -->
+  <div class="locker-header">TEXT TEXT TEXT</div>
+  <div class="locker-row">
+    <div class="locker postfach-locker" onclick="alert('Sicheres Postfach - NFC/Schluessel erforderlich')">
+      <div class="locker-door">
+        <span class="locker-label">POSTFACH</span>
+        <div class="locker-keyhole">
+          <div class="keyhole-outer">
+            <div class="keyhole-inner"></div>
+            <div class="keyhole-slot"></div>
+          </div>
+        </div>
+        <span class="locker-sublabel">NFC</span>
       </div>
-      <span class="btn-label">Home</span>
+    </div>
+    <div class="locker schliessfach-locker" onclick="alert('Schliessfach oeffnen - Tresor + Kasse')">
+      <div class="locker-door">
+        <span class="locker-label">SCHLIESSFACH</span>
+        <div class="locker-keyhole">
+          <div class="keyhole-outer">
+            <div class="keyhole-inner"></div>
+            <div class="keyhole-slot"></div>
+          </div>
+        </div>
+        <span class="locker-sublabel">TRESOR &bull; KASSE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- B9. COMM-BAR: [Setup KAI] | [Mikro K Chat] | [KIM Home] -->
+  <div id="comm-bar">
+    <!-- LINKE GRUPPE: Setup (Eck) + KAI -->
+    <div class="comm-group">
+      <div class="comm-btn corner-btn" onclick="alert('Setup oeffnen')">
+        <div class="btn-circle-sm">
+          <svg width="14" height="14" fill="#fff" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+        </div>
+      </div>
+      <div class="comm-btn kai" onclick="setAgent('kai')">
+        <div class="btn-circle">KAI</div>
+      </div>
+    </div>
+
+    <!-- MITTE: Mikro | [K] | Chat -->
+    <div class="comm-group center">
+      <div class="comm-btn mic" onclick="alert('Funk-Modus starten')">
+        <div class="btn-circle-sm">
+          <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+      </div>
+      <div class="comm-btn kim-main" onclick="setAgent('kim')">
+        <div class="btn-circle">K</div>
+      </div>
+      <div class="comm-btn chat" onclick="alert('Chat oeffnen')">
+        <div class="btn-circle-sm">
+          <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECHTE GRUPPE: KIM + Home (Eck) -->
+    <div class="comm-group">
+      <div class="comm-btn kim-right" onclick="setAgent('kim')">
+        <div class="btn-circle">KIM</div>
+      </div>
+      <div class="comm-btn corner-btn" onclick="alert('Home')">
+        <div class="btn-circle-sm">
+          <svg width="14" height="14" fill="#fff" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -706,6 +838,23 @@ function renderMail() {
       ${item.badge > 0 ? '<span class="badge">' + item.badge + '</span>' : ''}
     </div>
   `).join('');
+}
+
+// KIM Modus: Funk (Walkie-Talkie) oder Chat (Papierflieger)
+let kimMode = 'funk'; // 'funk' oder 'chat'
+
+function toggleKimMode() {
+  if (kimMode === 'funk') {
+    kimMode = 'chat';
+    document.getElementById('kim-icon-mic').style.display = 'none';
+    document.getElementById('kim-icon-chat').style.display = '';
+    document.getElementById('kim-mode-label').textContent = 'CHAT';
+  } else {
+    kimMode = 'funk';
+    document.getElementById('kim-icon-mic').style.display = '';
+    document.getElementById('kim-icon-chat').style.display = 'none';
+    document.getElementById('kim-mode-label').textContent = 'FUNK';
+  }
 }
 
 // ===== INIT =====
