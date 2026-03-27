@@ -256,29 +256,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .card-grid.scrollable::-webkit-scrollbar{display:none}
 .card-grid.scrollable .card-item{scroll-snap-align:start}
-/* Card Slider */
-.card-slider{
-  width:40%;height:12px;margin:0 auto;
-  display:flex;align-items:center;justify-content:center;
-  cursor:grab;
-}
-.card-slider:active{cursor:grabbing}
-.card-slider-track{
-  width:100%;height:3px;
-  background:#1a1a1a;border-radius:2px;
-  position:relative;
-}
-.card-slider-thumb{
-  position:absolute;top:-3px;
-  width:36px;height:8px;
-  background:linear-gradient(180deg,#555 0%,#3a3a3a 100%);
-  border:1px solid #555;
-  border-radius:4px;
-  box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
-  cursor:grab;
-  background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,.08) 3px,rgba(255,255,255,.08) 4px);
-}
-.card-slider-thumb:active{cursor:grabbing}
 .card-item{
   aspect-ratio:85.6/54;border-radius:var(--radius-sm);/* EC-Karten-Format 85.6x54mm */
   background:linear-gradient(160deg,#1a1a1a 0%,#141414 40%,#181818 100%);
@@ -362,30 +339,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .book.thick{width:40px}
 .book.extra{width:50px}
 
-/* Slider unter dem Regal */
-.shelf-slider{
-  width:100%;height:12px;
-  display:flex;align-items:center;justify-content:center;
-  padding:0 20px;flex-shrink:0;
-  cursor:grab;
-}
-.shelf-slider:active{cursor:grabbing}
-.shelf-slider-track{
-  width:40%;height:3px;
-  background:#1a1a1a;border-radius:2px;
-  position:relative;
-}
-.shelf-slider-thumb{
-  position:absolute;top:-3px;
-  width:36px;height:8px;
-  background:linear-gradient(180deg,#555 0%,#3a3a3a 100%);
-  border:1px solid #555;
-  border-radius:4px;
-  box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
-  cursor:grab;
-  background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,.08) 3px,rgba(255,255,255,.08) 4px);
-}
-.shelf-slider-thumb:active{cursor:grabbing;background-color:#4a4a4a}
 
 /* =========================================
    8. ABLAGE
@@ -526,38 +479,33 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <svg width="16" height="16" fill="#555" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
   </div>
 
-  <!-- 3-8. SCROLLABLE CONTENT -->
+  <!-- SCROLLABLE CONTENT (oben - Platz fuer KIMANUS/KAI) -->
   <div id="main-scroll">
+    <!-- Hier kommt spaeter mehr Inhalt rein (Visitenkarten gross, Agent-Details etc.) -->
+  </div>
 
-    <!-- B4. KARUSSELL 1 - Kategorien -->
-    <div class="carousel" id="carousel-1">
-      <div class="carousel-header">
-        <button class="carousel-arrow" onclick="scrollCarousel('cat-tabs',-1)">&lt;</button>
-        <div class="carousel-tabs" id="cat-tabs">
-          <div class="carousel-tab active" onclick="switchCategory('agenten',this)">Agenten</div>
-          <div class="carousel-tab" onclick="switchCategory('clubcard',this)">Clubcard</div>
-          <div class="carousel-tab" onclick="switchCategory('webseiten',this)">Webseiten</div>
-          <div class="carousel-tab" onclick="switchCategory('bilderrahmen',this)">Bilderrahmen</div>
-          <div class="carousel-tab" onclick="switchCategory('capcoin',this)">Cap-Coin</div>
-          <div class="carousel-tab" onclick="switchCategory('apps',this)">Meine Apps</div>
-        </div>
-        <button class="carousel-arrow" onclick="scrollCarousel('cat-tabs',1)">&gt;</button>
+  <!-- B4. KARUSSELL 1 - Kategorien (fest, ueber Cards) -->
+  <div class="carousel" id="carousel-1" style="flex-shrink:0;margin:0">
+    <div class="carousel-header">
+      <button class="carousel-arrow" onclick="scrollCarousel('cat-tabs',-1)">&lt;</button>
+      <div class="carousel-tabs" id="cat-tabs">
+        <div class="carousel-tab active" onclick="switchCategory('agenten',this)">Agenten</div>
+        <div class="carousel-tab" onclick="switchCategory('clubcard',this)">Clubcard</div>
+        <div class="carousel-tab" onclick="switchCategory('webseiten',this)">Webseiten</div>
+        <div class="carousel-tab" onclick="switchCategory('bilderrahmen',this)">Bilderrahmen</div>
+        <div class="carousel-tab" onclick="switchCategory('capcoin',this)">Cap-Coin</div>
+        <div class="carousel-tab" onclick="switchCategory('apps',this)">Meine Apps</div>
       </div>
+      <button class="carousel-arrow" onclick="scrollCarousel('cat-tabs',1)">&gt;</button>
     </div>
+  </div>
 
-    <!-- B5. CARD GRID (Visitenkarten-Format, scrollbar mit Slider) -->
-    <div class="card-grid-wrap">
-      <div class="card-grid" id="card-grid">
-        <!-- Wird dynamisch befuellt via JS -->
-      </div>
+  <!-- B5. CARD GRID (fest, 3x4 mit Slider) -->
+  <div class="card-grid-wrap" style="flex-shrink:0">
+    <div class="card-grid" id="card-grid">
+      <!-- Wird dynamisch befuellt via JS -->
     </div>
-    <div class="card-slider" id="card-slider-wrap">
-      <div class="card-slider-track">
-        <div class="card-slider-thumb" id="card-thumb"></div>
-      </div>
-    </div>
-
-  </div><!-- /main-scroll -->
+  </div>
 
   <!-- B6. KARUSSELL 2 - Buecherregal (fest, ueber Ablage) -->
   <div class="carousel" id="carousel-2" style="flex-shrink:0;margin:0">
@@ -578,12 +526,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   <div class="bookshelf" id="bookshelf" style="flex-shrink:0;margin:0 10px">
     <div class="shelf-row" id="shelf-row">
       <!-- Wird dynamisch befuellt via JS -->
-    </div>
-  </div>
-  <!-- Slider zum Scrollen -->
-  <div class="shelf-slider" id="shelf-slider">
-    <div class="shelf-slider-track">
-      <div class="shelf-slider-thumb" id="shelf-thumb"></div>
     </div>
   </div>
 
@@ -854,7 +796,10 @@ function renderCards() {
     </div>
   `).join('');
   grid.scrollLeft = 0;
-  setTimeout(updateCardSlider, 50);
+  // Endlos-Scroll fuer Cards wenn scrollbar
+  if (items.length > 12) {
+    setupInfiniteScroll(grid);
+  }
 }
 
 function renderShelf() {
@@ -867,60 +812,28 @@ function renderShelf() {
       </div>
     </div>
   `).join('');
-  // Slider aktualisieren
-  updateShelfSlider();
+  // Endlos-Scroll aktivieren
+  setupInfiniteScroll(row);
 }
 
-// Shelf Slider - zum Anfassen und Drehen
-function updateShelfSlider() {
-  const row = document.getElementById('shelf-row');
-  const thumb = document.getElementById('shelf-thumb');
-  const track = thumb.parentElement;
-  if (row.scrollWidth <= row.clientWidth) {
-    thumb.style.display = 'none';
-    return;
-  }
-  thumb.style.display = '';
-  const ratio = row.clientWidth / row.scrollWidth;
-  const thumbW = Math.max(30, track.clientWidth * ratio);
-  thumb.style.width = thumbW + 'px';
-  const scrollRatio = row.scrollLeft / (row.scrollWidth - row.clientWidth);
-  thumb.style.left = (scrollRatio * (track.clientWidth - thumbW)) + 'px';
+// Endlos-Scroll (Kreis) fuer Buecherregal
+function setupInfiniteScroll(el) {
+  if (!el || el.scrollWidth <= el.clientWidth) return;
+  // Items verdoppeln fuer nahtlosen Loop
+  const original = el.innerHTML;
+  el.innerHTML = original + original;
+
+  el.addEventListener('scroll', function() {
+    const half = el.scrollWidth / 2;
+    if (el.scrollLeft >= half) {
+      el.scrollLeft -= half;
+    } else if (el.scrollLeft <= 0) {
+      el.scrollLeft += half;
+    }
+  });
+  // Start in der Mitte
+  el.scrollLeft = 1;
 }
-
-// Slider Drag
-(function() {
-  let dragging = false, startX = 0, startScroll = 0;
-  const thumb = document.getElementById('shelf-thumb');
-  const row = document.getElementById('shelf-row');
-
-  function onDown(e) {
-    dragging = true;
-    startX = (e.touches ? e.touches[0].clientX : e.clientX);
-    startScroll = row.scrollLeft;
-    e.preventDefault();
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    const x = (e.touches ? e.touches[0].clientX : e.clientX);
-    const dx = x - startX;
-    const track = thumb.parentElement;
-    const ratio = (row.scrollWidth - row.clientWidth) / (track.clientWidth - thumb.clientWidth);
-    row.scrollLeft = startScroll + dx * ratio;
-    updateShelfSlider();
-  }
-  function onUp() { dragging = false; }
-
-  thumb.addEventListener('mousedown', onDown);
-  thumb.addEventListener('touchstart', onDown, {passive:false});
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('touchmove', onMove, {passive:false});
-  document.addEventListener('mouseup', onUp);
-  document.addEventListener('touchend', onUp);
-
-  // Sync slider when shelf scrolls
-  row.addEventListener('scroll', updateShelfSlider);
-})()
 
 function scrollCarousel(tabsId, dir) {
   const tabs = document.getElementById(tabsId);
@@ -998,60 +911,12 @@ function toggleKimMode() {
   }
 }
 
-// Card Slider
-function updateCardSlider() {
-  const grid = document.getElementById('card-grid');
-  const thumb = document.getElementById('card-thumb');
-  const track = thumb.parentElement;
-  if (grid.scrollWidth <= grid.clientWidth) {
-    thumb.style.display = 'none';
-    return;
-  }
-  thumb.style.display = '';
-  const ratio = grid.clientWidth / grid.scrollWidth;
-  const thumbW = Math.max(30, track.clientWidth * ratio);
-  thumb.style.width = thumbW + 'px';
-  const scrollRatio = grid.scrollLeft / (grid.scrollWidth - grid.clientWidth);
-  thumb.style.left = (scrollRatio * (track.clientWidth - thumbW)) + 'px';
-}
-
-(function() {
-  let dragging = false, startX = 0, startScroll = 0;
-  const thumb = document.getElementById('card-thumb');
-  const grid = document.getElementById('card-grid');
-
-  function onDown(e) {
-    dragging = true;
-    startX = (e.touches ? e.touches[0].clientX : e.clientX);
-    startScroll = grid.scrollLeft;
-    e.preventDefault();
-  }
-  function onMove(e) {
-    if (!dragging) return;
-    const x = (e.touches ? e.touches[0].clientX : e.clientX);
-    const dx = x - startX;
-    const track = thumb.parentElement;
-    const ratio = (grid.scrollWidth - grid.clientWidth) / (track.clientWidth - thumb.clientWidth);
-    grid.scrollLeft = startScroll + dx * ratio;
-    updateCardSlider();
-  }
-  function onUp() { dragging = false; }
-
-  thumb.addEventListener('mousedown', onDown);
-  thumb.addEventListener('touchstart', onDown, {passive:false});
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('touchmove', onMove, {passive:false});
-  document.addEventListener('mouseup', onUp);
-  document.addEventListener('touchend', onUp);
-  grid.addEventListener('scroll', updateCardSlider);
-})();
 
 // ===== INIT =====
 renderCards();
 renderShelf();
 renderMail();
 updateStatusBar();
-setTimeout(updateCardSlider, 100);
 </script>
 
 </body>
