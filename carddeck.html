@@ -132,28 +132,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .locker:active{transform:scale(.97)}
 .locker-door{
   height:44px;
-  border-radius:2px;/* Eckig wie echtes Schliessfach! */
+  border-radius:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   position:relative;
-  /* Gebuerstetes Metall */
-  background:linear-gradient(180deg,#4a4a4a 0%,#3a3a3a 15%,#404040 30%,#383838 50%,#3c3c3c 70%,#353535 85%,#3a3a3a 100%);
-  border:1px solid #555;
-  border-top:1px solid #666;
-  border-bottom:2px solid #2a2a2a;
-  box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.3);
-}
-/* Horizontale Buerststreifen */
-.locker-door::before{
-  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(255,255,255,.02) 2px,
-    rgba(255,255,255,.02) 3px
-  );
-  border-radius:2px;
-  pointer-events:none;
+  background:#3a3a3a;
+  border:1px solid #4a4a4a;
 }
 .locker-label{
   font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
@@ -170,22 +153,19 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .keyhole-outer{
   width:14px;height:14px;border-radius:50%;
-  background:linear-gradient(145deg,#555 0%,#333 100%);
-  border:1px solid #666;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.1);
+  background:#444;
+  border:1px solid #555;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   position:relative;
 }
 .keyhole-inner{
   width:4px;height:4px;border-radius:50%;
   background:#1a1a1a;
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.8);
 }
 .keyhole-slot{
   width:2px;height:4px;
   background:#1a1a1a;
   margin-top:-1px;
-  box-shadow:inset 0 1px 1px rgba(0,0,0,.8);
 }
 /* Beide Schliessfaecher gleicher Metall-Look */
 .postfach-locker .locker-label,.schliessfach-locker .locker-label{color:rgba(255,255,255,.6)}
@@ -241,10 +221,9 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .card-grid::-webkit-scrollbar{display:none}
 .card-item{scroll-snap-align:start}/* Jede Karte = Rasterpunkt */
 .card-item{
-  aspect-ratio:85.6/54;border-radius:4px;
-  background:linear-gradient(145deg,#2a2a2a 0%,#222 50%,#252525 100%);
-  border:1px solid #3a3a3a;
-  box-shadow:0 2px 6px rgba(0,0,0,.4);
+  aspect-ratio:85.6/54;border-radius:0;
+  background:#222;
+  border:1px solid #333;
   display:flex;flex-direction:row;align-items:stretch;
   cursor:pointer;transition:transform .15s;
   overflow:hidden;position:relative;
@@ -318,33 +297,24 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* Ordner - einheitliches Grau, 2 Groessen */
 .book .book-spine{
   height:130px;
-  background:linear-gradient(180deg,#404040 0%,#383838 20%,#3c3c3c 50%,#353535 80%,#3a3a3a 100%);
-  border:1px solid #4a4a4a;
-  border-right:2px solid #2a2a2a;
+  background:#383838;
+  border:1px solid #444;
   position:relative;
 }
-/* Buerststreifen auf dem Ordner */
-.book .book-spine::before{
-  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
-  background:repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(255,255,255,.02) 3px,rgba(255,255,255,.02) 4px);
-  pointer-events:none;
-}
-/* Griffloch unten - rund */
+/* Griffloch unten - rund, flach */
 .book .book-spine::after{
   content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
   width:14px;height:14px;
-  background:radial-gradient(circle,#1a1a1a 50%,#222 100%);
+  background:#1a1a1a;
   border-radius:50%;
   border:1px solid #333;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,.7);
 }
-/* Beschriftung oben (Schildchen) */
+/* Beschriftung oben (Schildchen) - flach */
 .book-tag{
   position:absolute;top:6px;left:50%;transform:translateX(-50%);
   width:80%;height:14px;
-  background:linear-gradient(180deg,#e8e0d0 0%,#d8d0c0 100%);
-  border-radius:1px;
-  border:1px solid #b0a890;
+  background:#d0c8b8;
+  border:1px solid #a09880;
   display:flex;align-items:center;justify-content:center;
 }
 .book-tag-text{
@@ -382,22 +352,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .ablage-tray{
   height:30px;
-  border-radius:2px;
-  position:relative;
+  border-radius:0;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;
-  transition:background .15s;
-  /* Gebuerstetes Metall - gleich wie Schliessfach */
-  background:linear-gradient(180deg,#3a3a3a 0%,#333 15%,#363636 30%,#313131 50%,#343434 70%,#303030 85%,#333 100%);
+  background:#333;
   border:1px solid #444;
-  border-top:1px solid #4a4a4a;
-  border-bottom:2px solid #252525;
-  box-shadow:0 2px 4px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);
-}
-.ablage-tray::before{
-  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 3px);
-  border-radius:2px;pointer-events:none;
 }
 .ablage-tray:active{opacity:.8}
 .ablage-tray .tray-label{
