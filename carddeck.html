@@ -297,30 +297,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* Ordner - einheitliches Grau, 2 Groessen */
 .book .book-spine{
   height:130px;
-  background:#383838;
   border:1px solid #444;
   position:relative;
 }
-/* Griffloch unten - rund, flach */
-.book .book-spine::after{
-  content:'';position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
-  width:14px;height:14px;
-  background:#1a1a1a;
-  border-radius:50%;
-  border:1px solid #333;
-}
-/* Beschriftung oben (Schildchen) - flach */
-.book-tag{
-  position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  width:80%;height:14px;
-  background:#d0c8b8;
-  border:1px solid #a09880;
-  display:flex;align-items:center;justify-content:center;
-}
-.book-tag-text{
-  font-size:5px;font-weight:700;color:#333;letter-spacing:.3px;
-  text-transform:uppercase;
-}
+.book-tag{display:none}
+.book-tag-text{display:none}
 /* Ruecken-Schrift groesser */
 .book-label{
   font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
@@ -328,10 +309,17 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   padding:4px 0;
   text-shadow:0 1px 2px rgba(0,0,0,.5);
 }
-/* Nur 2 Groessen: normal und gross */
+/* Groessen */
 .book.normal{width:34px}
 .book.thick{width:48px}
 .book.extra{width:48px}
+/* Graustufen - abwechselnd */
+.book:nth-child(6n+1) .book-spine{background:#3a3a3a}
+.book:nth-child(6n+2) .book-spine{background:#333}
+.book:nth-child(6n+3) .book-spine{background:#404040}
+.book:nth-child(6n+4) .book-spine{background:#2e2e2e}
+.book:nth-child(6n+5) .book-spine{background:#383838}
+.book:nth-child(6n+6) .book-spine{background:#353535}
 
 
 /* =========================================
