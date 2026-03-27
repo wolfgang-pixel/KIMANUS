@@ -117,13 +117,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
    ========================================= */
 .locker-header{
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--text-dim);padding:6px 20px 2px;
+  color:var(--text-dim);padding:6px 10px 2px;
   flex-shrink:0;
 }
 .locker-row{
   display:grid;grid-template-columns:1fr 1fr;gap:4px;
-  padding:4px 20px 6px;flex-shrink:0;
-  margin-bottom:10px;/* Spalt zwischen Schliessfach und Comm-Bar */
+  padding:4px 10px 6px;flex-shrink:0;
+  margin-bottom:10px;
 }
 .locker{
   flex:1;cursor:pointer;
@@ -289,9 +289,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .shelf-row{
   display:flex;gap:4px;align-items:flex-end;
-  padding:4px 10px 6px;
-  border-bottom:4px solid #2a2a2a;
-  box-shadow:0 4px 8px rgba(0,0,0,.5);
+  padding:4px 10px 4px;
   overflow-x:auto;scrollbar-width:none;
   -webkit-overflow-scrolling:touch;
   scroll-snap-type:x mandatory;/* Klack-Klack Raster! */
@@ -338,13 +336,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* Ablage-Header */
 .ablage-header{
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--text-dim);padding:4px 20px 2px;
+  color:var(--text-dim);padding:4px 10px 2px;
   flex-shrink:0;
 }
-/* Ablage = festes 2x2 Grid, gleiche Breite wie Schliessfaecher */
+/* Ablage = festes 2x2 Grid, gleiche Breite wie Karten */
 .ablage-grid{
   display:grid;grid-template-columns:1fr 1fr;gap:4px;
-  padding:0 20px;
+  padding:0 10px;
   align-content:end;
   flex-shrink:0;
 }
