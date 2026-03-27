@@ -284,12 +284,15 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   position:relative;overflow:hidden;
 }
 .shelf-row{
-  display:flex;gap:8px;align-items:flex-end;
+  display:flex;gap:4px;align-items:flex-end;
   padding-bottom:6px;
   border-bottom:4px solid #2a2a2a;
   box-shadow:0 4px 8px rgba(0,0,0,.5);
   overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;
 }
+.shelf-row::-webkit-scrollbar{display:none}
 .shelf-row::-webkit-scrollbar{display:none}
 .book{
   flex-shrink:0;width:50px;border-radius:3px;
@@ -309,12 +312,44 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   padding:4px 0;
 }
 /* Buch-Farben */
-.book.green .book-spine{background:linear-gradient(180deg,#2d6a2d 0%,#1e4d1e 100%);height:110px}
-.book.blue .book-spine{background:linear-gradient(180deg,#2d4a6a 0%,#1e3350 100%);height:95px}
-.book.red .book-spine{background:linear-gradient(180deg,#6a2d2d 0%,#501e1e 100%);height:100px}
-.book.gold .book-spine{background:linear-gradient(180deg,#6a5a2d 0%,#504420 100%);height:88px}
-.book.purple .book-spine{background:linear-gradient(180deg,#4a2d6a 0%,#351e50 100%);height:98px}
-.book.gray .book-spine{background:linear-gradient(180deg,#444 0%,#333 100%);height:92px}
+/* Alle Ordner gleiche Hoehe, unterschiedliche Breite */
+.book .book-spine{height:130px}
+.book.green .book-spine{background:linear-gradient(180deg,#2d6a2d 0%,#1e4d1e 100%)}
+.book.blue .book-spine{background:linear-gradient(180deg,#2d4a6a 0%,#1e3350 100%)}
+.book.red .book-spine{background:linear-gradient(180deg,#6a2d2d 0%,#501e1e 100%)}
+.book.gold .book-spine{background:linear-gradient(180deg,#6a5a2d 0%,#504420 100%)}
+.book.purple .book-spine{background:linear-gradient(180deg,#4a2d6a 0%,#351e50 100%)}
+.book.gray .book-spine{background:linear-gradient(180deg,#444 0%,#333 100%)}
+/* Breiten-Varianten (schmaler, naeher zusammen) */
+.book.thin{width:20px}
+.book.normal{width:30px}
+.book.thick{width:40px}
+.book.extra{width:50px}
+
+/* Slider unter dem Regal */
+.shelf-slider{
+  width:100%;height:12px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 20px;flex-shrink:0;
+  cursor:grab;
+}
+.shelf-slider:active{cursor:grabbing}
+.shelf-slider-track{
+  width:100%;height:3px;
+  background:#1a1a1a;border-radius:2px;
+  position:relative;
+}
+.shelf-slider-thumb{
+  position:absolute;top:-3px;
+  width:36px;height:8px;
+  background:linear-gradient(180deg,#555 0%,#3a3a3a 100%);
+  border:1px solid #555;
+  border-radius:4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
+  cursor:grab;
+  background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(255,255,255,.08) 3px,rgba(255,255,255,.08) 4px);
+}
+.shelf-slider-thumb:active{cursor:grabbing;background-color:#4a4a4a}
 
 /* =========================================
    8. ABLAGE
@@ -479,37 +514,37 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <!-- Wird dynamisch befuellt via JS -->
     </div>
 
-    <div class="section-divider"></div>
-
-    <!-- B6. KARUSSELL 2 - Buecherregal -->
-    <div class="carousel" id="carousel-2">
-      <div class="carousel-header">
-        <button class="carousel-arrow" onclick="scrollCarousel('shelf-tabs',-1)">&lt;</button>
-        <div class="carousel-tabs" id="shelf-tabs">
-          <div class="carousel-tab active" onclick="switchShelf('ordner',this)">Ordner</div>
-          <div class="carousel-tab" onclick="switchShelf('alben',this)">Alben</div>
-          <div class="carousel-tab" onclick="switchShelf('buecher',this)">Buecher</div>
-          <div class="carousel-tab" onclick="switchShelf('filme',this)">Filme</div>
-          <div class="carousel-tab" onclick="switchShelf('cd',this)">CD</div>
-          <div class="carousel-tab" onclick="switchShelf('apps',this)">Apps</div>
-        </div>
-        <button class="carousel-arrow" onclick="scrollCarousel('shelf-tabs',1)">&gt;</button>
-      </div>
-    </div>
-
-    <!-- B7. BUECHERREGAL -->
-    <div class="bookshelf" id="bookshelf">
-      <div class="shelf-row" id="shelf-row">
-        <!-- Wird dynamisch befuellt via JS -->
-      </div>
-    </div>
-
-    <div class="section-divider"></div>
-
   </div><!-- /main-scroll -->
 
+  <!-- B6. KARUSSELL 2 - Buecherregal (fest, ueber Ablage) -->
+  <div class="carousel" id="carousel-2" style="flex-shrink:0;margin:0">
+    <div class="carousel-header">
+      <button class="carousel-arrow" onclick="scrollCarousel('shelf-tabs',-1)">&lt;</button>
+      <div class="carousel-tabs" id="shelf-tabs">
+        <div class="carousel-tab active" onclick="switchShelf('ordner',this)">Projektordner</div>
+        <div class="carousel-tab" onclick="switchShelf('alben',this)">Alben</div>
+        <div class="carousel-tab" onclick="switchShelf('buecher',this)">Buecher</div>
+        <div class="carousel-tab" onclick="switchShelf('filme',this)">Filme</div>
+        <div class="carousel-tab" onclick="switchShelf('apps',this)">Apps</div>
+      </div>
+      <button class="carousel-arrow" onclick="scrollCarousel('shelf-tabs',1)">&gt;</button>
+    </div>
+  </div>
+
+  <!-- B7. BUECHERREGAL (fest, hoehere Ordner) -->
+  <div class="bookshelf" id="bookshelf" style="flex-shrink:0;margin:0 10px">
+    <div class="shelf-row" id="shelf-row">
+      <!-- Wird dynamisch befuellt via JS -->
+    </div>
+  </div>
+  <!-- Slider zum Scrollen -->
+  <div class="shelf-slider" id="shelf-slider">
+    <div class="shelf-slider-track">
+      <div class="shelf-slider-thumb" id="shelf-thumb"></div>
+    </div>
+  </div>
+
   <!-- B8. ABLAGE (fest, oberhalb der Schliessfaecher) -->
-  <div style="flex-shrink:0;height:12px"></div>
   <div class="ablage-header">ABLAGE</div>
   <div class="ablage-grid" id="ablage-grid">
     <!-- 2x2 feste Ablagefaecher -->
@@ -652,13 +687,17 @@ const CATEGORIES = {
 // Buecherregal-Daten
 const SHELVES = {
   ordner: [
-    {label:'Projekt', color:'green'},
-    {label:'Cap-Coin', color:'green'},
-    {label:'Versich.', color:'blue'},
-    {label:'Steuern', color:'red'},
-    {label:'Vertraege', color:'gold'},
-    {label:'Rezepte', color:'purple'},
-    {label:'Archiv', color:'gray'},
+    {label:'Projekt', color:'green', size:'thick'},
+    {label:'Cap-Coin', color:'green', size:'thick'},
+    {label:'Versich.', color:'blue', size:'normal'},
+    {label:'Steuern', color:'red', size:'extra'},
+    {label:'Vertraege', color:'gold', size:'normal'},
+    {label:'Rezepte', color:'purple', size:'thin'},
+    {label:'Archiv', color:'gray', size:'extra'},
+    {label:'Gesundh.', color:'blue', size:'thin'},
+    {label:'Reise', color:'green', size:'normal'},
+    {label:'Auto', color:'red', size:'thin'},
+    {label:'Wohnung', color:'gold', size:'thick'},
   ],
   alben: [
     {label:'Urlaub 24', color:'blue'},
@@ -677,12 +716,6 @@ const SHELVES = {
     {label:'Komoedie', color:'gold'},
     {label:'Doku', color:'blue'},
     {label:'Serien', color:'green'},
-  ],
-  cd: [
-    {label:'Rock', color:'red'},
-    {label:'Jazz', color:'blue'},
-    {label:'Klassik', color:'gold'},
-    {label:'Pop', color:'purple'},
   ],
   apps: [
     {label:'Reise', color:'blue'},
@@ -773,13 +806,66 @@ function renderShelf() {
   const row = document.getElementById('shelf-row');
   const books = SHELVES[currentShelf] || [];
   row.innerHTML = books.map(book => `
-    <div class="book ${book.color}" onclick="alert('${book.label} oeffnen')">
+    <div class="book ${book.color} ${book.size || 'normal'}" onclick="alert('${book.label} oeffnen')">
       <div class="book-spine">
         <span class="book-label">${book.label}</span>
       </div>
     </div>
   `).join('');
+  // Slider aktualisieren
+  updateShelfSlider();
 }
+
+// Shelf Slider - zum Anfassen und Drehen
+function updateShelfSlider() {
+  const row = document.getElementById('shelf-row');
+  const thumb = document.getElementById('shelf-thumb');
+  const track = thumb.parentElement;
+  if (row.scrollWidth <= row.clientWidth) {
+    thumb.style.display = 'none';
+    return;
+  }
+  thumb.style.display = '';
+  const ratio = row.clientWidth / row.scrollWidth;
+  const thumbW = Math.max(30, track.clientWidth * ratio);
+  thumb.style.width = thumbW + 'px';
+  const scrollRatio = row.scrollLeft / (row.scrollWidth - row.clientWidth);
+  thumb.style.left = (scrollRatio * (track.clientWidth - thumbW)) + 'px';
+}
+
+// Slider Drag
+(function() {
+  let dragging = false, startX = 0, startScroll = 0;
+  const thumb = document.getElementById('shelf-thumb');
+  const row = document.getElementById('shelf-row');
+
+  function onDown(e) {
+    dragging = true;
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    startScroll = row.scrollLeft;
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = x - startX;
+    const track = thumb.parentElement;
+    const ratio = (row.scrollWidth - row.clientWidth) / (track.clientWidth - thumb.clientWidth);
+    row.scrollLeft = startScroll + dx * ratio;
+    updateShelfSlider();
+  }
+  function onUp() { dragging = false; }
+
+  thumb.addEventListener('mousedown', onDown);
+  thumb.addEventListener('touchstart', onDown, {passive:false});
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
+
+  // Sync slider when shelf scrolls
+  row.addEventListener('scroll', updateShelfSlider);
+})()
 
 function scrollCarousel(tabsId, dir) {
   const tabs = document.getElementById(tabsId);
