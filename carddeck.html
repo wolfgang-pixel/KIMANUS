@@ -355,11 +355,20 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   cursor:pointer;
   background:#333;
   border:1px solid #444;
+  position:relative;
+}
+.ablage-tray::before{
+  content:'';position:absolute;top:3px;left:50%;transform:translateX(-50%);
+  width:28px;height:5px;
+  background:#555;border-radius:2px;
+  border-bottom:1px solid #666;
+  border-top:1px solid #222;
 }
 .ablage-tray:active{opacity:.8}
 .ablage-tray .tray-label{
   font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
   color:rgba(255,255,255,.5);
+  margin-top:4px;
 }
 .ablage-tray.postfach .tray-label{color:rgba(255,255,255,.5)}
 
@@ -408,7 +417,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 /* KAI + KIM = dezentes Grau */
 .comm-btn.kai .btn-circle{background:#444;border:1px solid #555;box-shadow:0 2px 6px rgba(0,0,0,.3);font-size:11px}
-.comm-btn.kim-right .btn-circle{background:#444;border:1px solid #555;box-shadow:0 2px 6px rgba(0,0,0,.3);font-size:10px}
+.comm-btn.kim-right .btn-circle{background:#444;border:1px solid #555;box-shadow:0 2px 6px rgba(0,0,0,.3);font-size:11px}
 /* Eck-Buttons (Setup + Home) ganz in die Ecken */
 .comm-btn.corner-btn .btn-circle-sm{width:26px;height:26px;opacity:.5}
 .comm-btn.corner-btn:active .btn-circle-sm{opacity:.8}
