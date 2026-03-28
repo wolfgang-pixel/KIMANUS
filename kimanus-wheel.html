@@ -139,6 +139,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border-radius:4px;
   margin-top:4px;
 }
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 .back-wheel-card .bwc-search-hint{
   margin-top:12px;
   font-size:10px;
@@ -336,6 +337,37 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   font-size:14px;font-weight:800;color:#fff;letter-spacing:2px;
 }
 
+/* === TASTATUR-TOOLBAR === */
+#kb-toolbar{
+  display:none;
+  position:fixed;
+  left:0;right:0;
+  bottom:0;
+  height:44px;
+  background:#1e1e1e;
+  border-top:1px solid rgba(255,255,255,0.1);
+  z-index:100;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 8px;
+  gap:6px;
+}
+#kb-toolbar.visible{display:flex}
+.kb-btn{
+  padding:6px 12px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
+  font-size:12px;
+  cursor:pointer;
+  border-radius:4px;
+  white-space:nowrap;
+}
+.kb-btn:active{background:rgba(255,255,255,0.12)}
+.kb-analyze{background:rgba(230,57,70,0.15);border-color:rgba(230,57,70,0.3);color:rgba(230,57,70,0.6)}
+.kb-kim{background:rgba(230,57,70,0.1);border-color:rgba(230,57,70,0.2);color:rgba(230,57,70,0.5)}
+.kb-done{margin-left:auto}
+
 /* === SCHUBLADE === */
 #drawer{
   position:fixed;
@@ -423,6 +455,14 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   </div>
 
   <div id="status-text"></div>
+
+  <!-- Tastatur-Toolbar (erscheint ueber der Tastatur) -->
+  <div id="kb-toolbar">
+    <button onclick="ytPaste()" class="kb-btn">📋 Einfügen</button>
+    <button onclick="ytAnalyze()" class="kb-btn kb-analyze">🔍 Los</button>
+    <button onclick="kbDismiss()" class="kb-btn kb-done">✓</button>
+    <button onclick="toggleSpeech()" class="kb-btn kb-kim">🎤 KIM</button>
+  </div>
 
   <!-- Schublade (Glasplatte von unten) -->
   <div id="drawer">
@@ -726,16 +766,13 @@ function buildBackCards() {
     let inner = '';
     if (back.type === 'yt-input') {
       inner = `
-        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px">
-          <div style="font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:1px">YOUTUBE URL EINFÜGEN</div>
-          <input id="yt-url" type="url" placeholder="https://youtube.com/watch?v=..."
-            style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:13px;outline:none"
-            onkeydown="if(event.key==='Enter')ytAnalyze()">
-          <div style="display:flex;gap:8px;width:100%">
-            <button onclick="ytPaste()" style="flex:1;padding:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:11px;cursor:pointer">📋 EINFÜGEN</button>
-            <button onclick="ytAnalyze()" style="flex:1;padding:8px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);color:rgba(230,57,70,0.6);font-size:11px;cursor:pointer">🔍 ANALYSIEREN</button>
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+          <div id="yt-url" style="width:100%;min-height:36px;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:12px;word-break:break-all;overflow:hidden">Tippe 🎤 oder 📋</div>
+          <div style="display:flex;gap:6px;width:100%">
+            <button onclick="ytMic()" style="flex:1;padding:10px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);color:rgba(230,57,70,0.5);font-size:12px;cursor:pointer">🎤 Sprechen</button>
+            <button onclick="ytPaste()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer">📋 Einfügen</button>
           </div>
-          <div style="font-size:9px;color:rgba(255,255,255,0.15);margin-top:4px">oder drück KIM und sag was du suchst</div>
+          <button onclick="ytGo()" style="width:100%;padding:12px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.5);font-size:13px;cursor:pointer;letter-spacing:2px;font-weight:600">🔍 LOS</button>
         </div>`;
     } else if (back.type === 'yt-player') {
       inner = `<div id="yt-player-wrap" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">
@@ -929,16 +966,131 @@ function selectTab(i) {
   toggleDrawer();
 }
 
+// === TASTATUR-TOOLBAR ===
+function kbDismiss() {
+  document.activeElement.blur();
+}
+
+// Toolbar zeigen wenn Input fokussiert, verstecken wenn nicht
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const toolbar = document.getElementById('kb-toolbar');
+    const heightDiff = window.innerHeight - window.visualViewport.height;
+    if (heightDiff > 100) {
+      // Tastatur ist offen
+      toolbar.classList.add('visible');
+      toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
+    } else {
+      toolbar.classList.remove('visible');
+    }
+  });
+  window.visualViewport.addEventListener('scroll', () => {
+    const toolbar = document.getElementById('kb-toolbar');
+    if (toolbar.classList.contains('visible')) {
+      toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
+    }
+  });
+}
+
 // === YOUTUBE SCOUT ===
 let ytCurrentVideoId = '';
 
 async function ytPaste() {
   try {
     const text = await navigator.clipboard.readText();
-    document.getElementById('yt-url').value = text;
+    const urlField = document.getElementById('yt-url');
+    urlField.textContent = text.trim();
+    urlField.style.color = 'rgba(255,255,255,0.5)';
   } catch(e) {
-    // Clipboard nicht verfuegbar - manuell einfuegen
-    document.getElementById('yt-url').focus();
+    alert('Clipboard nicht verfügbar. Bitte URL kopieren und nochmal versuchen.');
+  }
+}
+
+// Einfache Spracheingabe NUR fuer URL-Feld (kein KIM Chat)
+let ytMicRecorder = null;
+let ytMicChunks = [];
+let ytMicStream = null;
+let ytMicActive = false;
+
+function ytMic() {
+  if (ytMicActive) {
+    ytMicStop();
+  } else {
+    ytMicStart();
+  }
+}
+
+async function ytMicStart() {
+  try {
+    ytMicActive = true;
+    const urlField = document.getElementById('yt-url');
+    urlField.textContent = '🎤 Sprich jetzt...';
+    urlField.style.color = 'rgba(230,57,70,0.5)';
+
+    ytMicStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    // Beste Audio-Qualitaet fuer Whisper: mp4 auf iOS, webm auf Android/Desktop
+    const mimeOptions = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+    let selectedMime = '';
+    for (const mime of mimeOptions) {
+      if (MediaRecorder.isTypeSupported(mime)) { selectedMime = mime; break; }
+    }
+    ytMicRecorder = selectedMime ? new MediaRecorder(ytMicStream, {mimeType:selectedMime}) : new MediaRecorder(ytMicStream);
+    ytMicChunks = [];
+
+    ytMicRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) ytMicChunks.push(e.data);
+    };
+
+    ytMicRecorder.onstop = async () => {
+      const mimeType = ytMicRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(ytMicChunks, {type:mimeType});
+      if (ytMicStream) { ytMicStream.getTracks().forEach(t=>t.stop()); ytMicStream=null; }
+      ytMicActive = false;
+
+      if (blob.size < 1000) {
+        urlField.textContent = 'Keine URL';
+        urlField.style.color = 'rgba(255,255,255,0.4)';
+        return;
+      }
+
+      urlField.textContent = '⏳ Erkenne...';
+
+      const formData = new FormData();
+      const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      formData.append('audio', blob, 'recording.' + ext);
+
+      try {
+        const resp = await fetch('/api/stt', {method:'POST', body:formData});
+        const data = await resp.json();
+        const text = (data.text || '').trim();
+        if (text) {
+          urlField.textContent = text;
+          urlField.style.color = 'rgba(255,255,255,0.5)';
+        } else {
+          urlField.textContent = 'Nicht verstanden - nochmal versuchen';
+          urlField.style.color = 'rgba(255,255,255,0.2)';
+        }
+      } catch(e) {
+        urlField.textContent = 'Fehler - nochmal versuchen';
+        urlField.style.color = 'rgba(255,255,255,0.2)';
+      }
+    };
+
+    ytMicRecorder.start(250);
+
+    // Auto-stop nach 8 Sekunden
+    setTimeout(() => { if (ytMicActive) ytMicStop(); }, 8000);
+
+  } catch(e) {
+    ytMicActive = false;
+    console.error('Mic-Fehler:', e);
+  }
+}
+
+function ytMicStop() {
+  ytMicActive = false;
+  if (ytMicRecorder && ytMicRecorder.state === 'recording') {
+    ytMicRecorder.stop();
   }
 }
 
@@ -947,11 +1099,21 @@ function ytExtractId(url) {
   return m ? m[1] : '';
 }
 
-async function ytAnalyze() {
-  const url = document.getElementById('yt-url').value.trim();
-  if (!url) return;
-  const videoId = ytExtractId(url);
-  if (!videoId) { alert('Keine gültige YouTube URL'); return; }
+function ytGo() {
+  const el = document.getElementById('yt-url');
+  if (!el) return;
+  const text = (el.textContent || '').trim();
+  if (!text || text === 'Tippe 🎤 oder 📋' || text === 'Keine URL') return;
+
+  const videoId = ytExtractId(text);
+  if (videoId) {
+    ytAnalyzeVideo(videoId);
+  } else {
+    ytSearch(text);
+  }
+}
+
+async function ytAnalyzeVideo(videoId) {
 
   ytCurrentVideoId = videoId;
 
@@ -1044,7 +1206,8 @@ async function ytLoadSaved() {
 function ytLoadVideo(videoId) {
   if (!videoId) return;
   ytCurrentVideoId = videoId;
-  document.getElementById('yt-url').value = 'https://www.youtube.com/watch?v=' + videoId;
+  const urlField = document.getElementById('yt-url');
+  if (urlField) urlField.textContent = 'https://www.youtube.com/watch?v=' + videoId;
   const playerWrap = document.getElementById('yt-player-wrap');
   if (playerWrap) {
     playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
@@ -1052,6 +1215,96 @@ function ytLoadVideo(videoId) {
   // Zur Player-Glasplatte drehen
   backIndex = 1;
   positionBackCards(true);
+}
+
+async function ytSearch(query) {
+  // Auf der aktuellen BACK-Card anzeigen (bcard-0 = Eingabe-Platte)
+  const bcard = document.getElementById('bcard-0');
+  if (!bcard) return;
+
+  // Ladebildschirm
+  bcard.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+      <div style="font-size:24px;animation:spin 1s linear infinite">⏳</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3)">Suche: ${query}</div>
+    </div>`;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: 'Suche die 5 besten YouTube Videos zu: ' + query + '. Antworte kurz mit nummerierten Titeln.',
+        agent:'kim',
+        model:'groq-llama',
+        session:'yt-search-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    const answer = data.output || data.text || 'Keine Ergebnisse';
+
+    // Ergebnisse in einzelne Video-Karten aufteilen
+    const results = answer.split(/\n/).filter(l => l.trim().length > 10);
+    if (results.length > 1) {
+      const backTrack = document.getElementById('back-track');
+      const colors = ['#e63946','#4a90d9','#4caf50','#ff9800','#9c27b0','#607d8b','#d4a017','#e91e63'];
+
+      const cards = results.slice(0, 8).map((r, idx) => {
+        const color = colors[idx % colors.length];
+        const title = r.replace(/^\d+[\.\)\-]\s*/, '').trim();
+        const num = idx + 1;
+        return `
+        <div class="back-wheel-card" id="bcard-${idx}">
+          <div style="width:100%;height:100%;display:flex;flex-direction:row;padding:0;overflow:hidden">
+            <div style="width:45%;height:100%;background:linear-gradient(135deg,${color}22,${color}11);display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,0.04)">
+              <div style="font-size:40px;opacity:0.4">▶</div>
+            </div>
+            <div style="flex:1;padding:14px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+              <div style="font-size:9px;color:rgba(255,255,255,0.15)">Video ${num}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.5">${title}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      const resetCard = `<div class="back-wheel-card" id="bcard-${results.length}">
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.2)">🔍 ${query} - ${results.length} Ergebnisse</div>
+          <button onclick="ytResetInput()" style="padding:10px 20px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.4);font-size:12px;cursor:pointer">↩ Neue Suche</button>
+        </div>
+      </div>`;
+
+      backTrack.innerHTML = cards + resetCard;
+
+      const tempBacks = results.slice(0, 8).map(r => ({title:'', content:r.trim()}));
+      tempBacks.push({title:'reset', content:''});
+      activeCards[currentIndex].backs = tempBacks;
+
+      backIndex = 0;
+      positionBackCards(true);
+    } else {
+      bcard.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;padding:12px 16px;overflow-y:auto;scrollbar-width:none">
+          <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-bottom:6px">🔍 ${query}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.7;white-space:pre-line">${answer}</div>
+          <div onclick="ytResetInput()" style="font-size:10px;color:rgba(230,57,70,0.3);text-align:center;margin-top:6px;cursor:pointer">↩ Neue Suche</div>
+        </div>`;
+    }
+
+  } catch(e) {
+    bcard.innerHTML = `
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px">
+        <div style="font-size:12px;color:rgba(230,57,70,0.4)">Suche fehlgeschlagen</div>
+        <div onclick="ytResetInput()" style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;cursor:pointer">↩ Nochmal</div>
+      </div>`;
+  }
+}
+
+function ytResetInput() {
+  // Zurück zur Eingabe-Glasplatte
+  backIndex = 0;
+  buildBackCards();
+  positionBackCards(false);
 }
 
 // === SPRACH-PIPELINE ===
@@ -1144,10 +1397,28 @@ async function processVoice(blob, mimeType) {
       return;
     }
 
-    // Zeige erkannten Text sofort auf der Glasplatte
-    const centerCard = document.getElementById('card-' + currentIndex);
-    if (centerCard) {
-      const front = centerCard.querySelector('.card-front');
+    // Pruefen ob wir im YouTube Scout sind
+    const currentCard = activeCards[currentIndex];
+    const ytUrlField = document.getElementById('yt-url');
+
+    if (currentCard && currentCard.id === 'yt-scout' && ytUrlField) {
+      // Im YouTube Scout: Text ins URL-Feld oder direkt an KIM
+      const videoId = ytExtractId(userText);
+      if (videoId) {
+        // User hat eine URL gesprochen
+        ytUrlField.textContent = userText;
+        ytUrlField.style.color = 'rgba(255,255,255,0.5)';
+        btn.querySelector('span').textContent = 'KIM';
+        ytAnalyze();
+        return;
+      }
+      // Kein URL - als Suchanfrage an KIM weiterleiten
+    }
+
+    // Zeige erkannten Text auf der Glasplatte
+    const centerCardEl = document.getElementById('card-' + currentIndex);
+    if (centerCardEl && !isFlipped) {
+      const front = centerCardEl.querySelector('.card-front');
       if (front) {
         front.innerHTML = `
           <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 18px">
@@ -1217,19 +1488,43 @@ async function processVoice(blob, mimeType) {
 }
 
 function showKimResponse(question, answer) {
-  // Zeige Frage + Antwort direkt auf der aktiven Glasplatte
-  const centerCard = document.getElementById('card-' + currentIndex);
-  if (!centerCard) return;
+  const currentCard = activeCards[currentIndex];
 
-  // Finde die card-front und ersetze den Inhalt
-  const front = centerCard.querySelector('.card-front');
-  if (front) {
-    front.innerHTML = `
-      <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
-        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px">🗣️ ${question}</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;white-space:pre-line">${answer}</div>
-      </div>
-    `;
+  // Im YouTube Scout: Antwort auf die Kapitel-Glasplatte
+  if (currentCard && currentCard.id === 'yt-scout' && isFlipped) {
+    const chaptersWrap = document.getElementById('yt-chapters-wrap');
+    if (chaptersWrap) {
+      chaptersWrap.innerHTML = `
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.8;white-space:pre-line">${answer}</div>`;
+    }
+    // Zur Kapitel-Glasplatte drehen
+    backIndex = 2;
+    positionBackCards(true);
+    return;
+  }
+
+  // Normal: Auf der aktiven Glasplatte anzeigen
+  if (isFlipped) {
+    const bcard = document.getElementById('bcard-' + backIndex);
+    if (bcard) {
+      bcard.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;white-space:pre-line">${answer}</div>
+        </div>`;
+    }
+  } else {
+    const centerCardEl = document.getElementById('card-' + currentIndex);
+    if (!centerCardEl) return;
+    const front = centerCardEl.querySelector('.card-front');
+    if (front) {
+      front.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;white-space:pre-line">${answer}</div>
+        </div>`;
+    }
   }
 }
 
