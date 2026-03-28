@@ -108,8 +108,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 .wheel-card{
   height:210px;
-  width:calc(210px * 16 / 9);
-  max-width:calc(100% - 40px);
+  width:100%;
   left:50%;
   transform:translateX(-50%);
   margin-left:0;
@@ -127,7 +126,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .card-inner{
   width:100%;height:100%;
   position:relative;
-  transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);
+  transition:transform 1.2s cubic-bezier(0.25,0.1,0.25,1);
   transform-style:preserve-3d;
 }
 .wheel-card.flipped .card-inner{
@@ -156,10 +155,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   transform:rotateY(180deg);
 }
 .card-back .back-title{
-  display:none;
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:10px;
 }
 .card-back .back-content{
-  display:none;
+  font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
+  white-space:pre-line;padding:0 20px;
 }
 
 /* Keine Extra-Effekte - reine Glasplatte */
@@ -169,22 +171,24 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:none;
   position:absolute;
   left:50%;
-  transform:translateX(-50%);
-  top:80px;
-  width:calc(210px * 16 / 9);
-  max-width:calc(100% - 40px);
-  height:210px;
+  transform:translateX(-50%) scale(0.85);
   z-index:30;
+  width:100%;
+  height:210px;
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
   backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
   align-items:center;justify-content:center;
-  transition:all 0.5s ease;
+  opacity:0;
+  transition:all 0.8s ease;
 }
-#flip-label.visible{display:flex}
+#flip-label.visible{
+  display:flex;
+  opacity:0.7;
+}
 #flip-label .fl-icon{font-size:48px}
-#flip-label .fl-title{font-size:14px;font-weight:700;color:#fff}
-#flip-label .fl-sub{font-size:10px;color:#888;text-transform:uppercase}
+#flip-label .fl-title{display:none}
+#flip-label .fl-sub{display:none}
 
 /* === REGISTER === */
 #register-panel{
@@ -382,8 +386,8 @@ function buildCards() {
           <div class="card-icon">${card.icon}</div>
         </div>
         <div class="card-face card-back">
-          <div class="back-title" id="back-title-${i}"></div>
-          <div class="back-content" id="back-content-${i}"></div>
+          <div class="back-title" id="back-title-${i}">${card.backs?.[0]?.title || ''}</div>
+          <div class="back-content" id="back-content-${i}">${card.backs?.[0]?.content || ''}</div>
         </div>
       </div>
     </div>
@@ -500,8 +504,15 @@ function updateFlipLabel() {
   if (isFlipped) {
     const card = CARDS[currentIndex];
     document.getElementById('fl-icon').textContent = card.icon;
-    document.getElementById('fl-title').textContent = card.title;
-    document.getElementById('fl-sub').textContent = `Seite ${backIndex + 1} von ${card.backs?.length || 0}`;
+    // Position: gleich wie die obere Milchglas-Karte
+    const container = document.getElementById('wheel-container');
+    const totalH = container.clientHeight;
+    const centerH = 230;
+    const remainH = totalH - centerH;
+    const topH = Math.floor(remainH * 0.6);
+    const topMid = topH / 2;
+    const cardH = 210;
+    fl.style.top = (topMid - cardH / 2) + 'px';
     fl.classList.add('visible');
   } else {
     fl.classList.remove('visible');
