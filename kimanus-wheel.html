@@ -243,6 +243,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   background:#161616;
   border-top:1px solid rgba(255,255,255,0.06);
   flex-shrink:0;z-index:20;
+  position:relative;
 }
 
 #speech-btn{
@@ -280,6 +281,62 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 #speech-btn span{
   font-size:14px;font-weight:800;color:#fff;letter-spacing:2px;
 }
+
+/* === SCHUBLADE === */
+#drawer{
+  position:fixed;
+  left:50%;
+  width:calc((100% - 10px) * 0.9);
+  height:calc(210px * 0.9);
+  bottom:-200px;
+  transform:translateX(-50%);
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  z-index:19;
+  transition:bottom 0.5s cubic-bezier(0.23,1,0.32,1);
+}
+#drawer.open{
+  bottom:12px;
+}
+#drawer-content{
+  width:100%;height:100%;
+  padding:3px;
+  display:grid;
+  grid-template-rows:repeat(3,1fr);
+  grid-auto-flow:column;
+  grid-auto-columns:calc(33.33% - 2px);
+  gap:3px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  scroll-snap-type:x mandatory;
+}
+#drawer-content::-webkit-scrollbar{display:none}
+.dtab{
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+  scroll-snap-align:start;
+}
+.dtab:active{background:rgba(255,255,255,0.08)}
+.dtab span{font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);text-align:center}
+
+/* Schubladen-Button links in Bar */
+#drawer-btn{
+  position:absolute;
+  left:15px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;
+  padding:6px;
+}
+.db-line{
+  display:block;
+  width:22px;height:2px;
+  background:rgba(255,255,255,0.3);
+  border-radius:1px;
+  transition:all 0.3s;
+}
+#drawer-btn.open .db-line{background:rgba(255,255,255,0.5)}
 </style>
 </head>
 <body>
@@ -316,7 +373,17 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
   <div id="status-text"></div>
 
+  <!-- Schublade (Glasplatte von unten) -->
+  <div id="drawer">
+    <div id="drawer-content"></div>
+  </div>
+
   <div id="bottom-bar">
+    <div id="drawer-btn" onclick="toggleDrawer()">
+      <span class="db-line"></span>
+      <span class="db-line"></span>
+      <span class="db-line"></span>
+    </div>
     <button id="speech-btn" onclick="toggleSpeech()">
       <span id="speech-agent">KIM</span>
     </button>
@@ -663,6 +730,29 @@ function toggleRegister() {
 function selectRegister(i) { toggleRegister(); }
 
 // Speech
+// === SCHUBLADE ===
+let drawerOpen = false;
+function toggleDrawer() {
+  drawerOpen = !drawerOpen;
+  const d = document.getElementById('drawer');
+  const b = document.getElementById('drawer-btn');
+  if (drawerOpen) {
+    d.classList.add('open');
+    b.classList.add('open');
+    renderDrawer();
+  } else {
+    d.classList.remove('open');
+    b.classList.remove('open');
+  }
+}
+function renderDrawer() {
+  const tabs = ['Agenten','Clubkarten','Webseiten','Bilderrahmen','Cap-Coin','Meine Apps','Projektordner','Alben','Postfach','Schliessfach','Kalender','Notizen','Kontakte','Favoriten','Einstellungen'];
+  document.getElementById('drawer-content').innerHTML = tabs.map((name,i) =>
+    `<div class="dtab" onclick="selectTab(${i})"><span>${name}</span></div>`
+  ).join('');
+}
+function selectTab(i) { toggleDrawer(); }
+
 function toggleSpeech() {
   isListening = !isListening;
   const btn = document.getElementById('speech-btn');
