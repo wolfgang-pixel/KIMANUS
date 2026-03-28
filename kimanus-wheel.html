@@ -128,6 +128,18 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
   white-space:pre-line;
 }
+.back-wheel-card .bwc-video{
+  width:calc(100% - 16px);
+  height:calc(100% - 40px);
+  border-radius:4px;
+  margin-top:4px;
+}
+.back-wheel-card .bwc-search-hint{
+  margin-top:12px;
+  font-size:10px;
+  color:rgba(230,57,70,0.4);
+  letter-spacing:0.5px;
+}
 
 .wheel-card{
   height:210px;
@@ -169,8 +181,36 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* Vorderseite */
 .card-front{
   background:transparent;
+  padding:16px 20px;
+  justify-content:space-between;
+  align-items:stretch;
 }
-.card-front .card-icon{font-size:72px}
+.card-front .card-icon{
+  font-size:48px;
+  position:absolute;top:14px;right:18px;
+}
+.card-front .card-header{
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-front .card-name{
+  font-size:22px;font-weight:700;color:rgba(255,255,255,0.4);
+  letter-spacing:1px;
+}
+.card-front .card-role{
+  font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.card-front .card-contact{
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-front .card-contact span{
+  font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;
+}
+.card-front .card-brand{
+  position:absolute;bottom:14px;right:18px;
+  font-size:9px;font-weight:800;color:rgba(255,255,255,0.12);
+  letter-spacing:3px;
+}
 
 /* Rückseite */
 .card-back{
@@ -209,9 +249,18 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:flex;
   opacity:1;
 }
-#flip-label .fl-icon{font-size:48px}
-#flip-label .fl-title{display:none}
-#flip-label .fl-sub{display:none}
+.fl-card{
+  width:100%;height:100%;
+  padding:12px 16px;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+}
+.fl-card .fl-icon{font-size:36px;position:absolute;top:10px;right:14px}
+.fl-card .fl-name{font-size:18px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1px}
+.fl-card .fl-role{font-size:9px;font-weight:600;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.fl-card .fl-contact{font-size:9px;color:rgba(255,255,255,0.15)}
+.fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:7px;font-weight:800;color:rgba(255,255,255,0.1);letter-spacing:3px}
 
 /* === REGISTER === */
 #register-panel{
@@ -337,6 +386,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   transition:all 0.3s;
 }
 #drawer-btn.open .db-line{background:rgba(255,255,255,0.5)}
+
 </style>
 </head>
 <body>
@@ -355,11 +405,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
   <div id="wheel-container">
     <div id="flip-label">
-      <span class="fl-icon" id="fl-icon"></span>
-      <div>
-        <div class="fl-title" id="fl-title"></div>
-        <div class="fl-sub" id="fl-sub"></div>
-      </div>
+      <div class="fl-card" id="fl-card"></div>
     </div>
 
     <div class="panel" id="panel-top"></div>
@@ -392,7 +438,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <script>
 const CARDS = [
-  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946',
+  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
      {title:'Über KIM', content:'Dein persönlicher Assistent.\nFrag mich einfach was du brauchst!'},
      {title:'Fähigkeiten', content:'Termine • Wetter • Erinnerungen\nRecherche • Empfehlungen'},
@@ -400,7 +446,7 @@ const CARDS = [
      {title:'Einstellungen', content:'Sprache: Deutsch\nStimme: Ara (weiblich)\nModell: Groq Llama'},
      {title:'Statistik', content:'47 Gespräche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
    ]},
-  {id:'kai', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9',
+  {id:'kai', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9', email:'kai@kimanus.de', phone:'Durchwahl 002',
    backs:[
      {title:'Über KAI', content:'Dein Business-Berater.\nKalkulation, Einkauf und Geschäft.'},
      {title:'Services', content:'Rohaufschlag • Preisvergleich\nBestellungen • Lieferanten'},
@@ -408,7 +454,7 @@ const CARDS = [
      {title:'Kontakt', content:'kai@kimanus.de\nDurchwahl: intern 02'},
      {title:'Letzter Bericht', content:'Wareneinsatz März: 32%\nZiel: unter 30%'},
    ]},
-  {id:'wetterfrosch', icon:'🌤️', title:'Wetterfrosch', subtitle:'Meteorologe', color:'#4caf50',
+  {id:'wetterfrosch', icon:'🌤️', title:'Wetterfrosch', subtitle:'Meteorologe', color:'#4caf50', email:'wetter@kimanus.de', phone:'Durchwahl 003',
    backs:[
      {title:'Aktuelles Wetter', content:'Nürnberg: 14°C, bewölkt\nRegenwahrscheinlichkeit: 20%'},
      {title:'Wochenvorschau', content:'Mo: ☀️ 16°C\nDi: 🌧️ 12°C\nMi: ⛅ 14°C'},
@@ -416,7 +462,7 @@ const CARDS = [
      {title:'Pollenflug', content:'Birke: mittel\nGräser: gering\nAmbrosia: keine'},
      {title:'Reisewetter', content:'Mallorca: 24°C ☀️\nGardasee: 19°C ⛅\nNordsee: 11°C 🌧️'},
    ]},
-  {id:'animateur', icon:'🎯', title:'Animateur', subtitle:'Freizeit & Events', color:'#ff9800',
+  {id:'animateur', icon:'🎯', title:'Animateur', subtitle:'Freizeit & Events', color:'#ff9800', email:'freizeit@kimanus.de', phone:'Durchwahl 004',
    backs:[
      {title:'In der Nähe', content:'Kaiserburg Nürnberg (2km)\nTiergarten (5km)'},
      {title:'Empfehlung', content:'Bei dem Wetter:\nBiergarten am Dutzendteich!'},
@@ -424,7 +470,7 @@ const CARDS = [
      {title:'Restaurants', content:'Bratwurstglöcklein ⭐⭐⭐⭐\nSchlenkerla ⭐⭐⭐⭐⭐'},
      {title:'Wanderungen', content:'Fränkische Schweiz (30km)\nPottenstein Höhlen\nWalberla Aussicht'},
    ]},
-  {id:'kalkulierer', icon:'🧮', title:'Kalkulierer', subtitle:'Rohaufschlag-Experte', color:'#9c27b0',
+  {id:'kalkulierer', icon:'🧮', title:'Kalkulierer', subtitle:'Rohaufschlag-Experte', color:'#9c27b0', email:'kalkulation@kimanus.de', phone:'Durchwahl 005',
    backs:[
      {title:'Letzte Kalkulation', content:'Schnitzel: WEK 4.20€ → VK 12.90€\nRohaufschlag: 207%'},
      {title:'Top Margen', content:'Pizza Margherita: 340%\nCaesar Salad: 290%\nSpätzle: 380%'},
@@ -432,7 +478,7 @@ const CARDS = [
      {title:'Tages-Tipp', content:'Saisongemüse nutzen!\nSpargel gerade günstig\n→ Sonderkarte möglich'},
      {title:'Monatsübersicht', content:'Durchschnitt: 245%\nBester Tag: Freitag\nSchwächster: Montag'},
    ]},
-  {id:'sekretaer', icon:'📅', title:'Sekretär', subtitle:'Termine', color:'#607d8b',
+  {id:'sekretaer', icon:'📅', title:'Sekretär', subtitle:'Termine & Erinnerungen', color:'#607d8b', email:'termine@kimanus.de', phone:'Durchwahl 006',
    backs:[
      {title:'Heute', content:'14:00 Zahnarzt\n16:30 Jannick anrufen'},
      {title:'Diese Woche', content:'Mi: Steuerberater\nFr: Lieferant Getränke'},
@@ -440,13 +486,57 @@ const CARDS = [
      {title:'Geburtstage', content:'03.04. Mama\n15.04. Jannick\n22.04. Kollege Stefan'},
      {title:'Notizen', content:'Schlüsseldienst: 0911-123456\nHausmeister: Herr Müller\nWLAN-Passwort: büro2026'},
    ]},
-  {id:'capcoin', icon:'🪙', title:'Cap-Coin', subtitle:'Sammeln & Einlösen', color:'#d4a017',
+  {id:'capcoin', icon:'🪙', title:'Cap-Coin', subtitle:'Sammeln & Einlösen', color:'#d4a017', email:'coins@kimanus.de', phone:'Durchwahl 007',
    backs:[
      {title:'Dein Guthaben', content:'127 Cap-Coins\n= 12,70 EUR'},
      {title:'Zuletzt gesammelt', content:'Brauerei Schlenkerla: +5\nGasthof Krone: +3'},
      {title:'Einlösen bei', content:'Pizzeria Roma: 10% Rabatt\nKino Cinecitta: 2€ Nachlass'},
      {title:'Rangliste', content:'1. MaxBierFan: 842 Coins\n2. Du: 127 Coins\n3. BierLiese: 98 Coins'},
      {title:'Aktionen', content:'Doppelte Coins diese Woche!\nBei allen Partner-Brauereien'},
+   ]},
+];
+
+// Scout-Karten
+const SCOUTS = [
+  {id:'yt-scout', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'video@kimanus.de', phone:'Durchwahl 101',
+   backs:[
+     {title:'🎤 Frag mich!', content:'Sag einfach:\n"Such mir ein Video über..."', type:'search'},
+     {title:'📺 Jetzt läuft', content:'', type:'video', videoId:'dQw4w9WgXcQ'},
+     {title:'📋 Kapitel', content:'00:00 Einleitung\n02:15 Grundlagen\n05:30 Praxis-Beispiel\n08:45 Tipps & Tricks\n12:00 Zusammenfassung'},
+     {title:'📚 Gespeichert', content:'🎬 n8n Workflow Tutorial\n🎬 Claude Code Tricks\n🎬 KI Agent bauen\n🎬 RAG System Setup\n🎬 WhatsApp Bot'},
+     {title:'🔥 Empfehlungen', content:'Basierend auf deinen Interessen:\n\n🎬 Rohaufschlag berechnen\n🎬 Gastro-Kalkulation 2026\n🎬 KI in der Gastronomie'},
+   ]},
+  {id:'web-scout', icon:'🌐', title:'Web Scout', subtitle:'Internet-Rechercheur', color:'#4285f4', email:'recherche@kimanus.de', phone:'Durchwahl 102',
+   backs:[
+     {title:'Suche', content:'Ich durchsuche das Web\nfür dich!'},
+     {title:'Fakten-Check', content:'Quellen prüfen\nFake News erkennen\nZusammenfassen'},
+     {title:'Zuletzt', content:'Brauerei-Preise recherchiert\nWettbewerber analysiert'},
+     {title:'Fähigkeiten', content:'Google • Wikipedia\nNachrichtenseiten\nFachportale'},
+     {title:'Einstellungen', content:'Sprache: Deutsch\nRegion: Bayern\nSafe Search: An'},
+   ]},
+  {id:'news-scout', icon:'📰', title:'News Scout', subtitle:'Nachrichten-Jäger', color:'#1a73e8', email:'news@kimanus.de', phone:'Durchwahl 103',
+   backs:[
+     {title:'Heute', content:'3 relevante Nachrichten\nfür dich gefunden'},
+     {title:'Gastronomie', content:'Neue Hygiene-Verordnung ab Mai\nMehrwegpflicht Update'},
+     {title:'Technologie', content:'KI-Gesetz EU beschlossen\nNeue Whisper Version'},
+     {title:'Regional', content:'Volksfest Nürnberg Termine\nNeue Brauerei eröffnet'},
+     {title:'Einstellungen', content:'Themen: Gastro, Tech, Regional\nFrequenz: Täglich'},
+   ]},
+  {id:'deal-scout', icon:'💰', title:'Deal Scout', subtitle:'Schnäppchen-Finder', color:'#34a853', email:'deals@kimanus.de', phone:'Durchwahl 104',
+   backs:[
+     {title:'Aktuelle Deals', content:'Metro: Rindfleisch -15%\nSelgros: Getränke-Aktion'},
+     {title:'Preisalarm', content:'3 Preisalarme aktiv\nLachs unter 12€/kg\nOlivenöl unter 8€/l'},
+     {title:'Vergleich', content:'Metro vs. Selgros\nvs. Hamberger\nBester Preis markiert'},
+     {title:'Lieferanten', content:'Metro Nürnberg\nSelgros Fürth\nHamberger Online'},
+     {title:'Gespart', content:'Diese Woche: 127€\nDieser Monat: 483€'},
+   ]},
+  {id:'social-scout', icon:'📱', title:'Social Scout', subtitle:'Social Media Finder', color:'#e1306c', email:'social@kimanus.de', phone:'Durchwahl 105',
+   backs:[
+     {title:'Trends', content:'#FrankenBier trending\n#Gastro2026 aktiv'},
+     {title:'Instagram', content:'Neue Posts von\nfränkischen Brauereien'},
+     {title:'TikTok', content:'Virale Gastro-Videos\nKoch-Trends'},
+     {title:'Bewertungen', content:'3 neue Google Reviews\n1 neue Tripadvisor'},
+     {title:'Wettbewerber', content:'Konkurrenz-Posts\ndieser Woche analysiert'},
    ]},
 ];
 
@@ -462,6 +552,7 @@ const REGISTERS = [
   {icon:'🔒', name:'Schliessfach'},
 ];
 
+let activeCards = CARDS;
 let currentIndex = 0;
 let isFlipped = false;
 let backIndex = 0;
@@ -491,11 +582,20 @@ function calcSizes() {
 
 function buildCards() {
   const track = document.getElementById('wheel-track');
-  track.innerHTML = CARDS.map((card, i) => `
+  track.innerHTML = activeCards.map((card, i) => `
     <div class="wheel-card" id="card-${i}" onclick="handleCardTap(${i})">
       <div class="card-inner">
         <div class="card-face card-front">
           <div class="card-icon">${card.icon}</div>
+          <div class="card-header">
+            <div class="card-name">${card.title}</div>
+            <div class="card-role">${card.subtitle}</div>
+          </div>
+          <div class="card-contact">
+            <span>${card.email || ''}</span>
+            <span>${card.phone || ''}</span>
+          </div>
+          <div class="card-brand">KIMANUS</div>
         </div>
         <div class="card-face card-back">
           <div class="back-title" id="back-title-${i}">${card.backs?.[0]?.title || ''}</div>
@@ -519,7 +619,7 @@ function positionCards(animate) {
   const centerMid = topH + (centerH / 2);
   const bottomMid = topH + centerH + (bottomH / 2);
 
-  CARDS.forEach((card, i) => {
+  activeCards.forEach((card, i) => {
     const el = document.getElementById('card-' + i);
     if (!el) return;
 
@@ -556,8 +656,8 @@ function positionCards(animate) {
 
 function getOffset(i) {
   let diff = i - currentIndex;
-  if (diff > CARDS.length / 2) diff -= CARDS.length;
-  if (diff < -CARDS.length / 2) diff += CARDS.length;
+  if (diff > activeCards.length / 2) diff -= activeCards.length;
+  if (diff < -activeCards.length / 2) diff += activeCards.length;
   return diff;
 }
 
@@ -565,7 +665,7 @@ function spinWheel(direction) {
   if (isAnimating) return;
   if (isFlipped) {
     // Rückseiten-Rad drehen
-    const backs = CARDS[currentIndex].backs || [];
+    const backs = activeCards[currentIndex].backs || [];
     if (backs.length <= 1) return;
     isAnimating = true;
     backIndex = (backIndex + direction + backs.length) % backs.length;
@@ -574,7 +674,7 @@ function spinWheel(direction) {
     return;
   }
   isAnimating = true;
-  currentIndex = (currentIndex + direction + CARDS.length) % CARDS.length;
+  currentIndex = (currentIndex + direction + activeCards.length) % activeCards.length;
   positionCards(true);
   setTimeout(() => { isAnimating = false; }, 500);
 }
@@ -615,19 +715,33 @@ function flipCard() {
 }
 
 function buildBackCards() {
-  const card = CARDS[currentIndex];
+  const card = activeCards[currentIndex];
   const backs = card.backs || [];
   const backTrack = document.getElementById('back-track');
-  backTrack.innerHTML = backs.map((back, i) => `
-    <div class="back-wheel-card" id="bcard-${i}">
-      <div class="bwc-title">${back.title}</div>
-      <div class="bwc-content">${back.content}</div>
-    </div>
-  `).join('');
+  backTrack.innerHTML = backs.map((back, i) => {
+    let inner = '';
+    if (back.type === 'video' && back.videoId) {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <iframe class="bwc-video" src="https://www.youtube.com/embed/${back.videoId}?rel=0&modestbranding=1&playsinline=1"
+          frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture"
+          allowfullscreen></iframe>`;
+    } else if (back.type === 'search') {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.content}</div>
+        <div class="bwc-search-hint">🎤 Drück den KIM-Button und sag was du suchst</div>`;
+    } else {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.content}</div>`;
+    }
+    return `<div class="back-wheel-card" id="bcard-${i}">${inner}</div>`;
+  }).join('');
 }
 
 function positionBackCards(animate) {
-  const card = CARDS[currentIndex];
+  const card = activeCards[currentIndex];
   const backs = card.backs || [];
   if (backs.length === 0) return;
 
@@ -689,8 +803,16 @@ function positionBackCards(animate) {
 function updateFlipLabel() {
   const fl = document.getElementById('flip-label');
   if (isFlipped) {
-    const card = CARDS[currentIndex];
-    document.getElementById('fl-icon').textContent = card.icon;
+    const card = activeCards[currentIndex];
+    document.getElementById('fl-card').innerHTML = `
+      <div class="fl-icon">${card.icon}</div>
+      <div>
+        <div class="fl-name">${card.title}</div>
+        <div class="fl-role">${card.subtitle}</div>
+      </div>
+      <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
+      <div class="fl-brand">KIMANUS</div>
+    `;
     // Position: gleich wie die obere Milchglas-Karte
     const container = document.getElementById('wheel-container');
     const totalH = container.clientHeight;
@@ -707,7 +829,7 @@ function updateFlipLabel() {
 }
 
 function updateStatus() {
-  const card = CARDS[currentIndex];
+  const card = activeCards[currentIndex];
   document.getElementById('status-text').textContent = card.title;
 }
 
@@ -746,12 +868,36 @@ function toggleDrawer() {
   }
 }
 function renderDrawer() {
-  const tabs = ['Agenten','Clubkarten','Webseiten','Bilderrahmen','Cap-Coin','Meine Apps','Projektordner','Alben','Postfach','Schliessfach','Kalender','Notizen','Kontakte','Favoriten','Einstellungen'];
+  const tabs = ['Alle','Scouts','Berater','Clubkarten','Webseiten','Bilderrahmen','Cap-Coin','Meine Apps','Projektordner','Alben','Postfach','Schliessfach','Kalender','Notizen','Kontakte'];
   document.getElementById('drawer-content').innerHTML = tabs.map((name,i) =>
     `<div class="dtab" onclick="selectTab(${i})"><span>${name}</span></div>`
   ).join('');
 }
-function selectTab(i) { toggleDrawer(); }
+function selectTab(i) {
+  const tabNames = ['Alle','Scouts','Berater','Clubkarten','Webseiten','Bilderrahmen','Cap-Coin','Meine Apps','Projektordner','Alben','Postfach','Schliessfach','Kalender','Notizen','Kontakte'];
+  const name = tabNames[i];
+
+  // Karten-Set wechseln
+  if (name === 'Scouts') {
+    activeCards = SCOUTS;
+  } else {
+    activeCards = CARDS;
+  }
+
+  // Rad neu aufbauen
+  currentIndex = 0;
+  isFlipped = false;
+  backIndex = 0;
+  document.getElementById('back-track').style.display = 'none';
+  document.getElementById('wheel-track').style.display = 'block';
+  document.getElementById('flip-label').classList.remove('visible');
+
+  // Karten neu bauen mit dem aktiven Set
+  buildCards();
+  calcSizes();
+  positionCards(false);
+  toggleDrawer();
+}
 
 function toggleSpeech() {
   isListening = !isListening;
@@ -773,7 +919,7 @@ function toggleSpeech() {
 function demoKimAction() {
   document.getElementById('status-text').textContent = 'KIM: "Hier ist das Wetter!"';
   if (isFlipped) flipCard();
-  const target = CARDS.findIndex(c => c.id === 'wetterfrosch');
+  const target = activeCards.findIndex(c => c.id === 'wetterfrosch');
   animateToCard(target, () => setTimeout(flipCard, 500));
 }
 
@@ -781,8 +927,8 @@ function animateToCard(target, cb) {
   if (currentIndex === target) { if (cb) cb(); return; }
   const iv = setInterval(() => {
     if (currentIndex === target) { clearInterval(iv); if (cb) cb(); return; }
-    const diff = (target - currentIndex + CARDS.length) % CARDS.length;
-    spinWheel(diff <= CARDS.length / 2 ? 1 : -1);
+    const diff = (target - currentIndex + activeCards.length) % activeCards.length;
+    spinWheel(diff <= activeCards.length / 2 ? 1 : -1);
   }, 250);
 }
 
