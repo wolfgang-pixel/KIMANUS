@@ -99,11 +99,34 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 
 /* === RAD-MECHANISMUS === */
-#wheel-track{
+#wheel-track,#back-track{
   position:absolute;
-  left:12px;right:12px;
+  left:0;right:0;
   transition:transform 0.5s cubic-bezier(0.23,1,0.32,1);
   will-change:transform;
+}
+#back-track{z-index:12}
+.back-wheel-card{
+  width:100%;
+  height:210px;
+  position:absolute;
+  left:0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  transition:all 0.5s cubic-bezier(0.23,1,0.32,1);
+}
+.back-wheel-card .bwc-title{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:10px;
+}
+.back-wheel-card .bwc-content{
+  font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
+  white-space:pre-line;
 }
 
 .wheel-card{
@@ -287,6 +310,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="panel" id="panel-bottom"></div>
 
     <div id="wheel-track"></div>
+    <div id="back-track" style="display:none"></div>
     <div id="register-panel"><div id="register-tabs"></div></div>
   </div>
 
@@ -306,6 +330,8 @@ const CARDS = [
      {title:'Über KIM', content:'Dein persönlicher Assistent.\nFrag mich einfach was du brauchst!'},
      {title:'Fähigkeiten', content:'Termine • Wetter • Erinnerungen\nRecherche • Empfehlungen'},
      {title:'Letzte Gespräche', content:'Heute: Wetter abgefragt\nGestern: Termin eingetragen'},
+     {title:'Einstellungen', content:'Sprache: Deutsch\nStimme: Ara (weiblich)\nModell: Groq Llama'},
+     {title:'Statistik', content:'47 Gespräche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
    ]},
   {id:'kai', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9',
    backs:[
@@ -455,8 +481,10 @@ function spinWheel(direction) {
     // Rückseiten-Rad drehen
     const backs = CARDS[currentIndex].backs || [];
     if (backs.length <= 1) return;
+    isAnimating = true;
     backIndex = (backIndex + direction + backs.length) % backs.length;
-    updateBackContent();
+    positionBackCards(true);
+    setTimeout(() => { isAnimating = false; }, 500);
     return;
   }
   isAnimating = true;
@@ -478,26 +506,95 @@ function flipCard() {
   isFlipped = !isFlipped;
   backIndex = 0;
 
+  const backTrack = document.getElementById('back-track');
+  const wheelTrack = document.getElementById('wheel-track');
+
   if (isFlipped) {
     el.classList.add('flipped');
-    updateBackContent();
+    // Hauptrad verstecken, Rückseiten-Rad zeigen
+    setTimeout(() => {
+      wheelTrack.style.display = 'none';
+      backTrack.style.display = 'block';
+      buildBackCards();
+      positionBackCards(false);
+    }, 700); // Nach der Flip-Animation
   } else {
+    // Rückseiten-Rad verstecken, Hauptrad zeigen
+    backTrack.style.display = 'none';
+    wheelTrack.style.display = 'block';
     el.classList.remove('flipped');
+    positionCards(false);
   }
   updateFlipLabel();
-  updateStatus();
 }
 
-function updateBackContent() {
+function buildBackCards() {
+  const card = CARDS[currentIndex];
+  const backs = card.backs || [];
+  const backTrack = document.getElementById('back-track');
+  backTrack.innerHTML = backs.map((back, i) => `
+    <div class="back-wheel-card" id="bcard-${i}">
+      <div class="bwc-title">${back.title}</div>
+      <div class="bwc-content">${back.content}</div>
+    </div>
+  `).join('');
+}
+
+function positionBackCards(animate) {
   const card = CARDS[currentIndex];
   const backs = card.backs || [];
   if (backs.length === 0) return;
-  const back = backs[backIndex];
-  const titleEl = document.getElementById('back-title-' + currentIndex);
-  const contentEl = document.getElementById('back-content-' + currentIndex);
-  if (titleEl) titleEl.textContent = back.title;
-  if (contentEl) contentEl.textContent = back.content;
+
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+  const topMid = topH / 2;
+  const centerMid = topH + (centerH / 2);
+  const bottomMid = topH + centerH + (bottomH / 2);
+  const cardH = 210;
+
+  backs.forEach((back, i) => {
+    const el = document.getElementById('bcard-' + i);
+    if (!el) return;
+
+    let diff = i - backIndex;
+    // Endlos-Korrektur nur bei genug Karten
+    if (backs.length > 2) {
+      if (diff > backs.length / 2) diff -= backs.length;
+      if (diff < -backs.length / 2) diff += backs.length;
+    }
+
+    // EXAKT wie Hauptrad
+    let cardMid;
+    if (diff === 0) cardMid = centerMid;
+    else if (diff === -1) cardMid = topMid;
+    else if (diff === 1) cardMid = bottomMid + 40;
+    else if (diff < -1) cardMid = topMid - topH;
+    else cardMid = bottomMid + bottomH + 60;
+
+    el.style.top = (cardMid - cardH / 2) + 'px';
+    el.style.transition = animate ? 'all 0.5s cubic-bezier(0.23,1,0.32,1)' : 'none';
+
+    if (diff === 0) {
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+      el.style.zIndex = '10';
+    } else if (Math.abs(diff) === 1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'scale(0.9)';
+      el.style.zIndex = '5';
+    } else {
+      el.style.opacity = '0';
+      el.style.transform = 'scale(0.8)';
+      el.style.zIndex = '1';
+    }
+  });
 }
+
+// updateBackContent nicht mehr noetig - eigenes Rad uebernimmt
 
 function updateFlipLabel() {
   const fl = document.getElementById('flip-label');
