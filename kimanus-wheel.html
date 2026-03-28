@@ -899,15 +899,182 @@ function selectTab(i) {
   toggleDrawer();
 }
 
+// === SPRACH-PIPELINE ===
+let mediaRecorder = null;
+let audioChunks = [];
+let audioStream = null;
+
 function toggleSpeech() {
   isListening = !isListening;
   const btn = document.getElementById('speech-btn');
   if (isListening) {
     btn.classList.add('listening');
-    // TODO: Groq Whisper STT anbinden
-    // Sprache aufnehmen -> an KIM schicken -> Rad steuern
+    btn.querySelector('span').textContent = '...';
+    startRecording();
   } else {
     btn.classList.remove('listening');
+    btn.querySelector('span').textContent = 'KIM';
+    stopRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    mediaRecorder = new MediaRecorder(audioStream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+    mediaRecorder.onstop = async () => {
+      const mimeType = mediaRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(audioChunks, {type: mimeType});
+      cleanupMic();
+      if (blob.size > 1000) {
+        await processVoice(blob, mimeType);
+      }
+    };
+    mediaRecorder.start(250);
+
+    // Auto-Stop nach 10 Sekunden Stille
+    setTimeout(() => {
+      if (isListening) {
+        isListening = false;
+        const btn = document.getElementById('speech-btn');
+        btn.classList.remove('listening');
+        btn.querySelector('span').textContent = 'KIM';
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+      }
+    }, 10000);
+  } catch(err) {
+    console.error('Mikrofon-Fehler:', err);
+    isListening = false;
+    document.getElementById('speech-btn').classList.remove('listening');
+    document.getElementById('speech-btn').querySelector('span').textContent = 'KIM';
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+  }
+}
+
+function cleanupMic() {
+  if (audioStream) {
+    audioStream.getTracks().forEach(t => t.stop());
+    audioStream = null;
+  }
+}
+
+async function processVoice(blob, mimeType) {
+  const btn = document.getElementById('speech-btn');
+  btn.querySelector('span').textContent = '⏳';
+
+  // 1. Sprache -> Text (Groq Whisper)
+  const formData = new FormData();
+  const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'wav';
+  formData.append('audio', blob, 'recording.' + ext);
+
+  try {
+    const sttResp = await fetch('/api/stt', {method:'POST', body:formData});
+    const sttData = await sttResp.json();
+    const userText = sttData.text || '';
+
+    if (!userText.trim()) {
+      btn.querySelector('span').textContent = '❌';
+      setTimeout(() => btn.querySelector('span').textContent = 'KIM', 2000);
+      return;
+    }
+
+    // Zeige erkannten Text sofort auf der Glasplatte
+    const centerCard = document.getElementById('card-' + currentIndex);
+    if (centerCard) {
+      const front = centerCard.querySelector('.card-front');
+      if (front) {
+        front.innerHTML = `
+          <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 18px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:8px">🗣️ Du sagst:</div>
+            <div style="font-size:15px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.6">${userText}</div>
+            <div style="font-size:10px;color:rgba(230,57,70,0.4);margin-top:12px">KIM denkt nach...</div>
+          </div>
+        `;
+      }
+    }
+
+    btn.querySelector('span').textContent = '💬';
+
+    // 2. Text -> KIM (Chat API)
+    const chatResp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: userText,
+        agent: 'kim',
+        model: 'groq-llama',
+        session: 'wheel-' + Date.now()
+      })
+    });
+
+    let kimAnswer = '';
+    const contentType = chatResp.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      // Einfache JSON-Antwort
+      const data = await chatResp.json();
+      kimAnswer = data.output || data.text || data.answer || '';
+    } else {
+      // Streaming (SSE)
+      const reader = chatResp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, {stream:true});
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const d = JSON.parse(line.slice(6));
+              if (d.token) kimAnswer += d.token;
+              if (d.full) kimAnswer = d.full;
+              if (d.output) kimAnswer = d.output;
+            } catch(e) {}
+          }
+        }
+      }
+    }
+
+    // 3. Antwort auf die Glasplatte projizieren
+    if (kimAnswer) {
+      showKimResponse(userText, kimAnswer);
+    }
+
+  } catch(err) {
+    console.error('Pipeline-Fehler:', err);
+  }
+
+  btn.querySelector('span').textContent = 'KIM';
+}
+
+function showKimResponse(question, answer) {
+  // Zeige Frage + Antwort direkt auf der aktiven Glasplatte
+  const centerCard = document.getElementById('card-' + currentIndex);
+  if (!centerCard) return;
+
+  // Finde die card-front und ersetze den Inhalt
+  const front = centerCard.querySelector('.card-front');
+  if (front) {
+    front.innerHTML = `
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:6px">🗣️ ${question}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;white-space:pre-line">${answer}</div>
+      </div>
+    `;
   }
 }
 
