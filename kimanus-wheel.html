@@ -505,11 +505,11 @@ const CARDS = [
 const SCOUTS = [
   {id:'yt-scout', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'video@kimanus.de', phone:'Durchwahl 101',
    backs:[
-     {title:'🎤 Frag mich!', content:'Sag einfach:\n"Such mir ein Video über..."', type:'search'},
-     {title:'📺 Jetzt läuft', content:'', type:'video', videoId:'dQw4w9WgXcQ'},
-     {title:'📋 Kapitel', content:'00:00 Einleitung\n02:15 Grundlagen\n05:30 Praxis-Beispiel\n08:45 Tipps & Tricks\n12:00 Zusammenfassung'},
-     {title:'📚 Gespeichert', content:'🎬 n8n Workflow Tutorial\n🎬 Claude Code Tricks\n🎬 KI Agent bauen\n🎬 RAG System Setup\n🎬 WhatsApp Bot'},
-     {title:'🔥 Empfehlungen', content:'Basierend auf deinen Interessen:\n\n🎬 Rohaufschlag berechnen\n🎬 Gastro-Kalkulation 2026\n🎬 KI in der Gastronomie'},
+     {title:'', content:'', type:'yt-input'},
+     {title:'', content:'', type:'yt-player'},
+     {title:'', content:'', type:'yt-chapters'},
+     {title:'', content:'', type:'yt-saved'},
+     {title:'', content:'', type:'yt-info'},
    ]},
   {id:'web-scout', icon:'🌐', title:'Web Scout', subtitle:'Internet-Rechercheur', color:'#4285f4', email:'recherche@kimanus.de', phone:'Durchwahl 102',
    backs:[
@@ -724,7 +724,37 @@ function buildBackCards() {
   const backTrack = document.getElementById('back-track');
   backTrack.innerHTML = backs.map((back, i) => {
     let inner = '';
-    if (back.type === 'video' && back.videoId) {
+    if (back.type === 'yt-input') {
+      inner = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:1px">YOUTUBE URL EINFÜGEN</div>
+          <input id="yt-url" type="url" placeholder="https://youtube.com/watch?v=..."
+            style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:13px;outline:none"
+            onkeydown="if(event.key==='Enter')ytAnalyze()">
+          <div style="display:flex;gap:8px;width:100%">
+            <button onclick="ytPaste()" style="flex:1;padding:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:11px;cursor:pointer">📋 EINFÜGEN</button>
+            <button onclick="ytAnalyze()" style="flex:1;padding:8px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);color:rgba(230,57,70,0.6);font-size:11px;cursor:pointer">🔍 ANALYSIEREN</button>
+          </div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.15);margin-top:4px">oder drück KIM und sag was du suchst</div>
+        </div>`;
+    } else if (back.type === 'yt-player') {
+      inner = `<div id="yt-player-wrap" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15)">Kein Video geladen</div>
+      </div>`;
+    } else if (back.type === 'yt-chapters') {
+      inner = `<div id="yt-chapters-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Erst ein Video analysieren</div>
+      </div>`;
+    } else if (back.type === 'yt-saved') {
+      inner = `<div id="yt-saved-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Lade gespeicherte Videos...</div>
+      </div>`;
+      setTimeout(ytLoadSaved, 500);
+    } else if (back.type === 'yt-info') {
+      inner = `<div id="yt-info-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Video-Details erscheinen nach Analyse</div>
+      </div>`;
+    } else if (back.type === 'video' && back.videoId) {
       inner = `
         <iframe class="bwc-video-full" src="https://www.youtube.com/embed/${back.videoId}?rel=0&modestbranding=1&playsinline=1"
           frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture"
@@ -897,6 +927,131 @@ function selectTab(i) {
   calcSizes();
   positionCards(false);
   toggleDrawer();
+}
+
+// === YOUTUBE SCOUT ===
+let ytCurrentVideoId = '';
+
+async function ytPaste() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('yt-url').value = text;
+  } catch(e) {
+    // Clipboard nicht verfuegbar - manuell einfuegen
+    document.getElementById('yt-url').focus();
+  }
+}
+
+function ytExtractId(url) {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
+async function ytAnalyze() {
+  const url = document.getElementById('yt-url').value.trim();
+  if (!url) return;
+  const videoId = ytExtractId(url);
+  if (!videoId) { alert('Keine gültige YouTube URL'); return; }
+
+  ytCurrentVideoId = videoId;
+
+  // Player sofort laden
+  const playerWrap = document.getElementById('yt-player-wrap');
+  if (playerWrap) {
+    playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
+  }
+
+  // Zur Player-Glasplatte drehen
+  if (isFlipped) {
+    backIndex = 1;
+    positionBackCards(true);
+  }
+
+  // Analyse starten via KIM
+  const chaptersWrap = document.getElementById('yt-chapters-wrap');
+  if (chaptersWrap) {
+    chaptersWrap.innerHTML = '<div style="font-size:11px;color:rgba(230,57,70,0.4);text-align:center">Analysiere Video...</div>';
+  }
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: 'Analysiere dieses YouTube Video und erstelle Kapitel mit Timestamps: https://www.youtube.com/watch?v=' + videoId,
+        agent:'kim',
+        model:'groq-llama',
+        session:'yt-scout-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    const analysis = data.output || data.text || '';
+
+    // Kapitel anzeigen
+    if (chaptersWrap && analysis) {
+      chaptersWrap.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.8;white-space:pre-line">${analysis}</div>`;
+    }
+
+    // Info anzeigen
+    const infoWrap = document.getElementById('yt-info-wrap');
+    if (infoWrap) {
+      infoWrap.innerHTML = `
+        <div style="margin-bottom:8px"><img src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" style="width:100%;border-radius:2px;opacity:0.6"></div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.2)">ID: ${videoId}</div>
+        <button onclick="ytSave('${videoId}')" style="margin-top:8px;width:100%;padding:8px;background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.3);color:rgba(76,175,80,0.6);font-size:11px;cursor:pointer">💾 SPEICHERN</button>
+      `;
+    }
+  } catch(e) {
+    console.error('Analyse-Fehler:', e);
+    if (chaptersWrap) chaptersWrap.innerHTML = '<div style="color:rgba(230,57,70,0.4);font-size:11px">Analyse fehlgeschlagen</div>';
+  }
+}
+
+async function ytSave(videoId) {
+  try {
+    await fetch('/api/video-save', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url:'https://www.youtube.com/watch?v=' + videoId, analysis:'Gespeichert via Wheel'})
+    });
+    alert('Video gespeichert!');
+  } catch(e) { console.error(e); }
+}
+
+async function ytLoadSaved() {
+  const wrap = document.getElementById('yt-saved-wrap');
+  if (!wrap) return;
+  try {
+    const resp = await fetch('/api/video-list');
+    const data = await resp.json();
+    const videos = data.videos || [];
+    if (videos.length === 0) {
+      wrap.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Noch keine Videos gespeichert</div>';
+      return;
+    }
+    wrap.innerHTML = videos.slice(0, 10).map(v => {
+      const vid = ytExtractId(v.url || '');
+      return `<div onclick="ytLoadVideo('${vid}')" style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer">
+        ${vid ? '<img src="https://img.youtube.com/vi/'+vid+'/default.jpg" style="width:50px;height:38px;border-radius:2px;opacity:0.5">' : ''}
+        <div style="flex:1;font-size:10px;color:rgba(255,255,255,0.25);line-height:1.4">${v.title || v.url || 'Video'}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    wrap.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.15)">Fehler beim Laden</div>';
+  }
+}
+
+function ytLoadVideo(videoId) {
+  if (!videoId) return;
+  ytCurrentVideoId = videoId;
+  document.getElementById('yt-url').value = 'https://www.youtube.com/watch?v=' + videoId;
+  const playerWrap = document.getElementById('yt-player-wrap');
+  if (playerWrap) {
+    playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
+  }
+  // Zur Player-Glasplatte drehen
+  backIndex = 1;
+  positionBackCards(true);
 }
 
 // === SPRACH-PIPELINE ===
