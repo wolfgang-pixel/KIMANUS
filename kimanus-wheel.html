@@ -783,10 +783,9 @@ function buildBackCards() {
         <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Erst ein Video analysieren</div>
       </div>`;
     } else if (back.type === 'yt-saved') {
-      inner = `<div id="yt-saved-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
-        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Lade gespeicherte Videos...</div>
+      inner = `<div id="yt-saved-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+        <button onclick="ytLoadSaved()" style="padding:12px 24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer">📚 Videos laden</button>
       </div>`;
-      setTimeout(ytLoadSaved, 500);
     } else if (back.type === 'yt-info') {
       inner = `<div id="yt-info-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
         <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Video-Details erscheinen nach Analyse</div>
