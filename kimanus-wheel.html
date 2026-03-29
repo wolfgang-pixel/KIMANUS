@@ -563,34 +563,27 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <script>
 const CARDS = [
-  // --- LANDING & INFO-KARTEN ---
-  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Die helfende Hand', color:'#e63946', email:'', phone:'',
+  // --- 1. KIMANUS (Landing / Diashow auf Rueckseite) ---
+  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
-     {title:'Was ist KIMANUS?', content:'Dein digitales Betriebssystem.\nKIM + MANUS = Die helfende Hand.\nEin Assistent, der dich versteht.'},
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nEin Assistent, der dich versteht.'},
      {title:'So funktioniert es', content:'Sprich mit KIM — er kuemmert sich.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Dein Team', content:'KIM — Privatassistent\nKAI — Business-Berater\nKI-MANUS — Der Dirigent\n+ Scouts, Berater, Spezialisten'},
      {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.'},
-   ]},
-  {id:'info-team', icon:'👥', title:'Dein Team', subtitle:'KIM, KAI & Mitarbeiter', color:'#e63946', email:'', phone:'',
-   backs:[
-     {title:'Die Agenten', content:'KIM — Dein Privatassistent\nKAI — Business-Berater\nWetterfrosch, Animateur, ...'},
-     {title:'Die Scouts', content:'YouTube Scout — Videos finden\nWeb Scout — Recherche\nNews Scout — Nachrichten'},
-     {title:'Wie erreiche ich sie?', content:'Sprich einfach mit KIM.\nEr leitet dich zum richtigen\nMitarbeiter weiter.'},
-   ]},
-  {id:'info-start', icon:'🚀', title:'Los gehts!', subtitle:'Wische nach unten zu KIM', color:'#e63946', email:'', phone:'',
-   backs:[
-     {title:'Erste Schritte', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich'},
-     {title:'Tipps', content:'Halte KIM-Button = Sprechen\n3x kurz druecken = Hilfe\n3x lang druecken = SOS'},
+     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
 
-  // --- HAUPTKARTEN ---
+  // --- 2. KIM (Privatassistent, m/w waehlbar im Setup) ---
   {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
+     {title:'Ueber KIM', content:'Dein persoenlicher Assistent.\nGeschlechtsneutral — du waehlst\nim Setup ob m oder w.\nFrag mich einfach was du brauchst!'},
      {title:'Agenten', content:'KAI — Business-Berater\nWetterfrosch — Wetter\nAnimateur — Freizeit & Events\nKalkulierer — Rohaufschlag\nSekretaer — Termine\nCap-Coin — Sammeln'},
      {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
      {title:'Berater & Tools', content:'Clubkarten • Webseiten\nBilderrahmen • Apps\nProjektordner • E-Mail'},
-     {title:'Einstellungen', content:'Sprache: Deutsch\nStimme: Ara (weiblich)\nModell: Groq Llama'},
      {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
    ]},
+
+  // --- 3. KAI (Business-Berater) ---
   {id:'kai', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9', email:'kai@kimanus.de', phone:'Durchwahl 002',
    backs:[
      {title:'Über KAI', content:'Dein Business-Berater.\nKalkulation, Einkauf und Geschäft.'},
@@ -599,45 +592,45 @@ const CARDS = [
      {title:'Kontakt', content:'kai@kimanus.de\nDurchwahl: intern 02'},
      {title:'Letzter Bericht', content:'Wareneinsatz März: 32%\nZiel: unter 30%'},
    ]},
-  {id:'wetterfrosch', icon:'🌤️', title:'Wetterfrosch', subtitle:'Meteorologe', color:'#4caf50', email:'wetter@kimanus.de', phone:'Durchwahl 003',
+
+  // --- 4. KI-MANUS (Dirigent & Orchestrator) ---
+  {id:'ki-manus', icon:'🎛️', title:'KI-MANUS', subtitle:'Dirigent & Orchestrator', color:'#a78bfa', email:'manus@kimanus.de', phone:'Zentrale',
    backs:[
-     {title:'Aktuelles Wetter', content:'Nürnberg: 14°C, bewölkt\nRegenwahrscheinlichkeit: 20%'},
-     {title:'Wochenvorschau', content:'Mo: ☀️ 16°C\nDi: 🌧️ 12°C\nMi: ⛅ 14°C'},
-     {title:'Empfehlung', content:'Heute perfekt für\neinen Spaziergang!'},
-     {title:'Pollenflug', content:'Birke: mittel\nGräser: gering\nAmbrosia: keine'},
-     {title:'Reisewetter', content:'Mallorca: 24°C ☀️\nGardasee: 19°C ⛅\nNordsee: 11°C 🌧️'},
+     {title:'Ueber KI-MANUS', content:'Der Dirigent hinter den Kulissen.\nOrchestiert alle Agenten.\nRoutet zum richtigen Modell.'},
+     {title:'Modell-Routing', content:'KIM — Groq Llama (schnell)\nKAI — DeepSeek (praezise)\nKI-MANUS — Claude Sonnet\nGemini Flash — Fallback'},
+     {title:'Architektur', content:'AI MANUS — Moralwaechter\nKI MANUS — Dirigent\nKIM + KAI — Empfang\nSub-Agenten — Spezialisten'},
    ]},
-  {id:'animateur', icon:'🎯', title:'Animateur', subtitle:'Freizeit & Events', color:'#ff9800', email:'freizeit@kimanus.de', phone:'Durchwahl 004',
+
+  // --- Verdoppelt fuer fluessiges Endlos-Rad ---
+  {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
-     {title:'In der Nähe', content:'Kaiserburg Nürnberg (2km)\nTiergarten (5km)'},
-     {title:'Empfehlung', content:'Bei dem Wetter:\nBiergarten am Dutzendteich!'},
-     {title:'Events heute', content:'Bardentreffen Altstadt\nFlohmarkt Südstadt\nKino Open Air'},
-     {title:'Restaurants', content:'Bratwurstglöcklein ⭐⭐⭐⭐\nSchlenkerla ⭐⭐⭐⭐⭐'},
-     {title:'Wanderungen', content:'Fränkische Schweiz (30km)\nPottenstein Höhlen\nWalberla Aussicht'},
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nEin Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — er kuemmert sich.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Dein Team', content:'KIM — Privatassistent\nKAI — Business-Berater\nKI-MANUS — Der Dirigent\n+ Scouts, Berater, Spezialisten'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.'},
+     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
-  {id:'kalkulierer', icon:'🧮', title:'Kalkulierer', subtitle:'Rohaufschlag-Experte', color:'#9c27b0', email:'kalkulation@kimanus.de', phone:'Durchwahl 005',
+  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
-     {title:'Letzte Kalkulation', content:'Schnitzel: WEK 4.20€ → VK 12.90€\nRohaufschlag: 207%'},
-     {title:'Top Margen', content:'Pizza Margherita: 340%\nCaesar Salad: 290%\nSpätzle: 380%'},
-     {title:'Warnung', content:'Rindfleisch +12% teurer\nAlternative: Schweinelende'},
-     {title:'Tages-Tipp', content:'Saisongemüse nutzen!\nSpargel gerade günstig\n→ Sonderkarte möglich'},
-     {title:'Monatsübersicht', content:'Durchschnitt: 245%\nBester Tag: Freitag\nSchwächster: Montag'},
+     {title:'Ueber KIM', content:'Dein persoenlicher Assistent.\nGeschlechtsneutral — du waehlst\nim Setup ob m oder w.\nFrag mich einfach was du brauchst!'},
+     {title:'Agenten', content:'KAI — Business-Berater\nWetterfrosch — Wetter\nAnimateur — Freizeit & Events\nKalkulierer — Rohaufschlag\nSekretaer — Termine\nCap-Coin — Sammeln'},
+     {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
+     {title:'Berater & Tools', content:'Clubkarten • Webseiten\nBilderrahmen • Apps\nProjektordner • E-Mail'},
+     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
    ]},
-  {id:'sekretaer', icon:'📅', title:'Sekretär', subtitle:'Termine & Erinnerungen', color:'#607d8b', email:'termine@kimanus.de', phone:'Durchwahl 006',
+  {id:'kai2', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9', email:'kai@kimanus.de', phone:'Durchwahl 002',
    backs:[
-     {title:'Heute', content:'14:00 Zahnarzt\n16:30 Jannick anrufen'},
-     {title:'Diese Woche', content:'Mi: Steuerberater\nFr: Lieferant Getränke'},
-     {title:'Erinnerungen', content:'Steuererklärung bis 31.05.\nTÜV Auto läuft ab Juni'},
-     {title:'Geburtstage', content:'03.04. Mama\n15.04. Jannick\n22.04. Kollege Stefan'},
-     {title:'Notizen', content:'Schlüsseldienst: 0911-123456\nHausmeister: Herr Müller\nWLAN-Passwort: büro2026'},
+     {title:'Über KAI', content:'Dein Business-Berater.\nKalkulation, Einkauf und Geschäft.'},
+     {title:'Services', content:'Rohaufschlag • Preisvergleich\nBestellungen • Lieferanten'},
+     {title:'Branchen', content:'Gastronomie • Hotellerie\nHandel • Events'},
+     {title:'Kontakt', content:'kai@kimanus.de\nDurchwahl: intern 02'},
+     {title:'Letzter Bericht', content:'Wareneinsatz März: 32%\nZiel: unter 30%'},
    ]},
-  {id:'capcoin', icon:'🪙', title:'Cap-Coin', subtitle:'Sammeln & Einlösen', color:'#d4a017', email:'coins@kimanus.de', phone:'Durchwahl 007',
+  {id:'ki-manus2', icon:'🎛️', title:'KI-MANUS', subtitle:'Dirigent & Orchestrator', color:'#a78bfa', email:'manus@kimanus.de', phone:'Zentrale',
    backs:[
-     {title:'Dein Guthaben', content:'127 Cap-Coins\n= 12,70 EUR'},
-     {title:'Zuletzt gesammelt', content:'Brauerei Schlenkerla: +5\nGasthof Krone: +3'},
-     {title:'Einlösen bei', content:'Pizzeria Roma: 10% Rabatt\nKino Cinecitta: 2€ Nachlass'},
-     {title:'Rangliste', content:'1. MaxBierFan: 842 Coins\n2. Du: 127 Coins\n3. BierLiese: 98 Coins'},
-     {title:'Aktionen', content:'Doppelte Coins diese Woche!\nBei allen Partner-Brauereien'},
+     {title:'Ueber KI-MANUS', content:'Der Dirigent hinter den Kulissen.\nOrchestiert alle Agenten.\nRoutet zum richtigen Modell.'},
+     {title:'Modell-Routing', content:'KIM — Groq Llama (schnell)\nKAI — DeepSeek (praezise)\nKI-MANUS — Claude Sonnet\nGemini Flash — Fallback'},
+     {title:'Architektur', content:'AI MANUS — Moralwaechter\nKI MANUS — Dirigent\nKIM + KAI — Empfang\nSub-Agenten — Spezialisten'},
    ]},
 ];
 
