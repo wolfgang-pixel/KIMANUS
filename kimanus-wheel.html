@@ -98,11 +98,35 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border-top:2px solid rgba(255,255,255,0.1);
 }
 
+/* === SWIPE HINT (pulsender Pfeil unter Milchglas) === */
+#swipe-hint-behind{
+  position:absolute;
+  bottom:calc(40% - 75px);
+  left:22px;
+  font-size:34px;
+  font-weight:200;
+  color:rgba(230,57,70,0.8);
+  z-index:0;
+  pointer-events:none;
+  animation:swipeHintGlow 2s ease-in-out infinite;
+}
+@keyframes swipeHintPulse{
+  0%{color:rgba(230,57,70,0);text-shadow:none}
+  50%{color:rgba(230,57,70,1);text-shadow:0 0 12px rgba(230,57,70,0.8)}
+  100%{color:rgba(230,57,70,0);text-shadow:none}
+}
+@keyframes swipeHintGlow{
+  0%{opacity:0}
+  50%{opacity:1}
+  100%{opacity:0}
+}
+#swipe-hint-behind.hidden{display:none}
+
 /* === RAD-MECHANISMUS === */
 #wheel-track,#back-track{
   position:absolute;
   left:0;right:0;
-  transition:transform 0.5s cubic-bezier(0.23,1,0.32,1);
+  transition:transform 1.2s cubic-bezier(0.23,1,0.32,1);
   will-change:transform;
 }
 #back-track{z-index:12}
@@ -117,7 +141,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   padding:20px;
-  transition:all 0.5s cubic-bezier(0.23,1,0.32,1);
+  transition:all 1.2s cubic-bezier(0.23,1,0.32,1);
 }
 .back-wheel-card .bwc-title{
   font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
@@ -149,7 +173,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 .wheel-card{
   height:210px;
-  width:100%;
+  width:calc(100% - 20px);
   left:50%;
   transform:translateX(-50%);
   margin-left:0;
@@ -370,57 +394,59 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 /* === TRESOR === */
 #tresor-overlay{
-  display:none;
   position:fixed;inset:0;
-  background:rgba(0,0,0,0.6);
-  z-index:50;
+  background:rgba(0,0,0,0.4);
+  z-index:15;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 2s;
 }
-#tresor-overlay.open{display:block}
-/* Tresor-Panel = gleiche Glasplatte wie alter Drawer */
+#tresor-overlay.open{opacity:1;pointer-events:auto}
+/* Tresor-Panel: hinter Bottom Bar, gleiche Breite wie Karten */
 #tresor-panel{
   position:fixed;
   left:50%;
   width:calc((100% - 10px) * 0.9);
-  bottom:-400px;
+  bottom:-500px;
   transform:translateX(-50%);
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  z-index:51;
-  transition:bottom 0.5s cubic-bezier(0.23,1,0.32,1);
-  overflow-y:auto;
-  scrollbar-width:none;
-  max-height:70vh;
+  background:rgba(30,30,32,0.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.06);
+  z-index:16;
+  transition:bottom 2s cubic-bezier(0.25,0.1,0.25,1);
+  padding:2px;
 }
-#tresor-panel::-webkit-scrollbar{display:none}
 #tresor-overlay.open #tresor-panel{
-  bottom:calc(80px + env(safe-area-inset-bottom, 0px) + 8px);
+  bottom:80px;
 }
-/* Section-Titel (SETUP, ARCHIV, SAVE) */
+/* Section-Titel: ganz schmal, fein */
 .tresor-section-title{
-  font-size:10px;font-weight:700;
-  color:rgba(255,255,255,0.3);
-  letter-spacing:2px;
-  padding:6px 8px 2px;
+  font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:1.5px;
+  padding:0 6px;
+  height:17px;
+  line-height:17px;
+  background:rgba(255,255,255,0.06);
 }
 .tresor-divider{
-  display:flex;align-items:center;justify-content:center;
-  padding:6px;
-  cursor:pointer;
-  border-top:1px solid rgba(255,255,255,0.06);
-  margin-top:2px;
+  padding:0 6px;
+  height:17px;
+  line-height:17px;
+  margin:0;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;
 }
 .tresor-divider span{
-  font-size:10px;font-weight:700;
-  color:rgba(255,255,255,0.3);
-  letter-spacing:2px;
+  font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:1.5px;
 }
-.tresor-divider:active span{color:rgba(255,255,255,0.5)}
-/* Grids */
+/* Grids: eng */
 .tresor-grid{
   width:100%;
-  padding:3px;
   display:grid;
-  gap:3px;
+  gap:0;
 }
 .tresor-grid-3x2{
   grid-template-columns:repeat(3,1fr);
@@ -436,35 +462,16 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .tresor-tab{
   display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.06);
+  background:transparent;
+  border-right:1px solid rgba(255,255,255,0.07);
+  border-bottom:1px solid rgba(255,255,255,0.07);
   cursor:pointer;
-  padding:8px 4px;
-  min-height:42px;
+  padding:8px 3px;
+  min-height:34px;
 }
-.tresor-tab:active{background:rgba(255,255,255,0.08)}
-.tresor-tab span{font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);text-align:center}
-/* Level 2: verschachtelt, gleicher Grid-Style */
-.tresor-level.nested{
-  max-height:0;overflow:hidden;
-  transition:max-height 0.5s ease;
-}
-.tresor-level.nested.open{
-  max-height:400px;
-}
-.tresor-lock{
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,0.02);
-  border:1px solid rgba(255,255,255,0.06);
-  cursor:pointer;
-  padding:8px 4px;
-  min-height:42px;
-  width:100%;
-}
-.tresor-lock:active{background:rgba(255,255,255,0.06)}
-.tresor-lock span{font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);text-align:center}
-#tresor-l2.open{border-top:1px solid rgba(220,38,38,0.3)}
-#tresor-l3.open{border-top:1px solid rgba(124,45,18,0.5)}
+.tresor-tab:last-child{border-right:none}
+.tresor-tab:active{background:rgba(255,255,255,0.05)}
+.tresor-tab span{font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center}
 
 /* Tresor-Button links in Bar */
 #tresor-btn{
@@ -503,6 +510,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="panel" id="panel-center"></div>
     <div class="panel" id="panel-bottom"></div>
 
+    <div id="swipe-hint-behind">&#x276E;</div>
     <div id="wheel-track"></div>
     <div id="back-track" style="display:none"></div>
     <!-- Register-Panel entfernt -->
@@ -521,33 +529,26 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   <!-- Tresor-Overlay (faehrt von unten hoch) -->
   <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
     <div id="tresor-panel" onclick="event.stopPropagation()">
-      <!-- SETUP: 6 Kaestchen (3x2 Grid) -->
       <div class="tresor-section-title">SETUP</div>
       <div class="tresor-grid tresor-grid-3x2">
-        <div class="tresor-tab"><span>👤 KIM</span></div>
-        <div class="tresor-tab"><span>💼 KAI</span></div>
-        <div class="tresor-tab"><span>🎨 Skins</span></div>
-        <div class="tresor-tab"><span>🎨 Farben</span></div>
-        <div class="tresor-tab"><span>🗣️ Sprache</span></div>
-        <div class="tresor-tab"><span>⚙️ System</span></div>
+        <div class="tresor-tab"><span>KIM</span></div>
+        <div class="tresor-tab"><span>KAI</span></div>
+        <div class="tresor-tab"><span>Skins</span></div>
+        <div class="tresor-tab"><span>Farben</span></div>
+        <div class="tresor-tab"><span>Sprache</span></div>
+        <div class="tresor-tab"><span>System</span></div>
       </div>
-      <!-- ARCHIV: 4 Kaestchen (2x2 Grid), oeffnet sich per Tap -->
-      <div class="tresor-divider" onclick="openTresorLevel(2)"><span>📁 ARCHIV</span></div>
-      <div class="tresor-level nested" id="tresor-l2">
-        <div class="tresor-grid tresor-grid-2x2">
-          <div class="tresor-tab"><span>📸 Fotos</span></div>
-          <div class="tresor-tab"><span>📖 Tagebuch</span></div>
-          <div class="tresor-tab"><span>📋 Pers-Akten</span></div>
-          <div class="tresor-tab"><span>📁 Meine Ordner</span></div>
-        </div>
+      <div class="tresor-divider"><span>ARCHIV</span></div>
+      <div class="tresor-grid tresor-grid-2x2">
+        <div class="tresor-tab"><span>Fotos</span></div>
+        <div class="tresor-tab"><span>Tagebuch</span></div>
+        <div class="tresor-tab"><span>Pers-Akten</span></div>
+        <div class="tresor-tab"><span>Meine Ordner</span></div>
       </div>
-      <!-- SAVE: 2 Kaestchen (2x1 Grid), oeffnet sich per Tap -->
-      <div class="tresor-divider" onclick="openTresorLevel(3)"><span>🔐 SAVE</span></div>
-      <div class="tresor-level nested" id="tresor-l3">
-        <div class="tresor-grid tresor-grid-2x1">
-          <div class="tresor-tab"><span>🔒 Schliessfach</span></div>
-          <div class="tresor-tab"><span>📬 KIMANUS Postfach</span></div>
-        </div>
+      <div class="tresor-divider"><span>SAVE</span></div>
+      <div class="tresor-grid tresor-grid-2x1">
+        <div class="tresor-tab"><span>Schliessfach</span></div>
+        <div class="tresor-tab"><span>Postfach</span></div>
       </div>
     </div>
   </div>
@@ -776,7 +777,7 @@ function positionCards(animate) {
     else cardMid = bottomMid + bottomH + 60;
 
     el.style.top = (cardMid - cardH / 2) + 'px';
-    el.style.transition = animate ? 'all 0.5s cubic-bezier(0.23,1,0.32,1)' : 'none';
+    el.style.transition = animate ? 'all 1.2s cubic-bezier(0.23,1,0.32,1)' : 'none';
 
     if (offset === 0) {
       el.style.opacity = '1';
@@ -811,7 +812,7 @@ function spinWheel(direction) {
     isAnimating = true;
     backIndex = (backIndex + direction + backs.length) % backs.length;
     positionBackCards(true);
-    setTimeout(() => { isAnimating = false; }, 500);
+    setTimeout(() => { isAnimating = false; }, 400);
     return;
   }
   isAnimating = true;
@@ -820,7 +821,7 @@ function spinWheel(direction) {
   // Position merken
   localStorage.setItem('kimanus-lastCard', currentIndex);
   localStorage.setItem('kimanus-visited', 'true');
-  setTimeout(() => { isAnimating = false; }, 500);
+  setTimeout(() => { isAnimating = false; }, 400);
 }
 
 function handleCardTap(i) {
@@ -834,6 +835,9 @@ function flipCard() {
   const el = document.getElementById('card-' + currentIndex);
   if (!el) return;
   isFlipped = !isFlipped;
+  // Swipe-Hint: verstecken wenn geflippt, zeigen wenn zurueck
+  const hb = document.getElementById('swipe-hint-behind');
+  if (hb) hb.style.display = isFlipped ? 'none' : 'block';
   backIndex = 0;
 
   const backTrack = document.getElementById('back-track');
@@ -942,7 +946,7 @@ function positionBackCards(animate) {
     else cardMid = bottomMid + bottomH + 60;
 
     el.style.top = (cardMid - cardH / 2) + 'px';
-    el.style.transition = animate ? 'all 0.5s cubic-bezier(0.23,1,0.32,1)' : 'none';
+    el.style.transition = animate ? 'all 1.2s cubic-bezier(0.23,1,0.32,1)' : 'none';
 
     if (diff === 0) {
       el.style.opacity = '1';
@@ -1004,20 +1008,22 @@ let tresorOpen = false;
 function toggleTresor() {
   tresorOpen = !tresorOpen;
   document.getElementById('tresor-overlay').classList.toggle('open', tresorOpen);
-  if (!tresorOpen) closeTresorLevels();
 }
 function closeTresor() {
   tresorOpen = false;
   document.getElementById('tresor-overlay').classList.remove('open');
-  closeTresorLevels();
 }
-function openTresorLevel(n) {
-  const el = document.getElementById('tresor-l' + n);
-  if (el) el.classList.toggle('open');
-}
-function closeTresorLevels() {
-  document.querySelectorAll('.tresor-level.nested').forEach(el => el.classList.remove('open'));
-}
+// Tresor runter-wischen
+(function(){
+  let tStartY = 0;
+  const tp = document.getElementById('tresor-panel');
+  if (!tp) return;
+  tp.addEventListener('touchstart', e => { tStartY = e.touches[0].clientY; }, {passive:true});
+  tp.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientY - tStartY;
+    if (diff > 60) closeTresor();
+  }, {passive:true});
+})();
 
 // === TASTATUR-TOOLBAR ===
 function kbDismiss() {
