@@ -368,61 +368,117 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .kb-kim{background:rgba(230,57,70,0.1);border-color:rgba(230,57,70,0.2);color:rgba(230,57,70,0.5)}
 .kb-done{margin-left:auto}
 
-/* === SCHUBLADE === */
-#drawer{
+/* === TRESOR === */
+#tresor-overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:50;
+}
+#tresor-overlay.open{display:block}
+/* Tresor-Panel = gleiche Glasplatte wie alter Drawer */
+#tresor-panel{
   position:fixed;
   left:50%;
   width:calc((100% - 10px) * 0.9);
-  height:calc(210px * 0.9);
-  bottom:-200px;
+  bottom:-400px;
   transform:translateX(-50%);
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
-  z-index:19;
+  z-index:51;
   transition:bottom 0.5s cubic-bezier(0.23,1,0.32,1);
+  overflow-y:auto;
+  scrollbar-width:none;
+  max-height:70vh;
 }
-#drawer.open{
-  bottom:12px;
+#tresor-panel::-webkit-scrollbar{display:none}
+#tresor-overlay.open #tresor-panel{
+  bottom:calc(80px + env(safe-area-inset-bottom, 0px) + 8px);
 }
-#drawer-content{
-  width:100%;height:100%;
+/* Section-Titel (SETUP, ARCHIV, SAVE) */
+.tresor-section-title{
+  font-size:10px;font-weight:700;
+  color:rgba(255,255,255,0.3);
+  letter-spacing:2px;
+  padding:6px 8px 2px;
+}
+.tresor-divider{
+  display:flex;align-items:center;justify-content:center;
+  padding:6px;
+  cursor:pointer;
+  border-top:1px solid rgba(255,255,255,0.06);
+  margin-top:2px;
+}
+.tresor-divider span{
+  font-size:10px;font-weight:700;
+  color:rgba(255,255,255,0.3);
+  letter-spacing:2px;
+}
+.tresor-divider:active span{color:rgba(255,255,255,0.5)}
+/* Grids */
+.tresor-grid{
+  width:100%;
   padding:3px;
   display:grid;
-  grid-template-rows:repeat(3,1fr);
-  grid-auto-flow:column;
-  grid-auto-columns:calc(33.33% - 2px);
   gap:3px;
-  overflow-x:auto;
-  scrollbar-width:none;
-  scroll-snap-type:x mandatory;
 }
-#drawer-content::-webkit-scrollbar{display:none}
-.dtab{
+.tresor-grid-3x2{
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+.tresor-grid-2x2{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+.tresor-grid-2x1{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:1fr;
+}
+.tresor-tab{
   display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,0.03);
   border:1px solid rgba(255,255,255,0.06);
   cursor:pointer;
-  scroll-snap-align:start;
+  padding:8px 4px;
+  min-height:42px;
 }
-.dtab:active{background:rgba(255,255,255,0.08)}
-.dtab span{font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);text-align:center}
+.tresor-tab:active{background:rgba(255,255,255,0.08)}
+.tresor-tab span{font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);text-align:center}
+/* Level 2: verschachtelt, gleicher Grid-Style */
+.tresor-level.nested{
+  max-height:0;overflow:hidden;
+  transition:max-height 0.5s ease;
+}
+.tresor-level.nested.open{
+  max-height:400px;
+}
+.tresor-lock{
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  cursor:pointer;
+  padding:8px 4px;
+  min-height:42px;
+  width:100%;
+}
+.tresor-lock:active{background:rgba(255,255,255,0.06)}
+.tresor-lock span{font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);text-align:center}
+#tresor-l2.open{border-top:1px solid rgba(220,38,38,0.3)}
+#tresor-l3.open{border-top:1px solid rgba(124,45,18,0.5)}
 
-/* Schubladen-Button links in Bar */
-#drawer-btn{
+/* Tresor-Button links in Bar */
+#tresor-btn{
   position:absolute;
   left:15px;top:50%;transform:translateY(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:4px;
+  font-size:20px;
   cursor:pointer;
-  padding:6px;
+  padding:8px;
+  opacity:0.4;
+  transition:opacity 0.3s;
+  border:none;background:none;
+  -webkit-tap-highlight-color:transparent;
 }
-.db-line{
-  display:block;
-  width:22px;height:2px;
-  background:rgba(255,255,255,0.3);
-  border-radius:1px;
-  transition:all 0.3s;
-}
-#drawer-btn.open .db-line{background:rgba(255,255,255,0.5)}
+#tresor-btn:active{opacity:0.7}
 
 </style>
 </head>
@@ -435,9 +491,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
-    <button class="hdr-btn" onclick="toggleRegister()" title="Register">
-      <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-    </button>
+    <!-- Hamburger entfernt - Navigation lebt auf KIM's Rueckseite -->
   </div>
 
   <div id="wheel-container">
@@ -451,7 +505,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
     <div id="wheel-track"></div>
     <div id="back-track" style="display:none"></div>
-    <div id="register-panel"><div id="register-tabs"></div></div>
+    <!-- Register-Panel entfernt -->
   </div>
 
   <div id="status-text"></div>
@@ -464,17 +518,42 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <button onclick="toggleSpeech()" class="kb-btn kb-kim">🎤 KIM</button>
   </div>
 
-  <!-- Schublade (Glasplatte von unten) -->
-  <div id="drawer">
-    <div id="drawer-content"></div>
+  <!-- Tresor-Overlay (faehrt von unten hoch) -->
+  <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
+    <div id="tresor-panel" onclick="event.stopPropagation()">
+      <!-- SETUP: 6 Kaestchen (3x2 Grid) -->
+      <div class="tresor-section-title">SETUP</div>
+      <div class="tresor-grid tresor-grid-3x2">
+        <div class="tresor-tab"><span>👤 KIM</span></div>
+        <div class="tresor-tab"><span>💼 KAI</span></div>
+        <div class="tresor-tab"><span>🎨 Skins</span></div>
+        <div class="tresor-tab"><span>🎨 Farben</span></div>
+        <div class="tresor-tab"><span>🗣️ Sprache</span></div>
+        <div class="tresor-tab"><span>⚙️ System</span></div>
+      </div>
+      <!-- ARCHIV: 4 Kaestchen (2x2 Grid), oeffnet sich per Tap -->
+      <div class="tresor-divider" onclick="openTresorLevel(2)"><span>📁 ARCHIV</span></div>
+      <div class="tresor-level nested" id="tresor-l2">
+        <div class="tresor-grid tresor-grid-2x2">
+          <div class="tresor-tab"><span>📸 Fotos</span></div>
+          <div class="tresor-tab"><span>📖 Tagebuch</span></div>
+          <div class="tresor-tab"><span>📋 Pers-Akten</span></div>
+          <div class="tresor-tab"><span>📁 Meine Ordner</span></div>
+        </div>
+      </div>
+      <!-- SAVE: 2 Kaestchen (2x1 Grid), oeffnet sich per Tap -->
+      <div class="tresor-divider" onclick="openTresorLevel(3)"><span>🔐 SAVE</span></div>
+      <div class="tresor-level nested" id="tresor-l3">
+        <div class="tresor-grid tresor-grid-2x1">
+          <div class="tresor-tab"><span>🔒 Schliessfach</span></div>
+          <div class="tresor-tab"><span>📬 KIMANUS Postfach</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="bottom-bar">
-    <div id="drawer-btn" onclick="toggleDrawer()">
-      <span class="db-line"></span>
-      <span class="db-line"></span>
-      <span class="db-line"></span>
-    </div>
+    <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔑</button>
     <button id="speech-btn" onclick="toggleSpeech()">
       <span id="speech-agent">KIM</span>
     </button>
@@ -483,13 +562,33 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <script>
 const CARDS = [
+  // --- LANDING & INFO-KARTEN ---
+  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Die helfende Hand', color:'#e63946', email:'', phone:'',
+   backs:[
+     {title:'Was ist KIMANUS?', content:'Dein digitales Betriebssystem.\nKIM + MANUS = Die helfende Hand.\nEin Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — er kuemmert sich.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.'},
+   ]},
+  {id:'info-team', icon:'👥', title:'Dein Team', subtitle:'KIM, KAI & Mitarbeiter', color:'#e63946', email:'', phone:'',
+   backs:[
+     {title:'Die Agenten', content:'KIM — Dein Privatassistent\nKAI — Business-Berater\nWetterfrosch, Animateur, ...'},
+     {title:'Die Scouts', content:'YouTube Scout — Videos finden\nWeb Scout — Recherche\nNews Scout — Nachrichten'},
+     {title:'Wie erreiche ich sie?', content:'Sprich einfach mit KIM.\nEr leitet dich zum richtigen\nMitarbeiter weiter.'},
+   ]},
+  {id:'info-start', icon:'🚀', title:'Los gehts!', subtitle:'Wische nach unten zu KIM', color:'#e63946', email:'', phone:'',
+   backs:[
+     {title:'Erste Schritte', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich'},
+     {title:'Tipps', content:'Halte KIM-Button = Sprechen\n3x kurz druecken = Hilfe\n3x lang druecken = SOS'},
+   ]},
+
+  // --- HAUPTKARTEN ---
   {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
-     {title:'Über KIM', content:'Dein persönlicher Assistent.\nFrag mich einfach was du brauchst!'},
-     {title:'Fähigkeiten', content:'Termine • Wetter • Erinnerungen\nRecherche • Empfehlungen'},
-     {title:'Letzte Gespräche', content:'Heute: Wetter abgefragt\nGestern: Termin eingetragen'},
+     {title:'Agenten', content:'KAI — Business-Berater\nWetterfrosch — Wetter\nAnimateur — Freizeit & Events\nKalkulierer — Rohaufschlag\nSekretaer — Termine\nCap-Coin — Sammeln'},
+     {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
+     {title:'Berater & Tools', content:'Clubkarten • Webseiten\nBilderrahmen • Apps\nProjektordner • E-Mail'},
      {title:'Einstellungen', content:'Sprache: Deutsch\nStimme: Ara (weiblich)\nModell: Groq Llama'},
-     {title:'Statistik', content:'47 Gespräche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
+     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
    ]},
   {id:'kai', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9', email:'kai@kimanus.de', phone:'Durchwahl 002',
    backs:[
@@ -585,17 +684,7 @@ const SCOUTS = [
    ]},
 ];
 
-const REGISTERS = [
-  {icon:'👥', name:'Agenten'},
-  {icon:'💳', name:'Clubkarten'},
-  {icon:'🌐', name:'Webseiten'},
-  {icon:'🖼️', name:'Bilderrahmen'},
-  {icon:'🪙', name:'Cap-Coin'},
-  {icon:'📱', name:'Meine Apps'},
-  {icon:'📁', name:'Projektordner'},
-  {icon:'📧', name:'E-Mail'},
-  {icon:'🔒', name:'Schliessfach'},
-];
+// REGISTERS entfernt - Inhalt lebt jetzt auf KIM's Rueckseite
 
 let activeCards = CARDS;
 let currentIndex = 0;
@@ -609,6 +698,14 @@ let isAnimating = false;
 function init() {
   calcSizes();
   buildCards();
+
+  // Wiederkehrende Nutzer: letzte Position wiederherstellen
+  const visited = localStorage.getItem('kimanus-visited');
+  const lastCard = parseInt(localStorage.getItem('kimanus-lastCard') || '0');
+  if (visited && lastCard > 0 && lastCard < activeCards.length) {
+    currentIndex = lastCard;
+  }
+
   positionCards(false);
   window.addEventListener('resize', () => { calcSizes(); positionCards(false); });
 }
@@ -720,6 +817,9 @@ function spinWheel(direction) {
   isAnimating = true;
   currentIndex = (currentIndex + direction + activeCards.length) % activeCards.length;
   positionCards(true);
+  // Position merken
+  localStorage.setItem('kimanus-lastCard', currentIndex);
+  localStorage.setItem('kimanus-visited', 'true');
   setTimeout(() => { isAnimating = false; }, 500);
 }
 
@@ -899,70 +999,24 @@ function updateStatus() {
   document.getElementById('status-text').textContent = card.title;
 }
 
-// Register
-function toggleRegister() {
-  registerOpen = !registerOpen;
-  const p = document.getElementById('register-panel');
-  if (registerOpen) {
-    p.classList.add('visible');
-    p.innerHTML = '<div id="register-tabs">' + REGISTERS.map((r, i) =>
-      `<div class="register-tab" onclick="selectRegister(${i})">
-        <span class="tab-icon">${r.icon}</span>
-        <span class="tab-name">${r.name}</span>
-      </div>`
-    ).join('') + '</div>';
-  } else {
-    p.classList.remove('visible');
-  }
+// === TRESOR ===
+let tresorOpen = false;
+function toggleTresor() {
+  tresorOpen = !tresorOpen;
+  document.getElementById('tresor-overlay').classList.toggle('open', tresorOpen);
+  if (!tresorOpen) closeTresorLevels();
 }
-function selectRegister(i) { toggleRegister(); }
-
-// Speech
-// === SCHUBLADE ===
-let drawerOpen = false;
-function toggleDrawer() {
-  drawerOpen = !drawerOpen;
-  const d = document.getElementById('drawer');
-  const b = document.getElementById('drawer-btn');
-  if (drawerOpen) {
-    d.classList.add('open');
-    b.classList.add('open');
-    renderDrawer();
-  } else {
-    d.classList.remove('open');
-    b.classList.remove('open');
-  }
+function closeTresor() {
+  tresorOpen = false;
+  document.getElementById('tresor-overlay').classList.remove('open');
+  closeTresorLevels();
 }
-function renderDrawer() {
-  const tabs = ['Alle','Scouts','Berater','Clubkarten','Webseiten','Bilderrahmen','Cap-Coin','Meine Apps','Projektordner','Alben','Postfach','Schliessfach','Kalender','Notizen','Kontakte'];
-  document.getElementById('drawer-content').innerHTML = tabs.map((name,i) =>
-    `<div class="dtab" onclick="selectTab(${i})"><span>${name}</span></div>`
-  ).join('');
+function openTresorLevel(n) {
+  const el = document.getElementById('tresor-l' + n);
+  if (el) el.classList.toggle('open');
 }
-function selectTab(i) {
-  const tabNames = ['Alle','Scouts','Berater','Clubkarten','Webseiten','Bilderrahmen','Cap-Coin','Meine Apps','Projektordner','Alben','Postfach','Schliessfach','Kalender','Notizen','Kontakte'];
-  const name = tabNames[i];
-
-  // Karten-Set wechseln
-  if (name === 'Scouts') {
-    activeCards = SCOUTS;
-  } else {
-    activeCards = CARDS;
-  }
-
-  // Rad neu aufbauen
-  currentIndex = 0;
-  isFlipped = false;
-  backIndex = 0;
-  document.getElementById('back-track').style.display = 'none';
-  document.getElementById('wheel-track').style.display = 'block';
-  document.getElementById('flip-label').classList.remove('visible');
-
-  // Karten neu bauen mit dem aktiven Set
-  buildCards();
-  calcSizes();
-  positionCards(false);
-  toggleDrawer();
+function closeTresorLevels() {
+  document.querySelectorAll('.tresor-level.nested').forEach(el => el.classList.remove('open'));
 }
 
 // === TASTATUR-TOOLBAR ===
