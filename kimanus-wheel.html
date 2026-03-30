@@ -488,7 +488,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 #tresor-btn:active{opacity:0.7}
 
 </style>
-<!-- Voice Engine wird in naechster Session integriert (Gemini Flash Live) -->
 </head>
 <body>
 
@@ -1029,8 +1028,8 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', () => {
     const toolbar = document.getElementById('kb-toolbar');
     const heightDiff = window.innerHeight - window.visualViewport.height;
-    if (heightDiff > 100 && isFlipped && activeCards[currentIndex]?.id?.includes('yt-scout')) {
-      // Tastatur ist offen UND YouTube Scout ist aktiv
+    if (heightDiff > 100 && isFlipped && activeCards[currentIndex]?.id === 'yt-scout') {
+      // Tastatur ist offen UND YouTube Scout aktiv
       toolbar.classList.add('visible');
       toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
     } else {
