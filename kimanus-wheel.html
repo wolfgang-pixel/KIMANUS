@@ -317,13 +317,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 #bottom-bar{
   display:flex;align-items:center;justify-content:center;gap:20px;
   height:80px;
+  margin-bottom:-40px;
   padding:0 16px;
   background:#161616;
   border-top:1px solid rgba(255,255,255,0.06);
   flex-shrink:0;z-index:20;
-  position:fixed;
-  bottom:0;left:0;right:0;
-  padding-bottom:env(safe-area-inset-bottom,0px);
+  position:relative;
 }
 
 #speech-btn{
