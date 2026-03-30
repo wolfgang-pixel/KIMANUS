@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v2.0 - Echte 3D-Drehanimation -->
+<!-- KIMANUS Wheel v6.0 - Architektur v4: KIMANUS/KIM/Tools/Wallet (kein KAI, kein KI-MANUS) -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -532,7 +532,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div class="tresor-section-title">SETUP</div>
       <div class="tresor-grid tresor-grid-3x2">
         <div class="tresor-tab"><span>KIM</span></div>
-        <div class="tresor-tab"><span>KAI</span></div>
+        <div class="tresor-tab"><span>Voice</span></div>
         <div class="tresor-tab"><span>Skins</span></div>
         <div class="tresor-tab"><span>Farben</span></div>
         <div class="tresor-tab"><span>Sprache</span></div>
@@ -563,74 +563,82 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <script>
 const CARDS = [
-  // --- 1. KIMANUS (Landing / Diashow auf Rueckseite) ---
+  // --- 1. KIMANUS (Projekt-Vorstellung, Flip = PowerPoint-Praesentation) ---
   {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
-     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nEin Assistent, der dich versteht.'},
-     {title:'So funktioniert es', content:'Sprich mit KIM — er kuemmert sich.\nKeine Buttons, keine Menues.\nEinfach reden.'},
-     {title:'Dein Team', content:'KIM — Privatassistent\nKAI — Business-Berater\nKI-MANUS — Der Dirigent\n+ Scouts, Berater, Spezialisten'},
-     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.'},
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
+     {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
      {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
 
-  // --- 2. KIM (Privatassistent, m/w waehlbar im Setup) ---
-  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
+  // --- 2. KIM (Einziger Agent — Privat + Business) ---
+  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
-     {title:'Ueber KIM', content:'Dein persoenlicher Assistent.\nGeschlechtsneutral — du waehlst\nim Setup ob m oder w.\nFrag mich einfach was du brauchst!'},
-     {title:'Agenten', content:'KAI — Business-Berater\nWetterfrosch — Wetter\nAnimateur — Freizeit & Events\nKalkulierer — Rohaufschlag\nSekretaer — Termine\nCap-Coin — Sammeln'},
+     {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
      {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
-     {title:'Berater & Tools', content:'Clubkarten • Webseiten\nBilderrahmen • Apps\nProjektordner • E-Mail'},
-     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
+     {title:'Berater', content:'Wetterfrosch — Wetter & Tipps\nAnimateur — Freizeit & Events\nDolmetscher — Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen'},
+     {title:'Business', content:'Kalkulierer — Rohaufschlag\nEinkaufer — Preisvergleich\nBestellprofi — Lieferanten\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
+     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nGastro-Berater — Branche\nMarketing — Werbung & Posts\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
+     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv\n\nDein KIM lernt staendig dazu.'},
    ]},
 
-  // --- 3. KAI (Business-Berater) ---
-  {id:'kai', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9', email:'kai@kimanus.de', phone:'Durchwahl 002',
+  // --- 3. Tools (Werkzeuge ohne KI) ---
+  {id:'tools', icon:'🛠️', title:'Tools', subtitle:'Scanner, Rahmen & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
    backs:[
-     {title:'Über KAI', content:'Dein Business-Berater.\nKalkulation, Einkauf und Geschäft.'},
-     {title:'Services', content:'Rohaufschlag • Preisvergleich\nBestellungen • Lieferanten'},
-     {title:'Branchen', content:'Gastronomie • Hotellerie\nHandel • Events'},
-     {title:'Kontakt', content:'kai@kimanus.de\nDurchwahl: intern 02'},
-     {title:'Letzter Bericht', content:'Wareneinsatz März: 32%\nZiel: unter 30%'},
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren — ohne KI.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner & Kamera', content:'Dokumente scannen\nQR-Codes lesen\nVisitenkarten erfassen\nBelege fotografieren'},
+     {title:'Bilderrahmen', content:'RegioPic — Digitale Rahmen\nFuer Gastro: Anzeigen & Menues\nFuer Privat: Familienfotos\nFernsteuerbar per App'},
+     {title:'Schwarzes Brett', content:'Nachrichten ans Team\nGaestebuch pro Nutzer\nAlle lesen mit\nDein digitales Pinboard'},
+     {title:'Weitere Tools', content:'Taschenrechner\nNotizen & Merklisten\nTimer & Stoppuhr\nMehr kommt bald...'},
    ]},
 
-  // --- 4. KI-MANUS (Dirigent & Orchestrator) ---
-  {id:'ki-manus', icon:'🎛️', title:'KI-MANUS', subtitle:'Dirigent & Orchestrator', color:'#a78bfa', email:'manus@kimanus.de', phone:'Zentrale',
+  // --- 4. Wallet (Karten, Cap-Coin, Bezahlen) ---
+  {id:'wallet', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
    backs:[
-     {title:'Ueber KI-MANUS', content:'Der Dirigent hinter den Kulissen.\nOrchestiert alle Agenten.\nRoutet zum richtigen Modell.'},
-     {title:'Modell-Routing', content:'KIM — Groq Llama (schnell)\nKAI — DeepSeek (praezise)\nKI-MANUS — Claude Sonnet\nGemini Flash — Fallback'},
-     {title:'Architektur', content:'AI MANUS — Moralwaechter\nKI MANUS — Dirigent\nKIM + KAI — Empfang\nSub-Agenten — Spezialisten'},
+     {title:'Dein Wallet', content:'Alle deine Karten an einem Ort.\nCap-Coins sammeln & einloesen.\nDigital bezahlen.\nImmer dabei.'},
+     {title:'Cap-Coin', content:'Sammle Coins per QR-Code.\n1 Cap-Coin = 10 Cent\n10 Coins = 1 Euro\nBei teilnehmenden Partnern.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nAlle Stempelkarten digital.\nNie wieder vergessen.'},
+     {title:'Bonuskarten', content:'Treuepunkte sammeln\nRabatte einloesen\nAktionen entdecken\nAlles automatisch.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen\nSicher & verschluesselt.'},
    ]},
 
   // --- Verdoppelt fuer fluessiges Endlos-Rad ---
   {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
-     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nEin Assistent, der dich versteht.'},
-     {title:'So funktioniert es', content:'Sprich mit KIM — er kuemmert sich.\nKeine Buttons, keine Menues.\nEinfach reden.'},
-     {title:'Dein Team', content:'KIM — Privatassistent\nKAI — Business-Berater\nKI-MANUS — Der Dirigent\n+ Scouts, Berater, Spezialisten'},
-     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.'},
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
+     {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
      {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
-  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
+  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
-     {title:'Ueber KIM', content:'Dein persoenlicher Assistent.\nGeschlechtsneutral — du waehlst\nim Setup ob m oder w.\nFrag mich einfach was du brauchst!'},
-     {title:'Agenten', content:'KAI — Business-Berater\nWetterfrosch — Wetter\nAnimateur — Freizeit & Events\nKalkulierer — Rohaufschlag\nSekretaer — Termine\nCap-Coin — Sammeln'},
+     {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
      {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
-     {title:'Berater & Tools', content:'Clubkarten • Webseiten\nBilderrahmen • Apps\nProjektordner • E-Mail'},
-     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv'},
+     {title:'Berater', content:'Wetterfrosch — Wetter & Tipps\nAnimateur — Freizeit & Events\nDolmetscher — Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen'},
+     {title:'Business', content:'Kalkulierer — Rohaufschlag\nEinkaufer — Preisvergleich\nBestellprofi — Lieferanten\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
+     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nGastro-Berater — Branche\nMarketing — Werbung & Posts\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
+     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv\n\nDein KIM lernt staendig dazu.'},
    ]},
-  {id:'kai2', icon:'💼', title:'KAI', subtitle:'Business-Berater', color:'#4a90d9', email:'kai@kimanus.de', phone:'Durchwahl 002',
+  {id:'tools2', icon:'🛠️', title:'Tools', subtitle:'Scanner, Rahmen & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
    backs:[
-     {title:'Über KAI', content:'Dein Business-Berater.\nKalkulation, Einkauf und Geschäft.'},
-     {title:'Services', content:'Rohaufschlag • Preisvergleich\nBestellungen • Lieferanten'},
-     {title:'Branchen', content:'Gastronomie • Hotellerie\nHandel • Events'},
-     {title:'Kontakt', content:'kai@kimanus.de\nDurchwahl: intern 02'},
-     {title:'Letzter Bericht', content:'Wareneinsatz März: 32%\nZiel: unter 30%'},
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren — ohne KI.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner & Kamera', content:'Dokumente scannen\nQR-Codes lesen\nVisitenkarten erfassen\nBelege fotografieren'},
+     {title:'Bilderrahmen', content:'RegioPic — Digitale Rahmen\nFuer Gastro: Anzeigen & Menues\nFuer Privat: Familienfotos\nFernsteuerbar per App'},
+     {title:'Schwarzes Brett', content:'Nachrichten ans Team\nGaestebuch pro Nutzer\nAlle lesen mit\nDein digitales Pinboard'},
+     {title:'Weitere Tools', content:'Taschenrechner\nNotizen & Merklisten\nTimer & Stoppuhr\nMehr kommt bald...'},
    ]},
-  {id:'ki-manus2', icon:'🎛️', title:'KI-MANUS', subtitle:'Dirigent & Orchestrator', color:'#a78bfa', email:'manus@kimanus.de', phone:'Zentrale',
+  {id:'wallet2', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
    backs:[
-     {title:'Ueber KI-MANUS', content:'Der Dirigent hinter den Kulissen.\nOrchestiert alle Agenten.\nRoutet zum richtigen Modell.'},
-     {title:'Modell-Routing', content:'KIM — Groq Llama (schnell)\nKAI — DeepSeek (praezise)\nKI-MANUS — Claude Sonnet\nGemini Flash — Fallback'},
-     {title:'Architektur', content:'AI MANUS — Moralwaechter\nKI MANUS — Dirigent\nKIM + KAI — Empfang\nSub-Agenten — Spezialisten'},
+     {title:'Dein Wallet', content:'Alle deine Karten an einem Ort.\nCap-Coins sammeln & einloesen.\nDigital bezahlen.\nImmer dabei.'},
+     {title:'Cap-Coin', content:'Sammle Coins per QR-Code.\n1 Cap-Coin = 10 Cent\n10 Coins = 1 Euro\nBei teilnehmenden Partnern.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nAlle Stempelkarten digital.\nNie wieder vergessen.'},
+     {title:'Bonuskarten', content:'Treuepunkte sammeln\nRabatte einloesen\nAktionen entdecken\nAlles automatisch.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen\nSicher & verschluesselt.'},
    ]},
 ];
 
