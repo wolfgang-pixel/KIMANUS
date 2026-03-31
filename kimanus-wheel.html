@@ -176,6 +176,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   margin-top:4px;
 }
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes bwave{0%,100%{transform:scaleY(0.5)}50%{transform:scaleY(1.2)}}
+@keyframes sendPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,0.6)}50%{box-shadow:0 0 0 12px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 .back-wheel-card .bwc-search-hint{
   margin-top:12px;
   font-size:10px;
@@ -349,11 +351,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 #speech-btn:active{transform:scale(0.9)}
 #speech-btn svg{width:28px;height:28px;fill:#fff}
-#speech-btn.listening{animation:pulse 1.5s infinite}
+#speech-btn.listening{animation:pulse 1s infinite}
+#speech-btn.send-ready{animation:sendPulse 1.5s infinite}
 @keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(230,57,70,0.5)}
-  70%{box-shadow:0 0 0 15px rgba(230,57,70,0)}
-  100%{box-shadow:0 0 0 0 rgba(230,57,70,0)}
+  0%{box-shadow:0 0 0 0 rgba(230,57,70,0.7);transform:scale(1)}
+  50%{box-shadow:0 0 0 18px rgba(230,57,70,0);transform:scale(1.05)}
+  100%{box-shadow:0 0 0 0 rgba(230,57,70,0);transform:scale(1)}
 }
 
 .small-btn{
@@ -1574,18 +1577,101 @@ let mediaRecorder = null;
 let audioChunks = [];
 let audioStream = null;
 
+let speechState = 'idle'; // idle -> recording -> review -> sending
+let pendingText = '';
+
 function toggleSpeech() {
-  isListening = !isListening;
   const btn = document.getElementById('speech-btn');
-  if (isListening) {
+
+  if (speechState === 'idle') {
+    // Start: Aufnahme beginnen
+    speechState = 'recording';
+    isListening = true;
     btn.classList.add('listening');
-    btn.querySelector('span').textContent = '...';
+    btn.querySelector('span').textContent = 'STOP';
+    btn.querySelector('span').style.fontSize = '11px';
+    showEmptyBook();
     startRecording();
-  } else {
+
+  } else if (speechState === 'recording') {
+    // Stop: Aufnahme beenden, Review-Modus
+    speechState = 'review';
+    isListening = false;
     btn.classList.remove('listening');
-    btn.querySelector('span').textContent = 'KIM';
+    btn.classList.add('send-ready');
+    btn.querySelector('span').textContent = '➤';
+    btn.querySelector('span').style.fontSize = '';
+    btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
     stopRecording();
+
+  } else if (speechState === 'review') {
+    // Senden!
+    speechState = 'sending';
+    btn.classList.remove('send-ready');
+    btn.querySelector('span').textContent = '⏳';
+    btn.style.background = '';
+    if (pendingText) {
+      sendToKim(pendingText).then(() => {
+        speechState = 'idle';
+        btn.querySelector('span').textContent = 'KIM';
+      });
+    } else {
+      resetSpeechState();
+    }
   }
+}
+
+function resetSpeechState() {
+  speechState = 'idle';
+  pendingText = '';
+  isListening = false;
+  const btn = document.getElementById('speech-btn');
+  btn.classList.remove('listening');
+  btn.classList.remove('send-ready');
+  btn.querySelector('span').textContent = 'KIM';
+  btn.querySelector('span').style.fontSize = '';
+  btn.style.background = '';
+}
+
+function clearAndRespeak() {
+  // Alles zuruecksetzen
+  pendingText = '';
+  speechState = 'idle';
+  isListening = false;
+  const btn = document.getElementById('speech-btn');
+  btn.style.background = '';
+  btn.classList.remove('listening');
+  btn.querySelector('span').textContent = 'KIM';
+  btn.querySelector('span').style.fontSize = '';
+  // Sofort neue Aufnahme starten
+  setTimeout(() => toggleSpeech(), 100);
+}
+
+function showEmptyBook() {
+  const centerCardEl = document.getElementById('card-' + currentIndex);
+  if (!centerCardEl || isFlipped) return;
+  const front = centerCardEl.querySelector('.card-front');
+  if (!front) return;
+  front.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden">
+      <div id="book-left" style="flex:1;display:flex;flex-direction:column;padding:10px 12px;border-right:1px solid rgba(255,255,255,0.08);overflow:hidden">
+        <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">DU</div>
+        <div id="book-left-text" style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+        <div class="book-wave" id="book-wave" style="display:flex;gap:3px;align-items:center;height:24px;margin-top:6px;flex-shrink:0">
+          <span style="width:3px;height:10px;background:rgba(230,57,70,0.4);border-radius:2px;animation:bwave 0.8s ease-in-out infinite"></span>
+          <span style="width:3px;height:16px;background:rgba(230,57,70,0.5);border-radius:2px;animation:bwave 0.8s ease-in-out 0.1s infinite"></span>
+          <span style="width:3px;height:12px;background:rgba(230,57,70,0.4);border-radius:2px;animation:bwave 0.8s ease-in-out 0.2s infinite"></span>
+          <span style="width:3px;height:20px;background:rgba(230,57,70,0.6);border-radius:2px;animation:bwave 0.8s ease-in-out 0.3s infinite"></span>
+          <span style="width:3px;height:14px;background:rgba(230,57,70,0.4);border-radius:2px;animation:bwave 0.8s ease-in-out 0.4s infinite"></span>
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:4px;flex-shrink:0">Sprich jetzt...</div>
+      </div>
+      <div id="book-right" style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 12px;overflow:hidden">
+        <div style="font-size:10px;color:rgba(100,200,100,0.3);font-weight:600">KIM</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.1);margin-top:8px">wartet auf deine Frage...</div>
+      </div>
+    </div>`;
+  adjustBrightness(currentBrightness);
 }
 
 async function startRecording() {
@@ -1606,23 +1692,21 @@ async function startRecording() {
     };
     mediaRecorder.start(250);
 
-    // Auto-Stop nach 10 Sekunden Stille
+    // Auto-Stop nach 30 Sekunden
     setTimeout(() => {
-      if (isListening) {
+      if (speechState === 'recording') {
+        speechState = 'review';
         isListening = false;
         const btn = document.getElementById('speech-btn');
         btn.classList.remove('listening');
-        btn.querySelector('span').textContent = 'KIM';
         if (mediaRecorder && mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
         }
       }
-    }, 10000);
+    }, 30000);
   } catch(err) {
     console.error('Mikrofon-Fehler:', err);
-    isListening = false;
-    document.getElementById('speech-btn').classList.remove('listening');
-    document.getElementById('speech-btn').querySelector('span').textContent = 'KIM';
+    resetSpeechState();
   }
 }
 
@@ -1655,7 +1739,7 @@ async function processVoice(blob, mimeType) {
 
     if (!userText.trim()) {
       btn.querySelector('span').textContent = '❌';
-      setTimeout(() => btn.querySelector('span').textContent = 'KIM', 2000);
+      setTimeout(() => resetSpeechState(), 2000);
       return;
     }
 
@@ -1677,24 +1761,59 @@ async function processVoice(blob, mimeType) {
       // Kein URL - als Suchanfrage an KIM weiterleiten
     }
 
-    // Zeige erkannten Text auf der Glasplatte
+    // Zeige erkannten Text im Buch-Layout mit Muelleimer an der Trennlinie
+    pendingText = userText;
     const centerCardEl = document.getElementById('card-' + currentIndex);
     if (centerCardEl && !isFlipped) {
       const front = centerCardEl.querySelector('.card-front');
       if (front) {
         front.innerHTML = `
-          <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 18px">
-            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:8px">🗣️ Du sagst:</div>
-            <div style="font-size:15px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.6">${userText}</div>
-            <div style="font-size:10px;color:rgba(230,57,70,0.4);margin-top:12px">KIM denkt nach...</div>
-          </div>
-        `;
+          <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden;position:relative">
+            <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
+              <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">DU</div>
+              <div style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">${userText}</div>
+            </div>
+            <div style="width:1px;background:rgba(255,255,255,0.08);position:relative;flex-shrink:0">
+              <span onclick="clearAndRespeak()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);cursor:pointer;font-size:14px;opacity:0.35;background:#1a1a1a;padding:2px 4px;border-radius:3px">🗑</span>
+            </div>
+            <div id="book-right-wait" style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 12px">
+              <div style="font-size:10px;color:rgba(100,200,100,0.3);font-weight:600">KIM</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.1);margin-top:8px">Druecke ➤ zum Senden</div>
+            </div>
+          </div>`;
+        adjustBrightness(currentBrightness);
       }
     }
 
-    btn.querySelector('span').textContent = '💬';
+    // Review-Modus: Button auf SENDEN setzen (gruen, blinkend)
+    if (!walkieTalkieMode) {
+      speechState = 'review';
+      btn.querySelector('span').textContent = '➤';
+      btn.querySelector('span').style.fontSize = '';
+      btn.classList.add('send-ready');
+      btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+      return; // Warten bis User auf Senden drueckt
+    }
 
-    // 2. Text -> KIM (Chat API)
+    // Walkie-Talkie: Sofort senden
+    await sendToKim(userText);
+
+  } catch(err) {
+    console.error('Pipeline-Fehler:', err);
+  }
+  if (speechState !== 'review') {
+    resetSpeechState();
+  }
+}
+
+let walkieTalkieMode = false; // Standard: Review-Modus (erst lesen, dann senden)
+
+async function sendToKim(userText) {
+  const btn = document.getElementById('speech-btn');
+  btn.querySelector('span').textContent = '💬';
+  showBookQuestion(userText);
+
+  try {
     const chatResp = await fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -1710,11 +1829,9 @@ async function processVoice(blob, mimeType) {
     const contentType = chatResp.headers.get('content-type') || '';
 
     if (contentType.includes('application/json')) {
-      // Einfache JSON-Antwort
       const data = await chatResp.json();
       kimAnswer = data.output || data.text || data.answer || '';
     } else {
-      // Streaming (SSE)
       const reader = chatResp.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -1737,16 +1854,40 @@ async function processVoice(blob, mimeType) {
       }
     }
 
-    // 3. Antwort auf die Glasplatte projizieren
     if (kimAnswer) {
       showKimResponse(userText, kimAnswer);
     }
-
   } catch(err) {
-    console.error('Pipeline-Fehler:', err);
+    console.error('KIM-Fehler:', err);
   }
-
   btn.querySelector('span').textContent = 'KIM';
+}
+
+// === BUCH-LAYOUT: Links Frage, Rechts Antwort ===
+let conversationHistory = [];
+
+function showBookQuestion(question) {
+  const centerCardEl = document.getElementById('card-' + currentIndex);
+  if (!centerCardEl) return;
+  const front = centerCardEl.querySelector('.card-front');
+  if (!front) return;
+  front.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden">
+      <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;border-right:1px solid rgba(255,255,255,0.08);overflow-y:auto">
+        <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600">DU</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5">${question}</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 12px">
+        <div class="book-wave" style="display:flex;gap:3px;align-items:center;height:24px">
+          <span style="width:3px;height:10px;background:rgba(100,200,100,0.4);border-radius:2px;animation:bwave 0.6s ease-in-out infinite"></span>
+          <span style="width:3px;height:18px;background:rgba(100,200,100,0.5);border-radius:2px;animation:bwave 0.6s ease-in-out 0.1s infinite"></span>
+          <span style="width:3px;height:12px;background:rgba(100,200,100,0.4);border-radius:2px;animation:bwave 0.6s ease-in-out 0.2s infinite"></span>
+          <span style="width:3px;height:22px;background:rgba(100,200,100,0.6);border-radius:2px;animation:bwave 0.6s ease-in-out 0.3s infinite"></span>
+          <span style="width:3px;height:14px;background:rgba(100,200,100,0.4);border-radius:2px;animation:bwave 0.6s ease-in-out 0.4s infinite"></span>
+        </div>
+        <div style="font-size:10px;color:rgba(100,200,100,0.3);margin-top:6px">KIM denkt nach...</div>
+      </div>
+    </div>`;
 }
 
 function showKimResponse(question, answer) {
@@ -1760,33 +1901,49 @@ function showKimResponse(question, answer) {
         <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.8;white-space:pre-line">${answer}</div>`;
     }
-    // Zur Kapitel-Glasplatte drehen
     backIndex = 2;
     positionBackCards(true);
     return;
   }
 
-  // Normal: Auf der aktiven Glasplatte anzeigen
-  if (isFlipped) {
-    const bcard = document.getElementById('bcard-' + backIndex);
-    if (bcard) {
-      bcard.innerHTML = `
-        <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
-          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;white-space:pre-line">${answer}</div>
-        </div>`;
-    }
-  } else {
-    const centerCardEl = document.getElementById('card-' + currentIndex);
-    if (!centerCardEl) return;
-    const front = centerCardEl.querySelector('.card-front');
-    if (front) {
-      front.innerHTML = `
-        <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
-          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;white-space:pre-line">${answer}</div>
-        </div>`;
-    }
+  // Gespraech speichern
+  conversationHistory.push({q: question, a: answer, time: Date.now()});
+
+  // Buch-Layout: Links Frage, Rechts Antwort
+  const centerCardEl = document.getElementById('card-' + currentIndex);
+  if (!centerCardEl) return;
+  const front = centerCardEl.querySelector('.card-front');
+  if (!front && !isFlipped) return;
+
+  const target = isFlipped ? document.getElementById('bcard-' + backIndex) : front;
+  if (!target) return;
+
+  const cleanAnswer = answer.replace(/\n/g, '<br>');
+  const safeAnswer = answer.replace(/'/g, "\\'").replace(/\n/g, " ").substring(0, 500);
+  target.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden;position:relative">
+      <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
+        <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">DU</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">${question}</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
+        <div style="font-size:10px;color:rgba(100,200,100,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">KIM</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">${cleanAnswer}</div>
+        <span onclick="speakAnswer('${safeAnswer}')" style="flex-shrink:0;margin-top:4px;cursor:pointer;font-size:14px;opacity:0.35;align-self:flex-end">🔊</span>
+      </div>
+    </div>`;
+  adjustBrightness(currentBrightness);
+}
+
+function speakAnswer(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'de-DE';
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    window.speechSynthesis.speak(u);
   }
 }
 
@@ -1813,11 +1970,26 @@ let dragStartY = 0;
 let dragStartX = 0;
 const wc = document.getElementById('wheel-container');
 
+let touchInScrollable = false;
 wc.addEventListener('touchstart', e => {
   dragStartY = e.touches[0].clientY;
   dragStartX = e.touches[0].clientX;
+  // Pruefen ob Touch innerhalb eines scrollbaren Bereichs ist
+  const el = e.target;
+  touchInScrollable = false;
+  let node = el;
+  while (node && node !== wc) {
+    const style = getComputedStyle(node);
+    if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+      touchInScrollable = true;
+      break;
+    }
+    node = node.parentElement;
+  }
 }, {passive:true});
 wc.addEventListener('touchend', e => {
+  // Wenn Touch in scrollbarem Bereich war, Karte NICHT bewegen
+  if (touchInScrollable) { touchInScrollable = false; return; }
   const diffY = dragStartY - e.changedTouches[0].clientY;
   const diffX = e.changedTouches[0].clientX - dragStartX;
   // Horizontal stärker = Flip
