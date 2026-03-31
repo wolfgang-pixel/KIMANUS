@@ -178,6 +178,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes bwave{0%,100%{transform:scaleY(0.5)}50%{transform:scaleY(1.2)}}
 @keyframes sendPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,0.6)}50%{box-shadow:0 0 0 12px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@keyframes slideArrow{0%{transform:translateX(-30px);opacity:0}50%{opacity:1}100%{transform:translateX(30px);opacity:0}}
 .back-wheel-card .bwc-search-hint{
   margin-top:12px;
   font-size:10px;
@@ -342,7 +343,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 #speech-btn{
   width:70px;height:70px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%);
+  background:radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%);
   border:4px solid rgba(220,220,220,0.5);
   box-shadow:0 4px 20px rgba(230,57,70,0.4);
   display:flex;align-items:center;justify-content:center;
@@ -584,11 +585,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   </div>
 
   <div id="bottom-bar">
+    <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
     <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔒</button>
     <button id="speech-btn" onclick="toggleSpeech()">
       <span id="speech-agent">KIM</span>
     </button>
-    <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
+    <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 56px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
   </div>
 </div>
 
@@ -1577,8 +1579,9 @@ let mediaRecorder = null;
 let audioChunks = [];
 let audioStream = null;
 
-let speechState = 'idle'; // idle -> recording -> review -> sending
+let speechState = 'idle'; // idle -> recording -> processing -> review -> sending
 let pendingText = '';
+let silenceTimer = null;
 
 function toggleSpeech() {
   const btn = document.getElementById('speech-btn');
@@ -1588,21 +1591,29 @@ function toggleSpeech() {
     speechState = 'recording';
     isListening = true;
     btn.classList.add('listening');
-    btn.querySelector('span').textContent = 'STOP';
-    btn.querySelector('span').style.fontSize = '11px';
+    btn.querySelector('span').textContent = '●';
+    btn.querySelector('span').style.fontSize = '22px';
+    btn.style.background = 'radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%)';
     showEmptyBook();
     startRecording();
 
   } else if (speechState === 'recording') {
-    // Stop: Aufnahme beenden, Review-Modus
-    speechState = 'review';
+    // Stop: Aufnahme beenden
+    speechState = 'processing';
     isListening = false;
+    if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
     btn.classList.remove('listening');
-    btn.classList.add('send-ready');
-    btn.querySelector('span').textContent = '➤';
+    btn.querySelector('span').textContent = '⏳';
     btn.querySelector('span').style.fontSize = '';
     btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+    // Zeige auf Glasplatte: "Wird erkannt..."
+    const cc = document.getElementById('chat-content');
+    if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.35);font-size:14px">Wird erkannt<span style="display:inline-flex;gap:2px;margin-left:6px;vertical-align:middle"><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bwave 0.6s ease-in-out infinite"></span><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bwave 0.6s ease-in-out 0.2s infinite"></span><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bwave 0.6s ease-in-out 0.4s infinite"></span></span></span>';
     stopRecording();
+    // processVoice wird automatisch aufgerufen durch mediaRecorder.onstop
+
+  } else if (speechState === 'processing') {
+    return;
 
   } else if (speechState === 'review') {
     // Senden!
@@ -1630,21 +1641,34 @@ function resetSpeechState() {
   btn.classList.remove('send-ready');
   btn.querySelector('span').textContent = 'KIM';
   btn.querySelector('span').style.fontSize = '';
-  btn.style.background = '';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+  const delBtn = document.getElementById('delete-btn');
+  if (delBtn) delBtn.style.display = 'none';
 }
 
 function clearAndRespeak() {
-  // Alles zuruecksetzen
+  // Komplett zuruecksetzen
   pendingText = '';
+  stopAudioVisualizer();
+  cleanupMic();
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    try { mediaRecorder.stop(); } catch(e) {}
+  }
   speechState = 'idle';
   isListening = false;
   const btn = document.getElementById('speech-btn');
-  btn.style.background = '';
   btn.classList.remove('listening');
+  btn.classList.remove('send-ready');
   btn.querySelector('span').textContent = 'KIM';
   btn.querySelector('span').style.fontSize = '';
-  // Sofort neue Aufnahme starten
-  setTimeout(() => toggleSpeech(), 100);
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+  const delBtn = document.getElementById('delete-btn');
+  if (delBtn) delBtn.style.display = 'none';
+  // Karte zuruecksetzen auf Visitenkarte
+  const centerCardEl = document.getElementById('card-' + currentIndex);
+  if (centerCardEl && !isFlipped) {
+    positionCards(false);
+  }
 }
 
 function showEmptyBook() {
@@ -1653,36 +1677,98 @@ function showEmptyBook() {
   const front = centerCardEl.querySelector('.card-front');
   if (!front) return;
   front.innerHTML = `
-    <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden">
-      <div id="book-left" style="flex:1;display:flex;flex-direction:column;padding:10px 12px;border-right:1px solid rgba(255,255,255,0.08);overflow:hidden">
-        <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">DU</div>
-        <div id="book-left-text" style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
-        <div class="book-wave" id="book-wave" style="display:flex;gap:3px;align-items:center;height:24px;margin-top:6px;flex-shrink:0">
-          <span style="width:3px;height:10px;background:rgba(230,57,70,0.4);border-radius:2px;animation:bwave 0.8s ease-in-out infinite"></span>
-          <span style="width:3px;height:16px;background:rgba(230,57,70,0.5);border-radius:2px;animation:bwave 0.8s ease-in-out 0.1s infinite"></span>
-          <span style="width:3px;height:12px;background:rgba(230,57,70,0.4);border-radius:2px;animation:bwave 0.8s ease-in-out 0.2s infinite"></span>
-          <span style="width:3px;height:20px;background:rgba(230,57,70,0.6);border-radius:2px;animation:bwave 0.8s ease-in-out 0.3s infinite"></span>
-          <span style="width:3px;height:14px;background:rgba(230,57,70,0.4);border-radius:2px;animation:bwave 0.8s ease-in-out 0.4s infinite"></span>
-        </div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:4px;flex-shrink:0">Sprich jetzt...</div>
+    <div id="chat-page" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;color:rgba(230,57,70,0.6);font-weight:700">DU:</span>
+        <span style="flex:1"></span>
       </div>
-      <div id="book-right" style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 12px;overflow:hidden">
-        <div style="font-size:10px;color:rgba(100,200,100,0.3);font-weight:600">KIM</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.1);margin-top:8px">wartet auf deine Frage...</div>
-      </div>
+      <canvas id="audio-wave" width="280" height="24" style="margin:4px 0;opacity:0.6"></canvas>
+      <div id="chat-content" style="font-size:13px;color:rgba(255,255,255,0.2);line-height:1.4">Sprich jetzt...</div>
     </div>`;
   adjustBrightness(currentBrightness);
+}
+
+let audioCtx, analyser, animFrameId;
+
+function startAudioVisualizer(stream) {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  const source = audioCtx.createMediaStreamSource(stream);
+  source.connect(analyser);
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  const canvas = document.getElementById('audio-wave');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const barCount = 20;
+  const barW = 3, gap = (W - barCount * barW) / (barCount - 1);
+
+  function draw() {
+    animFrameId = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(data);
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < barCount; i++) {
+      const val = data[i * 3] / 255;
+      const h = Math.max(2, val * H);
+      const x = i * (barW + gap);
+      const y = (H - h) / 2;
+      const alpha = 0.2 + val * 0.5;
+      ctx.fillStyle = `rgba(230,57,70,${alpha})`;
+      ctx.fillRect(x, y, barW, h);
+    }
+  }
+  draw();
+}
+
+function stopAudioVisualizer() {
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  if (audioCtx) { audioCtx.close().catch(()=>{}); audioCtx = null; }
+  const canvas = document.getElementById('audio-wave');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Zeichne flache Linie
+    ctx.fillStyle = 'rgba(230,57,70,0.15)';
+    ctx.fillRect(0, 11, canvas.width, 2);
+  }
 }
 
 async function startRecording() {
   try {
     audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    startAudioVisualizer(audioStream);
     mediaRecorder = new MediaRecorder(audioStream);
     audioChunks = [];
+    let liveTranscriptTimer = null;
+
     mediaRecorder.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.push(e.data);
     };
+
+    // Live-Transkription: Alle 3 Sekunden bisheriges Audio transkribieren
+    let lastLiveText = '';
+    liveTranscriptTimer = setInterval(async () => {
+      if (speechState !== 'recording' || audioChunks.length === 0) return;
+      try {
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const liveBlob = new Blob([...audioChunks], {type: mimeType});
+        if (liveBlob.size < 3000) return;
+        const fd = new FormData();
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+        fd.append('audio', liveBlob, 'live.' + ext);
+        const resp = await fetch('/api/stt', {method:'POST', body:fd});
+        const data = await resp.json();
+        if (data.text && data.text.trim() && data.text !== lastLiveText && speechState === 'recording') {
+          lastLiveText = data.text;
+          const cc = document.getElementById('chat-content');
+          if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.4)">' + data.text + '</span><span style="display:inline-block;width:2px;height:13px;background:rgba(230,57,70,0.5);margin-left:3px;vertical-align:middle;animation:bwave 0.5s infinite"></span>';
+        }
+      } catch(e) {}
+    }, 3000);
+
     mediaRecorder.onstop = async () => {
+      if (liveTranscriptTimer) { clearInterval(liveTranscriptTimer); liveTranscriptTimer = null; }
       const mimeType = mediaRecorder.mimeType || 'audio/webm';
       const blob = new Blob(audioChunks, {type: mimeType});
       cleanupMic();
@@ -1691,19 +1777,6 @@ async function startRecording() {
       }
     };
     mediaRecorder.start(250);
-
-    // Auto-Stop nach 30 Sekunden
-    setTimeout(() => {
-      if (speechState === 'recording') {
-        speechState = 'review';
-        isListening = false;
-        const btn = document.getElementById('speech-btn');
-        btn.classList.remove('listening');
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-          mediaRecorder.stop();
-        }
-      }
-    }, 30000);
   } catch(err) {
     console.error('Mikrofon-Fehler:', err);
     resetSpeechState();
@@ -1711,6 +1784,7 @@ async function startRecording() {
 }
 
 function stopRecording() {
+  stopAudioVisualizer();
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     mediaRecorder.stop();
   }
@@ -1761,42 +1835,29 @@ async function processVoice(blob, mimeType) {
       // Kein URL - als Suchanfrage an KIM weiterleiten
     }
 
-    // Zeige erkannten Text im Buch-Layout mit Muelleimer an der Trennlinie
+    // Zeige erkannten Text auf der Glasplatte
     pendingText = userText;
-    const centerCardEl = document.getElementById('card-' + currentIndex);
-    if (centerCardEl && !isFlipped) {
-      const front = centerCardEl.querySelector('.card-front');
-      if (front) {
-        front.innerHTML = `
-          <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden;position:relative">
-            <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
-              <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">DU</div>
-              <div style="font-size:14px;color:rgba(255,255,255,0.45);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">${userText}</div>
-            </div>
-            <div style="width:1px;background:rgba(255,255,255,0.08);position:relative;flex-shrink:0">
-              <span onclick="clearAndRespeak()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);cursor:pointer;font-size:14px;opacity:0.35;background:#1a1a1a;padding:2px 4px;border-radius:3px">🗑</span>
-            </div>
-            <div id="book-right-wait" style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 12px">
-              <div style="font-size:10px;color:rgba(100,200,100,0.3);font-weight:600">KIM</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.1);margin-top:8px">Druecke ➤ zum Senden</div>
-            </div>
-          </div>`;
-        adjustBrightness(currentBrightness);
-      }
+    const chatContent = document.getElementById('chat-content');
+    const bookWave = document.getElementById('audio-wave');
+    const trashBtn = document.getElementById('trash-btn-glass');
+    if (chatContent) {
+      chatContent.innerHTML = `<span style="color:rgba(255,255,255,0.5)">${userText}</span>`;
     }
+    if (bookWave) bookWave.style.opacity = '0';
+    // Button auf SENDEN setzen (gruen, blinkend) + Loeschen-Button zeigen
+    speechState = 'review';
+    btn.querySelector('span').textContent = '▶';
+    btn.querySelector('span').style.fontSize = '';
+    btn.classList.add('send-ready');
+    btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+    const delBtn = document.getElementById('delete-btn');
+    if (delBtn) delBtn.style.display = 'flex';
 
-    // Review-Modus: Button auf SENDEN setzen (gruen, blinkend)
-    if (!walkieTalkieMode) {
-      speechState = 'review';
-      btn.querySelector('span').textContent = '➤';
-      btn.querySelector('span').style.fontSize = '';
-      btn.classList.add('send-ready');
-      btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
-      return; // Warten bis User auf Senden drueckt
+    if (walkieTalkieMode) {
+      // Walkie-Talkie: Sofort senden
+      await sendToKim(userText);
     }
-
-    // Walkie-Talkie: Sofort senden
-    await sendToKim(userText);
+    // Review: Warten bis User auf gruenen Button drueckt
 
   } catch(err) {
     console.error('Pipeline-Fehler:', err);
@@ -1810,7 +1871,46 @@ let walkieTalkieMode = false; // Standard: Review-Modus (erst lesen, dann senden
 
 async function sendToKim(userText) {
   const btn = document.getElementById('speech-btn');
-  btn.querySelector('span').textContent = '💬';
+  const delBtn = document.getElementById('delete-btn');
+  if (delBtn) delBtn.style.display = 'none';
+  btn.classList.remove('send-ready');
+  btn.querySelector('span').textContent = '⏳';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+
+  // Glasplatte nach oben schieben (Frage verschwindet)
+  const centerCardEl = document.getElementById('card-' + currentIndex);
+  if (centerCardEl) {
+    centerCardEl.style.transition = 'transform 0.5s ease-in, opacity 0.5s';
+    centerCardEl.style.transform = 'translateX(-50%) translateY(-120%)';
+    centerCardEl.style.opacity = '0.3';
+  }
+
+  // Laufender Pfeil unter der Glasplatte
+  const statusEl = document.getElementById('status-text');
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.innerHTML = '<div style="text-align:center;font-size:12px;color:rgba(100,200,100,0.4);animation:slideArrow 1.5s linear infinite">➜ ➜ ➜</div>';
+  }
+
+  // Kurz warten, dann neue Glasplatte von unten
+  await new Promise(r => setTimeout(r, 600));
+  if (centerCardEl) {
+    centerCardEl.style.transition = 'none';
+    centerCardEl.style.transform = 'translateX(-50%) translateY(120%)';
+    centerCardEl.style.opacity = '0.3';
+    // Zeige "KIM denkt nach" auf der neuen Glasplatte
+    const front = centerCardEl.querySelector('.card-front');
+    if (front) {
+      front.innerHTML = '<div id="chat-page" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y"><div style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</div><div id="chat-content" style="font-size:13px;color:rgba(255,255,255,0.2);line-height:1.4;margin-top:2px">denkt nach...</div></div>';
+    }
+    // Glasplatte von unten reingleiten
+    requestAnimationFrame(() => {
+      centerCardEl.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
+      centerCardEl.style.transform = 'translateX(-50%) translateY(0)';
+      centerCardEl.style.opacity = '1';
+    });
+  }
+
   showBookQuestion(userText);
 
   try {
@@ -1854,40 +1954,30 @@ async function sendToKim(userText) {
       }
     }
 
+    // Pfeil-Animation stoppen
+    const statusEl2 = document.getElementById('status-text');
+    if (statusEl2) statusEl2.style.display = 'none';
+
     if (kimAnswer) {
       showKimResponse(userText, kimAnswer);
     }
   } catch(err) {
     console.error('KIM-Fehler:', err);
+    const statusEl3 = document.getElementById('status-text');
+    if (statusEl3) statusEl3.style.display = 'none';
   }
-  btn.querySelector('span').textContent = 'KIM';
+  resetSpeechState();
 }
 
-// === BUCH-LAYOUT: Links Frage, Rechts Antwort ===
+// === CHAT-LAYOUT: Vollbreite wie Blatt Papier ===
 let conversationHistory = [];
+let lastKimAnswer = '';
 
 function showBookQuestion(question) {
-  const centerCardEl = document.getElementById('card-' + currentIndex);
-  if (!centerCardEl) return;
-  const front = centerCardEl.querySelector('.card-front');
-  if (!front) return;
-  front.innerHTML = `
-    <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden">
-      <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;border-right:1px solid rgba(255,255,255,0.08);overflow-y:auto">
-        <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600">DU</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.5">${question}</div>
-      </div>
-      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 12px">
-        <div class="book-wave" style="display:flex;gap:3px;align-items:center;height:24px">
-          <span style="width:3px;height:10px;background:rgba(100,200,100,0.4);border-radius:2px;animation:bwave 0.6s ease-in-out infinite"></span>
-          <span style="width:3px;height:18px;background:rgba(100,200,100,0.5);border-radius:2px;animation:bwave 0.6s ease-in-out 0.1s infinite"></span>
-          <span style="width:3px;height:12px;background:rgba(100,200,100,0.4);border-radius:2px;animation:bwave 0.6s ease-in-out 0.2s infinite"></span>
-          <span style="width:3px;height:22px;background:rgba(100,200,100,0.6);border-radius:2px;animation:bwave 0.6s ease-in-out 0.3s infinite"></span>
-          <span style="width:3px;height:14px;background:rgba(100,200,100,0.4);border-radius:2px;animation:bwave 0.6s ease-in-out 0.4s infinite"></span>
-        </div>
-        <div style="font-size:10px;color:rgba(100,200,100,0.3);margin-top:6px">KIM denkt nach...</div>
-      </div>
-    </div>`;
+  const chatContent = document.getElementById('chat-content');
+  if (!chatContent) return;
+  chatContent.innerHTML = `<span style="color:rgba(255,255,255,0.5)">${question}</span>
+<div><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span> <span style="display:inline-flex;gap:2px;align-items:center;vertical-align:middle"><span style="width:2px;height:8px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out infinite"></span><span style="width:2px;height:14px;background:rgba(100,200,100,0.5);border-radius:1px;animation:bwave 0.6s ease-in-out 0.15s infinite"></span><span style="width:2px;height:10px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out 0.3s infinite"></span></span></div>`;
 }
 
 function showKimResponse(question, answer) {
@@ -1908,31 +1998,22 @@ function showKimResponse(question, answer) {
 
   // Gespraech speichern
   conversationHistory.push({q: question, a: answer, time: Date.now()});
+  lastKimAnswer = answer;
 
-  // Buch-Layout: Links Frage, Rechts Antwort
-  const centerCardEl = document.getElementById('card-' + currentIndex);
-  if (!centerCardEl) return;
-  const front = centerCardEl.querySelector('.card-front');
-  if (!front && !isFlipped) return;
-
-  const target = isFlipped ? document.getElementById('bcard-' + backIndex) : front;
-  if (!target) return;
+  // Vollbreite: DU/KIM untereinander wie auf einem Blatt
+  const chatContent = document.getElementById('chat-content');
+  if (!chatContent) return;
 
   const cleanAnswer = answer.replace(/\n/g, '<br>');
-  const safeAnswer = answer.replace(/'/g, "\\'").replace(/\n/g, " ").substring(0, 500);
-  target.innerHTML = `
-    <div style="width:100%;height:100%;display:flex;gap:0;overflow:hidden;position:relative">
-      <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
-        <div style="font-size:10px;color:rgba(230,57,70,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">DU</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">${question}</div>
-      </div>
-      <div style="width:1px;background:rgba(255,255,255,0.08);flex-shrink:0"></div>
-      <div style="flex:1;display:flex;flex-direction:column;padding:10px 12px;overflow:hidden">
-        <div style="font-size:10px;color:rgba(100,200,100,0.5);margin-bottom:4px;font-weight:600;flex-shrink:0">KIM</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch">${cleanAnswer}</div>
-        <span onclick="speakAnswer('${safeAnswer}')" style="flex-shrink:0;margin-top:4px;cursor:pointer;font-size:14px;opacity:0.35;align-self:flex-end">🔊</span>
-      </div>
-    </div>`;
+  chatContent.innerHTML = `<span style="color:rgba(255,255,255,0.5)">${question}</span>
+<div><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span> <span id="speak-btn" style="cursor:pointer;font-size:12px;opacity:0.4;float:right">🔊</span></div>
+<div style="color:rgba(255,255,255,0.5);line-height:1.4">${cleanAnswer}</div>`;
+  // Lautsprecher klickbar machen
+  const sb = document.getElementById('speak-btn');
+  if (sb) sb.onclick = () => speakAnswer(lastKimAnswer);
+  // Scroll ans Ende
+  const chatPage = document.getElementById('chat-page');
+  if (chatPage) chatPage.scrollTop = chatPage.scrollHeight;
   adjustBrightness(currentBrightness);
 }
 
@@ -1965,18 +2046,37 @@ function animateToCard(target, cb) {
 
 function showKeyboard() { alert('Tastatur - kommt noch!'); }
 
+// Globaler Handler fuer Muelleimer (click + touchend fuer iOS)
+function handleTrash(e) {
+  const t = e.target;
+  if (t && (t.id === 'trash-btn-glass' || t.closest('#trash-btn-glass'))) {
+    e.preventDefault();
+    e.stopPropagation();
+    clearAndRespeak();
+  }
+}
+document.addEventListener('click', handleTrash);
+document.addEventListener('touchend', handleTrash);
+
 // Touch - vertikal=Rad drehen, horizontal=Flip
 let dragStartY = 0;
 let dragStartX = 0;
 const wc = document.getElementById('wheel-container');
 
 let touchInScrollable = false;
+let touchOnButton = false;
 wc.addEventListener('touchstart', e => {
   dragStartY = e.touches[0].clientY;
   dragStartX = e.touches[0].clientX;
-  // Pruefen ob Touch innerhalb eines scrollbaren Bereichs ist
-  const el = e.target;
+  touchOnButton = false;
   touchInScrollable = false;
+  const el = e.target;
+  // Pruefen ob Touch auf einem Button oder klickbaren Element ist
+  if (el.tagName === 'BUTTON' || el.id === 'trash-btn-glass' || el.closest('button')) {
+    touchOnButton = true;
+    return;
+  }
+  // Pruefen ob Touch innerhalb eines scrollbaren Bereichs ist
   let node = el;
   while (node && node !== wc) {
     const style = getComputedStyle(node);
@@ -1988,6 +2088,8 @@ wc.addEventListener('touchstart', e => {
   }
 }, {passive:true});
 wc.addEventListener('touchend', e => {
+  // Wenn Touch auf Button war, nicht als Swipe behandeln
+  if (touchOnButton) { touchOnButton = false; return; }
   // Wenn Touch in scrollbarem Bereich war, Karte NICHT bewegen
   if (touchInScrollable) { touchInScrollable = false; return; }
   const diffY = dragStartY - e.changedTouches[0].clientY;
