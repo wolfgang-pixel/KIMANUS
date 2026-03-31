@@ -10,12 +10,24 @@
 <title>KIMANUS</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0e0e0e;color:#e0e0e0}
+html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--skin-bg);color:var(--skin-glass-text)}
 
 :root{
   --sat:env(safe-area-inset-top,0px);
   --sab:env(safe-area-inset-bottom,0px);
   --kim-red:#e63946;
+  /* === SKIN VARIABLEN (austauschbar) === */
+  --skin-header-bg:#1a1a1a;
+  --skin-header-border:rgba(255,255,255,0.1);
+  --skin-bar-bg:#1a1a1a;
+  --skin-bar-border:rgba(255,255,255,0.12);
+  --skin-glass-bg:rgba(35,35,38,0.88);
+  --skin-glass-blur:12px;
+  --skin-glass-border:rgba(255,255,255,0.12);
+  --skin-glass-text:#f0f0f0;
+  --skin-tresor-bg:rgba(35,35,38,0.96);
+  --skin-tresor-blur:20px;
+  --skin-bg:#111111;
 }
 
 #app{
@@ -30,8 +42,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:flex;align-items:center;gap:8px;
   height:60px;
   padding:0 12px;
-  background:#161616;
-  border-bottom:1px solid rgba(255,255,255,0.06);
+  background:var(--skin-header-bg);
+  border-bottom:2px solid rgba(255,255,255,0.15);
   flex-shrink:0;z-index:20;
 }
 .logo-circle{
@@ -77,8 +89,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   content:'';position:absolute;inset:0;
   background:linear-gradient(180deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
   backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
-  pointer-events:none;z-index:2;
-  border-bottom:2px solid rgba(255,255,255,0.1);
+  pointer-events:none;z-index:14;
+  border-bottom:2px solid rgba(255,255,255,0.2);
 }
 
 /* Sichtfenster - klar */
@@ -94,8 +106,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   content:'';position:absolute;inset:0;
   background:linear-gradient(0deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
   backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
-  pointer-events:none;z-index:2;
-  border-top:2px solid rgba(255,255,255,0.1);
+  pointer-events:none;z-index:14;
+  border-top:2px solid rgba(255,255,255,0.2);
 }
 
 /* === SWIPE HINT (pulsender Pfeil unter Milchglas) === */
@@ -131,12 +143,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 #back-track{z-index:12}
 .back-wheel-card{
-  width:100%;
+  width:calc(100% - 20px);
   height:210px;
   position:absolute;
-  left:0;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
+  left:10px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -144,12 +156,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   transition:all 1.2s cubic-bezier(0.23,1,0.32,1);
 }
 .back-wheel-card .bwc-title{
-  font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
+  font-size:15px;font-weight:700;color:rgba(255,255,255,0.6);
   text-transform:uppercase;letter-spacing:2px;
   margin-bottom:10px;
 }
 .back-wheel-card .bwc-content{
-  font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
+  font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.8;
   white-space:pre-line;
 }
 .back-wheel-card .bwc-video-full{
@@ -179,8 +191,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   margin-left:0;
   position:absolute;
   border-radius:0;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   perspective:800px;
@@ -223,22 +235,22 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:flex;flex-direction:column;gap:3px;
 }
 .card-front .card-name{
-  font-size:22px;font-weight:700;color:rgba(255,255,255,0.4);
+  font-size:26px;font-weight:700;color:rgba(255,255,255,0.6);
   letter-spacing:1px;
 }
 .card-front .card-role{
-  font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.4);
   letter-spacing:2px;text-transform:uppercase;
 }
 .card-front .card-contact{
   display:flex;flex-direction:column;gap:3px;
 }
 .card-front .card-contact span{
-  font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;
+  font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;
 }
 .card-front .card-brand{
   position:absolute;bottom:14px;right:18px;
-  font-size:9px;font-weight:800;color:rgba(255,255,255,0.12);
+  font-size:10px;font-weight:800;color:rgba(255,255,255,0.2);
   letter-spacing:3px;
 }
 
@@ -248,12 +260,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   transform:rotateY(180deg);
 }
 .card-back .back-title{
-  font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
+  font-size:15px;font-weight:700;color:rgba(255,255,255,0.6);
   text-transform:uppercase;letter-spacing:2px;
   margin-bottom:10px;
 }
 .card-back .back-content{
-  font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
+  font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.8;
   white-space:pre-line;padding:0 20px;
 }
 
@@ -268,8 +280,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   z-index:30;
   width:100%;
   height:210px;
-  background:rgba(30,30,30,0.95);
-  border:1px solid rgba(255,255,255,0.1);
+  background:var(--skin-tresor-bg);
+  border:1px solid var(--skin-glass-border);
   box-shadow:0 4px 20px rgba(0,0,0,0.5);
   align-items:center;justify-content:center;
   opacity:0;
@@ -287,10 +299,10 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   position:relative;
 }
 .fl-card .fl-icon{font-size:36px;position:absolute;top:10px;right:14px}
-.fl-card .fl-name{font-size:18px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1px}
-.fl-card .fl-role{font-size:9px;font-weight:600;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.fl-card .fl-contact{font-size:9px;color:rgba(255,255,255,0.15)}
-.fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:7px;font-weight:800;color:rgba(255,255,255,0.1);letter-spacing:3px}
+.fl-card .fl-name{font-size:22px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px}
+.fl-card .fl-role{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.fl-card .fl-contact{font-size:11px;color:rgba(255,255,255,0.25)}
+.fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:8px;font-weight:800;color:rgba(255,255,255,0.15);letter-spacing:3px}
 
 /* === REGISTER === */
 #register-panel{
@@ -320,7 +332,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   margin-bottom:-40px;
   padding:0 16px;
   background:#161616;
-  border-top:1px solid rgba(255,255,255,0.06);
+  border-top:2px solid rgba(255,255,255,0.15);
+  border-bottom:2px solid rgba(255,255,255,0.2);
   flex-shrink:0;z-index:20;
   position:relative;
 }
@@ -399,7 +412,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   z-index:15;
   opacity:0;
   pointer-events:none;
-  transition:opacity 2s;
+  transition:opacity 0.5s;
 }
 #tresor-overlay.open{opacity:1;pointer-events:auto}
 /* Tresor-Panel: hinter Bottom Bar, gleiche Breite wie Karten */
@@ -409,11 +422,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   width:calc((100% - 10px) * 0.9);
   bottom:-500px;
   transform:translateX(-50%);
-  background:rgba(30,30,32,0.96);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.06);
+  background:var(--skin-tresor-bg);
+  backdrop-filter:blur(var(--skin-tresor-blur));-webkit-backdrop-filter:blur(var(--skin-tresor-blur));
+  border:1px solid var(--skin-glass-border);
   z-index:16;
-  transition:bottom 2s cubic-bezier(0.25,0.1,0.25,1);
+  transition:bottom 0.5s cubic-bezier(0.25,0.1,0.25,1);
   padding:2px;
 }
 #tresor-overlay.open #tresor-panel{
@@ -487,6 +500,27 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 #tresor-btn:active{opacity:0.7}
 
+/* Helligkeits-Schieber rechts in Bar */
+#brightness-slider{
+  position:absolute;
+  right:12px;top:50%;transform:translateY(-50%);
+  -webkit-appearance:none;appearance:none;
+  width:90px;height:4px;
+  background:rgba(255,255,255,0.15);
+  border-radius:2px;
+  outline:none;
+  opacity:0.5;
+  transition:opacity 0.3s;
+}
+#brightness-slider:active{opacity:0.9}
+#brightness-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;
+  background:#f0f0f0;
+  border:2px solid rgba(255,255,255,0.3);
+  cursor:pointer;
+}
+
 </style>
 </head>
 <body>
@@ -532,18 +566,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div class="tresor-section-title">SETUP</div>
       <div class="tresor-grid tresor-grid-3x2">
         <div class="tresor-tab"><span>KIM</span></div>
-        <div class="tresor-tab"><span>Voice</span></div>
+        <div class="tresor-tab"><span>KI MANUS</span></div>
         <div class="tresor-tab"><span>Skins</span></div>
         <div class="tresor-tab"><span>Farben</span></div>
         <div class="tresor-tab"><span>Sprache</span></div>
         <div class="tresor-tab"><span>System</span></div>
-      </div>
-      <div class="tresor-divider"><span>ARCHIV</span></div>
-      <div class="tresor-grid tresor-grid-2x2">
-        <div class="tresor-tab"><span>Fotos</span></div>
-        <div class="tresor-tab"><span>Tagebuch</span></div>
-        <div class="tresor-tab"><span>Pers-Akten</span></div>
-        <div class="tresor-tab"><span>Meine Ordner</span></div>
       </div>
       <div class="tresor-divider"><span>SAVE</span></div>
       <div class="tresor-grid tresor-grid-2x1">
@@ -554,10 +581,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   </div>
 
   <div id="bottom-bar">
-    <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔑</button>
+    <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔒</button>
     <button id="speech-btn" onclick="toggleSpeech()">
       <span id="speech-agent">KIM</span>
     </button>
+    <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
   </div>
 </div>
 
@@ -578,41 +606,55 @@ const CARDS = [
   {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
      {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
-     {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
-     {title:'Berater', content:'Wetterfrosch — Wetter & Tipps\nAnimateur — Freizeit & Events\nDolmetscher — Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen'},
-     {title:'Business', content:'Kalkulierer — Rohaufschlag\nEinkaufer — Preisvergleich\nBestellprofi — Lieferanten\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
-     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nGastro-Berater — Branche\nMarketing — Werbung & Posts\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
-     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv\n\nDein KIM lernt staendig dazu.'},
+     {title:'Scouts', content:'YouTube Scout — Videos finden\nWeb Scout — Internet-Recherche\nNews Scout — Nachrichten & Trends\nDeal Scout — Schnaeppchen & Angebote'},
+     {title:'Guides', content:'Animateur — Freizeit & Events\nGastro-Guide — Restaurants & Tipps\nNachtfahrer — Komm gut heim\nRegioPilot — Regionale Geheimtipps\nStadtfuehrer — Sehenswuerdigkeiten'},
+     {title:'Berater', content:'Wetterfrosch — Wetter & Lifestyle\nDolmetscher — Uebersetzen & Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen & Gedaechtnis'},
+     {title:'Business', content:'Kalkulierer — Rohaufschlag & Marge\nBestellprofi — Lieferanten & Mengen\nLagerist — Bestand & Inventur\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
+     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nSafety-Checker — NFC-Sicherheit\nMarketing — Werbung & Social Media\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
    ]},
 
-  // --- 3. Tools (Werkzeuge ohne KI) ---
-  {id:'tools', icon:'🛠️', title:'Tools', subtitle:'Scanner, Rahmen & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+  // --- 3. Tools (Werkzeuge, Hardware, Services) ---
+  {id:'tools', icon:'🛠️', title:'Tools', subtitle:'Scanner, Laser, Print & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
    backs:[
-     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren — ohne KI.\nTippe oder sag KIM Bescheid.'},
-     {title:'Scanner & Kamera', content:'Dokumente scannen\nQR-Codes lesen\nVisitenkarten erfassen\nBelege fotografieren'},
-     {title:'Bilderrahmen', content:'RegioPic — Digitale Rahmen\nFuer Gastro: Anzeigen & Menues\nFuer Privat: Familienfotos\nFernsteuerbar per App'},
-     {title:'Schwarzes Brett', content:'Nachrichten ans Team\nGaestebuch pro Nutzer\nAlle lesen mit\nDein digitales Pinboard'},
-     {title:'Weitere Tools', content:'Taschenrechner\nNotizen & Merklisten\nTimer & Stoppuhr\nMehr kommt bald...'},
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren.\nHardware + Software + Service.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner', content:'Dokumente scannen\nQR-Codes & Cap-Coins lesen\nVisitenkarten erfassen\nBelege & Z-Bons fotografieren'},
+     {title:'Laser & Print', content:'Gravuren auf Glas, Holz, Leder\nPersonalisierte Geschenke\nSouvenirs & Pokale\nFotodruck & Leinwand'},
+     {title:'RegioPic', content:'Fotodrucker an der Rezeption\nDigitale Bilderrahmen (Display)\nE-Ink Wandbilder (32 Zoll)\nFamilienfotos fuer Oma & Opa'},
+     {title:'Fotoalbum-Service', content:'KIM layoutet dein Album\nwaehrend du Urlaub machst.\nOvernight-Druck ans Hotel.\nHardcover — am Morgen im Zimmer.'},
+     {title:'Alltagshelfer', content:'Alkomat — Promille-Check\nTaschenrechner & Timer\nTaschenlampe & Kompass\nSchwarzes Brett & Notizen'},
    ]},
 
-  // --- 4. Wallet (Karten, Cap-Coin, Bezahlen) ---
+  // --- 4. Wallet (Karten, Cap-Coin, NFC-Stempel, Bezahlen) ---
   {id:'wallet', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
    backs:[
-     {title:'Dein Wallet', content:'Alle deine Karten an einem Ort.\nCap-Coins sammeln & einloesen.\nDigital bezahlen.\nImmer dabei.'},
-     {title:'Cap-Coin', content:'Sammle Coins per QR-Code.\n1 Cap-Coin = 10 Cent\n10 Coins = 1 Euro\nBei teilnehmenden Partnern.'},
-     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nAlle Stempelkarten digital.\nNie wieder vergessen.'},
-     {title:'Bonuskarten', content:'Treuepunkte sammeln\nRabatte einloesen\nAktionen entdecken\nAlles automatisch.'},
-     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen\nSicher & verschluesselt.'},
+     {title:'Dein Wallet', content:'Alle Karten und Coins\nan einem Ort.\nDigital bezahlen.\nFaelschungssicher per NFC.'},
+     {title:'Cap-Coin', content:'CapCoins sammeln per QR-Code.\nRegioCoins regional einloesen.\n1 Cap-Coin = 10 Cent\nBei allen Partnern gueltig.'},
+     {title:'NFC-Stempelkarte', content:'Handy an den Stempel halten.\nFaelschungssicher — kein Betrug!\nAlle Stempelkarten in einer App.\nNie wieder Karte vergessen.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen & verschenken\nSicher & verschluesselt.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nMitgliedskarten digital.\nImmer dabei, nie verloren.'},
+     {title:'Verschenktes Glueck', content:'Ein Teil geht an Menschen in Not.\nTransparent & direkt.\nKeine Verwaltungskosten.\nDein Konsum hilft automatisch.'},
    ]},
 
-  // --- 5. Archiv (Persoenliche Ablage, Ordner, Erinnerungen) ---
-  {id:'archiv', icon:'📁', title:'Archiv', subtitle:'Fotos, Videos & Notizen', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+  // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
+  {id:'archiv', icon:'📁', title:'Archiv', subtitle:'Dein zweites Gedaechtnis', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
    backs:[
-     {title:'Fotoalben', content:'Deine Bilder, sortiert nach Anlass.\nUrlaub • Familie • Events\nTeile Alben mit Freunden.\nImmer griffbereit.'},
-     {title:'Video-Sammlung', content:'Gespeicherte YouTube-Clips.\nLieblingsszenen markiert.\nKapitel & Timestamps.\nDein persoenliches Archiv.'},
-     {title:'Notizbuch', content:'Notizen & Merklisten.\nIdeen festhalten.\nEinkaufszettel.\nSchnell per Sprache diktieren.'},
-     {title:'Erinnerungen', content:'Geburtstage • Termine\nJahrestage • Fristen\nKIM erinnert dich rechtzeitig.\nNie wieder vergessen.'},
-     {title:'Meine Ordner', content:'Frei sortierbar.\nDokumente • Belege • Vertraege\nAlles an einem Ort.\nVerschluesselt & sicher.'},
+     {title:'Dein Gedaechtnis', content:'KIM merkt sich alles fuer dich.\nNotizen, Erinnerungen, Kontakte.\nVorlieben, Allergien, Termine.\nDu bestimmst was KIM weiss.'},
+     {title:'Fotos & Videos', content:'Fotoalben nach Anlass sortiert.\nYouTube-Clips & Playlists.\nAlbum-Druck per Overnight-Service.\nTeilen mit Familie & Freunden.'},
+     {title:'Dokumente', content:'Rechnungen • Lieferscheine\nVertraege • Belege • Urkunden\nAusweise • Fuehrerschein\nAlles verschluesselt & sicher.'},
+     {title:'Meine Geraete', content:'Bedienungsanleitungen gespeichert.\nFrag KIM: "Was kann meine Mikrowelle?"\nKIM erklaert jede Funktion.\nNie wieder Handbuch lesen.'},
+     {title:'Mein Buecherregal', content:'Lieblingsbuecher & Rezepte.\nMarkierte Passagen wiederfinden.\nKochbuecher • Reisefuehrer\nKIM liest vor & sucht raus.'},
+     {title:'Nachschlagewerke', content:'Brockhaus • Duden • Atlas\nGelbe Seiten • Wer liefert was?\nTelefonbuch • Fachliteratur\nAlles was frueher im Regal stand.'},
+   ]},
+
+  // --- 6. Apps (Lieblings-Apps, Handy-Hilfe, Schutz) ---
+  {id:'apps', icon:'📱', title:'Apps', subtitle:'Deine Lieblings-Apps', color:'#06b6d4', email:'apps@kimanus.de', phone:'',
+   backs:[
+     {title:'Ueber Apps', content:'Deine wichtigsten Apps\ndirekt von KIMANUS aus starten.\nKein App-Chaos mehr.\nAlles an einem Ort.'},
+     {title:'Kommunikation', content:'WhatsApp • Telegram\nSignal • Telefon\nE-Mail • SMS\nSag KIM wen du erreichen willst.'},
+     {title:'Navigation & Medien', content:'Google Maps • DB Navigator\nSpotify • Netflix • Podcasts\nKamera • Galerie\n"KIM, navigiere mich nach..."'},
+     {title:'Alltag', content:'Banking • PayPal\nLieferando • Amazon\nWetter • Kalender\nDie Apps die du taeglich brauchst.'},
+     {title:'Handy-Hilfe', content:'KIM erklaert jede Funktion.\n"Was macht dieser Knopf?"\nSchritt-fuer-Schritt Anleitung.\nFuer Anfaenger & Profis.'},
+     {title:'Handy-Schutz', content:'Fake-Anruf Erkennung\nPhishing & Betrugs-Warnung\nKindersicherung & Zeitlimits\nDatenschutz-Check fuer Apps'},
    ]},
 
   // --- Verdoppelt fuer fluessiges Endlos-Rad ---
@@ -628,35 +670,47 @@ const CARDS = [
   {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
    backs:[
      {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
-     {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
-     {title:'Berater', content:'Wetterfrosch — Wetter & Tipps\nAnimateur — Freizeit & Events\nDolmetscher — Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen'},
-     {title:'Business', content:'Kalkulierer — Rohaufschlag\nEinkaufer — Preisvergleich\nBestellprofi — Lieferanten\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
-     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nGastro-Berater — Branche\nMarketing — Werbung & Posts\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
-     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv\n\nDein KIM lernt staendig dazu.'},
+     {title:'Scouts', content:'YouTube Scout — Videos finden\nWeb Scout — Internet-Recherche\nNews Scout — Nachrichten & Trends\nDeal Scout — Schnaeppchen & Angebote'},
+     {title:'Guides', content:'Animateur — Freizeit & Events\nGastro-Guide — Restaurants & Tipps\nNachtfahrer — Komm gut heim\nRegioPilot — Regionale Geheimtipps\nStadtfuehrer — Sehenswuerdigkeiten'},
+     {title:'Berater', content:'Wetterfrosch — Wetter & Lifestyle\nDolmetscher — Uebersetzen & Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen & Gedaechtnis'},
+     {title:'Business', content:'Kalkulierer — Rohaufschlag & Marge\nBestellprofi — Lieferanten & Mengen\nLagerist — Bestand & Inventur\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
+     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nSafety-Checker — NFC-Sicherheit\nMarketing — Werbung & Social Media\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
    ]},
-  {id:'tools2', icon:'🛠️', title:'Tools', subtitle:'Scanner, Rahmen & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+  {id:'tools2', icon:'🛠️', title:'Tools', subtitle:'Scanner, Laser, Print & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
    backs:[
-     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren — ohne KI.\nTippe oder sag KIM Bescheid.'},
-     {title:'Scanner & Kamera', content:'Dokumente scannen\nQR-Codes lesen\nVisitenkarten erfassen\nBelege fotografieren'},
-     {title:'Bilderrahmen', content:'RegioPic — Digitale Rahmen\nFuer Gastro: Anzeigen & Menues\nFuer Privat: Familienfotos\nFernsteuerbar per App'},
-     {title:'Schwarzes Brett', content:'Nachrichten ans Team\nGaestebuch pro Nutzer\nAlle lesen mit\nDein digitales Pinboard'},
-     {title:'Weitere Tools', content:'Taschenrechner\nNotizen & Merklisten\nTimer & Stoppuhr\nMehr kommt bald...'},
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren.\nHardware + Software + Service.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner', content:'Dokumente scannen\nQR-Codes & Cap-Coins lesen\nVisitenkarten erfassen\nBelege & Z-Bons fotografieren'},
+     {title:'Laser & Print', content:'Gravuren auf Glas, Holz, Leder\nPersonalisierte Geschenke\nSouvenirs & Pokale\nFotodruck & Leinwand'},
+     {title:'RegioPic', content:'Fotodrucker an der Rezeption\nDigitale Bilderrahmen (Display)\nE-Ink Wandbilder (32 Zoll)\nFamilienfotos fuer Oma & Opa'},
+     {title:'Fotoalbum-Service', content:'KIM layoutet dein Album\nwaehrend du Urlaub machst.\nOvernight-Druck ans Hotel.\nHardcover — am Morgen im Zimmer.'},
+     {title:'Alltagshelfer', content:'Alkomat — Promille-Check\nTaschenrechner & Timer\nTaschenlampe & Kompass\nSchwarzes Brett & Notizen'},
    ]},
   {id:'wallet2', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
    backs:[
-     {title:'Dein Wallet', content:'Alle deine Karten an einem Ort.\nCap-Coins sammeln & einloesen.\nDigital bezahlen.\nImmer dabei.'},
-     {title:'Cap-Coin', content:'Sammle Coins per QR-Code.\n1 Cap-Coin = 10 Cent\n10 Coins = 1 Euro\nBei teilnehmenden Partnern.'},
-     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nAlle Stempelkarten digital.\nNie wieder vergessen.'},
-     {title:'Bonuskarten', content:'Treuepunkte sammeln\nRabatte einloesen\nAktionen entdecken\nAlles automatisch.'},
-     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen\nSicher & verschluesselt.'},
+     {title:'Dein Wallet', content:'Alle Karten und Coins\nan einem Ort.\nDigital bezahlen.\nFaelschungssicher per NFC.'},
+     {title:'Cap-Coin', content:'CapCoins sammeln per QR-Code.\nRegioCoins regional einloesen.\n1 Cap-Coin = 10 Cent\nBei allen Partnern gueltig.'},
+     {title:'NFC-Stempelkarte', content:'Handy an den Stempel halten.\nFaelschungssicher — kein Betrug!\nAlle Stempelkarten in einer App.\nNie wieder Karte vergessen.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen & verschenken\nSicher & verschluesselt.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nMitgliedskarten digital.\nImmer dabei, nie verloren.'},
+     {title:'Verschenktes Glueck', content:'Ein Teil geht an Menschen in Not.\nTransparent & direkt.\nKeine Verwaltungskosten.\nDein Konsum hilft automatisch.'},
    ]},
-  {id:'archiv2', icon:'📁', title:'Archiv', subtitle:'Fotos, Videos & Notizen', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+  {id:'archiv2', icon:'📁', title:'Archiv', subtitle:'Dein zweites Gedaechtnis', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
    backs:[
-     {title:'Fotoalben', content:'Deine Bilder, sortiert nach Anlass.\nUrlaub • Familie • Events\nTeile Alben mit Freunden.\nImmer griffbereit.'},
-     {title:'Video-Sammlung', content:'Gespeicherte YouTube-Clips.\nLieblingsszenen markiert.\nKapitel & Timestamps.\nDein persoenliches Archiv.'},
-     {title:'Notizbuch', content:'Notizen & Merklisten.\nIdeen festhalten.\nEinkaufszettel.\nSchnell per Sprache diktieren.'},
-     {title:'Erinnerungen', content:'Geburtstage • Termine\nJahrestage • Fristen\nKIM erinnert dich rechtzeitig.\nNie wieder vergessen.'},
-     {title:'Meine Ordner', content:'Frei sortierbar.\nDokumente • Belege • Vertraege\nAlles an einem Ort.\nVerschluesselt & sicher.'},
+     {title:'Dein Gedaechtnis', content:'KIM merkt sich alles fuer dich.\nNotizen, Erinnerungen, Kontakte.\nVorlieben, Allergien, Termine.\nDu bestimmst was KIM weiss.'},
+     {title:'Fotos & Videos', content:'Fotoalben nach Anlass sortiert.\nYouTube-Clips & Playlists.\nAlbum-Druck per Overnight-Service.\nTeilen mit Familie & Freunden.'},
+     {title:'Dokumente', content:'Rechnungen • Lieferscheine\nVertraege • Belege • Urkunden\nAusweise • Fuehrerschein\nAlles verschluesselt & sicher.'},
+     {title:'Meine Geraete', content:'Bedienungsanleitungen gespeichert.\nFrag KIM: "Was kann meine Mikrowelle?"\nKIM erklaert jede Funktion.\nNie wieder Handbuch lesen.'},
+     {title:'Mein Buecherregal', content:'Lieblingsbuecher & Rezepte.\nMarkierte Passagen wiederfinden.\nKochbuecher • Reisefuehrer\nKIM liest vor & sucht raus.'},
+     {title:'Nachschlagewerke', content:'Brockhaus • Duden • Atlas\nGelbe Seiten • Wer liefert was?\nTelefonbuch • Fachliteratur\nAlles was frueher im Regal stand.'},
+   ]},
+  {id:'apps2', icon:'📱', title:'Apps', subtitle:'Deine Lieblings-Apps', color:'#06b6d4', email:'apps@kimanus.de', phone:'',
+   backs:[
+     {title:'Ueber Apps', content:'Deine wichtigsten Apps\ndirekt von KIMANUS aus starten.\nKein App-Chaos mehr.\nAlles an einem Ort.'},
+     {title:'Kommunikation', content:'WhatsApp • Telegram\nSignal • Telefon\nE-Mail • SMS\nSag KIM wen du erreichen willst.'},
+     {title:'Navigation & Medien', content:'Google Maps • DB Navigator\nSpotify • Netflix • Podcasts\nKamera • Galerie\n"KIM, navigiere mich nach..."'},
+     {title:'Alltag', content:'Banking • PayPal\nLieferando • Amazon\nWetter • Kalender\nDie Apps die du taeglich brauchst.'},
+     {title:'Handy-Hilfe', content:'KIM erklaert jede Funktion.\n"Was macht dieser Knopf?"\nSchritt-fuer-Schritt Anleitung.\nFuer Anfaenger & Profis.'},
+     {title:'Handy-Schutz', content:'Fake-Anruf Erkennung\nPhishing & Betrugs-Warnung\nKindersicherung & Zeitlimits\nDatenschutz-Check fuer Apps'},
    ]},
 ];
 
@@ -870,6 +924,7 @@ function flipCard() {
       backTrack.style.display = 'block';
       buildBackCards();
       positionBackCards(false);
+      adjustBrightness(currentBrightness); // Helligkeit auf neue Karten anwenden
     }, 700); // Nach der Flip-Animation
   } else {
     // Rückseiten-Rad verstecken, Hauptrad zeigen
@@ -1012,6 +1067,7 @@ function updateFlipLabel() {
     const cardH = 210;
     fl.style.top = (topMid - cardH / 2) + 'px';
     fl.classList.add('visible');
+    adjustBrightness(currentBrightness); // Helligkeit auf Flip-Label anwenden
   } else {
     fl.classList.remove('visible');
   }
@@ -1020,6 +1076,59 @@ function updateFlipLabel() {
 function updateStatus() {
   const card = activeCards[currentIndex];
   document.getElementById('status-text').textContent = card.title;
+}
+
+// === HELLIGKEIT ===
+let currentBrightness = 30;
+function adjustBrightness(val) {
+  currentBrightness = val;
+  const v = val / 100;
+  // Spektrum: schwarz bis fast weiss
+  const cardBg = Math.round(v * 220);
+  const cardAlpha = 0.04 + v * 0.92;
+  const borderAlpha = 0.1 + v * 0.5;
+  const textAlpha = 0.4 + v * 0.6;
+  // Bei hellen Karten dunkle Schrift, bei dunklen helle Schrift
+  const textColor = v > 0.6 ? `rgba(0,0,0,${0.3 + v * 0.7})` : `rgba(255,255,255,${textAlpha})`;
+  const textSub = v > 0.6 ? `rgba(0,0,0,${0.2 + v * 0.5})` : `rgba(255,255,255,${textAlpha * 0.7})`;
+  const textFine = v > 0.6 ? `rgba(0,0,0,${0.15 + v * 0.4})` : `rgba(255,255,255,${textAlpha * 0.6})`;
+  const cardStyle = `rgba(${cardBg},${cardBg},${cardBg+2},${cardAlpha})`;
+  // Vorderseiten-Karten
+  document.querySelectorAll('.wheel-card').forEach(c => {
+    c.style.background = cardStyle;
+    c.style.borderColor = `rgba(255,255,255,${borderAlpha})`;
+  });
+  // Rueckseiten-Karten (gleiche Helligkeit!)
+  document.querySelectorAll('.back-wheel-card').forEach(c => {
+    c.style.background = cardStyle;
+    c.style.borderColor = `rgba(255,255,255,${borderAlpha})`;
+  });
+  // Flip-Label oben (gleiche Helligkeit wie Karten!)
+  const fl = document.getElementById('flip-label');
+  if (fl) fl.style.background = `rgba(${cardBg},${cardBg},${cardBg+2},0.95)`;
+  // Texte - Vorderseite
+  document.querySelectorAll('.card-front .card-name').forEach(e => e.style.color = textColor);
+  document.querySelectorAll('.card-front .card-role').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.card-front .card-contact span').forEach(e => e.style.color = textFine);
+  document.querySelectorAll('.card-front .card-brand').forEach(e => e.style.color = textFine);
+  // Texte - Rueckseiten-Rad
+  document.querySelectorAll('.bwc-title').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.bwc-content').forEach(e => e.style.color = textFine);
+  // Texte - Flip-Rueckseite
+  document.querySelectorAll('.back-title').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.back-content').forEach(e => e.style.color = textFine);
+  // Texte - Flip-Label oben (fl-name, fl-role, fl-contact, fl-brand)
+  document.querySelectorAll('.fl-name').forEach(e => e.style.color = textColor);
+  document.querySelectorAll('.fl-role').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.fl-contact').forEach(e => e.style.color = textFine);
+  document.querySelectorAll('.fl-brand').forEach(e => e.style.color = textFine);
+  // Bar-Kanten dynamisch anpassen (dunkel=dezent, hell=sichtbar)
+  const edgeAlpha = 0.06 + v * 0.25;
+  const edgeBorder = `2px solid rgba(255,255,255,${edgeAlpha})`;
+  document.getElementById('header').style.borderTop = 'none';
+  document.getElementById('header').style.borderBottom = edgeBorder;
+  document.getElementById('bottom-bar').style.borderTop = edgeBorder;
+  document.getElementById('bottom-bar').style.borderBottom = edgeBorder;
 }
 
 // === TRESOR ===
