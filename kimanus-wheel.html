@@ -590,7 +590,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <button id="speech-btn" onclick="toggleSpeech()">
       <span id="speech-agent">KIM</span>
     </button>
-    <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 56px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
+    <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 62px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
   </div>
 </div>
 
@@ -662,6 +662,17 @@ const CARDS = [
      {title:'Handy-Schutz', content:'Fake-Anruf Erkennung\nPhishing & Betrugs-Warnung\nKindersicherung & Zeitlimits\nDatenschutz-Check fuer Apps'},
    ]},
 
+  // --- 7. Chat (Gespraechs-Verlauf & Speicher) ---
+  {id:'chat', icon:'💬', title:'Chat', subtitle:'Deine letzten Gespraeche', color:'#f472b6', email:'chat@kimanus.de', phone:'',
+   backs:[
+     {title:'Letzte Gespraeche', content:'Hier findest du alle deine\nChats auf einen Blick.\nTippe um weiterzulesen.\nNeueste zuerst.'},
+     {title:'KIM — gerade eben', content:'Wie wird das Wetter morgen?\n→ Sonnig, 22 Grad...\n\n(Tippe um fortzusetzen)'},
+     {title:'Justus — gestern', content:'Mietvertrag pruefen\n→ Klausel 4 ist unwirksam...\n\n(Tippe um fortzusetzen)'},
+     {title:'Wetterfrosch — Mo', content:'Wochenende in Coburg?\n→ Samstag perfekt, Sonntag Regen\n\n(Tippe um fortzusetzen)'},
+     {title:'Lena — letzte Woche', content:'EDEKA Rechnung checken\n→ Differenz 12,50 EUR gefunden\n\n(Tippe um fortzusetzen)'},
+     {title:'Aeltere Gespraeche', content:'Alle bisherigen Chats\nnach Datum sortiert.\nSuche per Sprache:\n"KIM, was hab ich letztens gefragt?"'},
+   ]},
+
   // --- Verdoppelt fuer fluessiges Endlos-Rad ---
   {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
@@ -716,6 +727,15 @@ const CARDS = [
      {title:'Alltag', content:'Banking • PayPal\nLieferando • Amazon\nWetter • Kalender\nDie Apps die du taeglich brauchst.'},
      {title:'Handy-Hilfe', content:'KIM erklaert jede Funktion.\n"Was macht dieser Knopf?"\nSchritt-fuer-Schritt Anleitung.\nFuer Anfaenger & Profis.'},
      {title:'Handy-Schutz', content:'Fake-Anruf Erkennung\nPhishing & Betrugs-Warnung\nKindersicherung & Zeitlimits\nDatenschutz-Check fuer Apps'},
+   ]},
+  {id:'chat2', icon:'💬', title:'Chat', subtitle:'Deine letzten Gespraeche', color:'#f472b6', email:'chat@kimanus.de', phone:'',
+   backs:[
+     {title:'Letzte Gespraeche', content:'Hier findest du alle deine\nChats auf einen Blick.\nTippe um weiterzulesen.\nNeueste zuerst.'},
+     {title:'KIM — gerade eben', content:'Wie wird das Wetter morgen?\n→ Sonnig, 22 Grad...\n\n(Tippe um fortzusetzen)'},
+     {title:'Justus — gestern', content:'Mietvertrag pruefen\n→ Klausel 4 ist unwirksam...\n\n(Tippe um fortzusetzen)'},
+     {title:'Wetterfrosch — Mo', content:'Wochenende in Coburg?\n→ Samstag perfekt, Sonntag Regen\n\n(Tippe um fortzusetzen)'},
+     {title:'Lena — letzte Woche', content:'EDEKA Rechnung checken\n→ Differenz 12,50 EUR gefunden\n\n(Tippe um fortzusetzen)'},
+     {title:'Aeltere Gespraeche', content:'Alle bisherigen Chats\nnach Datum sortiert.\nSuche per Sprache:\n"KIM, was hab ich letztens gefragt?"'},
    ]},
 ];
 
@@ -1587,7 +1607,7 @@ function toggleSpeech() {
   const btn = document.getElementById('speech-btn');
 
   if (speechState === 'idle') {
-    // Start: Aufnahme beginnen
+    // Start: Aufnahme beginnen (kein separater Chat-Modus mehr)
     speechState = 'recording';
     isListening = true;
     btn.classList.add('listening');
@@ -1647,28 +1667,15 @@ function resetSpeechState() {
 }
 
 function clearAndRespeak() {
-  // Komplett zuruecksetzen
   pendingText = '';
   stopAudioVisualizer();
   cleanupMic();
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     try { mediaRecorder.stop(); } catch(e) {}
   }
-  speechState = 'idle';
-  isListening = false;
-  const btn = document.getElementById('speech-btn');
-  btn.classList.remove('listening');
-  btn.classList.remove('send-ready');
-  btn.querySelector('span').textContent = 'KIM';
-  btn.querySelector('span').style.fontSize = '';
-  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
-  const delBtn = document.getElementById('delete-btn');
-  if (delBtn) delBtn.style.display = 'none';
-  // Karte zuruecksetzen auf Visitenkarte
-  const centerCardEl = document.getElementById('card-' + currentIndex);
-  if (centerCardEl && !isFlipped) {
-    positionCards(false);
-  }
+  resetSpeechState();
+  // Im Chat bleiben! Nur leere Glasplatte zeigen
+  showEmptyBook();
 }
 
 function showEmptyBook() {
@@ -1877,40 +1884,7 @@ async function sendToKim(userText) {
   btn.querySelector('span').textContent = '⏳';
   btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
 
-  // Glasplatte nach oben schieben (Frage verschwindet)
-  const centerCardEl = document.getElementById('card-' + currentIndex);
-  if (centerCardEl) {
-    centerCardEl.style.transition = 'transform 0.5s ease-in, opacity 0.5s';
-    centerCardEl.style.transform = 'translateX(-50%) translateY(-120%)';
-    centerCardEl.style.opacity = '0.3';
-  }
-
-  // Laufender Pfeil unter der Glasplatte
-  const statusEl = document.getElementById('status-text');
-  if (statusEl) {
-    statusEl.style.display = 'block';
-    statusEl.innerHTML = '<div style="text-align:center;font-size:12px;color:rgba(100,200,100,0.4);animation:slideArrow 1.5s linear infinite">➜ ➜ ➜</div>';
-  }
-
-  // Kurz warten, dann neue Glasplatte von unten
-  await new Promise(r => setTimeout(r, 600));
-  if (centerCardEl) {
-    centerCardEl.style.transition = 'none';
-    centerCardEl.style.transform = 'translateX(-50%) translateY(120%)';
-    centerCardEl.style.opacity = '0.3';
-    // Zeige "KIM denkt nach" auf der neuen Glasplatte
-    const front = centerCardEl.querySelector('.card-front');
-    if (front) {
-      front.innerHTML = '<div id="chat-page" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y"><div style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</div><div id="chat-content" style="font-size:13px;color:rgba(255,255,255,0.2);line-height:1.4;margin-top:2px">denkt nach...</div></div>';
-    }
-    // Glasplatte von unten reingleiten
-    requestAnimationFrame(() => {
-      centerCardEl.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
-      centerCardEl.style.transform = 'translateX(-50%) translateY(0)';
-      centerCardEl.style.opacity = '1';
-    });
-  }
-
+  // Zeige "KIM denkt nach" auf der Glasplatte
   showBookQuestion(userText);
 
   try {
@@ -1954,24 +1928,114 @@ async function sendToKim(userText) {
       }
     }
 
-    // Pfeil-Animation stoppen
-    const statusEl2 = document.getElementById('status-text');
-    if (statusEl2) statusEl2.style.display = 'none';
-
     if (kimAnswer) {
+      conversationHistory.push({q: userText, a: kimAnswer, time: Date.now()});
+      lastKimAnswer = kimAnswer;
       showKimResponse(userText, kimAnswer);
     }
   } catch(err) {
     console.error('KIM-Fehler:', err);
-    const statusEl3 = document.getElementById('status-text');
-    if (statusEl3) statusEl3.style.display = 'none';
   }
   resetSpeechState();
 }
 
-// === CHAT-LAYOUT: Vollbreite wie Blatt Papier ===
+// === CHAT-MODUS: Rad wird zum Gespraechs-Verlauf ===
 let conversationHistory = [];
 let lastKimAnswer = '';
+let chatMode = false;
+let savedCards = null;
+let savedIndex = 0;
+
+function enterChatMode() {
+  if (chatMode) return;
+  chatMode = true;
+  savedCards = activeCards;
+  savedIndex = currentIndex;
+  // Chat startet mit leerer Frage-Glasplatte
+  conversationHistory = [];
+  activeCards = [{id:'chat-q-0', chatType:'question', icon:'', title:'', subtitle:'', color:'', email:'', phone:'', backs:[]}];
+  currentIndex = 0;
+  isFlipped = false;
+  buildCards();
+  positionCards(false);
+  // Leere Chat-Glasplatte zeigen
+  showChatInput();
+}
+
+function exitChatMode() {
+  if (!chatMode) return;
+  chatMode = false;
+  activeCards = savedCards;
+  currentIndex = savedIndex;
+  isFlipped = false;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
+}
+
+function showChatInput() {
+  const el = document.getElementById('card-' + currentIndex);
+  if (!el) return;
+  const front = el.querySelector('.card-front');
+  if (!front) return;
+  front.innerHTML = `
+    <div id="chat-page" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
+      <div style="font-size:11px;color:rgba(230,57,70,0.6);font-weight:700">DU:</div>
+      <canvas id="audio-wave" width="280" height="24" style="margin:4px 0;opacity:0.6"></canvas>
+      <div id="chat-content" style="font-size:13px;color:rgba(255,255,255,0.2);line-height:1.4">Sprich jetzt...</div>
+    </div>`;
+  adjustBrightness(currentBrightness);
+}
+
+function addAnswerCard(answer) {
+  const cleanAnswer = answer.replace(/\n/g, '<br>');
+  const safeAnswer = answer.replace(/'/g, "\\'").replace(/\n/g, " ").substring(0, 500);
+  // Neue Antwort-Glasplatte zum Rad hinzufuegen
+  const idx = activeCards.length;
+  activeCards.push({id:'chat-a-'+idx, chatType:'answer', icon:'', title:'', subtitle:'', color:'', email:'', phone:'', backs:[]});
+  // Karte ins DOM
+  const track = document.getElementById('wheel-track');
+  const div = document.createElement('div');
+  div.className = 'wheel-card';
+  div.id = 'card-' + idx;
+  div.innerHTML = `
+    <div class="card-inner">
+      <div class="card-face card-front">
+        <div id="chat-page-${idx}" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span>
+            <span onclick="speakAnswer('${safeAnswer}')" style="cursor:pointer;font-size:12px;opacity:0.3">🔊</span>
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.4;margin-top:2px">${cleanAnswer}</div>
+        </div>
+      </div>
+      <div class="card-face card-back"></div>
+    </div>`;
+  track.appendChild(div);
+  // Zum Antwort-Karte scrollen
+  currentIndex = idx;
+  positionCards(true);
+  adjustBrightness(currentBrightness);
+}
+
+function addQuestionCard() {
+  // Neue leere Frage-Glasplatte
+  const idx = activeCards.length;
+  activeCards.push({id:'chat-q-'+idx, chatType:'question', icon:'', title:'', subtitle:'', color:'', email:'', phone:'', backs:[]});
+  const track = document.getElementById('wheel-track');
+  const div = document.createElement('div');
+  div.className = 'wheel-card';
+  div.id = 'card-' + idx;
+  div.innerHTML = `
+    <div class="card-inner">
+      <div class="card-face card-front"></div>
+      <div class="card-face card-back"></div>
+    </div>`;
+  track.appendChild(div);
+  currentIndex = idx;
+  positionCards(true);
+  showChatInput();
+}
 
 function showBookQuestion(question) {
   const chatContent = document.getElementById('chat-content');
