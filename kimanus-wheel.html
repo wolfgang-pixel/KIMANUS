@@ -257,6 +257,36 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   letter-spacing:3px;
 }
 
+/* === Features-Layout (KIM-Karte etc.) === */
+.card-front .card-body{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  flex:1;margin-top:12px;gap:12px;
+}
+.card-front .card-features{
+  display:flex;flex-direction:column;gap:5px;
+  flex:1;
+}
+.card-front .card-features span{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.45);
+  letter-spacing:2px;text-transform:uppercase;line-height:1.4;
+}
+.card-front .card-features span::before{
+  content:'· ';font-weight:700;
+}
+.card-front .card-contact-right{
+  display:flex;flex-direction:column;gap:3px;
+  align-items:flex-end;text-align:right;
+  min-width:fit-content;padding-bottom:2px;
+}
+.card-front .card-contact-right span{
+  font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;
+}
+/* Subtitle fuer Karten mit features: KIMANUS nach dem Namen */
+.card-front .card-name .card-name-sub{
+  font-size:14px;font-weight:400;color:rgba(255,255,255,0.3);
+  letter-spacing:2px;margin-left:6px;
+}
+
 /* Rückseite */
 .card-back{
   background:transparent;
@@ -270,6 +300,64 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .card-back .back-content{
   font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.8;
   white-space:pre-line;padding:0 20px;
+}
+
+/* === Grid-Layout (Scouts etc.) === */
+.grid-header{
+  position:absolute;top:12px;left:16px;
+  font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.grid-container{
+  display:grid;gap:3px;
+  width:100%;padding:0 2px;
+}
+.grid-cell{
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:3px;
+  background:rgba(255,255,255,0.02);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:1px;padding:1px;
+  overflow:hidden;
+}
+.grid-cell-filled{
+  background:rgba(255,255,255,0.05);
+  border-color:rgba(255,255,255,0.1);
+  cursor:pointer;
+}
+.grid-cell-filled:active{
+  background:rgba(255,255,255,0.1);
+}
+.grid-cell-icon{
+  font-size:16px;line-height:1;
+}
+.grid-cell-label{
+  font-size:7px;font-weight:600;color:rgba(255,255,255,0.4);
+  text-align:center;letter-spacing:0.3px;text-transform:uppercase;
+  line-height:1.1;
+}
+
+.grid-sections{
+  width:100%;height:100%;display:flex;flex-direction:column;
+  padding:0;gap:0;
+  overflow:hidden;
+}
+.grid-section-header{
+  font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);
+  letter-spacing:2px;text-transform:uppercase;
+  padding:2px 4px 1px;
+  flex-shrink:0;
+}
+.grid-section{
+  min-height:0;
+}
+.grid-section .grid-cell{
+  height:40px;
+}
+/* Grid-Karten brauchen weniger Padding */
+.back-wheel-card:has(.grid-sections){
+  padding:6px;
 }
 
 /* Keine Extra-Effekte - reine Glasplatte */
@@ -305,6 +393,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .fl-card .fl-name{font-size:22px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px}
 .fl-card .fl-role{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
 .fl-card .fl-contact{font-size:11px;color:rgba(255,255,255,0.25)}
+.fl-card .fl-features{display:flex;flex-direction:column;gap:1px;margin-top:4px}
+.fl-card .fl-features span{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase}
 .fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:8px;font-weight:800;color:rgba(255,255,255,0.15);letter-spacing:3px}
 
 /* === REGISTER === */
@@ -608,14 +698,96 @@ const CARDS = [
    ]},
 
   // --- 2. KIM (Einziger Agent — Privat + Business) ---
-  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
+  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'0800 546 2687', phone:'kim@kimanus.de',
+   features:[
+     'Scouts',
+     'Guides',
+     'Berater',
+     'Business',
+     'Spezialisten',
+   ],
    backs:[
-     {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
-     {title:'Scouts', content:'YouTube Scout — Videos finden\nWeb Scout — Internet-Recherche\nNews Scout — Nachrichten & Trends\nDeal Scout — Schnaeppchen & Angebote'},
-     {title:'Guides', content:'Animateur — Freizeit & Events\nGastro-Guide — Restaurants & Tipps\nNachtfahrer — Komm gut heim\nRegioPilot — Regionale Geheimtipps\nStadtfuehrer — Sehenswuerdigkeiten'},
-     {title:'Berater', content:'Wetterfrosch — Wetter & Lifestyle\nDolmetscher — Uebersetzen & Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen & Gedaechtnis'},
-     {title:'Business', content:'Kalkulierer — Rohaufschlag & Marge\nBestellprofi — Lieferanten & Mengen\nLagerist — Bestand & Inventur\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
-     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nSafety-Checker — NFC-Sicherheit\nMarketing — Werbung & Social Media\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SCOUTS', items:[
+         {icon:'🎬', label:'YouTube Scout'},
+         {icon:'🌐', label:'Web Scout'},
+         {icon:'📰', label:'News Scout'},
+         {icon:'💰', label:'Deal Scout'},
+         {icon:'📱', label:'Social Scout'},
+       ]},
+       {label:'GUIDES', items:[
+         {icon:'🎭', label:'Animateur'},
+         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🚗', label:'Nachtfahrer'},
+         {icon:'📍', label:'RegioPilot'},
+         {icon:'🏛️', label:'Stadtfuehrer'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'BERATER', items:[
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'🌍', label:'Dolmetscher'},
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
+       {label:'BUSINESS', items:[
+         {icon:'🧮', label:'Kalkulierer'},
+         {icon:'📦', label:'Bestellprofi'},
+         {icon:'🏭', label:'Lagerist'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'💶', label:'Lena'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SPEZIALISTEN', items:[
+         {icon:'💻', label:'IT-Hilfe'},
+         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'📣', label:'Marketing'},
+         {icon:'🎵', label:'DJ'},
+         {icon:'🖨️', label:'Print-Memorys'},
+       ]},
+     ]},
+     // --- Duplikate fuer fluessiges Endlos-Scrollen ---
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SCOUTS', items:[
+         {icon:'🎬', label:'YouTube Scout'},
+         {icon:'🌐', label:'Web Scout'},
+         {icon:'📰', label:'News Scout'},
+         {icon:'💰', label:'Deal Scout'},
+         {icon:'📱', label:'Social Scout'},
+       ]},
+       {label:'GUIDES', items:[
+         {icon:'🎭', label:'Animateur'},
+         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🚗', label:'Nachtfahrer'},
+         {icon:'📍', label:'RegioPilot'},
+         {icon:'🏛️', label:'Stadtfuehrer'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'BERATER', items:[
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'🌍', label:'Dolmetscher'},
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
+       {label:'BUSINESS', items:[
+         {icon:'🧮', label:'Kalkulierer'},
+         {icon:'📦', label:'Bestellprofi'},
+         {icon:'🏭', label:'Lagerist'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'💶', label:'Lena'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SPEZIALISTEN', items:[
+         {icon:'💻', label:'IT-Hilfe'},
+         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'📣', label:'Marketing'},
+         {icon:'🎵', label:'DJ'},
+         {icon:'🖨️', label:'Print-Memorys'},
+       ]},
+     ]},
    ]},
 
   // --- 3. Tools (Werkzeuge, Hardware, Services) ---
@@ -683,14 +855,96 @@ const CARDS = [
      {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
      {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
-  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
+  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'0800 546 2687', phone:'kim@kimanus.de',
+   features:[
+     'Scouts',
+     'Guides',
+     'Berater',
+     'Business',
+     'Spezialisten',
+   ],
    backs:[
-     {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
-     {title:'Scouts', content:'YouTube Scout — Videos finden\nWeb Scout — Internet-Recherche\nNews Scout — Nachrichten & Trends\nDeal Scout — Schnaeppchen & Angebote'},
-     {title:'Guides', content:'Animateur — Freizeit & Events\nGastro-Guide — Restaurants & Tipps\nNachtfahrer — Komm gut heim\nRegioPilot — Regionale Geheimtipps\nStadtfuehrer — Sehenswuerdigkeiten'},
-     {title:'Berater', content:'Wetterfrosch — Wetter & Lifestyle\nDolmetscher — Uebersetzen & Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen & Gedaechtnis'},
-     {title:'Business', content:'Kalkulierer — Rohaufschlag & Marge\nBestellprofi — Lieferanten & Mengen\nLagerist — Bestand & Inventur\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
-     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nSafety-Checker — NFC-Sicherheit\nMarketing — Werbung & Social Media\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SCOUTS', items:[
+         {icon:'🎬', label:'YouTube Scout'},
+         {icon:'🌐', label:'Web Scout'},
+         {icon:'📰', label:'News Scout'},
+         {icon:'💰', label:'Deal Scout'},
+         {icon:'📱', label:'Social Scout'},
+       ]},
+       {label:'GUIDES', items:[
+         {icon:'🎭', label:'Animateur'},
+         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🚗', label:'Nachtfahrer'},
+         {icon:'📍', label:'RegioPilot'},
+         {icon:'🏛️', label:'Stadtfuehrer'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'BERATER', items:[
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'🌍', label:'Dolmetscher'},
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
+       {label:'BUSINESS', items:[
+         {icon:'🧮', label:'Kalkulierer'},
+         {icon:'📦', label:'Bestellprofi'},
+         {icon:'🏭', label:'Lagerist'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'💶', label:'Lena'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SPEZIALISTEN', items:[
+         {icon:'💻', label:'IT-Hilfe'},
+         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'📣', label:'Marketing'},
+         {icon:'🎵', label:'DJ'},
+         {icon:'🖨️', label:'Print-Memorys'},
+       ]},
+     ]},
+     // --- Duplikate fuer fluessiges Endlos-Scrollen ---
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SCOUTS', items:[
+         {icon:'🎬', label:'YouTube Scout'},
+         {icon:'🌐', label:'Web Scout'},
+         {icon:'📰', label:'News Scout'},
+         {icon:'💰', label:'Deal Scout'},
+         {icon:'📱', label:'Social Scout'},
+       ]},
+       {label:'GUIDES', items:[
+         {icon:'🎭', label:'Animateur'},
+         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🚗', label:'Nachtfahrer'},
+         {icon:'📍', label:'RegioPilot'},
+         {icon:'🏛️', label:'Stadtfuehrer'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'BERATER', items:[
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'🌍', label:'Dolmetscher'},
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
+       {label:'BUSINESS', items:[
+         {icon:'🧮', label:'Kalkulierer'},
+         {icon:'📦', label:'Bestellprofi'},
+         {icon:'🏭', label:'Lagerist'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'💶', label:'Lena'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+       {label:'SPEZIALISTEN', items:[
+         {icon:'💻', label:'IT-Hilfe'},
+         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'📣', label:'Marketing'},
+         {icon:'🎵', label:'DJ'},
+         {icon:'🖨️', label:'Print-Memorys'},
+       ]},
+     ]},
    ]},
   {id:'tools2', icon:'🛠️', title:'Tools', subtitle:'Scanner, Laser, Print & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
    backs:[
@@ -829,14 +1083,26 @@ function buildCards() {
         <div class="card-face card-front">
           <div class="card-icon">${card.icon}</div>
           <div class="card-header">
-            <div class="card-name">${card.title}</div>
+            <div class="card-name">${card.title}${card.features ? '<span class="card-name-sub">KIMANUS</span>' : ''}</div>
             <div class="card-role">${card.subtitle}</div>
           </div>
+          ${card.features ? `
+          <div class="card-body">
+            <div class="card-features">
+              ${card.features.map(f => `<span>${f}</span>`).join('')}
+            </div>
+            <div class="card-contact-right">
+              <span>${card.email || ''}</span>
+              <span>${card.phone || ''}</span>
+            </div>
+          </div>
+          ` : `
           <div class="card-contact">
             <span>${card.email || ''}</span>
             <span>${card.phone || ''}</span>
           </div>
           <div class="card-brand">KIMANUS</div>
+          `}
         </div>
         <div class="card-face card-back">
           <div class="back-title" id="back-title-${i}">${card.backs?.[0]?.title || ''}</div>
@@ -998,6 +1264,43 @@ function buildBackCards() {
         <iframe class="bwc-video-full" src="https://www.youtube.com/embed/${back.videoId}?rel=0&modestbranding=1&playsinline=1"
           frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture"
           allowfullscreen></iframe>`;
+    } else if (back.type === 'grid') {
+      const cols = back.gridCols || 4;
+      if (back.sections) {
+        let sectionsHtml = '';
+        back.sections.forEach(sec => {
+          const rowsPerSection = 2;
+          const totalCells = cols * rowsPerSection;
+          let cells = '';
+          for (let c = 0; c < totalCells; c++) {
+            const item = sec.items && sec.items[c];
+            if (item) {
+              cells += `<div class="grid-cell grid-cell-filled"><span class="grid-cell-icon">${item.icon}</span><span class="grid-cell-label">${item.label}</span></div>`;
+            } else {
+              cells += `<div class="grid-cell"></div>`;
+            }
+          }
+          sectionsHtml += `
+            <div class="grid-section-header">${sec.label}</div>
+            <div class="grid-container grid-section" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rowsPerSection},1fr)">${cells}</div>`;
+        });
+        inner = `<div class="grid-sections">${sectionsHtml}</div>`;
+      } else {
+        const rows = back.gridRows || 6;
+        const totalCells = cols * rows;
+        let cells = '';
+        for (let c = 0; c < totalCells; c++) {
+          const item = back.items && back.items[c];
+          if (item) {
+            cells += `<div class="grid-cell grid-cell-filled"><span class="grid-cell-icon">${item.icon}</span><span class="grid-cell-label">${item.label}</span></div>`;
+          } else {
+            cells += `<div class="grid-cell"></div>`;
+          }
+        }
+        inner = `
+          <div class="grid-header">${back.title}</div>
+          <div class="grid-container" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr)">${cells}</div>`;
+      }
     } else if (back.type === 'search') {
       inner = `
         <div class="bwc-title">${back.title}</div>
@@ -1076,11 +1379,12 @@ function updateFlipLabel() {
     document.getElementById('fl-card').innerHTML = `
       <div class="fl-icon">${card.icon}</div>
       <div>
-        <div class="fl-name">${card.title}</div>
+        <div class="fl-name">${card.title}${card.features ? '<span class="card-name-sub" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-left:4px">KIMANUS</span>' : ''}</div>
         <div class="fl-role">${card.subtitle}</div>
+        ${card.features ? '<div class="fl-features">' + card.features.map(f => '<span>· ' + f + '</span>').join('') + '</div>' : ''}
       </div>
       <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
-      <div class="fl-brand">KIMANUS</div>
+      ${card.features ? '' : '<div class="fl-brand">KIMANUS</div>'}
     `;
     // Position: gleich wie die obere Milchglas-Karte
     const container = document.getElementById('wheel-container');
