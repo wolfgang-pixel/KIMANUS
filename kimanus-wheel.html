@@ -2069,28 +2069,37 @@ function rebuildWheel() {
 
 // === KIM SPRECHBLASE (im Setup) ===
 function showKimBubble() {
-  let bubble = document.getElementById('kim-bubble');
-  if (bubble) {
-    bubble.style.display = bubble.style.display === 'none' ? 'flex' : 'none';
-    return;
-  }
-  bubble = document.createElement('div');
-  bubble.id = 'kim-bubble';
-  bubble.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1c1c1e;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:30;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:280px';
   const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
   const mode = cfg['kim_mode'] || 'concierge';
+  const gender = cfg['kim_gender'] || 'weiblich';
   const greeting = mode === 'concierge' ? 'Kann ich helfen?' : 'Was brauchst du?';
-  bubble.innerHTML = `
-    <div style="width:36px;height:36px;border-radius:18px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
-    <div>
-      <div style="font-size:15px;color:rgba(255,255,255,0.85)">KIM</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.4)">${greeting}</div>
+  const subtitle = mode === 'concierge' ? 'Concierge' : (gender === 'weiblich' ? 'Persoenliche Assistentin' : 'Persoenlicher Assistent');
+
+  let card = document.getElementById('kim-card-overlay');
+  if (card) {
+    card.style.display = card.style.display === 'none' ? 'flex' : 'none';
+    return;
+  }
+  card = document.createElement('div');
+  card.id = 'kim-card-overlay';
+  card.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:355px;height:auto;background:#1c1c1e;border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;z-index:30;padding:16px;gap:10px';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>
+      <div style="flex:1">
+        <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:1px">KIM</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.35)">${subtitle}</div>
+      </div>
+      <button onclick="document.getElementById('kim-card-overlay').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:18px;cursor:pointer">✕</button>
     </div>
-    <button onclick="document.getElementById('kim-bubble').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:16px;cursor:pointer;margin-left:auto">✕</button>
+    <div style="font-size:15px;color:rgba(255,255,255,0.5);line-height:1.5">${greeting}</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">kim@kimanus.de</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">·</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">0800 546 2687</div>
+    </div>
   `;
-  document.body.appendChild(bubble);
-  // Auto-hide nach 5 Sekunden
-  setTimeout(() => { if (bubble) bubble.style.display = 'none'; }, 5000);
+  document.body.appendChild(card);
 }
 
 // === HEADER INFO (KIMANUS + KIM) ===
