@@ -309,8 +309,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   letter-spacing:2px;text-transform:uppercase;
 }
 .grid-container{
-  display:grid;gap:3px;
-  width:100%;padding:0 2px;
+  display:grid;gap:6px;
+  width:100%;padding:0 4px;
 }
 .grid-cell{
   border:1px solid rgba(255,255,255,0.06);
@@ -318,7 +318,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   background:rgba(255,255,255,0.02);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  gap:1px;padding:1px;
+  gap:2px;padding:2px;
   overflow:hidden;
 }
 .grid-cell-filled{
@@ -330,10 +330,10 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   background:rgba(255,255,255,0.1);
 }
 .grid-cell-icon{
-  font-size:16px;line-height:1;
+  font-size:22px;line-height:1;
 }
 .grid-cell-label{
-  font-size:7px;font-weight:600;color:rgba(255,255,255,0.4);
+  font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);
   text-align:center;letter-spacing:0.3px;text-transform:uppercase;
   line-height:1.1;
 }
@@ -344,20 +344,21 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   overflow:hidden;
 }
 .grid-section-header{
-  font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);
-  letter-spacing:2px;text-transform:uppercase;
-  padding:2px 4px 1px;
+  font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);
+  letter-spacing:3px;text-transform:uppercase;
+  padding:6px 6px 4px;
   flex-shrink:0;
 }
 .grid-section{
   min-height:0;
 }
 .grid-section .grid-cell{
-  height:40px;
+  height:auto;min-height:50px;
 }
-/* Grid-Karten brauchen weniger Padding */
-.back-wheel-card:has(.grid-sections){
-  padding:6px;
+/* Grid-Karten: kein Padding, Inhalt fuellt ganze Karte */
+.back-wheel-card:has(.grid-sections),
+.back-wheel-card:has([style*="position:relative"]){
+  padding:0;
 }
 
 /* Keine Extra-Effekte - reine Glasplatte */
@@ -707,29 +708,33 @@ const CARDS = [
      'Spezialisten',
    ],
    backs:[
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
-         {icon:'🎬', label:'YouTube Scout'},
-         {icon:'🌐', label:'Web Scout'},
-         {icon:'📰', label:'News Scout'},
-         {icon:'💰', label:'Deal Scout'},
-         {icon:'📱', label:'Social Scout'},
+         {icon:'🎬', label:'YouTube'},
+         {icon:'🌐', label:'Web'},
+         {icon:'📰', label:'News'},
+         {icon:'💰', label:'Deals'},
+         {icon:'📱', label:'Social'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
-         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🍽️', label:'Gastro'},
          {icon:'🚗', label:'Nachtfahrer'},
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
          {icon:'📅', label:'Sekretaer'},
          {icon:'📚', label:'Bibliothekar'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -738,39 +743,43 @@ const CARDS = [
          {icon:'💶', label:'Lena'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
-         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'🔒', label:'Safety'},
          {icon:'📣', label:'Marketing'},
          {icon:'🎵', label:'DJ'},
-         {icon:'🖨️', label:'Print-Memorys'},
+         {icon:'🖨️', label:'Print'},
        ]},
      ]},
      // --- Duplikate fuer fluessiges Endlos-Scrollen ---
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
-         {icon:'🎬', label:'YouTube Scout'},
-         {icon:'🌐', label:'Web Scout'},
-         {icon:'📰', label:'News Scout'},
-         {icon:'💰', label:'Deal Scout'},
-         {icon:'📱', label:'Social Scout'},
+         {icon:'🎬', label:'YouTube'},
+         {icon:'🌐', label:'Web'},
+         {icon:'📰', label:'News'},
+         {icon:'💰', label:'Deals'},
+         {icon:'📱', label:'Social'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
-         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🍽️', label:'Gastro'},
          {icon:'🚗', label:'Nachtfahrer'},
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
          {icon:'📅', label:'Sekretaer'},
          {icon:'📚', label:'Bibliothekar'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -779,13 +788,13 @@ const CARDS = [
          {icon:'💶', label:'Lena'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
-         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'🔒', label:'Safety'},
          {icon:'📣', label:'Marketing'},
          {icon:'🎵', label:'DJ'},
-         {icon:'🖨️', label:'Print-Memorys'},
+         {icon:'🖨️', label:'Print'},
        ]},
      ]},
    ]},
@@ -864,29 +873,33 @@ const CARDS = [
      'Spezialisten',
    ],
    backs:[
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
-         {icon:'🎬', label:'YouTube Scout'},
-         {icon:'🌐', label:'Web Scout'},
-         {icon:'📰', label:'News Scout'},
-         {icon:'💰', label:'Deal Scout'},
-         {icon:'📱', label:'Social Scout'},
+         {icon:'🎬', label:'YouTube'},
+         {icon:'🌐', label:'Web'},
+         {icon:'📰', label:'News'},
+         {icon:'💰', label:'Deals'},
+         {icon:'📱', label:'Social'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
-         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🍽️', label:'Gastro'},
          {icon:'🚗', label:'Nachtfahrer'},
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
          {icon:'📅', label:'Sekretaer'},
          {icon:'📚', label:'Bibliothekar'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -895,39 +908,43 @@ const CARDS = [
          {icon:'💶', label:'Lena'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
-         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'🔒', label:'Safety'},
          {icon:'📣', label:'Marketing'},
          {icon:'🎵', label:'DJ'},
-         {icon:'🖨️', label:'Print-Memorys'},
+         {icon:'🖨️', label:'Print'},
        ]},
      ]},
      // --- Duplikate fuer fluessiges Endlos-Scrollen ---
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
-         {icon:'🎬', label:'YouTube Scout'},
-         {icon:'🌐', label:'Web Scout'},
-         {icon:'📰', label:'News Scout'},
-         {icon:'💰', label:'Deal Scout'},
-         {icon:'📱', label:'Social Scout'},
+         {icon:'🎬', label:'YouTube'},
+         {icon:'🌐', label:'Web'},
+         {icon:'📰', label:'News'},
+         {icon:'💰', label:'Deals'},
+         {icon:'📱', label:'Social'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
-         {icon:'🍽️', label:'Gastro-Guide'},
+         {icon:'🍽️', label:'Gastro'},
          {icon:'🚗', label:'Nachtfahrer'},
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
          {icon:'📅', label:'Sekretaer'},
          {icon:'📚', label:'Bibliothekar'},
        ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -936,13 +953,13 @@ const CARDS = [
          {icon:'💶', label:'Lena'},
        ]},
      ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:6, sections:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
-         {icon:'🔒', label:'Safety-Checker'},
+         {icon:'🔒', label:'Safety'},
          {icon:'📣', label:'Marketing'},
          {icon:'🎵', label:'DJ'},
-         {icon:'🖨️', label:'Print-Memorys'},
+         {icon:'🖨️', label:'Print'},
        ]},
      ]},
    ]},
@@ -1267,24 +1284,31 @@ function buildBackCards() {
     } else if (back.type === 'grid') {
       const cols = back.gridCols || 4;
       if (back.sections) {
-        let sectionsHtml = '';
+        // Exakte Prozent-Positionen aus Excalidraw (355x210 Glasplatte)
+        // Jedes Kaertchen: x/355*100 = left%, y/210*100 = top%, w/355*100 = width%, h/210*100 = height%
+        const GW = 355, GH = 210; // Excalidraw Glasplatte
+        const cardW = (78/GW*100).toFixed(1); // 22.0%
+        const cardH = (45/GH*100).toFixed(1); // 21.4%
+        // 4 Spalten Positionen aus Excalidraw: x=9, 95, 181, 267
+        const colX = [9,95,181,267].map(x => (x/GW*100).toFixed(1));
+        // Reihen: y=21, 88, 155 (3 Reihen moeglich)
+        const rowY = [21,88,155].map(y => (y/GH*100).toFixed(1));
+        // Labels: 2px unter Kaertchen
+        const labelOffset = ((45+3)/GH*100).toFixed(1);
+        let html = '';
         back.sections.forEach(sec => {
-          const rowsPerSection = 2;
-          const totalCells = cols * rowsPerSection;
-          let cells = '';
-          for (let c = 0; c < totalCells; c++) {
-            const item = sec.items && sec.items[c];
-            if (item) {
-              cells += `<div class="grid-cell grid-cell-filled"><span class="grid-cell-icon">${item.icon}</span><span class="grid-cell-label">${item.label}</span></div>`;
-            } else {
-              cells += `<div class="grid-cell"></div>`;
-            }
-          }
-          sectionsHtml += `
-            <div class="grid-section-header">${sec.label}</div>
-            <div class="grid-container grid-section" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rowsPerSection},1fr)">${cells}</div>`;
+          html += `<div style="position:absolute;left:${(9/GW*100).toFixed(1)}%;top:${(3/GH*100).toFixed(1)}%;font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:3px;text-transform:uppercase">${sec.label}</div>`;
+          sec.items.forEach((item, idx) => {
+            const col = idx % cols;
+            const row = Math.floor(idx / cols);
+            const left = colX[col];
+            const top = rowY[row];
+            const lTop = (parseFloat(top) + parseFloat(labelOffset)).toFixed(1);
+            html += `<div style="position:absolute;left:${left}%;top:${top}%;width:${cardW}%;height:${cardH}%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer">${item.icon}</div>`;
+            html += `<div style="position:absolute;left:${left}%;top:${lTop}%;width:${cardW}%;text-align:center;font-size:11px;font-weight:600;color:rgba(255,255,255,0.4)">${item.label}</div>`;
+          });
         });
-        inner = `<div class="grid-sections">${sectionsHtml}</div>`;
+        inner = `<div style="position:relative;width:100%;height:100%">${html}</div>`;
       } else {
         const rows = back.gridRows || 6;
         const totalCells = cols * rows;
