@@ -801,57 +801,202 @@ const CARDS = [
 
   // --- 3. Tools (Werkzeuge, Hardware, Services) ---
   {id:'tools', icon:'🛠️', title:'Tools', subtitle:'Scanner, Laser, Print & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+   features:['Scanner','Laser & Print','RegioPic','Fotoalbum','Alltagshelfer'],
    backs:[
-     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren.\nHardware + Software + Service.\nTippe oder sag KIM Bescheid.'},
-     {title:'Scanner', content:'Dokumente scannen\nQR-Codes & Cap-Coins lesen\nVisitenkarten erfassen\nBelege & Z-Bons fotografieren'},
-     {title:'Laser & Print', content:'Gravuren auf Glas, Holz, Leder\nPersonalisierte Geschenke\nSouvenirs & Pokale\nFotodruck & Leinwand'},
-     {title:'RegioPic', content:'Fotodrucker an der Rezeption\nDigitale Bilderrahmen (Display)\nE-Ink Wandbilder (32 Zoll)\nFamilienfotos fuer Oma & Opa'},
-     {title:'Fotoalbum-Service', content:'KIM layoutet dein Album\nwaehrend du Urlaub machst.\nOvernight-Druck ans Hotel.\nHardcover — am Morgen im Zimmer.'},
-     {title:'Alltagshelfer', content:'Alkomat — Promille-Check\nTaschenrechner & Timer\nTaschenlampe & Kompass\nSchwarzes Brett & Notizen'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'SCANNER', items:[
+         {icon:'📄', label:'Dokumente'},
+         {icon:'📷', label:'QR-Code'},
+         {icon:'💳', label:'Visitenkarte'},
+         {icon:'🧾', label:'Belege'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'LASER & PRINT', items:[
+         {icon:'✨', label:'Gravur'},
+         {icon:'🎁', label:'Geschenke'},
+         {icon:'🏆', label:'Pokale'},
+         {icon:'🖼️', label:'Leinwand'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'REGIOPIC', items:[
+         {icon:'🖨️', label:'Fotodruck'},
+         {icon:'📺', label:'Display'},
+         {icon:'🖼️', label:'E-Ink'},
+         {icon:'👴', label:'Oma & Opa'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'FOTOALBUM', items:[
+         {icon:'📸', label:'Album'},
+         {icon:'🌙', label:'Overnight'},
+         {icon:'📖', label:'Hardcover'},
+         {icon:'✈️', label:'Urlaub'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'ALLTAGSHELFER', items:[
+         {icon:'🍺', label:'Alkomat'},
+         {icon:'🔢', label:'Rechner'},
+         {icon:'🔦', label:'Lampe'},
+         {icon:'📌', label:'Brett'},
+       ]},
+     ]},
    ]},
 
   // --- 4. Wallet (Karten, Cap-Coin, NFC-Stempel, Bezahlen) ---
   {id:'wallet', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
+   features:['Cap-Coin','NFC-Stempel','Bezahlen','Clubkarten','Glueck'],
    backs:[
-     {title:'Dein Wallet', content:'Alle Karten und Coins\nan einem Ort.\nDigital bezahlen.\nFaelschungssicher per NFC.'},
-     {title:'Cap-Coin', content:'CapCoins sammeln per QR-Code.\nRegioCoins regional einloesen.\n1 Cap-Coin = 10 Cent\nBei allen Partnern gueltig.'},
-     {title:'NFC-Stempelkarte', content:'Handy an den Stempel halten.\nFaelschungssicher — kein Betrug!\nAlle Stempelkarten in einer App.\nNie wieder Karte vergessen.'},
-     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen & verschenken\nSicher & verschluesselt.'},
-     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nMitgliedskarten digital.\nImmer dabei, nie verloren.'},
-     {title:'Verschenktes Glueck', content:'Ein Teil geht an Menschen in Not.\nTransparent & direkt.\nKeine Verwaltungskosten.\nDein Konsum hilft automatisch.'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'CAP-COIN', items:[
+         {icon:'🪙', label:'CapCoins'},
+         {icon:'🌍', label:'RegioCoins'},
+         {icon:'📱', label:'QR-Scan'},
+         {icon:'🍺', label:'Brauerei'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'NFC-STEMPEL', items:[
+         {icon:'📲', label:'Stempel'},
+         {icon:'🔒', label:'Faelschungssicher'},
+         {icon:'☕', label:'Kaffee-Karte'},
+         {icon:'🎯', label:'Treuepunkte'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BEZAHLEN', items:[
+         {icon:'💳', label:'Kreditkarte'},
+         {icon:'🅿️', label:'PayPal'},
+         {icon:'🪙', label:'Cap-Coin'},
+         {icon:'🎁', label:'Gutscheine'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'CLUBKARTEN', items:[
+         {icon:'🍽️', label:'Restaurant'},
+         {icon:'💪', label:'Fitness'},
+         {icon:'✂️', label:'Friseur'},
+         {icon:'🥐', label:'Baecker'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'VERSCHENKTES GLUECK', items:[
+         {icon:'❤️', label:'Spenden'},
+         {icon:'🤝', label:'Direkt'},
+         {icon:'🌐', label:'Transparent'},
+         {icon:'🎗️', label:'Helfen'},
+       ]},
+     ]},
    ]},
 
   // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
   {id:'archiv', icon:'📁', title:'Archiv', subtitle:'Dein zweites Gedaechtnis', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+   features:['Gedaechtnis','Fotos & Videos','Dokumente','Geraete','Buecher'],
    backs:[
-     {title:'Dein Gedaechtnis', content:'KIM merkt sich alles fuer dich.\nNotizen, Erinnerungen, Kontakte.\nVorlieben, Allergien, Termine.\nDu bestimmst was KIM weiss.'},
-     {title:'Fotos & Videos', content:'Fotoalben nach Anlass sortiert.\nYouTube-Clips & Playlists.\nAlbum-Druck per Overnight-Service.\nTeilen mit Familie & Freunden.'},
-     {title:'Dokumente', content:'Rechnungen • Lieferscheine\nVertraege • Belege • Urkunden\nAusweise • Fuehrerschein\nAlles verschluesselt & sicher.'},
-     {title:'Meine Geraete', content:'Bedienungsanleitungen gespeichert.\nFrag KIM: "Was kann meine Mikrowelle?"\nKIM erklaert jede Funktion.\nNie wieder Handbuch lesen.'},
-     {title:'Mein Buecherregal', content:'Lieblingsbuecher & Rezepte.\nMarkierte Passagen wiederfinden.\nKochbuecher • Reisefuehrer\nKIM liest vor & sucht raus.'},
-     {title:'Nachschlagewerke', content:'Brockhaus • Duden • Atlas\nGelbe Seiten • Wer liefert was?\nTelefonbuch • Fachliteratur\nAlles was frueher im Regal stand.'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'GEDAECHTNIS', items:[
+         {icon:'🧠', label:'Notizen'},
+         {icon:'📅', label:'Termine'},
+         {icon:'👤', label:'Kontakte'},
+         {icon:'❤️', label:'Vorlieben'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'FOTOS & VIDEOS', items:[
+         {icon:'📸', label:'Alben'},
+         {icon:'🎬', label:'Clips'},
+         {icon:'📖', label:'Druck'},
+         {icon:'👨‍👩‍👧', label:'Teilen'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'DOKUMENTE', items:[
+         {icon:'🧾', label:'Rechnungen'},
+         {icon:'📋', label:'Vertraege'},
+         {icon:'🪪', label:'Ausweise'},
+         {icon:'🔒', label:'Verschluesselt'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'MEINE GERAETE', items:[
+         {icon:'📱', label:'Handy'},
+         {icon:'🔲', label:'Mikrowelle'},
+         {icon:'🖥️', label:'PC'},
+         {icon:'📘', label:'Anleitung'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BUECHERREGAL', items:[
+         {icon:'📚', label:'Buecher'},
+         {icon:'🍳', label:'Rezepte'},
+         {icon:'🗺️', label:'Reisefuehrer'},
+         {icon:'📖', label:'Duden'},
+       ]},
+     ]},
    ]},
 
   // --- 6. Apps (Lieblings-Apps, Handy-Hilfe, Schutz) ---
   {id:'apps', icon:'📱', title:'Apps', subtitle:'Deine Lieblings-Apps', color:'#06b6d4', email:'apps@kimanus.de', phone:'',
+   features:['Kommunikation','Navigation','Alltag','Handy-Hilfe','Schutz'],
    backs:[
-     {title:'Ueber Apps', content:'Deine wichtigsten Apps\ndirekt von KIMANUS aus starten.\nKein App-Chaos mehr.\nAlles an einem Ort.'},
-     {title:'Kommunikation', content:'WhatsApp • Telegram\nSignal • Telefon\nE-Mail • SMS\nSag KIM wen du erreichen willst.'},
-     {title:'Navigation & Medien', content:'Google Maps • DB Navigator\nSpotify • Netflix • Podcasts\nKamera • Galerie\n"KIM, navigiere mich nach..."'},
-     {title:'Alltag', content:'Banking • PayPal\nLieferando • Amazon\nWetter • Kalender\nDie Apps die du taeglich brauchst.'},
-     {title:'Handy-Hilfe', content:'KIM erklaert jede Funktion.\n"Was macht dieser Knopf?"\nSchritt-fuer-Schritt Anleitung.\nFuer Anfaenger & Profis.'},
-     {title:'Handy-Schutz', content:'Fake-Anruf Erkennung\nPhishing & Betrugs-Warnung\nKindersicherung & Zeitlimits\nDatenschutz-Check fuer Apps'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'KOMMUNIKATION', items:[
+         {icon:'💬', label:'WhatsApp'},
+         {icon:'✈️', label:'Telegram'},
+         {icon:'📞', label:'Telefon'},
+         {icon:'📧', label:'E-Mail'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'NAVIGATION & MEDIEN', items:[
+         {icon:'🗺️', label:'Maps'},
+         {icon:'🚂', label:'DB'},
+         {icon:'🎵', label:'Spotify'},
+         {icon:'🎬', label:'Netflix'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'ALLTAG', items:[
+         {icon:'🏦', label:'Banking'},
+         {icon:'🛒', label:'Amazon'},
+         {icon:'🍕', label:'Lieferando'},
+         {icon:'📅', label:'Kalender'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'HANDY-HILFE', items:[
+         {icon:'❓', label:'Erklaerung'},
+         {icon:'👆', label:'Anleitung'},
+         {icon:'👴', label:'Senioren'},
+         {icon:'🎓', label:'Profis'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'HANDY-SCHUTZ', items:[
+         {icon:'🚫', label:'Fake-Anruf'},
+         {icon:'🎣', label:'Phishing'},
+         {icon:'👶', label:'Kinder'},
+         {icon:'🔐', label:'Datenschutz'},
+       ]},
+     ]},
    ]},
 
   // --- 7. Chat (Gespraechs-Verlauf & Speicher) ---
   {id:'chat', icon:'💬', title:'Chat', subtitle:'Deine letzten Gespraeche', color:'#f472b6', email:'chat@kimanus.de', phone:'',
+   features:['KIM','Justus','Wetterfrosch','Lena','Archiv'],
    backs:[
-     {title:'Letzte Gespraeche', content:'Hier findest du alle deine\nChats auf einen Blick.\nTippe um weiterzulesen.\nNeueste zuerst.'},
-     {title:'KIM — gerade eben', content:'Wie wird das Wetter morgen?\n→ Sonnig, 22 Grad...\n\n(Tippe um fortzusetzen)'},
-     {title:'Justus — gestern', content:'Mietvertrag pruefen\n→ Klausel 4 ist unwirksam...\n\n(Tippe um fortzusetzen)'},
-     {title:'Wetterfrosch — Mo', content:'Wochenende in Coburg?\n→ Samstag perfekt, Sonntag Regen\n\n(Tippe um fortzusetzen)'},
-     {title:'Lena — letzte Woche', content:'EDEKA Rechnung checken\n→ Differenz 12,50 EUR gefunden\n\n(Tippe um fortzusetzen)'},
-     {title:'Aeltere Gespraeche', content:'Alle bisherigen Chats\nnach Datum sortiert.\nSuche per Sprache:\n"KIM, was hab ich letztens gefragt?"'},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'LETZTE CHATS', items:[
+         {icon:'👤', label:'KIM'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'💶', label:'Lena'},
+         {icon:'🎭', label:'Animateur'},
+         {icon:'💻', label:'IT-Hilfe'},
+       ]},
+     ]},
    ]},
 
   // --- Verdoppelt fuer fluessiges Endlos-Rad ---
