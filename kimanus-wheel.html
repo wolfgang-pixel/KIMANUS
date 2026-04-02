@@ -1970,8 +1970,19 @@ function showKimanusInfo() {
 }
 
 function showKimInfo() {
+  // Erst Backs updaten je nach Modus
+  updateKimBacks();
+  const cfg = getSetupConfig();
+  const mode = cfg['kim_mode'] || 'concierge';
+  const gender = cfg['kim_gender'] || 'weiblich';
+  // KIM Karte mit passendem Titel/Subtitle
   const kimCard = CARDS.find(c => c.id === 'kim');
   if (!kimCard) return;
+  if (mode === 'concierge') {
+    kimCard.subtitle = 'Dein Concierge';
+  } else {
+    kimCard.subtitle = gender === 'weiblich' ? 'Deine persoenliche Assistentin' : 'Dein persoenlicher Assistent';
+  }
   showHeaderCard(kimCard);
 }
 
