@@ -1526,12 +1526,11 @@ function updateFlipLabel() {
     document.getElementById('fl-card').innerHTML = `
       <div class="fl-icon">${card.icon}</div>
       <div>
-        <div class="fl-name">${card.title}${card.features ? '<span class="card-name-sub" style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-left:4px">KIMANUS</span>' : ''}</div>
+        <div class="fl-name">${card.title}</div>
         <div class="fl-role">${card.subtitle}</div>
-        ${card.features ? '<div class="fl-features">' + card.features.map(f => '<span>· ' + f + '</span>').join('') + '</div>' : ''}
       </div>
       <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
-      ${card.features ? '' : '<div class="fl-brand">KIMANUS</div>'}
+      <div class="fl-brand">KIMANUS</div>
     `;
     // Position: gleich wie die obere Milchglas-Karte
     const container = document.getElementById('wheel-container');
@@ -1541,9 +1540,10 @@ function updateFlipLabel() {
     const topH = Math.floor(remainH * 0.6);
     const topMid = topH / 2;
     const cardH = 210;
+    fl.style.display = '';
     fl.style.top = (topMid - cardH / 2) + 'px';
     fl.classList.add('visible');
-    adjustBrightness(currentBrightness); // Helligkeit auf Flip-Label anwenden
+    adjustBrightness(currentBrightness);
   } else {
     fl.classList.remove('visible');
   }
