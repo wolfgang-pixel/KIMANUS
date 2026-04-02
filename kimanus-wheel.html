@@ -1847,19 +1847,6 @@ function openSetup(mode) {
   html += `</div>`;
   } // Ende Claude-Setup
 
-  // Profile (in beiden Modi)
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Profile</div>`;
-  html += `<div style="${groupStyle}">`;
-  ['all','minimal','gastro','privat'].forEach((p,i) => {
-    const names = {all:'Alles aktivieren',minimal:'Minimal (nur KIM)',gastro:'Gastronomie',privat:'Privat'};
-    const icons = {all:'🌟',minimal:'✨',gastro:'🍽️',privat:'🏠'};
-    html += `<div onclick="applyProfile('${p}')" style="${i<3?rowStyle:lastRowStyle}cursor:pointer">`;
-    html += iconBox(icons[p]);
-    html += `<span style="${labelStyle}">${names[p]}</span>`;
-    html += `<span style="color:rgba(255,255,255,0.2);font-size:14px">›</span>`;
-    html += `</div>`;
-  });
-  html += `</div>`;
   list.innerHTML = html;
   document.getElementById('setup-overlay').style.display = 'block';
   document.getElementById('setup-back-btn').style.display = 'block';
