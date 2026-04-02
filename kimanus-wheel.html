@@ -1678,8 +1678,8 @@ function openSetup(mode) {
   const lastRowStyle = 'display:flex;align-items:center;padding:12px 16px;gap:14px;min-height:44px';
   const labelStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.85)';
   const labelOffStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.3)';
-  const subLabelStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.7)';
-  const subLabelOffStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.25)';
+  const subLabelStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.7);margin-left:2px';
+  const subLabelOffStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.25);margin-left:2px';
   const iconColors = {'⚖️':'#5856d6','💶':'#34c759','📦':'#ff9500','📣':'#ff2d55','🏛️':'#5ac8fa','🔍':'#007aff','💡':'#ffcc00','🔒':'#8e8e93','🛠️':'#ff9500','💳':'#34c759','📁':'#5856d6','📱':'#007aff','🤝':'#e63946','👤':'#ff2d55','🧠':'#5856d6','⚙️':'#8e8e93','🔗':'#007aff','🔀':'#34c759','🎭':'#ff9500','🌤️':'#5ac8fa','🌐':'#007aff','🎬':'#ff0000','📰':'#34c759','💰':'#ffcc00','📱':'#e1306c','🧭':'#ff9500','💼':'#5856d6','🔧':'#8e8e93','👥':'#007aff','🏢':'#34c759','📊':'#5856d6','📈':'#34c759','🧮':'#ff9500','🏭':'#8e8e93','📅':'#007aff','📚':'#5856d6','🌍':'#5ac8fa','🚗':'#1a1a2e','📍':'#34c759','🎵':'#ff2d55','🖨️':'#ff9500','💻':'#007aff','📣':'#ff2d55','🎪':'#ff9500','👷':'#ffcc00','🧾':'#8e8e93','📸':'#ff2d55','☀️':'#ffcc00','🎨':'#5856d6'};
   const iconBox = (emoji) => `<div style="width:30px;height:30px;border-radius:7px;background:${iconColors[emoji]||'#636366'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emoji}</div>`;
   const toggle = (key, on) => `<div onclick="event.stopPropagation();toggleSetupItem('${key}',${!on})" style="width:51px;height:31px;border-radius:16px;background:${on?'#34c759':'rgba(120,120,128,0.32)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:27px;height:27px;border-radius:14px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div></div>`;
@@ -1762,6 +1762,24 @@ function openSetup(mode) {
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Agenten</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein Team zusammenstellen</div></div>`;
   html += `</div>`;
 
+  // Aktive Agenten oben anzeigen (schnell deaktivieren)
+  const activeAgents = ALL_AGENTS.filter(a => cfg['agent_' + a.id] === true);
+  if (activeAgents.length > 0) {
+    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktiv (${activeAgents.length})</div>`;
+    html += `<div style="${groupStyle}">`;
+    activeAgents.forEach((agent, ai) => {
+      const key = 'agent_' + agent.id;
+      const isLast = ai === activeAgents.length - 1;
+      html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+      html += iconBox(agent.icon);
+      html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+      html += toggle(key, true);
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Alle Agenten</div>`;
   html += `<div style="${groupStyle}">`;
   categories.forEach((cat, ci) => {
     const agents = ALL_AGENTS.filter(a => a.category === cat);
@@ -1783,8 +1801,8 @@ function openSetup(mode) {
         const key = 'agent_' + agent.id;
         const enabled = cfg[key] === true;
         html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${ai < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.08)':''}gap:10px">`;
-        html += `<div style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
-        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:10px;color:rgba(255,255,255,0.12)">${agent.subtitle}</div></div>`;
+        html += `<div style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
+        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
         html += toggle(key, enabled);
         html += `</div>`;
       });
@@ -1859,8 +1877,8 @@ function openSetup(mode) {
           const enabled = cfg[key] === true;
           const isAgentLast = agi === agents.length - 1 && (isLast || ai < abteilungen.length - 1);
           html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${agi < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.08)':''}gap:10px">`;
-          html += `<div style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
-          html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:10px;color:rgba(255,255,255,0.12)">${agent.subtitle}</div></div>`;
+          html += `<div style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
+          html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
           html += toggle(key, enabled);
           html += `</div>`;
         });
