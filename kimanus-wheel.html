@@ -1857,8 +1857,43 @@ function applyProfile(profile) {
 }
 
 function rebuildWheel() {
-  // Rad mit aktiver Konfiguration neu bauen
   if (isFlipped) flipCard();
+  const cfg = getSetupConfig();
+  // Pruefen welche Hauptkarten aktive Genres haben
+  const filtered = CARDS.filter(card => {
+    // KIMANUS und Duplikate immer behalten
+    if (card.id === 'landing' || card.id === 'landing2') return true;
+    // Karten ohne Grid-Backs behalten (z.B. KIMANUS Text-Backs)
+    const hasGridBacks = card.backs && card.backs.some(b => b.type === 'grid' && b.sections);
+    if (!hasGridBacks) return true;
+    // Pruefen ob mindestens ein Genre aktiv ist
+    const cardId = card.id.replace('2','');
+    let hasActive = false;
+    card.backs.forEach(back => {
+      if (back.type === 'grid' && back.sections) {
+        back.sections.forEach(sec => {
+          const secKey = cardId + '_' + sec.label;
+          if (cfg[secKey] !== false) {
+            const activeItems = sec.items.filter(item => {
+              const itemKey = secKey + '_' + item.label;
+              return cfg[itemKey] !== false;
+            });
+            if (activeItems.length > 0) hasActive = true;
+          }
+        });
+      }
+    });
+    return hasActive;
+  });
+  // Mindestens KIMANUS + eine Hinweis-Karte wenn alles aus
+  if (filtered.length <= 2) {
+    // Nur KIMANUS + Duplikat uebrig - fuege Hinweis-Karte ein
+    const hintCard = {id:'hint', icon:'⚙️', title:'Setup', subtitle:'Mehr Funktionen aktivieren', color:'#64748b', email:'', phone:'',
+      backs:[{title:'Mehr entdecken', content:'Oeffne das Setup (Schloss unten)\nund aktiviere weitere Funktionen.\n\nScouts • Guides • Berater\nTools • Wallet • Archiv • Apps'}]
+    };
+    filtered.splice(1, 0, hintCard);
+  }
+  activeCards = filtered;
   currentIndex = 0;
   buildCards();
   positionCards(false);
