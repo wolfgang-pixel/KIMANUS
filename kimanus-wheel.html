@@ -664,7 +664,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   <div id="setup-overlay" style="display:none;position:fixed;top:60px;bottom:80px;left:0;right:0;background:rgba(0,0,0,0.85);z-index:15" onclick="if(event.target===this)closeSetup()">
     <div id="setup-panel" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#000000;overflow:hidden">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <button onclick="closeSetup()" style="background:none;border:none;color:#3b82f6;font-size:15px;cursor:pointer;padding:4px 0">‹ Zurueck</button>
+        <button onclick="closeSetup()" style="background:none;border:none;color:#007aff;font-size:17px;cursor:pointer;padding:4px 0">‹ Zurueck</button>
         <span style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">${setupMode === 'kim' ? 'KIM Setup' : 'Agenten & Bereiche'}</span>
         <div style="width:60px"></div>
       </div>
@@ -1673,15 +1673,16 @@ function openSetup(mode) {
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
   const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
-  const groupStyle = 'background:rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:20px';
-  const rowStyle = 'display:flex;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);gap:12px';
-  const lastRowStyle = 'display:flex;align-items:center;padding:11px 16px;gap:12px';
-  const labelStyle = 'flex:1;font-size:15px;color:rgba(255,255,255,0.7)';
-  const labelOffStyle = 'flex:1;font-size:15px;color:rgba(255,255,255,0.25)';
-  const subLabelStyle = 'flex:1;font-size:14px;color:rgba(255,255,255,0.5)';
-  const subLabelOffStyle = 'flex:1;font-size:14px;color:rgba(255,255,255,0.2)';
-  const iconBox = (emoji) => `<div style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emoji}</div>`;
-  const toggle = (key, on) => `<div onclick="toggleSetupItem('${key}',${!on})" style="width:42px;height:26px;border-radius:13px;background:${on?'#22c55e':'rgba(255,255,255,0.15)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:22px;height:22px;border-radius:11px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div></div>`;
+  const groupStyle = 'background:#1c1c1e;border-radius:12px;overflow:hidden;margin-bottom:35px';
+  const rowStyle = 'display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);gap:14px;min-height:44px';
+  const lastRowStyle = 'display:flex;align-items:center;padding:12px 16px;gap:14px;min-height:44px';
+  const labelStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.85)';
+  const labelOffStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.3)';
+  const subLabelStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.7)';
+  const subLabelOffStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.25)';
+  const iconColors = {'⚖️':'#5856d6','💶':'#34c759','📦':'#ff9500','📣':'#ff2d55','🏛️':'#5ac8fa','🔍':'#007aff','💡':'#ffcc00','🔒':'#8e8e93','🛠️':'#ff9500','💳':'#34c759','📁':'#5856d6','📱':'#007aff','🤝':'#e63946','👤':'#ff2d55','🧠':'#5856d6','⚙️':'#8e8e93','🔗':'#007aff','🔀':'#34c759','🎭':'#ff9500','🌤️':'#5ac8fa','🌐':'#007aff','🎬':'#ff0000','📰':'#34c759','💰':'#ffcc00','📱':'#e1306c','🧭':'#ff9500','💼':'#5856d6','🔧':'#8e8e93','👥':'#007aff','🏢':'#34c759','📊':'#5856d6','📈':'#34c759','🧮':'#ff9500','🏭':'#8e8e93','📅':'#007aff','📚':'#5856d6','🌍':'#5ac8fa','🚗':'#1a1a2e','📍':'#34c759','🎵':'#ff2d55','🖨️':'#ff9500','💻':'#007aff','📣':'#ff2d55','🎪':'#ff9500','👷':'#ffcc00','🧾':'#8e8e93','📸':'#ff2d55','☀️':'#ffcc00','🎨':'#5856d6'};
+  const iconBox = (emoji) => `<div style="width:30px;height:30px;border-radius:7px;background:${iconColors[emoji]||'#636366'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emoji}</div>`;
+  const toggle = (key, on) => `<div onclick="event.stopPropagation();toggleSetupItem('${key}',${!on})" style="width:51px;height:31px;border-radius:16px;background:${on?'#34c759':'rgba(120,120,128,0.32)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:27px;height:27px;border-radius:14px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div></div>`;
 
   let html = '';
 
