@@ -694,7 +694,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
     <button id="setup-back-btn" type="button" onclick="closeSetup()" style="display:none;position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);-webkit-tap-highlight-color:transparent">↩</button>
     <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔒</button>
-    <button id="speech-btn" onclick="toggleSpeech()">
+    <button id="speech-btn" ontouchstart="walkieStart(event)" ontouchend="walkieEnd(event)" onmousedown="walkieStart(event)" onmouseup="walkieEnd(event)" onclick="event.preventDefault()">
       <span id="speech-agent">KIM</span>
     </button>
     <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 62px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
@@ -2702,10 +2702,60 @@ let speechState = 'idle'; // idle -> recording -> processing -> review -> sendin
 let pendingText = '';
 let silenceTimer = null;
 
-function toggleSpeech() {
+// === WALKIE-TALKIE MODUS ===
+let walkieActive = false;
+
+function walkieStart(e) {
+  e.preventDefault();
   const btn = document.getElementById('speech-btn');
 
-  // Wenn Setup offen ist: KIM Sprechblase zeigen
+  // Wenn Setup offen: KIM Karte zeigen
+  if (document.getElementById('setup-overlay').style.display === 'block') {
+    showKimBubble();
+    return;
+  }
+
+  if (walkieActive) return;
+  walkieActive = true;
+
+  // Sofort Aufnahme starten
+  speechState = 'recording';
+  isListening = true;
+  btn.classList.add('listening');
+  btn.querySelector('span').textContent = '●';
+  btn.querySelector('span').style.fontSize = '22px';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%)';
+  showEmptyBook();
+  startRecording();
+}
+
+function walkieEnd(e) {
+  e.preventDefault();
+  if (!walkieActive) return;
+  walkieActive = false;
+
+  const btn = document.getElementById('speech-btn');
+
+  // Aufnahme stoppen und SOFORT senden
+  speechState = 'processing';
+  isListening = false;
+  btn.classList.remove('listening');
+  btn.querySelector('span').textContent = '⏳';
+  btn.querySelector('span').style.fontSize = '';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+
+  const cc = document.getElementById('chat-content');
+  if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.35);font-size:14px">Wird erkannt...</span>';
+
+  stopRecording();
+  // processVoice wird durch mediaRecorder.onstop aufgerufen
+  // und sendet dann direkt an KIM (walkieTalkieMode)
+}
+
+function toggleSpeech() {
+  // Fallback fuer alte Aufrufe
+  const btn = document.getElementById('speech-btn');
+
   if (document.getElementById('setup-overlay').style.display === 'block') {
     showKimBubble();
     return;
@@ -2761,6 +2811,7 @@ function resetSpeechState() {
   speechState = 'idle';
   pendingText = '';
   isListening = false;
+  walkieActive = false;
   const btn = document.getElementById('speech-btn');
   btn.classList.remove('listening');
   btn.classList.remove('send-ready');
@@ -2979,7 +3030,7 @@ async function processVoice(blob, mimeType) {
   }
 }
 
-let walkieTalkieMode = false; // Standard: Review-Modus (erst lesen, dann senden)
+let walkieTalkieMode = true; // Walkie-Talkie: Loslassen = sofort senden
 
 async function sendToKim(userText) {
   const btn = document.getElementById('speech-btn');
