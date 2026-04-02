@@ -1945,20 +1945,20 @@ function rebuildWheel() {
     wheelCards.push(chat);
   }
 
+  // Hinweis-Karte wenn Rad leer
+  if (wheelCards.length === 0) {
+    wheelCards.push({id:'hint', icon:'⚙️', title:'Setup', subtitle:'Agenten aktivieren', color:'#64748b', email:'', phone:'',
+      backs:[{title:'Los gehts!', content:'Oeffne das Setup (Schloss unten)\nund waehle deine Agenten.\n\nTippe auf KIMANUS oder KIM\nim Header fuer mehr Infos.'}]
+    });
+  }
+
   // Duplikate fuer fluessiges Endlos-Rad (mindestens 5 Karten)
   const origCards = [...wheelCards];
-  while (wheelCards.length < 5) {
-    wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_d' + wheelCards.length})));
-  }
-  // Immer noch eine Runde Duplikate dazu
-  wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_dup'})));
-
-  // Hinweis-Karte wenn Rad leer oder fast leer
-  if (wheelCards.length === 0) {
-    const hintCard = {id:'hint', icon:'⚙️', title:'Setup', subtitle:'Agenten aktivieren', color:'#64748b', email:'', phone:'',
-      backs:[{title:'Los gehts!', content:'Oeffne das Setup (Schloss unten)\nund waehle deine Agenten.\n\nTippe auf KIMANUS oder KIM\nim Header fuer mehr Infos.'}]
-    };
-    wheelCards.push(hintCard);
+  if (origCards.length > 0) {
+    while (wheelCards.length < 5) {
+      wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_d' + wheelCards.length})));
+    }
+    wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_dup'})));
   }
 
   activeCards = wheelCards;
