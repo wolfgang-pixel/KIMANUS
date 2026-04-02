@@ -660,7 +660,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div id="setup-panel" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#000000;overflow:hidden">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
         <button onclick="closeSetup()" style="background:none;border:none;color:#3b82f6;font-size:15px;cursor:pointer;padding:4px 0">‹ Zurueck</button>
-        <span style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">Einstellungen</span>
+        <span style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">${setupMode === 'kim' ? 'KIM Setup' : 'Agenten & Bereiche'}</span>
         <div style="width:60px"></div>
       </div>
       <div id="setup-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 20px"></div>
@@ -672,8 +672,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div id="tresor-panel" onclick="event.stopPropagation()">
       <div class="tresor-section-title">SETUP</div>
       <div class="tresor-grid tresor-grid-3x2">
-        <div class="tresor-tab" onclick="openSetup()"><span>KIM</span></div>
-        <div class="tresor-tab"><span>KI MANUS</span></div>
+        <div class="tresor-tab" onclick="openSetupKim()"><span>KIM</span></div>
+        <div class="tresor-tab" onclick="openSetupAgenten()"><span>Agenten</span></div>
         <div class="tresor-tab"><span>Skins</span></div>
         <div class="tresor-tab"><span>Farben</span></div>
         <div class="tresor-tab"><span>Sprache</span></div>
@@ -1693,8 +1693,18 @@ function saveSetupConfig(cfg) {
   localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
 }
 
-function openSetup() {
+function openSetupKim() {
   closeTresor();
+  openSetup('kim');
+}
+function openSetupAgenten() {
+  closeTresor();
+  openSetup('agenten');
+}
+
+let setupMode = 'kim';
+function openSetup(mode) {
+  setupMode = mode || 'kim';
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
   const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
@@ -1710,6 +1720,7 @@ function openSetup() {
 
   let html = '';
 
+  if (setupMode === 'kim') {
   // KIM Profil-Karte (wie Apple ID oben in den Einstellungen)
   const kimMode = cfg['kim_mode'] || 'persoenlich';
   const kimGender = cfg['kim_gender'] || 'weiblich';
@@ -1773,6 +1784,9 @@ function openSetup() {
   html += `</div>`;
   html += `</div>`;
 
+  } // Ende KIM-Setup
+
+  if (setupMode === 'agenten') {
   // Agenten einzeln ein/ausschaltbar, gruppiert nach Kategorie
   const categories = ['Scouts','Guides','Berater','Business','Spezialisten'];
   categories.forEach(cat => {
@@ -1813,7 +1827,9 @@ function openSetup() {
     html += `</div>`;
   });
   html += `</div>`;
-  // Profile
+  } // Ende Agenten-Setup
+
+  // Profile (in beiden Modi)
   html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Profile</div>`;
   html += `<div style="${groupStyle}">`;
   ['all','minimal','gastro','privat'].forEach((p,i) => {
