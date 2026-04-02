@@ -1128,6 +1128,39 @@ const CARDS = [
    ]},
 ];
 
+// === AGENTEN-REGISTRY (jeder Agent einzeln aufs Rad schaltbar) ===
+const ALL_AGENTS = [
+  // Scouts
+  {id:'ag-youtube', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'youtube@kimanus.de', phone:'Durchwahl 101', category:'Scouts', backs:[{title:'Ueber mich', content:'Ich finde die besten Videos\nfuer dich auf YouTube.\nKapitel, Timestamps, Analyse.'}]},
+  {id:'ag-web', icon:'🌐', title:'Web Scout', subtitle:'Internet-Recherche', color:'#4285f4', email:'web@kimanus.de', phone:'Durchwahl 102', category:'Scouts', backs:[{title:'Ueber mich', content:'Ich durchsuche das Web\nfuer dich. Fakten-Check,\nQuellen pruefen, zusammenfassen.'}]},
+  {id:'ag-news', icon:'📰', title:'News Scout', subtitle:'Nachrichten & Trends', color:'#34a853', email:'news@kimanus.de', phone:'Durchwahl 103', category:'Scouts', backs:[{title:'Ueber mich', content:'Aktuelle Nachrichten\nund Trends fuer dich.\nRegional und weltweit.'}]},
+  {id:'ag-deals', icon:'💰', title:'Deal Scout', subtitle:'Schnaeppchen & Angebote', color:'#fbbc05', email:'deals@kimanus.de', phone:'Durchwahl 104', category:'Scouts', backs:[{title:'Ueber mich', content:'Ich finde die besten\nAngebote und Schnaeppchen.\nPreisvergleich inklusive.'}]},
+  {id:'ag-social', icon:'📱', title:'Social Scout', subtitle:'Social Media', color:'#e1306c', email:'social@kimanus.de', phone:'Durchwahl 105', category:'Scouts', backs:[{title:'Ueber mich', content:'Trends auf Social Media.\nWas ist viral, was relevant\nfuer dich.'}]},
+  // Guides
+  {id:'ag-animateur', icon:'🎭', title:'Animateur', subtitle:'Freizeit & Events', color:'#ff6b35', email:'freizeit@kimanus.de', phone:'Durchwahl 201', category:'Guides', backs:[{title:'Ueber mich', content:'Ausflugsziele, Events,\nFreizeit-Tipps in deiner Region.\nImmer was los!'}]},
+  {id:'ag-gastro', icon:'🍽️', title:'Gastro-Guide', subtitle:'Restaurants & Tipps', color:'#d4a574', email:'gastro@kimanus.de', phone:'Durchwahl 202', category:'Guides', backs:[{title:'Ueber mich', content:'Die besten Restaurants,\nCafes und Bars.\nReservierung inklusive.'}]},
+  {id:'ag-nachtfahrer', icon:'🚗', title:'Nachtfahrer', subtitle:'Komm gut heim', color:'#1a1a2e', email:'heimfahrt@kimanus.de', phone:'Durchwahl 203', category:'Guides', backs:[{title:'Ueber mich', content:'Sichere Heimfahrt.\nTaxi rufen, Route planen.\nAlkomat-Check.'}]},
+  {id:'ag-regiopilot', icon:'📍', title:'RegioPilot', subtitle:'Regionale Geheimtipps', color:'#2d6a4f', email:'regio@kimanus.de', phone:'Durchwahl 204', category:'Guides', backs:[{title:'Ueber mich', content:'Geheimtipps in deiner Region.\nOrte die kein Tourist kennt.\nEcht und authentisch.'}]},
+  {id:'ag-stadtfuehrer', icon:'🏛️', title:'Stadtfuehrer', subtitle:'Sehenswuerdigkeiten', color:'#6b705c', email:'tour@kimanus.de', phone:'Durchwahl 205', category:'Guides', backs:[{title:'Ueber mich', content:'Stadtfuehrung per Sprache.\nGeschichte, Architektur,\nKultur erleben.'}]},
+  // Berater
+  {id:'ag-wetterfrosch', icon:'🌤️', title:'Wetterfrosch', subtitle:'Wetter & Lifestyle', color:'#48cae4', email:'wetter@kimanus.de', phone:'Durchwahl 301', category:'Berater', backs:[{title:'Ueber mich', content:'Wetter und was du\ndaraus machen kannst.\nAnzieh-Tipps inklusive.'}]},
+  {id:'ag-dolmetscher', icon:'🌍', title:'Dolmetscher', subtitle:'Uebersetzen & Sprachen', color:'#7209b7', email:'sprache@kimanus.de', phone:'Durchwahl 302', category:'Berater', backs:[{title:'Ueber mich', content:'Ich uebersetze fuer dich.\nAlle Sprachen, sofort.\nAuch Dokumente.'}]},
+  {id:'ag-sekretaer', icon:'📅', title:'Sekretaer', subtitle:'Termine & Planung', color:'#3a86ff', email:'termine@kimanus.de', phone:'Durchwahl 303', category:'Berater', backs:[{title:'Ueber mich', content:'Termine verwalten,\nErinnerungen setzen,\nTagesablauf planen.'}]},
+  {id:'ag-bibliothekar', icon:'📚', title:'Bibliothekar', subtitle:'Wissen & Gedaechtnis', color:'#8338ec', email:'wissen@kimanus.de', phone:'Durchwahl 304', category:'Berater', backs:[{title:'Ueber mich', content:'Dein Wissen verwalten.\nBuecher, Notizen, Passagen.\nIch vergesse nichts.'}]},
+  // Business
+  {id:'ag-kalkulierer', icon:'🧮', title:'Kalkulierer', subtitle:'Rohaufschlag & Marge', color:'#06d6a0', email:'kalkulation@kimanus.de', phone:'Durchwahl 401', category:'Business', backs:[{title:'Ueber mich', content:'Rohaufschlag berechnen,\nMarge optimieren,\nPreise kalkulieren.'}]},
+  {id:'ag-bestellprofi', icon:'📦', title:'Bestellprofi', subtitle:'Lieferanten & Mengen', color:'#118ab2', email:'bestellung@kimanus.de', phone:'Durchwahl 402', category:'Business', backs:[{title:'Ueber mich', content:'Bestellvorschlaege,\nLieferanten-Split,\nPreiserhoehungen im Blick.'}]},
+  {id:'ag-lagerist', icon:'🏭', title:'Lagerist', subtitle:'Bestand & Inventur', color:'#073b4c', email:'lager@kimanus.de', phone:'Durchwahl 403', category:'Business', backs:[{title:'Ueber mich', content:'Bestandserfassung per Kamera,\nMix-Matrix, Inventur,\nVerlust-Protokoll.'}]},
+  {id:'ag-justus', icon:'⚖️', title:'Justus', subtitle:'Recht & Vertraege', color:'#264653', email:'recht@kimanus.de', phone:'Durchwahl 404', category:'Business', backs:[{title:'Ueber mich', content:'Vertraege pruefen,\nRechtsfragen klaeren,\nArbeitsrecht, Mietrecht.'}]},
+  {id:'ag-lena', icon:'💶', title:'Lena', subtitle:'Finanzen & Buchhaltung', color:'#2a9d8f', email:'finanzen@kimanus.de', phone:'Durchwahl 405', category:'Business', backs:[{title:'Ueber mich', content:'Buchhaltung, Steuern,\nRechnungen, Belege.\nAlles im Griff.'}]},
+  // Spezialisten
+  {id:'ag-ithilfe', icon:'💻', title:'IT-Hilfe', subtitle:'Technik-Support', color:'#e76f51', email:'hilfe@kimanus.de', phone:'Durchwahl 501', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Technik-Probleme loesen.\nGeduldig erklaert.\nFuer Anfaenger & Profis.'}]},
+  {id:'ag-safety', icon:'🔒', title:'Safety-Checker', subtitle:'NFC-Sicherheit', color:'#264653', email:'sicherheit@kimanus.de', phone:'Durchwahl 502', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Sicherheitsrundgaenge,\nNFC-Pruefungen, HACCP.\nManipulationssicher.'}]},
+  {id:'ag-marketing', icon:'📣', title:'Marketing', subtitle:'Werbung & Social Media', color:'#e63946', email:'marketing@kimanus.de', phone:'Durchwahl 503', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Werbung, Posts, Kampagnen.\nContent erstellen.\nReichweite steigern.'}]},
+  {id:'ag-dj', icon:'🎵', title:'DJ', subtitle:'Musik & Playlists', color:'#9b5de5', email:'musik@kimanus.de', phone:'Durchwahl 504', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Musik fuer jeden Anlass.\nPlaylists, Wuensche,\nStimmung machen.'}]},
+  {id:'ag-print', icon:'🖨️', title:'Print-Memorys', subtitle:'Drucksachen', color:'#f15bb5', email:'print@kimanus.de', phone:'Durchwahl 505', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Fotodruck, Gravur,\nSouvenirs, Alben.\nErinnerungen zum Anfassen.'}]},
+];
+
 // Scout-Karten
 const SCOUTS = [
   {id:'yt-scout', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'video@kimanus.de', phone:'Durchwahl 101',
@@ -1646,19 +1679,10 @@ function getSetupConfig() {
   try {
     const stored = localStorage.getItem('kimanus-setup');
     if (!stored) {
-      // Erster Start: Alles ausschalten ausser KIM Scouts
+      // Erster Start: Alles aus - User schaltet im Setup dazu
       const defaultCfg = {};
-      CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
-        if (card.backs) card.backs.forEach(back => {
-          if (back.type === 'grid' && back.sections) {
-            back.sections.forEach(sec => {
-              const secKey = card.id.replace('2','') + '_' + sec.label;
-              // Nur KIM SCOUTS an, alles andere aus
-              defaultCfg[secKey] = (card.id === 'kim' && sec.label === 'SCOUTS');
-            });
-          }
-        });
-      });
+      // Nur YouTube Scout als Demo aktivieren
+      defaultCfg['agent_ag-youtube'] = true;
       localStorage.setItem('kimanus-setup', JSON.stringify(defaultCfg));
       return defaultCfg;
     }
@@ -1749,54 +1773,44 @@ function openSetup() {
   html += `</div>`;
   html += `</div>`;
 
-  // Funktionen als einklappbare Container
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Funktionen</div>`;
-
-  // Jede Karte als ein Eintrag der sich aufklappt
-  html += `<div style="${groupStyle}">`;
-  configCards.forEach((card, ci) => {
-    const cardKey = 'setup_open_' + card.id;
-    const isOpen = cfg[cardKey] === true;
-    // Sections deduplizieren und Items zusammenfassen
-    const sectionsMap = {};
-    card.backs.forEach(back => {
-      if (back.type === 'grid' && back.sections) {
-        back.sections.forEach(sec => {
-          if (!sectionsMap[sec.label]) {
-            sectionsMap[sec.label] = {label: sec.label, items: [...sec.items]};
-          } else {
-            // Nur Items hinzufuegen die noch nicht drin sind
-            sec.items.forEach(item => {
-              if (!sectionsMap[sec.label].items.find(i => i.label === item.label)) {
-                sectionsMap[sec.label].items.push(item);
-              }
-            });
-          }
-        });
-      }
+  // Agenten einzeln ein/ausschaltbar, gruppiert nach Kategorie
+  const categories = ['Scouts','Guides','Berater','Business','Spezialisten'];
+  categories.forEach(cat => {
+    const agents = ALL_AGENTS.filter(a => a.category === cat);
+    const activeCount = agents.filter(a => cfg['agent_' + a.id] === true).length;
+    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">${cat} <span style="color:rgba(255,255,255,0.15)">${activeCount}/${agents.length}</span></div>`;
+    html += `<div style="${groupStyle}">`;
+    agents.forEach((agent, ai) => {
+      const key = 'agent_' + agent.id;
+      const enabled = cfg[key] === true;
+      const isLast = ai === agents.length - 1;
+      html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+      html += iconBox(agent.icon);
+      html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
+      html += toggle(key, enabled);
+      html += `</div>`;
     });
-    const sections = Object.values(sectionsMap);
-    const enabledCount = sections.filter(s => cfg[card.id + '_' + s.label] !== false).length;
-
-    // Hauptzeile (klickbar zum Auf/Zuklappen)
-    html += `<div onclick="toggleSetupItem('${cardKey}',${!isOpen})" style="${ci < configCards.length - 1 || isOpen ? rowStyle : lastRowStyle}cursor:pointer">`;
-    html += iconBox(card.icon);
-    html += `<div style="flex:1"><span style="${labelStyle}">${card.title}</span><div style="font-size:12px;color:rgba(255,255,255,0.2)">${enabledCount}/${sections.length} aktiv</div></div>`;
-    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
     html += `</div>`;
+  });
 
-    // Aufgeklappter Inhalt
-    if (isOpen) {
-      sections.forEach((sec, si) => {
-        const secKey = card.id + '_' + sec.label;
-        const secEnabled = cfg[secKey] !== false;
-        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${si < sections.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}gap:10px">`;
-        html += `<span style="font-size:18px;flex-shrink:0">${sec.items[0]?.icon || '📦'}</span>`;
-        html += `<span style="${secEnabled ? subLabelStyle : subLabelOffStyle}">${sec.label}</span>`;
-        html += toggle(secKey, secEnabled);
-        html += `</div>`;
-      });
-    }
+  // Haupt-Bereiche (Tools, Wallet, Archiv, Apps)
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Bereiche</div>`;
+  html += `<div style="${groupStyle}">`;
+  const extraCards = [
+    {id:'tools',icon:'🛠️',name:'Tools',sub:'Scanner, Laser, Print'},
+    {id:'wallet',icon:'💳',name:'Wallet',sub:'Cap-Coin, NFC, Bezahlen'},
+    {id:'archiv',icon:'📁',name:'Archiv',sub:'Fotos, Dokumente, Buecher'},
+    {id:'apps',icon:'📱',name:'Apps',sub:'WhatsApp, Maps, Handy-Hilfe'},
+  ];
+  extraCards.forEach((ec, ei) => {
+    const key = 'card_' + ec.id;
+    const enabled = cfg[key] === true;
+    const isLast = ei === extraCards.length - 1;
+    html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+    html += iconBox(ec.icon);
+    html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${ec.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${ec.sub}</div></div>`;
+    html += toggle(key, enabled);
+    html += `</div>`;
   });
   html += `</div>`;
   // Profile
@@ -1880,41 +1894,52 @@ function applyProfile(profile) {
 function rebuildWheel() {
   if (isFlipped) flipCard();
   const cfg = getSetupConfig();
-  // Pruefen welche Hauptkarten aktive Genres haben
-  const filtered = CARDS.filter(card => {
-    // KIMANUS und Duplikate immer behalten
-    if (card.id === 'landing' || card.id === 'landing2') return true;
-    // Karten ohne Grid-Backs behalten (z.B. KIMANUS Text-Backs)
-    const hasGridBacks = card.backs && card.backs.some(b => b.type === 'grid' && b.sections);
-    if (!hasGridBacks) return true;
-    // Pruefen ob mindestens ein Genre aktiv ist
-    const cardId = card.id.replace('2','');
-    let hasActive = false;
-    card.backs.forEach(back => {
-      if (back.type === 'grid' && back.sections) {
-        back.sections.forEach(sec => {
-          const secKey = cardId + '_' + sec.label;
-          if (cfg[secKey] !== false) {
-            const activeItems = sec.items.filter(item => {
-              const itemKey = secKey + '_' + item.label;
-              return cfg[itemKey] !== false;
-            });
-            if (activeItems.length > 0) hasActive = true;
-          }
-        });
-      }
-    });
-    return hasActive;
+
+  // Basis-Karten: KIMANUS + KIM (immer da)
+  const landing = CARDS.find(c => c.id === 'landing');
+  const kim = CARDS.find(c => c.id === 'kim');
+  let wheelCards = [landing, kim];
+
+  // Aktivierte Agenten als eigene Karten hinzufuegen
+  ALL_AGENTS.forEach(agent => {
+    const key = 'agent_' + agent.id;
+    if (cfg[key] === true) {
+      wheelCards.push(agent);
+    }
   });
-  // Mindestens KIMANUS + eine Hinweis-Karte wenn alles aus
-  if (filtered.length <= 2) {
-    // Nur KIMANUS + Duplikat uebrig - fuege Hinweis-Karte ein
-    const hintCard = {id:'hint', icon:'⚙️', title:'Setup', subtitle:'Mehr Funktionen aktivieren', color:'#64748b', email:'', phone:'',
-      backs:[{title:'Mehr entdecken', content:'Oeffne das Setup (Schloss unten)\nund aktiviere weitere Funktionen.\n\nScouts • Guides • Berater\nTools • Wallet • Archiv • Apps'}]
-    };
-    filtered.splice(1, 0, hintCard);
+
+  // Haupt-Karten (Tools, Wallet, Archiv, Apps, Chat) wenn aktiv
+  const mainCards = CARDS.filter(c =>
+    !c.id.endsWith('2') &&
+    !['landing','kim'].includes(c.id) &&
+    c.id !== 'chat'
+  );
+  mainCards.forEach(card => {
+    const key = 'card_' + card.id;
+    if (cfg[key] === true) {
+      wheelCards.push(card);
+    }
+  });
+
+  // Chat immer wenn mindestens ein Agent aktiv
+  const chat = CARDS.find(c => c.id === 'chat');
+  if (wheelCards.length > 2 && chat) {
+    wheelCards.push(chat);
   }
-  activeCards = filtered;
+
+  // Duplikate fuer Endlos-Rad
+  const dupes = wheelCards.map(c => ({...c, id: c.id + '_dup'}));
+  wheelCards = wheelCards.concat(dupes);
+
+  // Hinweis-Karte wenn fast leer
+  if (wheelCards.length <= 4) {
+    const hintCard = {id:'hint', icon:'⚙️', title:'Setup', subtitle:'Mehr aktivieren', color:'#64748b', email:'', phone:'',
+      backs:[{title:'Mehr entdecken', content:'Oeffne das Setup (Schloss unten)\nund aktiviere Agenten und Features.\n\nScouts • Guides • Berater\nBusiness • Tools • Wallet'}]
+    };
+    wheelCards.splice(2, 0, hintCard);
+  }
+
+  activeCards = wheelCards;
   currentIndex = 0;
   buildCards();
   positionCards(false);
