@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<!-- KIMANUS Wheel v6.0 - Architektur v4: KIMANUS/KIM/Tools/Wallet (kein KAI, kein KI-MANUS) -->
+<html lang="de" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0e0e">
+<title>KIMANUS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0e0e0e;color:#e0e0e0}
+
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --kim-red:#e63946;
+}
+
+#app{
+  display:flex;flex-direction:column;
+  height:100dvh;
+  padding-top:var(--sat);padding-bottom:var(--sab);
+  position:fixed;inset:0;
+}
+
+/* === HEADER === */
+#header{
+  display:flex;align-items:center;gap:8px;
+  height:60px;
+  padding:0 12px;
+  background:#161616;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;z-index:20;
+}
+.logo-circle{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--kim-red);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:14px;color:#fff;
+}
+#header .title{font-size:18px;font-weight:800;letter-spacing:3px;flex:1}
+#header .hdr-btn{background:none;border:none;cursor:pointer;padding:4px}
+#header .hdr-btn svg{width:22px;height:22px;fill:#888}
+
+/* === DREI GLEICH GROSSE FELDER === */
+#wheel-container{
+  flex:1;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+
+.panel{
+  flex:1;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+/* Obere Glasplatte groesser (Platz fuer geflippte Karte) */
+#panel-top{
+  flex:1.2;
+}
+/* Sichtfenster fest */
+#panel-center{
+  flex:none;
+  height:230px;
+}
+/* Untere Glasplatte kleiner */
+#panel-bottom{
+  flex:0.8;
+}
+
+/* Milchiges Glas oben */
+#panel-top{
+  position:relative;
+}
+#panel-top::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  pointer-events:none;z-index:2;
+  border-bottom:2px solid rgba(255,255,255,0.1);
+}
+
+/* Sichtfenster - klar */
+#panel-center{
+  position:relative;z-index:5;
+}
+
+/* Milchiges Glas unten */
+#panel-bottom{
+  position:relative;
+}
+#panel-bottom::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(0deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  pointer-events:none;z-index:2;
+  border-top:2px solid rgba(255,255,255,0.1);
+}
+
+/* === SWIPE HINT (pulsender Pfeil unter Milchglas) === */
+#swipe-hint-behind{
+  position:absolute;
+  bottom:calc(40% - 75px);
+  left:22px;
+  font-size:34px;
+  font-weight:200;
+  color:rgba(230,57,70,0.8);
+  z-index:0;
+  pointer-events:none;
+  animation:swipeHintGlow 2s ease-in-out infinite;
+}
+@keyframes swipeHintPulse{
+  0%{color:rgba(230,57,70,0);text-shadow:none}
+  50%{color:rgba(230,57,70,1);text-shadow:0 0 12px rgba(230,57,70,0.8)}
+  100%{color:rgba(230,57,70,0);text-shadow:none}
+}
+@keyframes swipeHintGlow{
+  0%{opacity:0}
+  50%{opacity:1}
+  100%{opacity:0}
+}
+#swipe-hint-behind.hidden{display:none}
+
+/* === RAD-MECHANISMUS === */
+#wheel-track,#back-track{
+  position:absolute;
+  left:0;right:0;
+  transition:transform 1.2s cubic-bezier(0.23,1,0.32,1);
+  will-change:transform;
+}
+#back-track{z-index:12}
+.back-wheel-card{
+  width:100%;
+  height:210px;
+  position:absolute;
+  left:0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  transition:all 1.2s cubic-bezier(0.23,1,0.32,1);
+}
+.back-wheel-card .bwc-title{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:10px;
+}
+.back-wheel-card .bwc-content{
+  font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
+  white-space:pre-line;
+}
+.back-wheel-card .bwc-video-full{
+  width:100%;
+  height:100%;
+  border-radius:0;
+}
+.back-wheel-card .bwc-video{
+  width:calc(100% - 16px);
+  height:calc(100% - 40px);
+  border-radius:4px;
+  margin-top:4px;
+}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.back-wheel-card .bwc-search-hint{
+  margin-top:12px;
+  font-size:10px;
+  color:rgba(230,57,70,0.4);
+  letter-spacing:0.5px;
+}
+
+.wheel-card{
+  height:210px;
+  width:calc(100% - 20px);
+  left:50%;
+  transform:translateX(-50%);
+  margin-left:0;
+  position:absolute;
+  border-radius:0;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  perspective:800px;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+
+/* Card-Inneres fuer Flip */
+.card-inner{
+  width:100%;height:100%;
+  position:relative;
+  transition:transform 1.2s cubic-bezier(0.25,0.1,0.25,1);
+  transform-style:preserve-3d;
+}
+.wheel-card.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.card-face{
+  position:absolute;inset:0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:0;
+  padding:16px;
+}
+
+/* Vorderseite */
+.card-front{
+  background:transparent;
+  padding:16px 20px;
+  justify-content:space-between;
+  align-items:stretch;
+}
+.card-front .card-icon{
+  font-size:48px;
+  position:absolute;top:14px;right:18px;
+}
+.card-front .card-header{
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-front .card-name{
+  font-size:22px;font-weight:700;color:rgba(255,255,255,0.4);
+  letter-spacing:1px;
+}
+.card-front .card-role{
+  font-size:11px;font-weight:600;color:rgba(255,255,255,0.25);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.card-front .card-contact{
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-front .card-contact span{
+  font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;
+}
+.card-front .card-brand{
+  position:absolute;bottom:14px;right:18px;
+  font-size:9px;font-weight:800;color:rgba(255,255,255,0.12);
+  letter-spacing:3px;
+}
+
+/* Rückseite */
+.card-back{
+  background:transparent;
+  transform:rotateY(180deg);
+}
+.card-back .back-title{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:10px;
+}
+.card-back .back-content{
+  font-size:12px;color:rgba(255,255,255,0.2);text-align:center;line-height:1.8;
+  white-space:pre-line;padding:0 20px;
+}
+
+/* Keine Extra-Effekte - reine Glasplatte */
+
+/* === FLIP LABEL (Vorderseite oben beim Flip) === */
+#flip-label{
+  display:none;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%) scale(0.85);
+  z-index:30;
+  width:100%;
+  height:210px;
+  background:rgba(30,30,30,0.95);
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  align-items:center;justify-content:center;
+  opacity:0;
+  transition:all 0.8s ease;
+}
+#flip-label.visible{
+  display:flex;
+  opacity:1;
+}
+.fl-card{
+  width:100%;height:100%;
+  padding:12px 16px;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+}
+.fl-card .fl-icon{font-size:36px;position:absolute;top:10px;right:14px}
+.fl-card .fl-name{font-size:18px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1px}
+.fl-card .fl-role{font-size:9px;font-weight:600;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.fl-card .fl-contact{font-size:9px;color:rgba(255,255,255,0.15)}
+.fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:7px;font-weight:800;color:rgba(255,255,255,0.1);letter-spacing:3px}
+
+/* === REGISTER === */
+#register-panel{
+  display:none;
+  position:absolute;bottom:0;left:0;right:0;
+  height:33.33%;z-index:15;
+  background:#161616;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+#register-panel.visible{display:flex;flex-direction:column}
+#register-tabs{flex:1;overflow-y:auto;padding:6px 12px;scrollbar-width:none}
+#register-tabs::-webkit-scrollbar{display:none}
+.register-tab{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;
+}
+.register-tab:active{background:rgba(255,255,255,0.06)}
+.register-tab .tab-icon{font-size:20px}
+.register-tab .tab-name{font-size:14px;font-weight:600;color:#ccc;flex:1}
+
+/* === BOTTOM BAR === */
+#bottom-bar{
+  display:flex;align-items:center;justify-content:center;gap:20px;
+  height:80px;
+  margin-bottom:-40px;
+  padding:0 16px;
+  background:#161616;
+  border-top:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;z-index:20;
+  position:relative;
+}
+
+#speech-btn{
+  width:70px;height:70px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%);
+  border:4px solid rgba(220,220,220,0.5);
+  box-shadow:0 4px 20px rgba(230,57,70,0.4);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform 0.15s;
+  margin-top:-35px;
+}
+#speech-btn:active{transform:scale(0.9)}
+#speech-btn svg{width:28px;height:28px;fill:#fff}
+#speech-btn.listening{animation:pulse 1.5s infinite}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(230,57,70,0.5)}
+  70%{box-shadow:0 0 0 15px rgba(230,57,70,0)}
+  100%{box-shadow:0 0 0 0 rgba(230,57,70,0)}
+}
+
+.small-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.small-btn:active{transform:scale(0.9);background:rgba(255,255,255,0.1)}
+.small-btn svg{width:18px;height:18px;fill:#888}
+
+/* Status */
+#status-text{
+  display:none;
+}
+#speech-btn span{
+  font-size:14px;font-weight:800;color:#fff;letter-spacing:2px;
+}
+
+/* === TASTATUR-TOOLBAR === */
+#kb-toolbar{
+  display:none;
+  position:fixed;
+  left:0;right:0;
+  bottom:0;
+  height:44px;
+  background:#1e1e1e;
+  border-top:1px solid rgba(255,255,255,0.1);
+  z-index:100;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 8px;
+  gap:6px;
+}
+#kb-toolbar.visible{display:flex}
+.kb-btn{
+  padding:6px 12px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
+  font-size:12px;
+  cursor:pointer;
+  border-radius:4px;
+  white-space:nowrap;
+}
+.kb-btn:active{background:rgba(255,255,255,0.12)}
+.kb-analyze{background:rgba(230,57,70,0.15);border-color:rgba(230,57,70,0.3);color:rgba(230,57,70,0.6)}
+.kb-kim{background:rgba(230,57,70,0.1);border-color:rgba(230,57,70,0.2);color:rgba(230,57,70,0.5)}
+.kb-done{margin-left:auto}
+
+/* === TRESOR === */
+#tresor-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:15;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 2s;
+}
+#tresor-overlay.open{opacity:1;pointer-events:auto}
+/* Tresor-Panel: hinter Bottom Bar, gleiche Breite wie Karten */
+#tresor-panel{
+  position:fixed;
+  left:50%;
+  width:calc((100% - 10px) * 0.9);
+  bottom:-500px;
+  transform:translateX(-50%);
+  background:rgba(30,30,32,0.96);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.06);
+  z-index:16;
+  transition:bottom 2s cubic-bezier(0.25,0.1,0.25,1);
+  padding:2px;
+}
+#tresor-overlay.open #tresor-panel{
+  bottom:80px;
+}
+/* Section-Titel: ganz schmal, fein */
+.tresor-section-title{
+  font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:1.5px;
+  padding:0 6px;
+  height:17px;
+  line-height:17px;
+  background:rgba(255,255,255,0.06);
+}
+.tresor-divider{
+  padding:0 6px;
+  height:17px;
+  line-height:17px;
+  margin:0;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;
+}
+.tresor-divider span{
+  font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:1.5px;
+}
+/* Grids: eng */
+.tresor-grid{
+  width:100%;
+  display:grid;
+  gap:0;
+}
+.tresor-grid-3x2{
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+.tresor-grid-2x2{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+.tresor-grid-2x1{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:1fr;
+}
+.tresor-tab{
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;
+  border-right:1px solid rgba(255,255,255,0.07);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  cursor:pointer;
+  padding:8px 3px;
+  min-height:34px;
+}
+.tresor-tab:last-child{border-right:none}
+.tresor-tab:active{background:rgba(255,255,255,0.05)}
+.tresor-tab span{font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center}
+
+/* Tresor-Button links in Bar */
+#tresor-btn{
+  position:absolute;
+  left:15px;top:50%;transform:translateY(-50%);
+  font-size:20px;
+  cursor:pointer;
+  padding:8px;
+  opacity:0.4;
+  transition:opacity 0.3s;
+  border:none;background:none;
+  -webkit-tap-highlight-color:transparent;
+}
+#tresor-btn:active{opacity:0.7}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="header">
+    <div class="logo-circle">K</div>
+    <span class="title">KIMANUS</span>
+    <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+    <!-- Hamburger entfernt - Navigation lebt auf KIM's Rueckseite -->
+  </div>
+
+  <div id="wheel-container">
+    <div id="flip-label">
+      <div class="fl-card" id="fl-card"></div>
+    </div>
+
+    <div class="panel" id="panel-top"></div>
+    <div class="panel" id="panel-center"></div>
+    <div class="panel" id="panel-bottom"></div>
+
+    <div id="swipe-hint-behind">&#x276E;</div>
+    <div id="wheel-track"></div>
+    <div id="back-track" style="display:none"></div>
+    <!-- Register-Panel entfernt -->
+  </div>
+
+  <div id="status-text"></div>
+
+  <!-- Tastatur-Toolbar (erscheint ueber der Tastatur) -->
+  <div id="kb-toolbar">
+    <button onclick="ytPaste()" class="kb-btn">📋 Einfügen</button>
+    <button onclick="ytAnalyze()" class="kb-btn kb-analyze">🔍 Los</button>
+    <button onclick="kbDismiss()" class="kb-btn kb-done">✓</button>
+    <button onclick="toggleSpeech()" class="kb-btn kb-kim">🎤 KIM</button>
+  </div>
+
+  <!-- Tresor-Overlay (faehrt von unten hoch) -->
+  <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
+    <div id="tresor-panel" onclick="event.stopPropagation()">
+      <div class="tresor-section-title">SETUP</div>
+      <div class="tresor-grid tresor-grid-3x2">
+        <div class="tresor-tab"><span>KIM</span></div>
+        <div class="tresor-tab"><span>Voice</span></div>
+        <div class="tresor-tab"><span>Skins</span></div>
+        <div class="tresor-tab"><span>Farben</span></div>
+        <div class="tresor-tab"><span>Sprache</span></div>
+        <div class="tresor-tab"><span>System</span></div>
+      </div>
+      <div class="tresor-divider"><span>ARCHIV</span></div>
+      <div class="tresor-grid tresor-grid-2x2">
+        <div class="tresor-tab"><span>Fotos</span></div>
+        <div class="tresor-tab"><span>Tagebuch</span></div>
+        <div class="tresor-tab"><span>Pers-Akten</span></div>
+        <div class="tresor-tab"><span>Meine Ordner</span></div>
+      </div>
+      <div class="tresor-divider"><span>SAVE</span></div>
+      <div class="tresor-grid tresor-grid-2x1">
+        <div class="tresor-tab"><span>Schliessfach</span></div>
+        <div class="tresor-tab"><span>Postfach</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottom-bar">
+    <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔑</button>
+    <button id="speech-btn" onclick="toggleSpeech()">
+      <span id="speech-agent">KIM</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  // --- 1. KIMANUS (Projekt-Vorstellung, Flip = PowerPoint-Praesentation) ---
+  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
+   backs:[
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
+     {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
+     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
+   ]},
+
+  // --- 2. KIM (Einziger Agent — Privat + Business) ---
+  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
+   backs:[
+     {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
+     {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
+     {title:'Berater', content:'Wetterfrosch — Wetter & Tipps\nAnimateur — Freizeit & Events\nDolmetscher — Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen'},
+     {title:'Business', content:'Kalkulierer — Rohaufschlag\nEinkaufer — Preisvergleich\nBestellprofi — Lieferanten\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
+     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nGastro-Berater — Branche\nMarketing — Werbung & Posts\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
+     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv\n\nDein KIM lernt staendig dazu.'},
+   ]},
+
+  // --- 3. Tools (Werkzeuge ohne KI) ---
+  {id:'tools', icon:'🛠️', title:'Tools', subtitle:'Scanner, Rahmen & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+   backs:[
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren — ohne KI.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner & Kamera', content:'Dokumente scannen\nQR-Codes lesen\nVisitenkarten erfassen\nBelege fotografieren'},
+     {title:'Bilderrahmen', content:'RegioPic — Digitale Rahmen\nFuer Gastro: Anzeigen & Menues\nFuer Privat: Familienfotos\nFernsteuerbar per App'},
+     {title:'Schwarzes Brett', content:'Nachrichten ans Team\nGaestebuch pro Nutzer\nAlle lesen mit\nDein digitales Pinboard'},
+     {title:'Weitere Tools', content:'Taschenrechner\nNotizen & Merklisten\nTimer & Stoppuhr\nMehr kommt bald...'},
+   ]},
+
+  // --- 4. Wallet (Karten, Cap-Coin, Bezahlen) ---
+  {id:'wallet', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
+   backs:[
+     {title:'Dein Wallet', content:'Alle deine Karten an einem Ort.\nCap-Coins sammeln & einloesen.\nDigital bezahlen.\nImmer dabei.'},
+     {title:'Cap-Coin', content:'Sammle Coins per QR-Code.\n1 Cap-Coin = 10 Cent\n10 Coins = 1 Euro\nBei teilnehmenden Partnern.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nAlle Stempelkarten digital.\nNie wieder vergessen.'},
+     {title:'Bonuskarten', content:'Treuepunkte sammeln\nRabatte einloesen\nAktionen entdecken\nAlles automatisch.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen\nSicher & verschluesselt.'},
+   ]},
+
+  // --- 5. Archiv (Persoenliche Ablage, Ordner, Erinnerungen) ---
+  {id:'archiv', icon:'📁', title:'Archiv', subtitle:'Fotos, Videos & Notizen', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+   backs:[
+     {title:'Fotoalben', content:'Deine Bilder, sortiert nach Anlass.\nUrlaub • Familie • Events\nTeile Alben mit Freunden.\nImmer griffbereit.'},
+     {title:'Video-Sammlung', content:'Gespeicherte YouTube-Clips.\nLieblingsszenen markiert.\nKapitel & Timestamps.\nDein persoenliches Archiv.'},
+     {title:'Notizbuch', content:'Notizen & Merklisten.\nIdeen festhalten.\nEinkaufszettel.\nSchnell per Sprache diktieren.'},
+     {title:'Erinnerungen', content:'Geburtstage • Termine\nJahrestage • Fristen\nKIM erinnert dich rechtzeitig.\nNie wieder vergessen.'},
+     {title:'Meine Ordner', content:'Frei sortierbar.\nDokumente • Belege • Vertraege\nAlles an einem Ort.\nVerschluesselt & sicher.'},
+   ]},
+
+  // --- Verdoppelt fuer fluessiges Endlos-Rad ---
+  {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
+   backs:[
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
+     {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
+     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
+   ]},
+  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'kim@kimanus.de', phone:'Durchwahl 001',
+   backs:[
+     {title:'Ueber KIM', content:'Dein persoenlicher Assistent\nfuer Privat und Business.\nFrag mich einfach was du brauchst!\nIch kuemmer mich drum.'},
+     {title:'Scouts', content:'YouTube Scout — Videos\nWeb Scout — Recherche\nNews Scout — Nachrichten\nDeal Scout — Schnaeppchen\nSocial Scout — Social Media'},
+     {title:'Berater', content:'Wetterfrosch — Wetter & Tipps\nAnimateur — Freizeit & Events\nDolmetscher — Sprachen\nSekretaer — Termine & Planung\nBibliothekar — Wissen'},
+     {title:'Business', content:'Kalkulierer — Rohaufschlag\nEinkaufer — Preisvergleich\nBestellprofi — Lieferanten\nJustus — Recht & Vertraege\nLena — Finanzen & Buchhaltung'},
+     {title:'Spezialisten', content:'IT-Hilfe — Technik-Support\nGastro-Berater — Branche\nMarketing — Werbung & Posts\nDJ — Musik & Playlists\nPrint-Memorys — Drucksachen'},
+     {title:'Statistik', content:'47 Gespraeche diese Woche\n12 Termine geplant\n3 Erinnerungen aktiv\n\nDein KIM lernt staendig dazu.'},
+   ]},
+  {id:'tools2', icon:'🛠️', title:'Tools', subtitle:'Scanner, Rahmen & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+   backs:[
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren — ohne KI.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner & Kamera', content:'Dokumente scannen\nQR-Codes lesen\nVisitenkarten erfassen\nBelege fotografieren'},
+     {title:'Bilderrahmen', content:'RegioPic — Digitale Rahmen\nFuer Gastro: Anzeigen & Menues\nFuer Privat: Familienfotos\nFernsteuerbar per App'},
+     {title:'Schwarzes Brett', content:'Nachrichten ans Team\nGaestebuch pro Nutzer\nAlle lesen mit\nDein digitales Pinboard'},
+     {title:'Weitere Tools', content:'Taschenrechner\nNotizen & Merklisten\nTimer & Stoppuhr\nMehr kommt bald...'},
+   ]},
+  {id:'wallet2', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
+   backs:[
+     {title:'Dein Wallet', content:'Alle deine Karten an einem Ort.\nCap-Coins sammeln & einloesen.\nDigital bezahlen.\nImmer dabei.'},
+     {title:'Cap-Coin', content:'Sammle Coins per QR-Code.\n1 Cap-Coin = 10 Cent\n10 Coins = 1 Euro\nBei teilnehmenden Partnern.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nAlle Stempelkarten digital.\nNie wieder vergessen.'},
+     {title:'Bonuskarten', content:'Treuepunkte sammeln\nRabatte einloesen\nAktionen entdecken\nAlles automatisch.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen\nSicher & verschluesselt.'},
+   ]},
+  {id:'archiv2', icon:'📁', title:'Archiv', subtitle:'Fotos, Videos & Notizen', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+   backs:[
+     {title:'Fotoalben', content:'Deine Bilder, sortiert nach Anlass.\nUrlaub • Familie • Events\nTeile Alben mit Freunden.\nImmer griffbereit.'},
+     {title:'Video-Sammlung', content:'Gespeicherte YouTube-Clips.\nLieblingsszenen markiert.\nKapitel & Timestamps.\nDein persoenliches Archiv.'},
+     {title:'Notizbuch', content:'Notizen & Merklisten.\nIdeen festhalten.\nEinkaufszettel.\nSchnell per Sprache diktieren.'},
+     {title:'Erinnerungen', content:'Geburtstage • Termine\nJahrestage • Fristen\nKIM erinnert dich rechtzeitig.\nNie wieder vergessen.'},
+     {title:'Meine Ordner', content:'Frei sortierbar.\nDokumente • Belege • Vertraege\nAlles an einem Ort.\nVerschluesselt & sicher.'},
+   ]},
+];
+
+// Scout-Karten
+const SCOUTS = [
+  {id:'yt-scout', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'video@kimanus.de', phone:'Durchwahl 101',
+   backs:[
+     {title:'', content:'', type:'yt-input'},
+     {title:'', content:'', type:'yt-player'},
+     {title:'', content:'', type:'yt-chapters'},
+     {title:'', content:'', type:'yt-saved'},
+     {title:'', content:'', type:'yt-info'},
+   ]},
+  {id:'web-scout', icon:'🌐', title:'Web Scout', subtitle:'Internet-Rechercheur', color:'#4285f4', email:'recherche@kimanus.de', phone:'Durchwahl 102',
+   backs:[
+     {title:'Suche', content:'Ich durchsuche das Web\nfür dich!'},
+     {title:'Fakten-Check', content:'Quellen prüfen\nFake News erkennen\nZusammenfassen'},
+     {title:'Zuletzt', content:'Brauerei-Preise recherchiert\nWettbewerber analysiert'},
+     {title:'Fähigkeiten', content:'Google • Wikipedia\nNachrichtenseiten\nFachportale'},
+     {title:'Einstellungen', content:'Sprache: Deutsch\nRegion: Bayern\nSafe Search: An'},
+   ]},
+  {id:'news-scout', icon:'📰', title:'News Scout', subtitle:'Nachrichten-Jäger', color:'#1a73e8', email:'news@kimanus.de', phone:'Durchwahl 103',
+   backs:[
+     {title:'Heute', content:'3 relevante Nachrichten\nfür dich gefunden'},
+     {title:'Gastronomie', content:'Neue Hygiene-Verordnung ab Mai\nMehrwegpflicht Update'},
+     {title:'Technologie', content:'KI-Gesetz EU beschlossen\nNeue Whisper Version'},
+     {title:'Regional', content:'Volksfest Nürnberg Termine\nNeue Brauerei eröffnet'},
+     {title:'Einstellungen', content:'Themen: Gastro, Tech, Regional\nFrequenz: Täglich'},
+   ]},
+  {id:'deal-scout', icon:'💰', title:'Deal Scout', subtitle:'Schnäppchen-Finder', color:'#34a853', email:'deals@kimanus.de', phone:'Durchwahl 104',
+   backs:[
+     {title:'Aktuelle Deals', content:'Metro: Rindfleisch -15%\nSelgros: Getränke-Aktion'},
+     {title:'Preisalarm', content:'3 Preisalarme aktiv\nLachs unter 12€/kg\nOlivenöl unter 8€/l'},
+     {title:'Vergleich', content:'Metro vs. Selgros\nvs. Hamberger\nBester Preis markiert'},
+     {title:'Lieferanten', content:'Metro Nürnberg\nSelgros Fürth\nHamberger Online'},
+     {title:'Gespart', content:'Diese Woche: 127€\nDieser Monat: 483€'},
+   ]},
+  {id:'social-scout', icon:'📱', title:'Social Scout', subtitle:'Social Media Finder', color:'#e1306c', email:'social@kimanus.de', phone:'Durchwahl 105',
+   backs:[
+     {title:'Trends', content:'#FrankenBier trending\n#Gastro2026 aktiv'},
+     {title:'Instagram', content:'Neue Posts von\nfränkischen Brauereien'},
+     {title:'TikTok', content:'Virale Gastro-Videos\nKoch-Trends'},
+     {title:'Bewertungen', content:'3 neue Google Reviews\n1 neue Tripadvisor'},
+     {title:'Wettbewerber', content:'Konkurrenz-Posts\ndieser Woche analysiert'},
+   ]},
+];
+
+// REGISTERS entfernt - Inhalt lebt jetzt auf KIM's Rueckseite
+
+let activeCards = CARDS;
+let currentIndex = 0;
+let isFlipped = false;
+let backIndex = 0;
+let isListening = false;
+let registerOpen = false;
+let panelH = 0;
+let isAnimating = false;
+
+function init() {
+  calcSizes();
+  buildCards();
+
+  // Wiederkehrende Nutzer: letzte Position wiederherstellen
+  const visited = localStorage.getItem('kimanus-visited');
+  const lastCard = parseInt(localStorage.getItem('kimanus-lastCard') || '0');
+  if (visited && lastCard > 0 && lastCard < activeCards.length) {
+    currentIndex = lastCard;
+  }
+
+  positionCards(false);
+  window.addEventListener('resize', () => { calcSizes(); positionCards(false); });
+}
+
+function calcSizes() {
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+  panelH = centerH;
+  // Debug
+  document.querySelector('#header .title').textContent = 'KIMANUS';
+}
+
+function buildCards() {
+  const track = document.getElementById('wheel-track');
+  track.innerHTML = activeCards.map((card, i) => `
+    <div class="wheel-card" id="card-${i}" onclick="handleCardTap(${i})">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-icon">${card.icon}</div>
+          <div class="card-header">
+            <div class="card-name">${card.title}</div>
+            <div class="card-role">${card.subtitle}</div>
+          </div>
+          <div class="card-contact">
+            <span>${card.email || ''}</span>
+            <span>${card.phone || ''}</span>
+          </div>
+          <div class="card-brand">KIMANUS</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="back-title" id="back-title-${i}">${card.backs?.[0]?.title || ''}</div>
+          <div class="back-content" id="back-content-${i}">${card.backs?.[0]?.content || ''}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function positionCards(animate) {
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+
+  // Mittelpunkte der drei Panels
+  const topMid = topH / 2;
+  const centerMid = topH + (centerH / 2);
+  const bottomMid = topH + centerH + (bottomH / 2);
+
+  activeCards.forEach((card, i) => {
+    const el = document.getElementById('card-' + i);
+    if (!el) return;
+
+    const cardH = el.offsetHeight || 200;
+    const offset = getOffset(i);
+
+    let cardMid;
+    if (offset === 0) cardMid = centerMid;
+    else if (offset === -1) cardMid = topMid;
+    else if (offset === 1) cardMid = bottomMid + 40;
+    else if (offset < -1) cardMid = topMid - topH;
+    else cardMid = bottomMid + bottomH + 60;
+
+    el.style.top = (cardMid - cardH / 2) + 'px';
+    el.style.transition = animate ? 'all 1.2s cubic-bezier(0.23,1,0.32,1)' : 'none';
+
+    if (offset === 0) {
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) scale(1)';
+      el.style.zIndex = '10';
+    } else if (Math.abs(offset) === 1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'translateX(-50%) scale(0.9)';
+      el.style.zIndex = '5';
+    } else {
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(-50%) scale(0.8)';
+      el.style.zIndex = '1';
+    }
+  });
+  updateStatus();
+  updateFlipLabel();
+}
+
+function getOffset(i) {
+  let diff = i - currentIndex;
+  if (diff > activeCards.length / 2) diff -= activeCards.length;
+  if (diff < -activeCards.length / 2) diff += activeCards.length;
+  return diff;
+}
+
+function spinWheel(direction) {
+  if (isAnimating) return;
+  if (isFlipped) {
+    const backs = activeCards[currentIndex].backs || [];
+    if (backs.length < 2) return;
+    isAnimating = true;
+    backIndex = (backIndex + direction + backs.length) % backs.length;
+    positionBackCards(true);
+    setTimeout(() => { isAnimating = false; }, 400);
+    return;
+  }
+  isAnimating = true;
+  currentIndex = (currentIndex + direction + activeCards.length) % activeCards.length;
+  positionCards(true);
+  // Position merken
+  localStorage.setItem('kimanus-lastCard', currentIndex);
+  localStorage.setItem('kimanus-visited', 'true');
+  setTimeout(() => { isAnimating = false; }, 400);
+}
+
+function handleCardTap(i) {
+  if (i === currentIndex) {
+    // Aktive Karte antippen = Flip
+    flipCard();
+  }
+}
+
+function flipCard() {
+  const el = document.getElementById('card-' + currentIndex);
+  if (!el) return;
+  isFlipped = !isFlipped;
+  // Swipe-Hint: verstecken wenn geflippt, zeigen wenn zurueck
+  const hb = document.getElementById('swipe-hint-behind');
+  if (hb) hb.style.display = isFlipped ? 'none' : 'block';
+  backIndex = 0;
+
+  const backTrack = document.getElementById('back-track');
+  const wheelTrack = document.getElementById('wheel-track');
+
+  if (isFlipped) {
+    el.classList.add('flipped');
+    // Hauptrad verstecken, Rückseiten-Rad zeigen
+    setTimeout(() => {
+      wheelTrack.style.display = 'none';
+      backTrack.style.display = 'block';
+      buildBackCards();
+      positionBackCards(false);
+    }, 700); // Nach der Flip-Animation
+  } else {
+    // Rückseiten-Rad verstecken, Hauptrad zeigen
+    backTrack.style.display = 'none';
+    wheelTrack.style.display = 'block';
+    el.classList.remove('flipped');
+    positionCards(false);
+  }
+  updateFlipLabel();
+}
+
+function buildBackCards() {
+  const card = activeCards[currentIndex];
+  const backs = card.backs || [];
+  const backTrack = document.getElementById('back-track');
+  backTrack.innerHTML = backs.map((back, i) => {
+    let inner = '';
+    if (back.type === 'yt-input') {
+      inner = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+          <div id="yt-url" style="width:100%;min-height:36px;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:12px;word-break:break-all;overflow:hidden">Tippe 🎤 oder 📋</div>
+          <div style="display:flex;gap:6px;width:100%">
+            <button onclick="ytMic()" style="flex:1;padding:10px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);color:rgba(230,57,70,0.5);font-size:12px;cursor:pointer">🎤 Sprechen</button>
+            <button onclick="ytPaste()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer">📋 Einfügen</button>
+          </div>
+          <button onclick="ytGo()" style="width:100%;padding:12px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.5);font-size:13px;cursor:pointer;letter-spacing:2px;font-weight:600">🔍 LOS</button>
+        </div>`;
+    } else if (back.type === 'yt-player') {
+      inner = `<div id="yt-player-wrap" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15)">Kein Video geladen</div>
+      </div>`;
+    } else if (back.type === 'yt-chapters') {
+      inner = `<div id="yt-chapters-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Erst ein Video analysieren</div>
+      </div>`;
+    } else if (back.type === 'yt-saved') {
+      inner = `<div id="yt-saved-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+        <button onclick="ytLoadSaved()" style="padding:12px 24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer">📚 Videos laden</button>
+      </div>`;
+    } else if (back.type === 'yt-info') {
+      inner = `<div id="yt-info-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Video-Details erscheinen nach Analyse</div>
+      </div>`;
+    } else if (back.type === 'video' && back.videoId) {
+      inner = `
+        <iframe class="bwc-video-full" src="https://www.youtube.com/embed/${back.videoId}?rel=0&modestbranding=1&playsinline=1"
+          frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture"
+          allowfullscreen></iframe>`;
+    } else if (back.type === 'search') {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.content}</div>
+        <div class="bwc-search-hint">🎤 Drück den KIM-Button und sag was du suchst</div>`;
+    } else {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.content}</div>`;
+    }
+    return `<div class="back-wheel-card" id="bcard-${i}">${inner}</div>`;
+  }).join('');
+}
+
+function positionBackCards(animate) {
+  const card = activeCards[currentIndex];
+  const backs = card.backs || [];
+  if (backs.length === 0) return;
+
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+  const topMid = topH / 2;
+  const centerMid = topH + (centerH / 2);
+  const bottomMid = topH + centerH + (bottomH / 2);
+  const cardH = 210;
+
+  backs.forEach((back, i) => {
+    const el = document.getElementById('bcard-' + i);
+    if (!el) return;
+
+    let diff = i - backIndex;
+    if (diff > backs.length / 2) diff -= backs.length;
+    if (diff < -backs.length / 2) diff += backs.length;
+
+    // EXAKT wie Hauptrad
+    let cardMid;
+    if (diff === 0) cardMid = centerMid;
+    else if (diff === -1) cardMid = topMid;
+    else if (diff === 1) cardMid = bottomMid + 40;
+    else if (diff < -1) cardMid = topMid - topH;
+    else cardMid = bottomMid + bottomH + 60;
+
+    el.style.top = (cardMid - cardH / 2) + 'px';
+    el.style.transition = animate ? 'all 1.2s cubic-bezier(0.23,1,0.32,1)' : 'none';
+
+    if (diff === 0) {
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+      el.style.zIndex = '10';
+    } else if (diff === 1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'scale(0.9)';
+      el.style.zIndex = '5';
+    } else if (diff === -1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'scale(0.8)';
+      el.style.zIndex = '5';
+    } else {
+      el.style.opacity = '0';
+      el.style.transform = 'scale(0.75)';
+      el.style.zIndex = '1';
+    }
+  });
+}
+
+// updateBackContent nicht mehr noetig - eigenes Rad uebernimmt
+
+function updateFlipLabel() {
+  const fl = document.getElementById('flip-label');
+  if (isFlipped) {
+    const card = activeCards[currentIndex];
+    document.getElementById('fl-card').innerHTML = `
+      <div class="fl-icon">${card.icon}</div>
+      <div>
+        <div class="fl-name">${card.title}</div>
+        <div class="fl-role">${card.subtitle}</div>
+      </div>
+      <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
+      <div class="fl-brand">KIMANUS</div>
+    `;
+    // Position: gleich wie die obere Milchglas-Karte
+    const container = document.getElementById('wheel-container');
+    const totalH = container.clientHeight;
+    const centerH = 230;
+    const remainH = totalH - centerH;
+    const topH = Math.floor(remainH * 0.6);
+    const topMid = topH / 2;
+    const cardH = 210;
+    fl.style.top = (topMid - cardH / 2) + 'px';
+    fl.classList.add('visible');
+  } else {
+    fl.classList.remove('visible');
+  }
+}
+
+function updateStatus() {
+  const card = activeCards[currentIndex];
+  document.getElementById('status-text').textContent = card.title;
+}
+
+// === TRESOR ===
+let tresorOpen = false;
+function toggleTresor() {
+  tresorOpen = !tresorOpen;
+  document.getElementById('tresor-overlay').classList.toggle('open', tresorOpen);
+}
+function closeTresor() {
+  tresorOpen = false;
+  document.getElementById('tresor-overlay').classList.remove('open');
+}
+// Tresor runter-wischen
+(function(){
+  let tStartY = 0;
+  const tp = document.getElementById('tresor-panel');
+  if (!tp) return;
+  tp.addEventListener('touchstart', e => { tStartY = e.touches[0].clientY; }, {passive:true});
+  tp.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientY - tStartY;
+    if (diff > 60) closeTresor();
+  }, {passive:true});
+})();
+
+// === TASTATUR-TOOLBAR ===
+function kbDismiss() {
+  document.activeElement.blur();
+}
+
+// Toolbar zeigen wenn Input fokussiert, verstecken wenn nicht
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const toolbar = document.getElementById('kb-toolbar');
+    const heightDiff = window.innerHeight - window.visualViewport.height;
+    if (heightDiff > 100 && isFlipped && activeCards[currentIndex]?.id === 'yt-scout') {
+      // Tastatur ist offen UND YouTube Scout aktiv
+      toolbar.classList.add('visible');
+      toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
+    } else {
+      toolbar.classList.remove('visible');
+    }
+  });
+  window.visualViewport.addEventListener('scroll', () => {
+    const toolbar = document.getElementById('kb-toolbar');
+    if (toolbar.classList.contains('visible')) {
+      toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
+    }
+  });
+}
+
+// === YOUTUBE SCOUT ===
+let ytCurrentVideoId = '';
+
+async function ytPaste() {
+  try {
+    const text = await navigator.clipboard.readText();
+    const urlField = document.getElementById('yt-url');
+    urlField.textContent = text.trim();
+    urlField.style.color = 'rgba(255,255,255,0.5)';
+  } catch(e) {
+    alert('Clipboard nicht verfügbar. Bitte URL kopieren und nochmal versuchen.');
+  }
+}
+
+// Einfache Spracheingabe NUR fuer URL-Feld (kein KIM Chat)
+let ytMicRecorder = null;
+let ytMicChunks = [];
+let ytMicStream = null;
+let ytMicActive = false;
+
+function ytMic() {
+  if (ytMicActive) {
+    ytMicStop();
+  } else {
+    ytMicStart();
+  }
+}
+
+async function ytMicStart() {
+  try {
+    ytMicActive = true;
+    const urlField = document.getElementById('yt-url');
+    urlField.textContent = '🎤 Sprich jetzt...';
+    urlField.style.color = 'rgba(230,57,70,0.5)';
+
+    ytMicStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    // Beste Audio-Qualitaet fuer Whisper: mp4 auf iOS, webm auf Android/Desktop
+    const mimeOptions = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+    let selectedMime = '';
+    for (const mime of mimeOptions) {
+      if (MediaRecorder.isTypeSupported(mime)) { selectedMime = mime; break; }
+    }
+    ytMicRecorder = selectedMime ? new MediaRecorder(ytMicStream, {mimeType:selectedMime}) : new MediaRecorder(ytMicStream);
+    ytMicChunks = [];
+
+    ytMicRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) ytMicChunks.push(e.data);
+    };
+
+    ytMicRecorder.onstop = async () => {
+      const mimeType = ytMicRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(ytMicChunks, {type:mimeType});
+      if (ytMicStream) { ytMicStream.getTracks().forEach(t=>t.stop()); ytMicStream=null; }
+      ytMicActive = false;
+
+      if (blob.size < 1000) {
+        urlField.textContent = 'Keine URL';
+        urlField.style.color = 'rgba(255,255,255,0.4)';
+        return;
+      }
+
+      urlField.textContent = '⏳ Erkenne...';
+
+      const formData = new FormData();
+      const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      formData.append('audio', blob, 'recording.' + ext);
+
+      try {
+        const resp = await fetch('/api/stt', {method:'POST', body:formData});
+        const data = await resp.json();
+        const text = (data.text || '').trim();
+        if (text) {
+          urlField.textContent = text;
+          urlField.style.color = 'rgba(255,255,255,0.5)';
+        } else {
+          urlField.textContent = 'Nicht verstanden - nochmal versuchen';
+          urlField.style.color = 'rgba(255,255,255,0.2)';
+        }
+      } catch(e) {
+        urlField.textContent = 'Fehler - nochmal versuchen';
+        urlField.style.color = 'rgba(255,255,255,0.2)';
+      }
+    };
+
+    ytMicRecorder.start(250);
+
+    // Auto-stop nach 8 Sekunden
+    setTimeout(() => { if (ytMicActive) ytMicStop(); }, 8000);
+
+  } catch(e) {
+    ytMicActive = false;
+    console.error('Mic-Fehler:', e);
+  }
+}
+
+function ytMicStop() {
+  ytMicActive = false;
+  if (ytMicRecorder && ytMicRecorder.state === 'recording') {
+    ytMicRecorder.stop();
+  }
+}
+
+function ytExtractId(url) {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
+function ytGo() {
+  const el = document.getElementById('yt-url');
+  if (!el) return;
+  const text = (el.textContent || '').trim();
+  if (!text || text === 'Tippe 🎤 oder 📋' || text === 'Keine URL') return;
+
+  const videoId = ytExtractId(text);
+  if (videoId) {
+    ytAnalyzeVideo(videoId);
+  } else {
+    ytSearch(text);
+  }
+}
+
+async function ytAnalyzeVideo(videoId) {
+
+  ytCurrentVideoId = videoId;
+
+  // Player sofort laden
+  const playerWrap = document.getElementById('yt-player-wrap');
+  if (playerWrap) {
+    playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
+  }
+
+  // Zur Player-Glasplatte drehen
+  if (isFlipped) {
+    backIndex = 1;
+    positionBackCards(true);
+  }
+
+  // Analyse starten via KIM
+  const chaptersWrap = document.getElementById('yt-chapters-wrap');
+  if (chaptersWrap) {
+    chaptersWrap.innerHTML = '<div style="font-size:11px;color:rgba(230,57,70,0.4);text-align:center">Analysiere Video...</div>';
+  }
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: 'Analysiere dieses YouTube Video und erstelle Kapitel mit Timestamps: https://www.youtube.com/watch?v=' + videoId,
+        agent:'kim',
+        model:'groq-llama',
+        session:'yt-scout-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    const analysis = data.output || data.text || '';
+
+    // Kapitel anzeigen
+    if (chaptersWrap && analysis) {
+      chaptersWrap.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.8;white-space:pre-line">${analysis}</div>`;
+    }
+
+    // Info anzeigen
+    const infoWrap = document.getElementById('yt-info-wrap');
+    if (infoWrap) {
+      infoWrap.innerHTML = `
+        <div style="margin-bottom:8px"><img src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" style="width:100%;border-radius:2px;opacity:0.6"></div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.2)">ID: ${videoId}</div>
+        <button onclick="ytSave('${videoId}')" style="margin-top:8px;width:100%;padding:8px;background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.3);color:rgba(76,175,80,0.6);font-size:11px;cursor:pointer">💾 SPEICHERN</button>
+      `;
+    }
+  } catch(e) {
+    console.error('Analyse-Fehler:', e);
+    if (chaptersWrap) chaptersWrap.innerHTML = '<div style="color:rgba(230,57,70,0.4);font-size:11px">Analyse fehlgeschlagen</div>';
+  }
+}
+
+async function ytSave(videoId) {
+  try {
+    await fetch('/api/video-save', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url:'https://www.youtube.com/watch?v=' + videoId, analysis:'Gespeichert via Wheel'})
+    });
+    alert('Video gespeichert!');
+  } catch(e) { console.error(e); }
+}
+
+async function ytLoadSaved() {
+  const wrap = document.getElementById('yt-saved-wrap');
+  if (!wrap) return;
+  try {
+    const resp = await fetch('/api/video-list');
+    const data = await resp.json();
+    const videos = data.videos || [];
+    if (videos.length === 0) {
+      wrap.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Noch keine Videos gespeichert</div>';
+      return;
+    }
+
+    // Duplikate entfernen
+    const seen = new Set();
+    const unique = videos.filter(v => {
+      const vid = ytExtractId(v.url || '');
+      if (vid && !seen.has(vid)) { seen.add(vid); return true; }
+      return false;
+    });
+
+    wrap.style.scrollbarWidth = 'none';
+    wrap.innerHTML = unique.slice(0, 10).map(v => {
+      const vid = ytExtractId(v.url || '');
+      const title = (v.title || 'Video').slice(0, 40);
+      return `<div onclick="ytLoadVideo('${vid}')" style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;align-items:center">
+        <div style="width:64px;height:42px;flex-shrink:0;position:relative;overflow:hidden">
+          <img src="https://img.youtube.com/vi/${vid}/default.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.7;display:block">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <div style="width:18px;height:18px;background:rgba(230,57,70,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">▶</div>
+          </div>
+        </div>
+        <div style="flex:1;font-size:10px;color:rgba(255,255,255,0.3);line-height:1.3">${title}</div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    wrap.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.15)">Fehler beim Laden</div>';
+  }
+}
+
+function ytShowSavedOnWheel(videos) {
+  const backTrack = document.getElementById('back-track');
+  const uniqueVids = [];
+  const seenIds = new Set();
+
+  // Duplikate entfernen (gleiche Video-ID)
+  videos.forEach(v => {
+    const vid = ytExtractId(v.url || '');
+    if (vid && !seenIds.has(vid)) {
+      seenIds.add(vid);
+      uniqueVids.push({...v, videoId: vid});
+    }
+  });
+
+  const cards = uniqueVids.slice(0, 10).map((v, idx) => `
+    <div class="back-wheel-card" id="bcard-${idx}" onclick="ytLoadVideo('${v.videoId}')">
+      <div style="width:100%;height:100%;display:flex;flex-direction:row;padding:0;overflow:hidden;cursor:pointer">
+        <div style="width:45%;height:100%;overflow:hidden;border-right:1px solid rgba(255,255,255,0.04);position:relative">
+          <img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.8">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <div style="width:36px;height:36px;background:rgba(230,57,70,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff">▶</div>
+          </div>
+        </div>
+        <div style="flex:1;padding:10px;display:flex;flex-direction:column;justify-content:center;gap:4px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4">${(v.title || 'Video').slice(0, 60)}</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.15)">Antippen = Abspielen</div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Zurueck-Karte
+  const resetCard = `<div class="back-wheel-card" id="bcard-${uniqueVids.length}">
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">${uniqueVids.length} Videos gespeichert</div>
+      <button onclick="ytResetInput()" style="padding:8px 16px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.4);font-size:11px;cursor:pointer">↩ Zurück</button>
+    </div>
+  </div>`;
+
+  backTrack.innerHTML = cards + resetCard;
+
+  const tempBacks = uniqueVids.slice(0, 10).map(v => ({title:v.title, content:''}));
+  tempBacks.push({title:'reset', content:''});
+  activeCards[currentIndex].backs = tempBacks;
+
+  backIndex = 0;
+  positionBackCards(true);
+}
+
+function ytLoadVideo(videoId) {
+  if (!videoId) return;
+  ytCurrentVideoId = videoId;
+  const urlField = document.getElementById('yt-url');
+  if (urlField) urlField.textContent = 'https://www.youtube.com/watch?v=' + videoId;
+  const playerWrap = document.getElementById('yt-player-wrap');
+  if (playerWrap) {
+    playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
+  }
+  // Zur Player-Glasplatte drehen
+  backIndex = 1;
+  positionBackCards(true);
+}
+
+async function ytSearch(query) {
+  // Auf der aktuellen BACK-Card anzeigen (bcard-0 = Eingabe-Platte)
+  const bcard = document.getElementById('bcard-0');
+  if (!bcard) return;
+
+  // Ladebildschirm
+  bcard.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+      <div style="font-size:24px;animation:spin 1s linear infinite">⏳</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3)">Suche: ${query}</div>
+    </div>`;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: 'Suche die 5 besten YouTube Videos zu: ' + query + '. Antworte EXAKT in diesem Format pro Zeile: NUMMER. TITEL | youtube.com/watch?v=VIDEO_ID - Nur echte YouTube URLs die wirklich existieren!',
+        agent:'kim',
+        model:'groq-llama',
+        session:'yt-search-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    const answer = data.output || data.text || 'Keine Ergebnisse';
+
+    // Ergebnisse in einzelne Video-Karten aufteilen
+    const results = answer.split(/\n/).filter(l => l.trim().length > 10);
+    if (results.length > 1) {
+      const backTrack = document.getElementById('back-track');
+      const colors = ['#e63946','#4a90d9','#4caf50','#ff9800','#9c27b0','#607d8b','#d4a017','#e91e63'];
+
+      const cards = results.slice(0, 8).map((r, idx) => {
+        const color = colors[idx % colors.length];
+        const line = r.replace(/^\d+[\.\)\-]\s*/, '').trim();
+        const num = idx + 1;
+
+        // YouTube Video-ID extrahieren falls vorhanden
+        const vidMatch = line.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+        const vidId = vidMatch ? vidMatch[1] : '';
+        const title = line.replace(/\|.*$/, '').replace(/https?:\/\/\S+/g, '').replace(/-\s*$/, '').trim();
+
+        const thumbArea = vidId
+          ? `<img src="https://img.youtube.com/vi/${vidId}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.7" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:100%;height:100%;align-items:center;justify-content:center"><div style='font-size:40px;opacity:0.3'>▶</div></div>`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,${color}22,${color}11)"><div style='font-size:40px;opacity:0.3'>▶</div></div>`;
+
+        return `
+        <div class="back-wheel-card" id="bcard-${idx}" ${vidId ? 'onclick="ytLoadVideo(\''+vidId+'\')"' : ''}>
+          <div style="width:100%;height:100%;display:flex;flex-direction:row;padding:0;overflow:hidden;cursor:${vidId?'pointer':'default'}">
+            <div style="width:45%;height:100%;overflow:hidden;border-right:1px solid rgba(255,255,255,0.04)">
+              ${thumbArea}
+            </div>
+            <div style="flex:1;padding:12px;display:flex;flex-direction:column;justify-content:center;gap:4px">
+              <div style="font-size:9px;color:rgba(255,255,255,0.15)">Video ${num}${vidId?' • Antippen = Abspielen':''}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.4">${title}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      const resetCard = `<div class="back-wheel-card" id="bcard-${results.length}">
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.2)">🔍 ${query} - ${results.length} Ergebnisse</div>
+          <button onclick="ytResetInput()" style="padding:10px 20px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.4);font-size:12px;cursor:pointer">↩ Neue Suche</button>
+        </div>
+      </div>`;
+
+      backTrack.innerHTML = cards + resetCard;
+
+      const tempBacks = results.slice(0, 8).map(r => ({title:'', content:r.trim()}));
+      tempBacks.push({title:'reset', content:''});
+      activeCards[currentIndex].backs = tempBacks;
+
+      backIndex = 0;
+      positionBackCards(true);
+    } else {
+      bcard.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;padding:12px 16px;overflow-y:auto;scrollbar-width:none">
+          <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-bottom:6px">🔍 ${query}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.7;white-space:pre-line">${answer}</div>
+          <div onclick="ytResetInput()" style="font-size:10px;color:rgba(230,57,70,0.3);text-align:center;margin-top:6px;cursor:pointer">↩ Neue Suche</div>
+        </div>`;
+    }
+
+  } catch(e) {
+    bcard.innerHTML = `
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px">
+        <div style="font-size:12px;color:rgba(230,57,70,0.4)">Suche fehlgeschlagen</div>
+        <div onclick="ytResetInput()" style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;cursor:pointer">↩ Nochmal</div>
+      </div>`;
+  }
+}
+
+function ytResetInput() {
+  // Zurück zur Eingabe-Glasplatte
+  backIndex = 0;
+  buildBackCards();
+  positionBackCards(false);
+}
+
+// === SPRACH-PIPELINE ===
+let mediaRecorder = null;
+let audioChunks = [];
+let audioStream = null;
+
+function toggleSpeech() {
+  isListening = !isListening;
+  const btn = document.getElementById('speech-btn');
+  if (isListening) {
+    btn.classList.add('listening');
+    btn.querySelector('span').textContent = '...';
+    startRecording();
+  } else {
+    btn.classList.remove('listening');
+    btn.querySelector('span').textContent = 'KIM';
+    stopRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    mediaRecorder = new MediaRecorder(audioStream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+    mediaRecorder.onstop = async () => {
+      const mimeType = mediaRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(audioChunks, {type: mimeType});
+      cleanupMic();
+      if (blob.size > 1000) {
+        await processVoice(blob, mimeType);
+      }
+    };
+    mediaRecorder.start(250);
+
+    // Auto-Stop nach 10 Sekunden Stille
+    setTimeout(() => {
+      if (isListening) {
+        isListening = false;
+        const btn = document.getElementById('speech-btn');
+        btn.classList.remove('listening');
+        btn.querySelector('span').textContent = 'KIM';
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+      }
+    }, 10000);
+  } catch(err) {
+    console.error('Mikrofon-Fehler:', err);
+    isListening = false;
+    document.getElementById('speech-btn').classList.remove('listening');
+    document.getElementById('speech-btn').querySelector('span').textContent = 'KIM';
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+  }
+}
+
+function cleanupMic() {
+  if (audioStream) {
+    audioStream.getTracks().forEach(t => t.stop());
+    audioStream = null;
+  }
+}
+
+async function processVoice(blob, mimeType) {
+  const btn = document.getElementById('speech-btn');
+  btn.querySelector('span').textContent = '⏳';
+
+  // 1. Sprache -> Text (Groq Whisper)
+  const formData = new FormData();
+  const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'wav';
+  formData.append('audio', blob, 'recording.' + ext);
+
+  try {
+    const sttResp = await fetch('/api/stt', {method:'POST', body:formData});
+    const sttData = await sttResp.json();
+    const userText = sttData.text || '';
+
+    if (!userText.trim()) {
+      btn.querySelector('span').textContent = '❌';
+      setTimeout(() => btn.querySelector('span').textContent = 'KIM', 2000);
+      return;
+    }
+
+    // Pruefen ob wir im YouTube Scout sind
+    const currentCard = activeCards[currentIndex];
+    const ytUrlField = document.getElementById('yt-url');
+
+    if (currentCard && currentCard.id === 'yt-scout' && ytUrlField) {
+      // Im YouTube Scout: Text ins URL-Feld oder direkt an KIM
+      const videoId = ytExtractId(userText);
+      if (videoId) {
+        // User hat eine URL gesprochen
+        ytUrlField.textContent = userText;
+        ytUrlField.style.color = 'rgba(255,255,255,0.5)';
+        btn.querySelector('span').textContent = 'KIM';
+        ytAnalyze();
+        return;
+      }
+      // Kein URL - als Suchanfrage an KIM weiterleiten
+    }
+
+    // Zeige erkannten Text auf der Glasplatte
+    const centerCardEl = document.getElementById('card-' + currentIndex);
+    if (centerCardEl && !isFlipped) {
+      const front = centerCardEl.querySelector('.card-front');
+      if (front) {
+        front.innerHTML = `
+          <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 18px">
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:8px">🗣️ Du sagst:</div>
+            <div style="font-size:15px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.6">${userText}</div>
+            <div style="font-size:10px;color:rgba(230,57,70,0.4);margin-top:12px">KIM denkt nach...</div>
+          </div>
+        `;
+      }
+    }
+
+    btn.querySelector('span').textContent = '💬';
+
+    // 2. Text -> KIM (Chat API)
+    const chatResp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: userText,
+        agent: 'kim',
+        model: 'groq-llama',
+        session: 'wheel-' + Date.now()
+      })
+    });
+
+    let kimAnswer = '';
+    const contentType = chatResp.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      // Einfache JSON-Antwort
+      const data = await chatResp.json();
+      kimAnswer = data.output || data.text || data.answer || '';
+    } else {
+      // Streaming (SSE)
+      const reader = chatResp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, {stream:true});
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const d = JSON.parse(line.slice(6));
+              if (d.token) kimAnswer += d.token;
+              if (d.full) kimAnswer = d.full;
+              if (d.output) kimAnswer = d.output;
+            } catch(e) {}
+          }
+        }
+      }
+    }
+
+    // 3. Antwort auf die Glasplatte projizieren
+    if (kimAnswer) {
+      showKimResponse(userText, kimAnswer);
+    }
+
+  } catch(err) {
+    console.error('Pipeline-Fehler:', err);
+  }
+
+  btn.querySelector('span').textContent = 'KIM';
+}
+
+function showKimResponse(question, answer) {
+  const currentCard = activeCards[currentIndex];
+
+  // Im YouTube Scout: Antwort auf die Kapitel-Glasplatte
+  if (currentCard && currentCard.id === 'yt-scout' && isFlipped) {
+    const chaptersWrap = document.getElementById('yt-chapters-wrap');
+    if (chaptersWrap) {
+      chaptersWrap.innerHTML = `
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.8;white-space:pre-line">${answer}</div>`;
+    }
+    // Zur Kapitel-Glasplatte drehen
+    backIndex = 2;
+    positionBackCards(true);
+    return;
+  }
+
+  // Normal: Auf der aktiven Glasplatte anzeigen
+  if (isFlipped) {
+    const bcard = document.getElementById('bcard-' + backIndex);
+    if (bcard) {
+      bcard.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;white-space:pre-line">${answer}</div>
+        </div>`;
+    }
+  } else {
+    const centerCardEl = document.getElementById('card-' + currentIndex);
+    if (!centerCardEl) return;
+    const front = centerCardEl.querySelector('.card-front');
+    if (front) {
+      front.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:14px 18px;overflow-y:auto">
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;white-space:pre-line">${answer}</div>
+        </div>`;
+    }
+  }
+}
+
+function demoKimAction() {
+  document.getElementById('status-text').textContent = 'KIM: "Hier ist das Wetter!"';
+  if (isFlipped) flipCard();
+  const target = activeCards.findIndex(c => c.id === 'wetterfrosch');
+  animateToCard(target, () => setTimeout(flipCard, 500));
+}
+
+function animateToCard(target, cb) {
+  if (currentIndex === target) { if (cb) cb(); return; }
+  const iv = setInterval(() => {
+    if (currentIndex === target) { clearInterval(iv); if (cb) cb(); return; }
+    const diff = (target - currentIndex + activeCards.length) % activeCards.length;
+    spinWheel(diff <= activeCards.length / 2 ? 1 : -1);
+  }, 250);
+}
+
+function showKeyboard() { alert('Tastatur - kommt noch!'); }
+
+// Touch - vertikal=Rad drehen, horizontal=Flip
+let dragStartY = 0;
+let dragStartX = 0;
+const wc = document.getElementById('wheel-container');
+
+wc.addEventListener('touchstart', e => {
+  dragStartY = e.touches[0].clientY;
+  dragStartX = e.touches[0].clientX;
+}, {passive:true});
+wc.addEventListener('touchend', e => {
+  const diffY = dragStartY - e.changedTouches[0].clientY;
+  const diffX = e.changedTouches[0].clientX - dragStartX;
+  // Horizontal stärker = Flip
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+    flipCard();
+  }
+  // Vertikal stärker = Rad drehen
+  else if (Math.abs(diffY) > 40) {
+    spinWheel(diffY > 0 ? 1 : -1);
+  }
+}, {passive:true});
+
+// Mouse
+wc.addEventListener('mousedown', e => { dragStartY = e.clientY; dragStartX = e.clientX; });
+wc.addEventListener('mouseup', e => {
+  const diffY = dragStartY - e.clientY;
+  const diffX = e.clientX - dragStartX;
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+    flipCard();
+  } else if (Math.abs(diffY) > 40) {
+    spinWheel(diffY > 0 ? 1 : -1);
+  }
+});
+
+// Scroll wheel
+wc.addEventListener('wheel', e => {
+  e.preventDefault();
+  spinWheel(e.deltaY > 0 ? 1 : -1);
+}, {passive:false});
+
+// Init
+init();
+</script>
+</body>
+</html>
