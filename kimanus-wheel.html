@@ -2082,7 +2082,14 @@ function showKimBubble() {
   }
   card = document.createElement('div');
   card.id = 'kim-card-overlay';
-  card.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:355px;height:auto;background:#1c1c1e;border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;z-index:30;padding:16px;gap:10px';
+  // Position wie Glasplatte im Sichtfenster
+  const container = document.getElementById('wheel-container');
+  const totalH = container ? container.clientHeight : 500;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const cardTop = 60 + topH; // Header + oberes Milchglas
+  card.style.cssText = `position:fixed;top:${cardTop}px;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:355px;height:210px;background:rgba(30,30,32,0.95);border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;z-index:30;padding:20px;gap:10px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)`;
   card.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px">
       <div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>
@@ -2090,7 +2097,7 @@ function showKimBubble() {
         <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:1px">KIM</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.35)">${subtitle}</div>
       </div>
-      <button onclick="document.getElementById('kim-card-overlay').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:18px;cursor:pointer">✕</button>
+      <button onclick="document.getElementById('kim-card-overlay').style.display='none'" style="background:rgba(120,120,128,0.32);border:none;color:rgba(255,255,255,0.5);font-size:16px;cursor:pointer;width:32px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
     </div>
     <div style="font-size:15px;color:rgba(255,255,255,0.5);line-height:1.5">${greeting}</div>
     <div style="display:flex;gap:8px;margin-top:4px">
