@@ -622,12 +622,14 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <div id="app">
   <div id="header">
-    <div class="logo-circle">K</div>
-    <span class="title">KIMANUS</span>
+    <div class="logo-circle" onclick="showKimanusInfo()">K</div>
+    <div style="flex:1;cursor:pointer" onclick="showKimanusInfo()">
+      <div class="title" style="margin:0;line-height:1.2">KIMANUS</div>
+      <div id="header-kim-status" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px" onclick="event.stopPropagation();showKimInfo()">KIM · Concierge</div>
+    </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
-    <!-- Hamburger entfernt - Navigation lebt auf KIM's Rueckseite -->
   </div>
 
   <div id="wheel-container">
@@ -1966,10 +1968,8 @@ function rebuildWheel() {
   if (isFlipped) flipCard();
   const cfg = getSetupConfig();
 
-  // Basis-Karten: KIMANUS + KIM (immer da)
-  const landing = CARDS.find(c => c.id === 'landing');
-  const kim = CARDS.find(c => c.id === 'kim');
-  let wheelCards = [landing, kim];
+  // KIMANUS und KIM sind jetzt im Header, nicht mehr auf dem Rad
+  let wheelCards = [];
 
   // Aktivierte Agenten als eigene Karten hinzufuegen
   ALL_AGENTS.forEach(agent => {
@@ -2002,12 +2002,12 @@ function rebuildWheel() {
   const dupes = wheelCards.map(c => ({...c, id: c.id + '_dup'}));
   wheelCards = wheelCards.concat(dupes);
 
-  // Hinweis-Karte wenn fast leer
-  if (wheelCards.length <= 4) {
-    const hintCard = {id:'hint', icon:'⚙️', title:'Setup', subtitle:'Mehr aktivieren', color:'#64748b', email:'', phone:'',
-      backs:[{title:'Mehr entdecken', content:'Oeffne das Setup (Schloss unten)\nund aktiviere Agenten und Features.\n\nScouts • Guides • Berater\nBusiness • Tools • Wallet'}]
+  // Hinweis-Karte wenn Rad leer oder fast leer
+  if (wheelCards.length === 0) {
+    const hintCard = {id:'hint', icon:'⚙️', title:'Setup', subtitle:'Agenten aktivieren', color:'#64748b', email:'', phone:'',
+      backs:[{title:'Los gehts!', content:'Oeffne das Setup (Schloss unten)\nund waehle deine Agenten.\n\nTippe auf KIMANUS oder KIM\nim Header fuer mehr Infos.'}]
     };
-    wheelCards.splice(2, 0, hintCard);
+    wheelCards.push(hintCard);
   }
 
   activeCards = wheelCards;
@@ -2015,6 +2015,49 @@ function rebuildWheel() {
   buildCards();
   positionCards(false);
   adjustBrightness(currentBrightness);
+}
+
+// === HEADER INFO (KIMANUS + KIM) ===
+function showKimanusInfo() {
+  // KIMANUS Visitenkarte auf der mittleren Glasplatte anzeigen
+  const el = document.getElementById('card-' + currentIndex);
+  if (!el || isFlipped) return;
+  const front = el.querySelector('.card-front');
+  if (!front) return;
+  front.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🤝</div>
+      <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:2px">KIMANUS</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:4px">DEIN DIGITALES BETRIEBSSYSTEM</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:12px;line-height:1.6">KIM + MANUS = Die helfende Hand\nMensch, KI und Universum</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:12px">kimanus.de · v8.0</div>
+    </div>`;
+}
+
+function showKimInfo() {
+  const el = document.getElementById('card-' + currentIndex);
+  if (!el || isFlipped) return;
+  const front = el.querySelector('.card-front');
+  if (!front) return;
+  const cfg = getSetupConfig();
+  const mode = cfg['kim_mode'] || 'concierge';
+  const gender = cfg['kim_gender'] || 'weiblich';
+  front.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">👤</div>
+      <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:2px">KIM</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:4px">${mode === 'concierge' ? 'CONCIERGE' : 'PERSOENLICHE ASSISTENTIN'}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:12px;line-height:1.6">${gender === 'weiblich' ? 'Weiblich' : 'Maennlich'} · Durchwahl 001</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:8px">kim@kimanus.de · 0800 546 2687</div>
+    </div>`;
+}
+
+// Header-Status updaten
+function updateHeaderKimStatus() {
+  const cfg = getSetupConfig();
+  const mode = cfg['kim_mode'] || 'concierge';
+  const el = document.getElementById('header-kim-status');
+  if (el) el.textContent = 'KIM · ' + (mode === 'concierge' ? 'Concierge' : 'Assistent');
 }
 
 // === TRESOR ===
