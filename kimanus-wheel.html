@@ -1344,6 +1344,11 @@ function getOffset(i) {
 
 function spinWheel(direction) {
   if (isAnimating) return;
+  // Header-Karte entfernen wenn User am Rad dreht
+  if (headerCardActive && !isFlipped) {
+    hideHeaderCard();
+    return;
+  }
   if (isFlipped) {
     const backs = activeCards[currentIndex].backs || [];
     if (backs.length < 2) return;
@@ -2025,38 +2030,51 @@ function rebuildWheel() {
 }
 
 // === HEADER INFO (KIMANUS + KIM) ===
+let headerCardActive = null; // Merkt sich ob KIMANUS/KIM gerade angezeigt wird
+
 function showKimanusInfo() {
-  // KIMANUS Visitenkarte auf der mittleren Glasplatte anzeigen
-  const el = document.getElementById('card-' + currentIndex);
-  if (!el || isFlipped) return;
-  const front = el.querySelector('.card-front');
-  if (!front) return;
-  front.innerHTML = `
-    <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px;text-align:center">
-      <div style="font-size:36px;margin-bottom:8px">🤝</div>
-      <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:2px">KIMANUS</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:4px">DEIN DIGITALES BETRIEBSSYSTEM</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:12px;line-height:1.6">KIM + MANUS = Die helfende Hand\nMensch, KI und Universum</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:12px">kimanus.de · v8.0</div>
-    </div>`;
+  const kimanusCard = CARDS.find(c => c.id === 'landing');
+  if (!kimanusCard) return;
+  showHeaderCard(kimanusCard);
 }
 
 function showKimInfo() {
-  const el = document.getElementById('card-' + currentIndex);
-  if (!el || isFlipped) return;
-  const front = el.querySelector('.card-front');
-  if (!front) return;
-  const cfg = getSetupConfig();
-  const mode = cfg['kim_mode'] || 'concierge';
-  const gender = cfg['kim_gender'] || 'weiblich';
-  front.innerHTML = `
-    <div style="width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:16px;text-align:center">
-      <div style="font-size:36px;margin-bottom:8px">👤</div>
-      <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:2px">KIM</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:4px">${mode === 'concierge' ? 'CONCIERGE' : 'PERSOENLICHE ASSISTENTIN'}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:12px;line-height:1.6">${gender === 'weiblich' ? 'Weiblich' : 'Maennlich'} · Durchwahl 001</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:8px">kim@kimanus.de · 0800 546 2687</div>
-    </div>`;
+  const kimCard = CARDS.find(c => c.id === 'kim');
+  if (!kimCard) return;
+  showHeaderCard(kimCard);
+}
+
+function showHeaderCard(card) {
+  // Wenn schon eine Header-Karte aktiv ist, erst zuruecksetzen
+  if (headerCardActive) {
+    hideHeaderCard();
+  }
+  // Wenn geflippt, erst zurueckflippen
+  if (isFlipped) flipCard();
+
+  // Aktuelle Karte merken und Header-Karte temporaer einsetzen
+  headerCardActive = {
+    origCards: [...activeCards],
+    origIndex: currentIndex
+  };
+
+  // Header-Karte an Position 0 einfuegen
+  activeCards = [card, ...activeCards];
+  currentIndex = 0;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
+}
+
+function hideHeaderCard() {
+  if (!headerCardActive) return;
+  if (isFlipped) flipCard();
+  activeCards = headerCardActive.origCards;
+  currentIndex = headerCardActive.origIndex;
+  headerCardActive = null;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
 }
 
 // Header-Status updaten
