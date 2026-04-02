@@ -718,13 +718,26 @@ const CARDS = [
 
   // --- 2. KIM (Einziger Agent — Privat + Business) ---
   {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'0800 546 2687', phone:'kim@kimanus.de',
-   backs:[
-     {title:'Ueber KIM', content:'Ich bin dein persoenlicher Assistent.\nIch kuemmer mich um alles.\nFrag mich einfach was du brauchst.\nIch verbinde dich mit dem richtigen Experten.'},
-     {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
-     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
-     {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
-     {title:'Mein Team', content:'Ich habe ein ganzes Team hinter mir:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nDu sprichst nur mit mir.'},
-     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+   get backs() {
+     const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
+     const mode = cfg['kim_mode'] || 'concierge';
+     if (mode === 'concierge') return [
+       {title:'KIM · Concierge', content:'Ich bin dein Concierge.\nSchnell, effizient, auf den Punkt.\nIch verbinde dich sofort\nmit dem richtigen Experten.'},
+       {title:'Was ich tue', content:'Anfragen entgegennehmen\nAn den richtigen Agenten weiterleiten\nTermine koordinieren\nInformationen beschaffen\nProbleme sofort loesen'},
+       {title:'Mein Service', content:'Reservierungen buchen\nTaxi bestellen\nWeg beschreiben\nOeffnungszeiten nennen\nVerfuegbarkeit pruefen'},
+       {title:'Empfehlungen', content:'Restaurants in der Naehe\nVeranstaltungen heute\nBeste Angebote\nRegionale Geheimtipps\nImmer aktuell & lokal'},
+       {title:'Mein Team', content:'Hinter mir stehen Experten:\nScouts • Guides • Berater\nBusiness • Spezialisten\nIch verbinde dich in Sekunden.'},
+       {title:'Erreichbarkeit', content:'Gruener Button = Sprechen\nIch antworte sofort.\n0800 546 2687\nkim@kimanus.de\n24/7 fuer dich da.'},
+     ];
+     return [
+       {title:'KIM · Persoenlich', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich und denke mit.\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
+       {title:'Dein Alltag', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
+       {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nMedikamente & Arzttermine'},
+       {title:'Ich denke mit', content:'"Du bestellst immer Cappuccino."\n"Morgen hat deine Mutter Geburtstag."\n"Der Friseur hat heute offen."\n"Dein Lieblingswein ist im Angebot."\nIch lerne staendig dazu.'},
+       {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+       {title:'Immer da', content:'Gruener Button = Sprechen\nIch hoere immer zu.\n0800 546 2687\nkim@kimanus.de\nDein zweites Gedaechtnis.'},
+     ];
+   },
      // --- Duplikate fuer fluessiges Endlos-Scrollen ---
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
@@ -962,13 +975,26 @@ const CARDS = [
      'Business',
      'Spezialisten',
    ],
-   backs:[
-     {title:'Ueber KIM', content:'Ich bin dein persoenlicher Assistent.\nIch kuemmer mich um alles.\nFrag mich einfach was du brauchst.\nIch verbinde dich mit dem richtigen Experten.'},
-     {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
-     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
-     {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
-     {title:'Mein Team', content:'Ich habe ein ganzes Team hinter mir:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nDu sprichst nur mit mir.'},
-     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+   get backs() {
+     const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
+     const mode = cfg['kim_mode'] || 'concierge';
+     if (mode === 'concierge') return [
+       {title:'KIM · Concierge', content:'Ich bin dein Concierge.\nSchnell, effizient, auf den Punkt.\nIch verbinde dich sofort\nmit dem richtigen Experten.'},
+       {title:'Was ich tue', content:'Anfragen entgegennehmen\nAn den richtigen Agenten weiterleiten\nTermine koordinieren\nInformationen beschaffen\nProbleme sofort loesen'},
+       {title:'Mein Service', content:'Reservierungen buchen\nTaxi bestellen\nWeg beschreiben\nOeffnungszeiten nennen\nVerfuegbarkeit pruefen'},
+       {title:'Empfehlungen', content:'Restaurants in der Naehe\nVeranstaltungen heute\nBeste Angebote\nRegionale Geheimtipps\nImmer aktuell & lokal'},
+       {title:'Mein Team', content:'Hinter mir stehen Experten:\nScouts • Guides • Berater\nBusiness • Spezialisten\nIch verbinde dich in Sekunden.'},
+       {title:'Erreichbarkeit', content:'Gruener Button = Sprechen\nIch antworte sofort.\n0800 546 2687\nkim@kimanus.de\n24/7 fuer dich da.'},
+     ];
+     return [
+       {title:'KIM · Persoenlich', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich und denke mit.\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
+       {title:'Dein Alltag', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
+       {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nMedikamente & Arzttermine'},
+       {title:'Ich denke mit', content:'"Du bestellst immer Cappuccino."\n"Morgen hat deine Mutter Geburtstag."\n"Der Friseur hat heute offen."\n"Dein Lieblingswein ist im Angebot."\nIch lerne staendig dazu.'},
+       {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+       {title:'Immer da', content:'Gruener Button = Sprechen\nIch hoere immer zu.\n0800 546 2687\nkim@kimanus.de\nDein zweites Gedaechtnis.'},
+     ];
+   },
      // --- Duplikate fuer fluessiges Endlos-Scrollen ---
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
@@ -1851,6 +1877,7 @@ function closeSetup() {
   document.getElementById('setup-back-btn').style.display = 'none';
   document.getElementById('tresor-btn').style.display = '';
   document.getElementById('brightness-slider').style.display = '';
+  updateHeaderKimStatus();
   rebuildWheel();
 }
 
