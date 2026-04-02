@@ -655,12 +655,24 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <button onclick="toggleSpeech()" class="kb-btn kb-kim">🎤 KIM</button>
   </div>
 
+  <!-- Setup-Overlay (scrollbare Kaertchen-Auswahl) -->
+  <div id="setup-overlay" style="display:none;position:fixed;top:60px;bottom:80px;left:0;right:0;background:rgba(0,0,0,0.85);z-index:15" onclick="if(event.target===this)closeSetup()">
+    <div id="setup-panel" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#000000;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <button onclick="closeSetup()" style="background:none;border:none;color:#3b82f6;font-size:15px;cursor:pointer;padding:4px 0">‹ Zurueck</button>
+        <span style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">Einstellungen</span>
+        <div style="width:60px"></div>
+      </div>
+      <div id="setup-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 20px"></div>
+    </div>
+  </div>
+
   <!-- Tresor-Overlay (faehrt von unten hoch) -->
   <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
     <div id="tresor-panel" onclick="event.stopPropagation()">
       <div class="tresor-section-title">SETUP</div>
       <div class="tresor-grid tresor-grid-3x2">
-        <div class="tresor-tab"><span>KIM</span></div>
+        <div class="tresor-tab" onclick="openSetup()"><span>KIM</span></div>
         <div class="tresor-tab"><span>KI MANUS</span></div>
         <div class="tresor-tab"><span>Skins</span></div>
         <div class="tresor-tab"><span>Farben</span></div>
@@ -677,6 +689,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
   <div id="bottom-bar">
     <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
+    <button id="setup-back-btn" type="button" onclick="closeSetup()" style="display:none;position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);-webkit-tap-highlight-color:transparent">↩</button>
     <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔒</button>
     <button id="speech-btn" onclick="toggleSpeech()">
       <span id="speech-agent">KIM</span>
@@ -716,8 +729,6 @@ const CARDS = [
          {icon:'💰', label:'Deals'},
          {icon:'📱', label:'Social'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
          {icon:'🍽️', label:'Gastro'},
@@ -725,16 +736,16 @@ const CARDS = [
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
-         {icon:'📅', label:'Sekretaer'},
-         {icon:'📚', label:'Bibliothekar'},
        ]},
      ]},
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BERATER', items:[
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -742,8 +753,6 @@ const CARDS = [
          {icon:'⚖️', label:'Justus'},
          {icon:'💶', label:'Lena'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
          {icon:'🔒', label:'Safety'},
@@ -761,8 +770,6 @@ const CARDS = [
          {icon:'💰', label:'Deals'},
          {icon:'📱', label:'Social'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
          {icon:'🍽️', label:'Gastro'},
@@ -770,16 +777,16 @@ const CARDS = [
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
-         {icon:'📅', label:'Sekretaer'},
-         {icon:'📚', label:'Bibliothekar'},
        ]},
      ]},
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BERATER', items:[
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -787,8 +794,6 @@ const CARDS = [
          {icon:'⚖️', label:'Justus'},
          {icon:'💶', label:'Lena'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
          {icon:'🔒', label:'Safety'},
@@ -810,16 +815,12 @@ const CARDS = [
          {icon:'💳', label:'Visitenkarte'},
          {icon:'🧾', label:'Belege'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'LASER & PRINT', items:[
          {icon:'✨', label:'Gravur'},
          {icon:'🎁', label:'Geschenke'},
          {icon:'🏆', label:'Pokale'},
          {icon:'🖼️', label:'Leinwand'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'REGIOPIC', items:[
          {icon:'🖨️', label:'Fotodruck'},
          {icon:'📺', label:'Display'},
@@ -834,8 +835,6 @@ const CARDS = [
          {icon:'📖', label:'Hardcover'},
          {icon:'✈️', label:'Urlaub'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'ALLTAGSHELFER', items:[
          {icon:'🍺', label:'Alkomat'},
          {icon:'🔢', label:'Rechner'},
@@ -856,21 +855,17 @@ const CARDS = [
          {icon:'📱', label:'QR-Scan'},
          {icon:'🍺', label:'Brauerei'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'NFC-STEMPEL', items:[
          {icon:'📲', label:'Stempel'},
-         {icon:'🔒', label:'Faelschungssicher'},
-         {icon:'☕', label:'Kaffee-Karte'},
-         {icon:'🎯', label:'Treuepunkte'},
+         {icon:'🔒', label:'Sicher'},
+         {icon:'☕', label:'Kaffee'},
+         {icon:'🎯', label:'Treue'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BEZAHLEN', items:[
-         {icon:'💳', label:'Kreditkarte'},
+         {icon:'💳', label:'Karte'},
          {icon:'🅿️', label:'PayPal'},
-         {icon:'🪙', label:'Cap-Coin'},
-         {icon:'🎁', label:'Gutscheine'},
+         {icon:'🪙', label:'Coin'},
+         {icon:'🎁', label:'Gutschein'},
        ]},
      ]},
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
@@ -880,9 +875,7 @@ const CARDS = [
          {icon:'✂️', label:'Friseur'},
          {icon:'🥐', label:'Baecker'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
-       {label:'VERSCHENKTES GLUECK', items:[
+       {label:'GLUECK', items:[
          {icon:'❤️', label:'Spenden'},
          {icon:'🤝', label:'Direkt'},
          {icon:'🌐', label:'Transparent'},
@@ -902,33 +895,27 @@ const CARDS = [
          {icon:'👤', label:'Kontakte'},
          {icon:'❤️', label:'Vorlieben'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'FOTOS & VIDEOS', items:[
          {icon:'📸', label:'Alben'},
          {icon:'🎬', label:'Clips'},
          {icon:'📖', label:'Druck'},
          {icon:'👨‍👩‍👧', label:'Teilen'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'DOKUMENTE', items:[
          {icon:'🧾', label:'Rechnungen'},
          {icon:'📋', label:'Vertraege'},
          {icon:'🪪', label:'Ausweise'},
-         {icon:'🔒', label:'Verschluesselt'},
+         {icon:'🔒', label:'Sicher'},
        ]},
      ]},
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
-       {label:'MEINE GERAETE', items:[
+       {label:'GERAETE', items:[
          {icon:'📱', label:'Handy'},
          {icon:'🔲', label:'Mikrowelle'},
          {icon:'🖥️', label:'PC'},
          {icon:'📘', label:'Anleitung'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
-       {label:'BUECHERREGAL', items:[
+       {label:'BUECHER', items:[
          {icon:'📚', label:'Buecher'},
          {icon:'🍳', label:'Rezepte'},
          {icon:'🗺️', label:'Reisefuehrer'},
@@ -948,16 +935,12 @@ const CARDS = [
          {icon:'📞', label:'Telefon'},
          {icon:'📧', label:'E-Mail'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
-       {label:'NAVIGATION & MEDIEN', items:[
+       {label:'NAVIGATION', items:[
          {icon:'🗺️', label:'Maps'},
          {icon:'🚂', label:'DB'},
          {icon:'🎵', label:'Spotify'},
          {icon:'🎬', label:'Netflix'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'ALLTAG', items:[
          {icon:'🏦', label:'Banking'},
          {icon:'🛒', label:'Amazon'},
@@ -972,8 +955,6 @@ const CARDS = [
          {icon:'👴', label:'Senioren'},
          {icon:'🎓', label:'Profis'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'HANDY-SCHUTZ', items:[
          {icon:'🚫', label:'Fake-Anruf'},
          {icon:'🎣', label:'Phishing'},
@@ -1026,8 +1007,6 @@ const CARDS = [
          {icon:'💰', label:'Deals'},
          {icon:'📱', label:'Social'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
          {icon:'🍽️', label:'Gastro'},
@@ -1035,16 +1014,16 @@ const CARDS = [
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
-         {icon:'📅', label:'Sekretaer'},
-         {icon:'📚', label:'Bibliothekar'},
        ]},
      ]},
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BERATER', items:[
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -1052,8 +1031,6 @@ const CARDS = [
          {icon:'⚖️', label:'Justus'},
          {icon:'💶', label:'Lena'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
          {icon:'🔒', label:'Safety'},
@@ -1071,8 +1048,6 @@ const CARDS = [
          {icon:'💰', label:'Deals'},
          {icon:'📱', label:'Social'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'GUIDES', items:[
          {icon:'🎭', label:'Animateur'},
          {icon:'🍽️', label:'Gastro'},
@@ -1080,16 +1055,16 @@ const CARDS = [
          {icon:'📍', label:'RegioPilot'},
          {icon:'🏛️', label:'Stadtfuehrer'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'BERATER', items:[
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'🌍', label:'Dolmetscher'},
-         {icon:'📅', label:'Sekretaer'},
-         {icon:'📚', label:'Bibliothekar'},
        ]},
      ]},
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BERATER', items:[
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
        {label:'BUSINESS', items:[
          {icon:'🧮', label:'Kalkulierer'},
          {icon:'📦', label:'Bestellprofi'},
@@ -1097,8 +1072,6 @@ const CARDS = [
          {icon:'⚖️', label:'Justus'},
          {icon:'💶', label:'Lena'},
        ]},
-     ]},
-     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SPEZIALISTEN', items:[
          {icon:'💻', label:'IT-Hilfe'},
          {icon:'🔒', label:'Safety'},
@@ -1429,29 +1402,36 @@ function buildBackCards() {
     } else if (back.type === 'grid') {
       const cols = back.gridCols || 4;
       if (back.sections) {
-        // Exakte Prozent-Positionen aus Excalidraw (355x210 Glasplatte)
-        // Jedes Kaertchen: x/355*100 = left%, y/210*100 = top%, w/355*100 = width%, h/210*100 = height%
-        const GW = 355, GH = 210; // Excalidraw Glasplatte
-        const cardW = (78/GW*100).toFixed(1); // 22.0%
-        const cardH = (45/GH*100).toFixed(1); // 21.4%
-        // 4 Spalten Positionen aus Excalidraw: x=9, 95, 181, 267
+        const GW = 355, GH = 210;
+        const cardW = (78/GW*100).toFixed(1);
+        const cardH = (45/GH*100).toFixed(1);
         const colX = [9,95,181,267].map(x => (x/GW*100).toFixed(1));
-        // Reihen: y=21, 88, 155 (3 Reihen moeglich)
         const rowY = [21,88,155].map(y => (y/GH*100).toFixed(1));
-        // Labels: 2px unter Kaertchen
         const labelOffset = ((45+3)/GH*100).toFixed(1);
-        let html = '';
+        // Sammle alle Items aus allen Sections zusammen
+        let allItems = [];
         back.sections.forEach(sec => {
-          html += `<div style="position:absolute;left:${(9/GW*100).toFixed(1)}%;top:${(3/GH*100).toFixed(1)}%;font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:3px;text-transform:uppercase">${sec.label}</div>`;
           sec.items.forEach((item, idx) => {
-            const col = idx % cols;
-            const row = Math.floor(idx / cols);
-            const left = colX[col];
-            const top = rowY[row];
-            const lTop = (parseFloat(top) + parseFloat(labelOffset)).toFixed(1);
-            html += `<div style="position:absolute;left:${left}%;top:${top}%;width:${cardW}%;height:${cardH}%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer">${item.icon}</div>`;
-            html += `<div style="position:absolute;left:${left}%;top:${lTop}%;width:${cardW}%;text-align:center;font-size:11px;font-weight:600;color:rgba(255,255,255,0.4)">${item.label}</div>`;
+            allItems.push({icon:item.icon, label:item.label, secLabel:sec.label, isFirst:idx===0});
           });
+        });
+        let html = '';
+        let lastLabel = '';
+        allItems.forEach((item, idx) => {
+          if (idx >= 12) return; // Max 12 pro Glasplatte (4x3)
+          const col = idx % cols;
+          const row = Math.floor(idx / cols);
+          const left = colX[col];
+          const top = rowY[row];
+          const lTop = (parseFloat(top) + parseFloat(labelOffset)).toFixed(1);
+          // Genre-Label beim ersten Item eines neuen Genres
+          if (item.secLabel !== lastLabel) {
+            const hTop = (parseFloat(top) - 6).toFixed(1);
+            html += `<div style="position:absolute;left:${left}%;top:${hTop}%;font-size:8px;font-weight:700;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase">${item.secLabel}</div>`;
+            lastLabel = item.secLabel;
+          }
+          html += `<div style="position:absolute;left:${left}%;top:${top}%;width:${cardW}%;height:${cardH}%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer">${item.icon}</div>`;
+          html += `<div style="position:absolute;left:${left}%;top:${lTop}%;width:${cardW}%;text-align:center;font-size:11px;font-weight:600;color:rgba(255,255,255,0.4)">${item.label}</div>`;
         });
         inner = `<div style="position:relative;width:100%;height:100%">${html}</div>`;
       } else {
@@ -1627,6 +1607,219 @@ function adjustBrightness(val) {
   document.getElementById('header').style.borderBottom = edgeBorder;
   document.getElementById('bottom-bar').style.borderTop = edgeBorder;
   document.getElementById('bottom-bar').style.borderBottom = edgeBorder;
+  // Setup-Panel Helligkeit anpassen
+  const setupPanel = document.getElementById('setup-panel');
+  if (setupPanel) {
+    const setupBg = Math.round(v * 40);
+    setupPanel.style.background = `rgb(${setupBg},${setupBg},${setupBg})`;
+  }
+}
+
+// === SETUP (Kaertchen-Auswahl) ===
+function getSetupConfig() {
+  try { return JSON.parse(localStorage.getItem('kimanus-setup') || '{}'); } catch(e) { return {}; }
+}
+function saveSetupConfig(cfg) {
+  localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
+}
+
+function openSetup() {
+  closeTresor();
+  const cfg = getSetupConfig();
+  const list = document.getElementById('setup-list');
+  const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
+  const groupStyle = 'background:rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:20px';
+  const rowStyle = 'display:flex;align-items:center;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.06);gap:12px';
+  const lastRowStyle = 'display:flex;align-items:center;padding:11px 16px;gap:12px';
+  const labelStyle = 'flex:1;font-size:15px;color:rgba(255,255,255,0.7)';
+  const labelOffStyle = 'flex:1;font-size:15px;color:rgba(255,255,255,0.25)';
+  const subLabelStyle = 'flex:1;font-size:14px;color:rgba(255,255,255,0.5)';
+  const subLabelOffStyle = 'flex:1;font-size:14px;color:rgba(255,255,255,0.2)';
+  const iconBox = (emoji) => `<div style="width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emoji}</div>`;
+  const toggle = (key, on) => `<div onclick="toggleSetupItem('${key}',${!on})" style="width:42px;height:26px;border-radius:13px;background:${on?'#22c55e':'rgba(255,255,255,0.15)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:22px;height:22px;border-radius:11px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div></div>`;
+
+  let html = '';
+
+  // KIM Profil-Karte (wie Apple ID oben in den Einstellungen)
+  const kimMode = cfg['kim_mode'] || 'persoenlich';
+  const kimGender = cfg['kim_gender'] || 'weiblich';
+  const kimVoice = cfg['kim_voice'] || 'warm';
+  html += `<div onclick="" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👤</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
+  html += `</div>`;
+
+  // KIM Einstellungen
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">KIM Einstellungen</div>`;
+  html += `<div style="${groupStyle}">`;
+  // Modus
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('🎭');
+  html += `<span style="${labelStyle}">Modus</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_mode','concierge')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimMode==='concierge'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Concierge</div>`;
+  html += `<div onclick="toggleSetupItem('kim_mode','persoenlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimMode==='persoenlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Persoenlich</div>`;
+  html += `</div></div>`;
+  // Geschlecht
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('⚥');
+  html += `<span style="${labelStyle}">Geschlecht</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_gender','weiblich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='weiblich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Weiblich</div>`;
+  html += `<div onclick="toggleSetupItem('kim_gender','maennlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='maennlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Maennlich</div>`;
+  html += `</div></div>`;
+  // Stimme
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('🔊');
+  html += `<span style="${labelStyle}">Stimme</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_voice','warm')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimVoice==='warm'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Warm</div>`;
+  html += `<div onclick="toggleSetupItem('kim_voice','kuhl')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimVoice==='kuhl'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Kuhl</div>`;
+  html += `</div></div>`;
+  // Sprache
+  html += `<div style="${lastRowStyle}">`;
+  html += iconBox('🌐');
+  html += `<span style="${labelStyle}">Sprache</span>`;
+  html += `<span style="color:rgba(255,255,255,0.3);font-size:14px">Deutsch ›</span>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  // KI MANUS (Erweitert)
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">KI MANUS</div>`;
+  html += `<div style="${groupStyle}">`;
+  const llmQuality = cfg['llm_quality'] || 'ausgewogen';
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('🧠');
+  html += `<span style="${labelStyle}">KI-Qualitaet</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('llm_quality','schnell')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='schnell'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Schnell</div>`;
+  html += `<div onclick="toggleSetupItem('llm_quality','ausgewogen')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='ausgewogen'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Ausgewogen</div>`;
+  html += `<div onclick="toggleSetupItem('llm_quality','premium')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='premium'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Premium</div>`;
+  html += `</div></div>`;
+  html += `<div style="${lastRowStyle}">`;
+  html += iconBox('⚙️');
+  html += `<span style="${labelStyle}">Orchestrator</span>`;
+  html += `<span style="color:rgba(255,255,255,0.3);font-size:14px">Automatisch ›</span>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  // Funktionen als einklappbare Container
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Funktionen</div>`;
+
+  // Jede Karte als ein Eintrag der sich aufklappt
+  html += `<div style="${groupStyle}">`;
+  configCards.forEach((card, ci) => {
+    const cardKey = 'setup_open_' + card.id;
+    const isOpen = cfg[cardKey] === true;
+    const sections = [];
+    card.backs.forEach(back => {
+      if (back.type === 'grid' && back.sections) sections.push(...back.sections);
+    });
+    const enabledCount = sections.filter(s => cfg[card.id + '_' + s.label] !== false).length;
+
+    // Hauptzeile (klickbar zum Auf/Zuklappen)
+    html += `<div onclick="toggleSetupItem('${cardKey}',${!isOpen})" style="${ci < configCards.length - 1 || isOpen ? rowStyle : lastRowStyle}cursor:pointer">`;
+    html += iconBox(card.icon);
+    html += `<div style="flex:1"><span style="${labelStyle}">${card.title}</span><div style="font-size:12px;color:rgba(255,255,255,0.2)">${enabledCount}/${sections.length} aktiv</div></div>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
+    html += `</div>`;
+
+    // Aufgeklappter Inhalt
+    if (isOpen) {
+      sections.forEach((sec, si) => {
+        const secKey = card.id + '_' + sec.label;
+        const secEnabled = cfg[secKey] !== false;
+        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${si < sections.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}gap:10px">`;
+        html += `<span style="font-size:18px;flex-shrink:0">${sec.items[0]?.icon || '📦'}</span>`;
+        html += `<span style="${secEnabled ? subLabelStyle : subLabelOffStyle}">${sec.label}</span>`;
+        html += toggle(secKey, secEnabled);
+        html += `</div>`;
+      });
+    }
+  });
+  html += `</div>`;
+  // Profile
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Profile</div>`;
+  html += `<div style="${groupStyle}">`;
+  ['all','minimal','gastro','privat'].forEach((p,i) => {
+    const names = {all:'Alles aktivieren',minimal:'Minimal (nur KIM)',gastro:'Gastronomie',privat:'Privat'};
+    const icons = {all:'🌟',minimal:'✨',gastro:'🍽️',privat:'🏠'};
+    html += `<div onclick="applyProfile('${p}')" style="${i<3?rowStyle:lastRowStyle}cursor:pointer">`;
+    html += iconBox(icons[p]);
+    html += `<span style="${labelStyle}">${names[p]}</span>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:14px">›</span>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  list.innerHTML = html;
+  document.getElementById('setup-overlay').style.display = 'block';
+  document.getElementById('setup-back-btn').style.display = 'block';
+  document.getElementById('tresor-btn').style.display = 'none';
+  document.getElementById('brightness-slider').style.display = 'none';
+}
+
+function closeSetup() {
+  document.getElementById('setup-overlay').style.display = 'none';
+  document.getElementById('setup-back-btn').style.display = 'none';
+  document.getElementById('tresor-btn').style.display = '';
+  document.getElementById('brightness-slider').style.display = '';
+  rebuildWheel();
+}
+
+function toggleSetupItem(key, enabled) {
+  const cfg = getSetupConfig();
+  cfg[key] = enabled;
+  saveSetupConfig(cfg);
+  // Checkbox-Farbe live updaten
+  openSetup();
+}
+
+function applyProfile(profile) {
+  const cfg = {};
+  if (profile === 'all') {
+    // Alles loeschen = alles an (default)
+  } else if (profile === 'minimal') {
+    // Alles aus ausser KIM Scouts
+    CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+      card.backs.forEach(back => {
+        if (back.sections) back.sections.forEach(sec => {
+          const key = card.id + '_' + sec.label;
+          cfg[key] = (card.id === 'kim' && sec.label === 'SCOUTS');
+        });
+      });
+    });
+  } else if (profile === 'gastro') {
+    CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+      card.backs.forEach(back => {
+        if (back.sections) back.sections.forEach(sec => {
+          const key = card.id + '_' + sec.label;
+          const gastroSections = ['BUSINESS','SCANNER','ALLTAGSHELFER','CAP-COIN','NFC-STEMPEL','BEZAHLEN'];
+          cfg[key] = gastroSections.includes(sec.label);
+        });
+      });
+    });
+  } else if (profile === 'privat') {
+    CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+      card.backs.forEach(back => {
+        if (back.sections) back.sections.forEach(sec => {
+          const key = card.id + '_' + sec.label;
+          const privatSections = ['SCOUTS','GUIDES','GEDAECHTNIS','FOTOS & VIDEOS','KOMMUNIKATION','ALLTAG'];
+          cfg[key] = privatSections.includes(sec.label);
+        });
+      });
+    });
+  }
+  saveSetupConfig(cfg);
+  openSetup();
+}
+
+function rebuildWheel() {
+  // Rad mit aktiver Konfiguration neu bauen
+  if (isFlipped) flipCard();
+  currentIndex = 0;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
 }
 
 // === TRESOR ===
