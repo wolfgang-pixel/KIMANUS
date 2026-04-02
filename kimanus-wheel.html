@@ -623,9 +623,9 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 <div id="app">
   <div id="header">
     <div class="logo-circle" onclick="showKimanusInfo()">K</div>
-    <div style="flex:1;cursor:pointer" onclick="showKimanusInfo()">
-      <div class="title" style="margin:0;line-height:1.2">KIMANUS</div>
-      <div id="header-kim-status" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px" onclick="event.stopPropagation();showKimInfo()">KIM · Concierge</div>
+    <div style="flex:1">
+      <div class="title" style="margin:0;line-height:1.2;cursor:pointer" onclick="showKimanusInfo()">KIMANUS</div>
+      <div id="header-kim-status" onclick="showKimInfo()" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:1.5px;cursor:pointer;padding:2px 0">KIM · Concierge</div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
@@ -1921,8 +1921,8 @@ function toggleSetupItem(key, enabled) {
   const cfg = getSetupConfig();
   cfg[key] = enabled;
   saveSetupConfig(cfg);
-  // Checkbox-Farbe live updaten
-  openSetup();
+  // Setup neu rendern aber offen lassen
+  openSetup(setupMode);
 }
 
 function applyProfile(profile) {
@@ -1998,9 +1998,13 @@ function rebuildWheel() {
     wheelCards.push(chat);
   }
 
-  // Duplikate fuer Endlos-Rad
-  const dupes = wheelCards.map(c => ({...c, id: c.id + '_dup'}));
-  wheelCards = wheelCards.concat(dupes);
+  // Duplikate fuer fluessiges Endlos-Rad (mindestens 5 Karten)
+  const origCards = [...wheelCards];
+  while (wheelCards.length < 5) {
+    wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_d' + wheelCards.length})));
+  }
+  // Immer noch eine Runde Duplikate dazu
+  wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_dup'})));
 
   // Hinweis-Karte wenn Rad leer oder fast leer
   if (wheelCards.length === 0) {
