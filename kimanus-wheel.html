@@ -1762,8 +1762,9 @@ function openSetup(mode) {
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Agenten</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein Team zusammenstellen</div></div>`;
   html += `</div>`;
 
-  // Aktive Agenten oben anzeigen (schnell deaktivieren)
-  const activeAgents = ALL_AGENTS.filter(a => cfg['agent_' + a.id] === true);
+  // Nur aktive aus den Agenten-Kategorien (Scouts, Guides, Berater, Spezialisten)
+  const agentCategories = ['Scouts','Guides','Berater','Business','Spezialisten'];
+  const activeAgents = ALL_AGENTS.filter(a => agentCategories.includes(a.category) && cfg['agent_' + a.id] === true);
   if (activeAgents.length > 0) {
     html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktiv (${activeAgents.length})</div>`;
     html += `<div style="${groupStyle}">`;
@@ -1819,8 +1820,9 @@ function openSetup(mode) {
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Abteilungen</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Deine Firma, deine Mitarbeiter</div></div>`;
   html += `</div>`;
 
-  // Aktive aus Abteilungen oben anzeigen
-  const activeInAbt = ALL_AGENTS.filter(a => cfg['agent_' + a.id] === true);
+  // Nur aktive aus Abteilungs-Kategorien (Recht, Finanzen)
+  const abtCategories = ['Recht','Finanzen'];
+  const activeInAbt = ALL_AGENTS.filter(a => abtCategories.includes(a.category) && cfg['agent_' + a.id] === true);
   const activeCards2 = ['tools','wallet','archiv','apps'].filter(id => cfg['card_' + id] === true);
   if (activeInAbt.length > 0 || activeCards2.length > 0) {
     html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktiv (${activeInAbt.length + activeCards2.length})</div>`;
