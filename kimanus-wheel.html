@@ -1402,6 +1402,10 @@ function flipCard() {
     wheelTrack.style.display = 'block';
     el.classList.remove('flipped');
     positionCards(false);
+    // Header-Karte entfernen wenn zurueckgeflippt
+    if (headerCardActive) {
+      setTimeout(() => hideHeaderCard(), 300);
+    }
   }
   updateFlipLabel();
 }
