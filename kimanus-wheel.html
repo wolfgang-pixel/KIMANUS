@@ -674,9 +674,9 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div class="tresor-grid tresor-grid-3x2">
         <div class="tresor-tab" onclick="openSetupKim()"><span>KIM</span></div>
         <div class="tresor-tab" onclick="openSetupAgenten()"><span>Agenten</span></div>
+        <div class="tresor-tab" onclick="openSetupKimanus()"><span>KIMANUS</span></div>
+        <div class="tresor-tab" onclick="openSetupClaude()"><span>Claude</span></div>
         <div class="tresor-tab"><span>Skins</span></div>
-        <div class="tresor-tab"><span>Farben</span></div>
-        <div class="tresor-tab"><span>Sprache</span></div>
         <div class="tresor-tab"><span>System</span></div>
       </div>
       <div class="tresor-divider"><span>SAVE</span></div>
@@ -1701,6 +1701,14 @@ function openSetupAgenten() {
   closeTresor();
   openSetup('agenten');
 }
+function openSetupKimanus() {
+  closeTresor();
+  openSetup('kimanus');
+}
+function openSetupClaude() {
+  closeTresor();
+  openSetup('claude');
+}
 
 let setupMode = 'kim';
 function openSetup(mode) {
@@ -1828,6 +1836,53 @@ function openSetup(mode) {
   });
   html += `</div>`;
   } // Ende Agenten-Setup
+
+  if (setupMode === 'kimanus') {
+  // KIMANUS Orchestrator Einstellungen
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🤝</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIMANUS</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Orchestrator & Agenten-Manager</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Orchestrierung</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🔀')}<span style="${labelStyle}">Auto-Routing</span><span style="color:rgba(100,200,100,0.6);font-size:13px">Aktiv</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🧠')}<span style="${labelStyle}">Agenten-Training</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📊')}<span style="${labelStyle}">Qualitaets-Check</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('⚡')}<span style="${labelStyle}">Neue Skills vergeben</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">LLM Routing</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🚀')}<div style="flex:1"><span style="${labelStyle}">Schnell (Groq)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Scouts, einfache Fragen</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('⚖️')}<div style="flex:1"><span style="${labelStyle}">Ausgewogen (DeepSeek)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Berater, Business</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('💎')}<div style="flex:1"><span style="${labelStyle}">Premium (Claude)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KIM persoenlich, komplexe Aufgaben</div></div></div>`;
+  html += `</div>`;
+  } // Ende KIMANUS-Setup
+
+  if (setupMode === 'claude') {
+  // Claude Einstellungen
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#d4a574,#c2410c);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧡</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Claude</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Chefentwickler & Berater</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Verbindung</div>`;
+  html += `<div style="${groupStyle}">`;
+  const claudeConnected = true;
+  html += `<div style="${rowStyle}">${iconBox('🔗')}<span style="${labelStyle}">Status</span><span style="color:${claudeConnected?'rgba(100,200,100,0.7)':'rgba(230,57,70,0.7)'};font-size:13px">${claudeConnected?'Verbunden':'Offline'}</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🤖')}<span style="${labelStyle}">Modell</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Opus 4.6</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('📊')}<span style="${labelStyle}">Kontext</span><span style="color:rgba(255,255,255,0.3);font-size:13px">1M Tokens</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Faehigkeiten</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('💻')}<div style="flex:1"><span style="${labelStyle}">Code schreiben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Apps, Workflows, Websites</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🔧')}<div style="flex:1"><span style="${labelStyle}">Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Neue Agenten per Sprache erstellen</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🌐')}<div style="flex:1"><span style="${labelStyle}">Web durchsuchen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Recherche, Browser Use</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🖥️')}<div style="flex:1"><span style="${labelStyle}">Server verwalten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Docker, Deploy, Monitoring</div></div></div>`;
+  html += `</div>`;
+  } // Ende Claude-Setup
 
   // Profile (in beiden Modi)
   html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Profile</div>`;
