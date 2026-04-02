@@ -1364,7 +1364,15 @@ function flipCard() {
 
 function buildBackCards() {
   const card = activeCards[currentIndex];
-  const backs = card.backs || [];
+  let backs = card.backs || [];
+  // Bei weniger als 5 Backs: verdoppeln fuer fluessiges Endlos-Drehen
+  if (backs.length > 0 && backs.length < 5) {
+    const orig = [...backs];
+    while (backs.length < 5) {
+      backs = backs.concat(orig.map(b => ({...b})));
+    }
+    card.backs = backs;
+  }
   const backTrack = document.getElementById('back-track');
   backTrack.innerHTML = backs.map((back, i) => {
     let inner = '';
@@ -1408,19 +1416,34 @@ function buildBackCards() {
         const colX = [9,95,181,267].map(x => (x/GW*100).toFixed(1));
         const rowY = [22,82,142].map(y => (y/GH*100).toFixed(1)); // enger zusammen
         const labelOffset = ((40+2)/GH*100).toFixed(1);
-        // Erst berechnen welche Genres draufpassen (max 3 Reihen)
+        // Setup-Config lesen und deaktivierte Genres/Items filtern
+        const setupCfg = getSetupConfig();
+        const cardId = activeCards[currentIndex]?.id?.replace('2','') || '';
+        const filteredSections = back.sections.filter(sec => {
+          const secKey = cardId + '_' + sec.label;
+          return setupCfg[secKey] !== false;
+        }).map(sec => {
+          const secKey = cardId + '_' + sec.label;
+          const filteredItems = sec.items.filter(item => {
+            const itemKey = secKey + '_' + item.label;
+            return setupCfg[itemKey] !== false;
+          });
+          return {...sec, items: filteredItems};
+        }).filter(sec => sec.items.length > 0);
+
+        // Berechnen welche Genres draufpassen (max 3 Reihen)
         let testRow = 0;
         const visibleGenres = [];
-        back.sections.forEach(sec => {
+        filteredSections.forEach(sec => {
           if (testRow >= 3) return;
           visibleGenres.push(sec.label);
           const rowsNeeded = Math.ceil(sec.items.length / cols);
           testRow += rowsNeeded;
         });
         const genreNames = visibleGenres.join(' · ');
-        let html = `<div style="position:absolute;left:2.5%;top:1%;font-size:9px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase">${genreNames}</div>`;
+        let html = genreNames ? `<div style="position:absolute;left:2.5%;top:1%;font-size:9px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase">${genreNames}</div>` : '';
         let currentRow = 0;
-        back.sections.forEach(sec => {
+        filteredSections.forEach(sec => {
           if (currentRow >= 3) return;
           sec.items.forEach((item, idx) => {
             const col = idx % cols;
@@ -1713,10 +1736,25 @@ function openSetup() {
   configCards.forEach((card, ci) => {
     const cardKey = 'setup_open_' + card.id;
     const isOpen = cfg[cardKey] === true;
-    const sections = [];
+    // Sections deduplizieren und Items zusammenfassen
+    const sectionsMap = {};
     card.backs.forEach(back => {
-      if (back.type === 'grid' && back.sections) sections.push(...back.sections);
+      if (back.type === 'grid' && back.sections) {
+        back.sections.forEach(sec => {
+          if (!sectionsMap[sec.label]) {
+            sectionsMap[sec.label] = {label: sec.label, items: [...sec.items]};
+          } else {
+            // Nur Items hinzufuegen die noch nicht drin sind
+            sec.items.forEach(item => {
+              if (!sectionsMap[sec.label].items.find(i => i.label === item.label)) {
+                sectionsMap[sec.label].items.push(item);
+              }
+            });
+          }
+        });
+      }
     });
+    const sections = Object.values(sectionsMap);
     const enabledCount = sections.filter(s => cfg[card.id + '_' + s.label] !== false).length;
 
     // Hauptzeile (klickbar zum Auf/Zuklappen)
@@ -1758,6 +1796,9 @@ function openSetup() {
   document.getElementById('setup-back-btn').style.display = 'block';
   document.getElementById('tresor-btn').style.display = 'none';
   document.getElementById('brightness-slider').style.display = 'none';
+  // Flip-Label verstecken
+  const fl = document.getElementById('flip-label');
+  if (fl) fl.style.display = 'none';
 }
 
 function closeSetup() {
