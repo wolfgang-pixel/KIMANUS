@@ -1819,6 +1819,32 @@ function openSetup(mode) {
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Abteilungen</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Deine Firma, deine Mitarbeiter</div></div>`;
   html += `</div>`;
 
+  // Aktive aus Abteilungen oben anzeigen
+  const activeInAbt = ALL_AGENTS.filter(a => cfg['agent_' + a.id] === true);
+  const activeCards2 = ['tools','wallet','archiv','apps'].filter(id => cfg['card_' + id] === true);
+  if (activeInAbt.length > 0 || activeCards2.length > 0) {
+    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktiv (${activeInAbt.length + activeCards2.length})</div>`;
+    html += `<div style="${groupStyle}">`;
+    activeInAbt.forEach((agent, ai) => {
+      const key = 'agent_' + agent.id;
+      html += `<div style="${rowStyle}">`;
+      html += iconBox(agent.icon);
+      html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+      html += toggle(key, true);
+      html += `</div>`;
+    });
+    const cardNames = {tools:'🛠️ Tools',wallet:'💳 Wallet',archiv:'📁 Archiv',apps:'📱 Apps'};
+    activeCards2.forEach(id => {
+      const key = 'card_' + id;
+      html += `<div style="${rowStyle}">`;
+      html += iconBox(cardNames[id]?.charAt(0) || '📦');
+      html += `<span style="${labelStyle}">${cardNames[id] || id}</span>`;
+      html += toggle(key, true);
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
   const abteilungen = [
     {id:'rechtsabteilung', icon:'⚖️', name:'Rechtsabteilung', agents:['ag-justus','ag-steuerrecht','ag-patentrecht','ag-arbeitsrecht','ag-veranstaltungsrecht'],
      sub:'Allgemein, Steuer, Patent, Arbeit, Veranstaltung'},
