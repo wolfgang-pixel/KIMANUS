@@ -1185,16 +1185,17 @@ let isAnimating = false;
 
 function init() {
   calcSizes();
-  buildCards();
+  // Setup-Config anwenden BEVOR Karten gebaut werden
+  rebuildWheel();
 
   // Wiederkehrende Nutzer: letzte Position wiederherstellen
   const visited = localStorage.getItem('kimanus-visited');
   const lastCard = parseInt(localStorage.getItem('kimanus-lastCard') || '0');
   if (visited && lastCard > 0 && lastCard < activeCards.length) {
     currentIndex = lastCard;
+    positionCards(false);
   }
 
-  positionCards(false);
   window.addEventListener('resize', () => { calcSizes(); positionCards(false); });
 }
 
@@ -1642,7 +1643,27 @@ function adjustBrightness(val) {
 
 // === SETUP (Kaertchen-Auswahl) ===
 function getSetupConfig() {
-  try { return JSON.parse(localStorage.getItem('kimanus-setup') || '{}'); } catch(e) { return {}; }
+  try {
+    const stored = localStorage.getItem('kimanus-setup');
+    if (!stored) {
+      // Erster Start: Alles ausschalten ausser KIM Scouts
+      const defaultCfg = {};
+      CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+        if (card.backs) card.backs.forEach(back => {
+          if (back.type === 'grid' && back.sections) {
+            back.sections.forEach(sec => {
+              const secKey = card.id.replace('2','') + '_' + sec.label;
+              // Nur KIM SCOUTS an, alles andere aus
+              defaultCfg[secKey] = (card.id === 'kim' && sec.label === 'SCOUTS');
+            });
+          }
+        });
+      });
+      localStorage.setItem('kimanus-setup', JSON.stringify(defaultCfg));
+      return defaultCfg;
+    }
+    return JSON.parse(stored);
+  } catch(e) { return {}; }
 }
 function saveSetupConfig(cfg) {
   localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
