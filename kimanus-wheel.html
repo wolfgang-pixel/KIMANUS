@@ -678,7 +678,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div class="tresor-grid tresor-grid-3x2">
         <div class="tresor-tab" onclick="openSetupKim()"><span>KIM</span></div>
         <div class="tresor-tab" onclick="openSetupAgenten()"><span>Agenten</span></div>
-        <div class="tresor-tab" onclick="openSetupBereiche()"><span>Bereiche</span></div>
+        <div class="tresor-tab" onclick="openSetupBereiche()"><span>Abteilungen</span></div>
         <div class="tresor-tab" onclick="openSetupKimanus()"><span>KIMANUS</span></div>
         <div class="tresor-tab" onclick="openSetupClaude()"><span>Claude</span></div>
         <div class="tresor-tab"><span>System</span></div>
@@ -1767,37 +1767,81 @@ function openSetup(mode) {
   } // Ende Agenten-Setup
 
   if (setupMode === 'bereiche') {
-  // Bereiche (Tools, Wallet, Archiv, Apps, Skins)
+  // Abteilungen wie in einer Firma
   html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
-  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📦</div>`;
-  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Bereiche</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Tools, Wallet, Archiv & mehr</div></div>`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🏢</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Abteilungen</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Deine Firma, deine Mitarbeiter</div></div>`;
   html += `</div>`;
 
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktivieren / Deaktivieren</div>`;
-  html += `<div style="${groupStyle}">`;
-  const extraCards = [
-    {id:'tools',icon:'🛠️',name:'Tools',sub:'Scanner, Laser, Print, RegioPic, Fotoalbum'},
-    {id:'wallet',icon:'💳',name:'Wallet',sub:'Cap-Coin, NFC-Stempel, Bezahlen, Clubkarten'},
-    {id:'archiv',icon:'📁',name:'Archiv',sub:'Fotos, Dokumente, Geraete, Buecher'},
-    {id:'apps',icon:'📱',name:'Apps',sub:'WhatsApp, Maps, Handy-Hilfe, Schutz'},
+  const abteilungen = [
+    {id:'rechtsabteilung', icon:'⚖️', name:'Rechtsabteilung', agents:['ag-justus'],
+     sub:'Patentrecht, Steuerrecht, Arbeitsrecht'},
+    {id:'finanzabteilung', icon:'💶', name:'Finanzabteilung', agents:['ag-lena'],
+     sub:'Buchhaltung, Steuern, Rechnungen'},
+    {id:'einkauf', icon:'📦', name:'Einkauf & Lager', agents:['ag-bestellprofi','ag-lagerist','ag-kalkulierer'],
+     sub:'Bestellung, Inventur, Kalkulation'},
+    {id:'marketing', icon:'📣', name:'Marketing & Medien', agents:['ag-marketing','ag-dj','ag-print'],
+     sub:'Werbung, Musik, Drucksachen'},
+    {id:'empfang', icon:'🏛️', name:'Empfang & Concierge', agents:['ag-stadtfuehrer','ag-gastro','ag-animateur'],
+     sub:'Gaeste, Restaurants, Events'},
+    {id:'recherche', icon:'🔍', name:'Recherche & Scouts', agents:['ag-youtube','ag-web','ag-news','ag-deals','ag-social'],
+     sub:'Videos, Web, News, Angebote'},
+    {id:'beratung', icon:'💡', name:'Beratung', agents:['ag-wetterfrosch','ag-dolmetscher','ag-sekretaer','ag-bibliothekar'],
+     sub:'Wetter, Sprachen, Termine, Wissen'},
+    {id:'sicherheit', icon:'🔒', name:'Sicherheit & IT', agents:['ag-ithilfe','ag-safety','ag-nachtfahrer'],
+     sub:'IT-Support, Safety-Check, Heimfahrt'},
+    {id:'tools', icon:'🛠️', name:'Werkstatt & Tools', cardId:'tools',
+     sub:'Scanner, Laser, RegioPic, Fotoalbum'},
+    {id:'finanzen', icon:'💳', name:'Kasse & Wallet', cardId:'wallet',
+     sub:'Cap-Coin, NFC-Stempel, Bezahlen'},
+    {id:'archiv_abt', icon:'📁', name:'Archiv & Ablage', cardId:'archiv',
+     sub:'Fotos, Dokumente, Buecher, Geraete'},
+    {id:'it_abt', icon:'📱', name:'IT & Apps', cardId:'apps',
+     sub:'WhatsApp, Maps, Handy-Hilfe'},
   ];
-  extraCards.forEach((ec, ei) => {
-    const key = 'card_' + ec.id;
-    const enabled = cfg[key] === true;
-    const isLast = ei === extraCards.length - 1;
-    html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
-    html += iconBox(ec.icon);
-    html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${ec.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${ec.sub}</div></div>`;
-    html += toggle(key, enabled);
+
+  abteilungen.forEach((abt, ai) => {
+    const abtKey = 'abt_open_' + abt.id;
+    const isOpen = cfg[abtKey] === true;
+    // Zaehle aktive Mitarbeiter
+    let activeCount = 0;
+    let totalCount = 0;
+    if (abt.agents) {
+      totalCount = abt.agents.length;
+      activeCount = abt.agents.filter(a => cfg['agent_' + a] === true).length;
+    } else if (abt.cardId) {
+      totalCount = 1;
+      activeCount = cfg['card_' + abt.cardId] === true ? 1 : 0;
+    }
+
+    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:${ai===0?'0':'8'}px">${abt.name} <span style="color:rgba(255,255,255,0.15)">${activeCount}/${totalCount}</span></div>`;
+    html += `<div style="${groupStyle}">`;
+
+    if (abt.agents) {
+      // Abteilung mit einzelnen Mitarbeitern
+      const agents = abt.agents.map(id => ALL_AGENTS.find(a => a.id === id)).filter(Boolean);
+      agents.forEach((agent, agi) => {
+        const key = 'agent_' + agent.id;
+        const enabled = cfg[key] === true;
+        const isLast = agi === agents.length - 1;
+        html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+        html += iconBox(agent.icon);
+        html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
+        html += toggle(key, enabled);
+        html += `</div>`;
+      });
+    } else if (abt.cardId) {
+      // Bereich als Ganzes
+      const key = 'card_' + abt.cardId;
+      const enabled = cfg[key] === true;
+      html += `<div style="${lastRowStyle}">`;
+      html += iconBox(abt.icon);
+      html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${abt.sub}</span></div>`;
+      html += toggle(key, enabled);
+      html += `</div>`;
+    }
     html += `</div>`;
   });
-  html += `</div>`;
-
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Darstellung</div>`;
-  html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('🎨')}<span style="${labelStyle}">Skins & Farben</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><span style="color:rgba(255,255,255,0.3);font-size:14px">Slider ›</span></div>`;
-  html += `</div>`;
   } // Ende Bereiche-Setup
 
   if (setupMode === 'kimanus') {
