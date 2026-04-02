@@ -1958,6 +1958,9 @@ function closeSetup() {
   document.getElementById('setup-back-btn').style.display = 'none';
   document.getElementById('tresor-btn').style.display = '';
   document.getElementById('brightness-slider').style.display = '';
+  // KIM Karte schliessen wenn offen
+  const kimCard = document.getElementById('kim-card-overlay');
+  if (kimCard) kimCard.style.display = 'none';
   updateHeaderKimStatus();
   updateKimBacks();
   rebuildWheel();
@@ -2082,14 +2085,16 @@ function showKimBubble() {
   }
   card = document.createElement('div');
   card.id = 'kim-card-overlay';
-  // Position wie Glasplatte im Sichtfenster
-  const container = document.getElementById('wheel-container');
-  const totalH = container ? container.clientHeight : 500;
-  const centerH = 230;
-  const remainH = totalH - centerH;
-  const topH = Math.floor(remainH * 0.6);
-  const cardTop = 60 + topH; // Header + oberes Milchglas
-  card.style.cssText = `position:fixed;top:${cardTop}px;left:50%;transform:translateX(-50%);width:calc(100% - 20px);max-width:355px;height:210px;background:rgba(30,30,32,0.95);border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;z-index:30;padding:20px;gap:10px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)`;
+  // Position exakt wie die Wheel-Karte im Sichtfenster
+  const wheelCard = document.querySelector('.wheel-card');
+  let cardTop = 200, cardW = 340, cardH = 200;
+  if (wheelCard) {
+    const r = wheelCard.getBoundingClientRect();
+    cardTop = Math.round(r.top);
+    cardW = Math.round(r.width);
+    cardH = Math.round(r.height);
+  }
+  card.style.cssText = `position:fixed;top:${cardTop}px;left:50%;transform:translateX(-50%);width:${cardW}px;height:${cardH}px;background:rgba(30,30,32,0.95);border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;z-index:30;padding:20px;gap:10px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)`;
   card.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px">
       <div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>
