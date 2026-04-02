@@ -1349,7 +1349,15 @@ function buildBackCards() {
   const backTrack = document.getElementById('back-track');
   backTrack.innerHTML = backs.map((back, i) => {
     let inner = '';
-    if (back.type === 'yt-input') {
+    if (back.type === 'kim-contact') {
+      inner = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px">
+          <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:6px">Soll ich mich bei dir eintragen?</div>
+          <button onclick="kimAddContact()" style="width:80%;padding:12px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:rgba(34,197,94,0.7);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">📇 Als Kontakt speichern</button>
+          <button onclick="kimOpenWhatsApp()" style="width:80%;padding:12px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);color:rgba(37,211,102,0.7);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">💬 WhatsApp Chat starten</button>
+          <button onclick="kimCall()" style="width:80%;padding:12px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:rgba(59,130,246,0.7);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">📞 KIM anrufen</button>
+        </div>`;
+    } else if (back.type === 'yt-input') {
       inner = `
         <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
           <div id="yt-url" style="width:100%;min-height:36px;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:12px;word-break:break-all;overflow:hidden">Tippe 🎤 oder 📋</div>
@@ -2032,6 +2040,24 @@ function updateHeaderKimStatus() {
   }
 }
 
+// KIM Kontakt-Funktionen
+function kimAddContact() {
+  const vcard = 'BEGIN:VCARD\nVERSION:3.0\nFN:KIM (KIMANUS)\nTEL;TYPE=WORK:+4908005462687\nEMAIL:kim@kimanus.de\nURL:https://app.kimanus.de\nNOTE:Dein persoenlicher Assistent von KIMANUS\nEND:VCARD';
+  const blob = new Blob([vcard], {type:'text/vcard'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'KIM-KIMANUS.vcf';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function kimOpenWhatsApp() {
+  window.open('https://wa.me/4908005462687?text=Hallo%20KIM!', '_blank');
+}
+function kimCall() {
+  window.open('tel:+4908005462687');
+}
+
 function updateKimBacks() {
   const cfg = getSetupConfig();
   const mode = cfg['kim_mode'] || 'concierge';
@@ -2041,7 +2067,7 @@ function updateKimBacks() {
     {title:'Mein Service', content:'Reservierungen buchen\nTaxi bestellen\nWeg beschreiben\nOeffnungszeiten nennen\nVerfuegbarkeit pruefen'},
     {title:'Empfehlungen', content:'Restaurants in der Naehe\nVeranstaltungen heute\nBeste Angebote\nRegionale Geheimtipps\nImmer aktuell & lokal'},
     {title:'Mein Team', content:'Hinter mir stehen Experten:\nScouts • Guides • Berater\nBusiness • Spezialisten\nIch verbinde dich in Sekunden.'},
-    {title:'Erreichbarkeit', content:'Gruener Button = Sprechen\nIch antworte sofort.\n0800 546 2687\nkim@kimanus.de\n24/7 fuer dich da.'},
+    {title:'Soll ich mich eintragen?', content:'', type:'kim-contact'},
   ];
   const persoenlichbacks = [
     {title:'KIM · Persoenlich', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich und denke mit.\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
@@ -2049,7 +2075,7 @@ function updateKimBacks() {
     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nMedikamente & Arzttermine'},
     {title:'Ich denke mit', content:'"Du bestellst immer Cappuccino."\n"Morgen hat deine Mutter Geburtstag."\n"Der Friseur hat heute offen."\n"Dein Lieblingswein ist im Angebot."\nIch lerne staendig dazu.'},
     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
-    {title:'Immer da', content:'Gruener Button = Sprechen\nIch hoere immer zu.\n0800 546 2687\nkim@kimanus.de\nDein zweites Gedaechtnis.'},
+    {title:'Soll ich mich eintragen?', content:'', type:'kim-contact'},
   ];
   const newBacks = mode === 'concierge' ? conciergebacks : persoenlichbacks;
   // Alle KIM Karten updaten
