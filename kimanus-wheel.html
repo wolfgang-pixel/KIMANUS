@@ -1079,8 +1079,16 @@ const ALL_AGENTS = [
   {id:'ag-kalkulierer', icon:'🧮', title:'Kalkulierer', subtitle:'Rohaufschlag & Marge', color:'#06d6a0', email:'kalkulation@kimanus.de', phone:'Durchwahl 401', category:'Business', backs:[{title:'Ueber mich', content:'Rohaufschlag berechnen,\nMarge optimieren,\nPreise kalkulieren.'}]},
   {id:'ag-bestellprofi', icon:'📦', title:'Bestellprofi', subtitle:'Lieferanten & Mengen', color:'#118ab2', email:'bestellung@kimanus.de', phone:'Durchwahl 402', category:'Business', backs:[{title:'Ueber mich', content:'Bestellvorschlaege,\nLieferanten-Split,\nPreiserhoehungen im Blick.'}]},
   {id:'ag-lagerist', icon:'🏭', title:'Lagerist', subtitle:'Bestand & Inventur', color:'#073b4c', email:'lager@kimanus.de', phone:'Durchwahl 403', category:'Business', backs:[{title:'Ueber mich', content:'Bestandserfassung per Kamera,\nMix-Matrix, Inventur,\nVerlust-Protokoll.'}]},
-  {id:'ag-justus', icon:'⚖️', title:'Justus', subtitle:'Recht & Vertraege', color:'#264653', email:'recht@kimanus.de', phone:'Durchwahl 404', category:'Business', backs:[{title:'Ueber mich', content:'Vertraege pruefen,\nRechtsfragen klaeren,\nArbeitsrecht, Mietrecht.'}]},
-  {id:'ag-lena', icon:'💶', title:'Lena', subtitle:'Finanzen & Buchhaltung', color:'#2a9d8f', email:'finanzen@kimanus.de', phone:'Durchwahl 405', category:'Business', backs:[{title:'Ueber mich', content:'Buchhaltung, Steuern,\nRechnungen, Belege.\nAlles im Griff.'}]},
+  // Rechtsabteilung
+  {id:'ag-justus', icon:'⚖️', title:'Justus', subtitle:'Allgemeines Recht', color:'#264653', email:'recht@kimanus.de', phone:'Durchwahl 404', category:'Recht', backs:[{title:'Ueber mich', content:'Allgemeine Rechtsfragen,\nVertraege pruefen,\nMietrecht, Kaufrecht.'}]},
+  {id:'ag-steuerrecht', icon:'🧾', title:'Dr. Steuer', subtitle:'Steuerrecht', color:'#264653', email:'steuer@kimanus.de', phone:'Durchwahl 410', category:'Recht', backs:[{title:'Ueber mich', content:'Steuererklärung,\nBetriebspruefung,\nUmsatzsteuer, Gewerbesteuer.'}]},
+  {id:'ag-patentrecht', icon:'💡', title:'Patentius', subtitle:'Patent- & Markenrecht', color:'#264653', email:'patent@kimanus.de', phone:'Durchwahl 411', category:'Recht', backs:[{title:'Ueber mich', content:'Patentanmeldung,\nMarkenschutz, DPMA, EUIPO,\nDesignschutz.'}]},
+  {id:'ag-arbeitsrecht', icon:'👷', title:'Arbex', subtitle:'Arbeitsrecht', color:'#264653', email:'arbeit@kimanus.de', phone:'Durchwahl 412', category:'Recht', backs:[{title:'Ueber mich', content:'Arbeitsvertraege,\nKuendigung, Abmahnung,\nBetriebsrat, Urlaub.'}]},
+  {id:'ag-veranstaltungsrecht', icon:'🎪', title:'Eventus', subtitle:'Veranstaltungsrecht', color:'#264653', email:'event-recht@kimanus.de', phone:'Durchwahl 413', category:'Recht', backs:[{title:'Ueber mich', content:'Genehmigungen, GEMA,\nHaftung, Versicherung,\nJugendschutz, Laermschutz.'}]},
+  // Finanzabteilung
+  {id:'ag-lena', icon:'💶', title:'Lena', subtitle:'Buchhaltung', color:'#2a9d8f', email:'finanzen@kimanus.de', phone:'Durchwahl 405', category:'Finanzen', backs:[{title:'Ueber mich', content:'Buchhaltung, Belege,\nRechnungen schreiben,\nMahnwesen.'}]},
+  {id:'ag-steuerlena', icon:'📊', title:'Steuerchen', subtitle:'Steuern & Abgaben', color:'#2a9d8f', email:'steuern@kimanus.de', phone:'Durchwahl 414', category:'Finanzen', backs:[{title:'Ueber mich', content:'Steuererklärung vorbereiten,\nVoranmeldungen,\nAbschreibungen.'}]},
+  {id:'ag-controlling', icon:'📈', title:'Controller', subtitle:'Controlling & Analyse', color:'#2a9d8f', email:'controlling@kimanus.de', phone:'Durchwahl 415', category:'Finanzen', backs:[{title:'Ueber mich', content:'Kennzahlen, Berichte,\nBudgetplanung,\nSoll-Ist-Vergleich.'}]},
   // Spezialisten
   {id:'ag-ithilfe', icon:'💻', title:'IT-Hilfe', subtitle:'Technik-Support', color:'#e76f51', email:'hilfe@kimanus.de', phone:'Durchwahl 501', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Technik-Probleme loesen.\nGeduldig erklaert.\nFuer Anfaenger & Profis.'}]},
   {id:'ag-safety', icon:'🔒', title:'Safety-Checker', subtitle:'NFC-Sicherheit', color:'#264653', email:'sicherheit@kimanus.de', phone:'Durchwahl 502', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Sicherheitsrundgaenge,\nNFC-Pruefungen, HACCP.\nManipulationssicher.'}]},
@@ -1774,16 +1782,16 @@ function openSetup(mode) {
   html += `</div>`;
 
   const abteilungen = [
-    {id:'rechtsabteilung', icon:'⚖️', name:'Rechtsabteilung', agents:['ag-justus'],
-     sub:'Patentrecht, Steuerrecht, Arbeitsrecht'},
-    {id:'finanzabteilung', icon:'💶', name:'Finanzabteilung', agents:['ag-lena'],
-     sub:'Buchhaltung, Steuern, Rechnungen'},
+    {id:'rechtsabteilung', icon:'⚖️', name:'Rechtsabteilung', agents:['ag-justus','ag-steuerrecht','ag-patentrecht','ag-arbeitsrecht','ag-veranstaltungsrecht'],
+     sub:'Allgemein, Steuer, Patent, Arbeit, Veranstaltung'},
+    {id:'finanzabteilung', icon:'💶', name:'Finanzabteilung', agents:['ag-lena','ag-steuerlena','ag-controlling'],
+     sub:'Buchhaltung, Steuern, Controlling'},
     {id:'einkauf', icon:'📦', name:'Einkauf & Lager', agents:['ag-bestellprofi','ag-lagerist','ag-kalkulierer'],
      sub:'Bestellung, Inventur, Kalkulation'},
     {id:'marketing', icon:'📣', name:'Marketing & Medien', agents:['ag-marketing','ag-dj','ag-print'],
      sub:'Werbung, Musik, Drucksachen'},
-    {id:'empfang', icon:'🏛️', name:'Empfang & Concierge', agents:['ag-stadtfuehrer','ag-gastro','ag-animateur'],
-     sub:'Gaeste, Restaurants, Events'},
+    {id:'empfang', icon:'🏛️', name:'Empfang & Concierge', agents:['ag-stadtfuehrer','ag-gastro','ag-animateur','ag-regiopilot'],
+     sub:'Gaeste, Restaurants, Events, Region'},
     {id:'recherche', icon:'🔍', name:'Recherche & Scouts', agents:['ag-youtube','ag-web','ag-news','ag-deals','ag-social'],
      sub:'Videos, Web, News, Angebote'},
     {id:'beratung', icon:'💡', name:'Beratung', agents:['ag-wetterfrosch','ag-dolmetscher','ag-sekretaer','ag-bibliothekar'],
@@ -1792,7 +1800,7 @@ function openSetup(mode) {
      sub:'IT-Support, Safety-Check, Heimfahrt'},
     {id:'tools', icon:'🛠️', name:'Werkstatt & Tools', cardId:'tools',
      sub:'Scanner, Laser, RegioPic, Fotoalbum'},
-    {id:'finanzen', icon:'💳', name:'Kasse & Wallet', cardId:'wallet',
+    {id:'finanzen_kasse', icon:'💳', name:'Kasse & Wallet', cardId:'wallet',
      sub:'Cap-Coin, NFC-Stempel, Bezahlen'},
     {id:'archiv_abt', icon:'📁', name:'Archiv & Ablage', cardId:'archiv',
      sub:'Fotos, Dokumente, Buecher, Geraete'},
@@ -1800,12 +1808,12 @@ function openSetup(mode) {
      sub:'WhatsApp, Maps, Handy-Hilfe'},
   ];
 
+  // Alle Abteilungen in einer Gruppe wie iPhone Einstellungen
+  html += `<div style="${groupStyle}">`;
   abteilungen.forEach((abt, ai) => {
     const abtKey = 'abt_open_' + abt.id;
     const isOpen = cfg[abtKey] === true;
-    // Zaehle aktive Mitarbeiter
-    let activeCount = 0;
-    let totalCount = 0;
+    let activeCount = 0, totalCount = 0;
     if (abt.agents) {
       totalCount = abt.agents.length;
       activeCount = abt.agents.filter(a => cfg['agent_' + a] === true).length;
@@ -1813,35 +1821,41 @@ function openSetup(mode) {
       totalCount = 1;
       activeCount = cfg['card_' + abt.cardId] === true ? 1 : 0;
     }
+    const isLast = ai === abteilungen.length - 1 && !isOpen;
 
-    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:${ai===0?'0':'8'}px">${abt.name} <span style="color:rgba(255,255,255,0.15)">${activeCount}/${totalCount}</span></div>`;
-    html += `<div style="${groupStyle}">`;
+    // Abteilungs-Zeile (antippbar -> aufklappen)
+    html += `<div onclick="toggleSetupItem('${abtKey}',${!isOpen})" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(abt.icon);
+    html += `<div style="flex:1"><span style="${labelStyle}">${abt.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${activeCount > 0 ? activeCount + ' aktiv' : abt.sub}</div></div>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
+    html += `</div>`;
 
-    if (abt.agents) {
-      // Abteilung mit einzelnen Mitarbeitern
-      const agents = abt.agents.map(id => ALL_AGENTS.find(a => a.id === id)).filter(Boolean);
-      agents.forEach((agent, agi) => {
-        const key = 'agent_' + agent.id;
+    // Aufgeklappte Mitarbeiter
+    if (isOpen) {
+      if (abt.agents) {
+        const agents = abt.agents.map(id => ALL_AGENTS.find(a => a.id === id)).filter(Boolean);
+        agents.forEach((agent, agi) => {
+          const key = 'agent_' + agent.id;
+          const enabled = cfg[key] === true;
+          const isAgentLast = agi === agents.length - 1 && (isLast || ai < abteilungen.length - 1);
+          html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${agi < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}gap:10px">`;
+          html += `<span style="font-size:18px;flex-shrink:0">${agent.icon}</span>`;
+          html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:10px;color:rgba(255,255,255,0.12)">${agent.subtitle}</div></div>`;
+          html += toggle(key, enabled);
+          html += `</div>`;
+        });
+      } else if (abt.cardId) {
+        const key = 'card_' + abt.cardId;
         const enabled = cfg[key] === true;
-        const isLast = agi === agents.length - 1;
-        html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
-        html += iconBox(agent.icon);
-        html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
+        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;gap:10px">`;
+        html += `<span style="font-size:18px;flex-shrink:0">${abt.icon}</span>`;
+        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${abt.sub}</span></div>`;
         html += toggle(key, enabled);
         html += `</div>`;
-      });
-    } else if (abt.cardId) {
-      // Bereich als Ganzes
-      const key = 'card_' + abt.cardId;
-      const enabled = cfg[key] === true;
-      html += `<div style="${lastRowStyle}">`;
-      html += iconBox(abt.icon);
-      html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${abt.sub}</span></div>`;
-      html += toggle(key, enabled);
-      html += `</div>`;
+      }
     }
-    html += `</div>`;
   });
+  html += `</div>`;
   } // Ende Bereiche-Setup
 
   if (setupMode === 'kimanus') {
