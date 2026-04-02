@@ -1752,25 +1752,44 @@ function openSetup(mode) {
   } // Ende KIM-Setup
 
   if (setupMode === 'agenten') {
-  // Agenten einzeln ein/ausschaltbar, gruppiert nach Kategorie
-  const categories = ['Scouts','Guides','Berater','Business','Spezialisten'];
-  categories.forEach(cat => {
+  // Agenten aufklappbar nach Kategorie (wie Abteilungen)
+  const catIcons = {Scouts:'🔍',Guides:'🧭',Berater:'💡',Business:'💼',Spezialisten:'🔧',Recht:'⚖️',Finanzen:'💶'};
+  const categories = [...new Set(ALL_AGENTS.map(a => a.category))];
+
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👥</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Agenten</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein Team zusammenstellen</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="${groupStyle}">`;
+  categories.forEach((cat, ci) => {
     const agents = ALL_AGENTS.filter(a => a.category === cat);
     const activeCount = agents.filter(a => cfg['agent_' + a.id] === true).length;
-    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">${cat} <span style="color:rgba(255,255,255,0.15)">${activeCount}/${agents.length}</span></div>`;
-    html += `<div style="${groupStyle}">`;
-    agents.forEach((agent, ai) => {
-      const key = 'agent_' + agent.id;
-      const enabled = cfg[key] === true;
-      const isLast = ai === agents.length - 1;
-      html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
-      html += iconBox(agent.icon);
-      html += `<div style="flex:1"><span style="${enabled ? labelStyle : labelOffStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
-      html += toggle(key, enabled);
-      html += `</div>`;
-    });
+    const catKey = 'agcat_open_' + cat;
+    const isOpen = cfg[catKey] === true;
+    const isLast = ci === categories.length - 1 && !isOpen;
+
+    // Kategorie-Zeile mit Pfeil
+    html += `<div onclick="toggleSetupItem('${catKey}',${!isOpen})" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(catIcons[cat] || '📦');
+    html += `<div style="flex:1"><span style="${labelStyle}">${cat}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${activeCount > 0 ? activeCount + ' aktiv' : agents.length + ' verfuegbar'}</div></div>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
     html += `</div>`;
+
+    // Aufgeklappt: einzelne Agenten
+    if (isOpen) {
+      agents.forEach((agent, ai) => {
+        const key = 'agent_' + agent.id;
+        const enabled = cfg[key] === true;
+        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${ai < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}gap:10px">`;
+        html += `<span style="font-size:18px;flex-shrink:0">${agent.icon}</span>`;
+        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:10px;color:rgba(255,255,255,0.12)">${agent.subtitle}</div></div>`;
+        html += toggle(key, enabled);
+        html += `</div>`;
+      });
+    }
   });
+  html += `</div>`;
 
   } // Ende Agenten-Setup
 
