@@ -574,12 +574,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border-right:1px solid rgba(255,255,255,0.07);
   border-bottom:1px solid rgba(255,255,255,0.07);
   cursor:pointer;
-  padding:8px 3px;
-  min-height:34px;
+  padding:10px 3px;
+  min-height:42px;
 }
 .tresor-tab:last-child{border-right:none}
 .tresor-tab:active{background:rgba(255,255,255,0.05)}
-.tresor-tab span{font-size:13px;font-weight:600;color:rgba(255,255,255,0.3);text-align:center}
+.tresor-tab span{font-size:14px;font-weight:600;color:rgba(255,255,255,0.35);text-align:center}
 
 /* Tresor-Button links in Bar */
 #tresor-btn{
@@ -675,16 +675,14 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   <!-- Tresor-Overlay (faehrt von unten hoch) -->
   <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
     <div id="tresor-panel" onclick="event.stopPropagation()">
-      <div class="tresor-section-title">SETUP</div>
       <div class="tresor-grid tresor-grid-3x2">
         <div class="tresor-tab" onclick="openSetupKim()"><span>KIM</span></div>
         <div class="tresor-tab" onclick="openSetupAgenten()"><span>Agenten</span></div>
+        <div class="tresor-tab" onclick="openSetupBereiche()"><span>Bereiche</span></div>
         <div class="tresor-tab" onclick="openSetupKimanus()"><span>KIMANUS</span></div>
         <div class="tresor-tab" onclick="openSetupClaude()"><span>Claude</span></div>
-        <div class="tresor-tab"><span>Skins</span></div>
         <div class="tresor-tab"><span>System</span></div>
       </div>
-      <div class="tresor-divider"><span>SAVE</span></div>
       <div class="tresor-grid tresor-grid-2x1">
         <div class="tresor-tab"><span>Schliessfach</span></div>
         <div class="tresor-tab"><span>Postfach</span></div>
@@ -1648,6 +1646,10 @@ function openSetupAgenten() {
   closeTresor();
   openSetup('agenten');
 }
+function openSetupBereiche() {
+  closeTresor();
+  openSetup('bereiche');
+}
 function openSetupKimanus() {
   closeTresor();
   openSetup('kimanus');
@@ -1762,14 +1764,22 @@ function openSetup(mode) {
     html += `</div>`;
   });
 
-  // Haupt-Bereiche (Tools, Wallet, Archiv, Apps)
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Bereiche</div>`;
+  } // Ende Agenten-Setup
+
+  if (setupMode === 'bereiche') {
+  // Bereiche (Tools, Wallet, Archiv, Apps, Skins)
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📦</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Bereiche</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Tools, Wallet, Archiv & mehr</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktivieren / Deaktivieren</div>`;
   html += `<div style="${groupStyle}">`;
   const extraCards = [
-    {id:'tools',icon:'🛠️',name:'Tools',sub:'Scanner, Laser, Print'},
-    {id:'wallet',icon:'💳',name:'Wallet',sub:'Cap-Coin, NFC, Bezahlen'},
-    {id:'archiv',icon:'📁',name:'Archiv',sub:'Fotos, Dokumente, Buecher'},
-    {id:'apps',icon:'📱',name:'Apps',sub:'WhatsApp, Maps, Handy-Hilfe'},
+    {id:'tools',icon:'🛠️',name:'Tools',sub:'Scanner, Laser, Print, RegioPic, Fotoalbum'},
+    {id:'wallet',icon:'💳',name:'Wallet',sub:'Cap-Coin, NFC-Stempel, Bezahlen, Clubkarten'},
+    {id:'archiv',icon:'📁',name:'Archiv',sub:'Fotos, Dokumente, Geraete, Buecher'},
+    {id:'apps',icon:'📱',name:'Apps',sub:'WhatsApp, Maps, Handy-Hilfe, Schutz'},
   ];
   extraCards.forEach((ec, ei) => {
     const key = 'card_' + ec.id;
@@ -1782,7 +1792,13 @@ function openSetup(mode) {
     html += `</div>`;
   });
   html += `</div>`;
-  } // Ende Agenten-Setup
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Darstellung</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🎨')}<span style="${labelStyle}">Skins & Farben</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><span style="color:rgba(255,255,255,0.3);font-size:14px">Slider ›</span></div>`;
+  html += `</div>`;
+  } // Ende Bereiche-Setup
 
   if (setupMode === 'kimanus') {
   // KIMANUS Orchestrator Einstellungen
