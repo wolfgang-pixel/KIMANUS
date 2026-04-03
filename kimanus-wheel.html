@@ -25,9 +25,15 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   --skin-glass-blur:12px;
   --skin-glass-border:rgba(255,255,255,0.12);
   --skin-glass-text:#f0f0f0;
+  --skin-glass-tint:transparent;
   --skin-tresor-bg:rgba(35,35,38,0.96);
   --skin-tresor-blur:20px;
   --skin-bg:#111111;
+  --skin-card-radius:0px;
+  --skin-card-bg:rgba(255,255,255,0.06);
+  --skin-card-border:1px solid rgba(255,255,255,0.12);
+  --skin-card-shadow:none;
+  --skin-accent:#e63946;
 }
 
 #app{
@@ -87,8 +93,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 #panel-top::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
-  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  background:linear-gradient(180deg, var(--skin-glass-tint, rgba(14,14,14,0.35)) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
+  backdrop-filter:blur(var(--skin-glass-blur));-webkit-backdrop-filter:blur(var(--skin-glass-blur));
   pointer-events:none;z-index:14;
   border-bottom:2px solid rgba(255,255,255,0.2);
 }
@@ -104,8 +110,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 #panel-bottom::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(0deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
-  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  background:linear-gradient(0deg, var(--skin-glass-tint, rgba(14,14,14,0.35)) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
+  backdrop-filter:blur(var(--skin-glass-blur));-webkit-backdrop-filter:blur(var(--skin-glass-blur));
   pointer-events:none;z-index:14;
   border-top:2px solid rgba(255,255,255,0.2);
 }
@@ -147,8 +153,10 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   height:210px;
   position:absolute;
   left:10px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.12);
+  background:var(--skin-card-bg);
+  border:var(--skin-card-border);
+  border-radius:var(--skin-card-radius);
+  box-shadow:var(--skin-card-shadow);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -193,9 +201,10 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   transform:translateX(-50%);
   margin-left:0;
   position:absolute;
-  border-radius:0;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--skin-card-radius);
+  background:var(--skin-card-bg);
+  border:var(--skin-card-border);
+  box-shadow:var(--skin-card-shadow);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   perspective:800px;
@@ -370,11 +379,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   left:50%;
   transform:translateX(-50%) scale(0.85);
   z-index:30;
-  width:100%;
+  width:calc(100% - 20px);
   height:210px;
   background:var(--skin-tresor-bg);
-  border:1px solid var(--skin-glass-border);
-  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  border:var(--skin-card-border);
+  border-radius:var(--skin-card-radius);
+  box-shadow:var(--skin-card-shadow, 0 4px 20px rgba(0,0,0,0.5));
   align-items:center;justify-content:center;
   opacity:0;
   transition:all 0.8s ease;
@@ -754,7 +764,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v10.5</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v11.5</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -763,7 +773,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   </div>
 
   <div id="wheel-container">
-    <div id="flip-label">
+    <div id="flip-label" style="pointer-events:none">
       <div class="fl-card" id="fl-card"></div>
     </div>
 
@@ -2006,6 +2016,8 @@ function updateFlipLabel() {
     adjustBrightness(currentBrightness);
   } else {
     fl.classList.remove('visible');
+    fl.style.display = 'none';
+    fl.style.opacity = '0';
   }
 }
 
@@ -2040,6 +2052,143 @@ function setMicAgent(name) {
 
 // === HELLIGKEIT ===
 let currentBrightness = 30;
+// === SKIN SYSTEM ===
+const SKINS = {
+  dark: {
+    name: 'Dunkel', icon: '🖤',
+    vars: {}  // Default - alles aus :root
+  },
+  klavierlack: {
+    name: 'Klavierlack', icon: '🎹',
+    vars: {
+      '--skin-bg': '#050505',
+      '--skin-header-bg': '#0a0a0a',
+      '--skin-bar-bg': '#0a0a0a',
+      '--skin-glass-tint': 'rgba(0,0,0,0.5)',
+      '--skin-glass-blur': '4px',
+      '--skin-card-bg': 'rgba(255,255,255,0.03)',
+      '--skin-card-border': '1px solid rgba(255,255,255,0.08)',
+      '--skin-card-shadow': '0 2px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+      '--skin-card-radius': '2px'
+    }
+  },
+  frost: {
+    name: 'Frost', icon: '❄️',
+    vars: {
+      '--skin-bg': '#0d1117',
+      '--skin-header-bg': '#161b22',
+      '--skin-bar-bg': '#161b22',
+      '--skin-glass-tint': 'rgba(100,150,255,0.12)',
+      '--skin-glass-blur': '6px',
+      '--skin-card-bg': 'rgba(100,150,255,0.06)',
+      '--skin-card-border': '1px solid rgba(100,150,255,0.15)',
+      '--skin-card-shadow': '0 2px 10px rgba(0,40,100,0.3)',
+      '--skin-card-radius': '12px',
+      '--skin-accent': '#4d9fff'
+    }
+  },
+  emerald: {
+    name: 'Smaragd', icon: '💚',
+    vars: {
+      '--skin-bg': '#0a120e',
+      '--skin-header-bg': '#0f1a14',
+      '--skin-bar-bg': '#0f1a14',
+      '--skin-glass-tint': 'rgba(34,197,94,0.1)',
+      '--skin-glass-blur': '5px',
+      '--skin-card-bg': 'rgba(34,197,94,0.05)',
+      '--skin-card-border': '1px solid rgba(34,197,94,0.15)',
+      '--skin-card-shadow': '0 2px 10px rgba(0,60,30,0.3)',
+      '--skin-card-radius': '12px',
+      '--skin-accent': '#22c55e'
+    }
+  },
+  warm: {
+    name: 'Warm', icon: '🔥',
+    vars: {
+      '--skin-bg': '#141010',
+      '--skin-header-bg': '#1c1414',
+      '--skin-bar-bg': '#1c1414',
+      '--skin-glass-tint': 'rgba(230,57,70,0.08)',
+      '--skin-glass-blur': '12px',
+      '--skin-card-bg': 'rgba(230,57,70,0.04)',
+      '--skin-card-border': '1px solid rgba(230,57,70,0.12)',
+      '--skin-card-shadow': '0 2px 10px rgba(100,0,0,0.3)',
+      '--skin-card-radius': '8px',
+      '--skin-accent': '#e63946'
+    }
+  },
+  gold: {
+    name: 'Gold', icon: '✨',
+    vars: {
+      '--skin-bg': '#12100a',
+      '--skin-header-bg': '#1a1610',
+      '--skin-bar-bg': '#1a1610',
+      '--skin-glass-tint': 'rgba(245,158,11,0.08)',
+      '--skin-glass-blur': '5px',
+      '--skin-card-bg': 'rgba(245,158,11,0.04)',
+      '--skin-card-border': '1px solid rgba(245,158,11,0.12)',
+      '--skin-card-shadow': '0 2px 10px rgba(80,50,0,0.3), inset 0 1px 0 rgba(245,158,11,0.08)',
+      '--skin-card-radius': '10px',
+      '--skin-accent': '#f59e0b'
+    }
+  }
+};
+
+// Default-Werte merken
+const DEFAULT_SKIN_VARS = {
+  '--skin-bg': '#111111', '--skin-header-bg': '#1a1a1a', '--skin-bar-bg': '#1a1a1a',
+  '--skin-glass-tint': 'transparent', '--skin-glass-blur': '12px',
+  '--skin-card-bg': 'rgba(255,255,255,0.06)', '--skin-card-border': '1px solid rgba(255,255,255,0.12)',
+  '--skin-card-shadow': 'none', '--skin-card-radius': '0px', '--skin-accent': '#e63946'
+};
+
+function applySkin(skinId) {
+  const skin = SKINS[skinId];
+  if (!skin) return;
+  const root = document.documentElement;
+  // Erst alles auf Default zuruecksetzen
+  Object.entries(DEFAULT_SKIN_VARS).forEach(([k, v]) => root.style.setProperty(k, v));
+  // Dann Skin-Werte setzen
+  Object.entries(skin.vars).forEach(([k, v]) => root.style.setProperty(k, v));
+  localStorage.setItem('kimanus-skin', skinId);
+}
+
+// Beim Start gespeicherten Skin laden
+(function() {
+  const saved = localStorage.getItem('kimanus-skin');
+  if (saved && SKINS[saved]) applySkin(saved);
+})();
+
+function setGlassTint(value) {
+  document.documentElement.style.setProperty('--skin-glass-tint', value);
+  localStorage.setItem('kimanus-custom-tint', value);
+}
+
+function setCard3D(on) {
+  if (on) {
+    document.documentElement.style.setProperty('--skin-card-bg', 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%)');
+    document.documentElement.style.setProperty('--skin-card-shadow', '0 3px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)');
+    document.documentElement.style.setProperty('--skin-card-border', '1px solid rgba(255,255,255,0.15)');
+  } else {
+    document.documentElement.style.setProperty('--skin-card-bg', 'rgba(255,255,255,0.06)');
+    document.documentElement.style.setProperty('--skin-card-shadow', 'none');
+    document.documentElement.style.setProperty('--skin-card-border', '1px solid rgba(255,255,255,0.12)');
+  }
+  localStorage.setItem('kimanus-custom-3d', on ? '1' : '0');
+}
+
+// Custom-Einstellungen beim Start laden
+(function() {
+  const blur = localStorage.getItem('kimanus-custom-blur');
+  if (blur) document.documentElement.style.setProperty('--skin-glass-blur', blur + 'px');
+  const tint = localStorage.getItem('kimanus-custom-tint');
+  if (tint) document.documentElement.style.setProperty('--skin-glass-tint', tint);
+  const radius = localStorage.getItem('kimanus-custom-radius');
+  if (radius) document.documentElement.style.setProperty('--skin-card-radius', radius + 'px');
+  const is3d = localStorage.getItem('kimanus-custom-3d');
+  if (is3d === '1') setCard3D(true);
+})();
+
 function adjustBrightness(val) {
   currentBrightness = val;
   const v = val / 100;
@@ -2267,12 +2416,51 @@ function openSetup(mode, isBack) {
   // 7. Darstellung
   html += `<div style="${groupStyle}">`;
   html += `<div style="${rowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="100" value="${currentBrightness||30}" oninput="adjustBrightness(this.value)" style="width:100%;accent-color:#e63946"></div></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('🎨')}<span style="${labelStyle}">Design</span><span style="color:rgba(255,255,255,0.3);font-size:14px">Dunkel ›</span></div>`;
+  // --- Design Presets ---
+  const currentSkin = localStorage.getItem('kimanus-skin') || 'dark';
+  html += `<div style="${rowStyle};flex-wrap:wrap;gap:8px;padding-bottom:12px">${iconBox('🎨')}<span style="${labelStyle};flex:1">Vorlagen</span><div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;padding-top:6px">`;
+  Object.entries(SKINS).forEach(([id, skin]) => {
+    const active = id === currentSkin;
+    html += `<div onclick="applySkin('${id}');openSetup('main')" style="padding:6px 12px;border-radius:10px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${active ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4)'}">${skin.icon} ${skin.name}</div>`;
+  });
+  html += `</div></div>`;
+
+  // --- Glasplatten ---
+  const curBlur = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--skin-glass-blur')) || 12;
+  html += `<div style="${rowStyle}">${iconBox('🧊')}<span style="${labelStyle}">Frost</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="8" value="${Math.min(curBlur,8)}" oninput="document.documentElement.style.setProperty('--skin-glass-blur',this.value+'px');localStorage.setItem('kimanus-custom-blur',this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
+
+  // --- Glas-Tonung ---
+  const tints = [
+    {label:'Klar',value:'transparent',color:'#888'},
+    {label:'Blau',value:'rgba(100,150,255,0.15)',color:'#6496ff'},
+    {label:'Gruen',value:'rgba(34,197,94,0.12)',color:'#22c55e'},
+    {label:'Rot',value:'rgba(230,57,70,0.1)',color:'#e63946'},
+    {label:'Gold',value:'rgba(245,158,11,0.1)',color:'#f59e0b'},
+    {label:'Lila',value:'rgba(168,85,247,0.12)',color:'#a855f7'}
+  ];
+  const curTint = localStorage.getItem('kimanus-custom-tint') || 'transparent';
+  html += `<div style="${rowStyle};flex-wrap:wrap">${iconBox('💎')}<span style="${labelStyle};flex:1">Glas-Tonung</span><div style="display:flex;gap:8px;width:100%;padding-top:8px">`;
+  tints.forEach(t => {
+    const isActive = curTint === t.value;
+    html += `<div onclick="setGlassTint('${t.value}');openSetup('main')" style="width:32px;height:32px;border-radius:50%;background:${t.color};border:3px solid ${isActive ? '#fff' : 'rgba(255,255,255,0.08)'};cursor:pointer;-webkit-tap-highlight-color:transparent;opacity:${isActive ? '1' : '0.4'};transform:${isActive ? 'scale(1.15)' : 'scale(1)'};transition:all 0.2s" title="${t.label}"></div>`;
+  });
+  html += `</div></div>`;
+
+  // --- Karten-Rundung ---
+  const curRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--skin-card-radius')) || 0;
+  html += `<div style="${rowStyle}">${iconBox('⬜')}<span style="${labelStyle}">Karten-Ecken</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="20" value="${curRadius}" oninput="document.documentElement.style.setProperty('--skin-card-radius',this.value+'px');localStorage.setItem('kimanus-custom-radius',this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
+
+  // --- Karten-3D ---
+  const is3d = localStorage.getItem('kimanus-custom-3d') === '1';
+  html += `<div style="${lastRowStyle}">${iconBox('🎲')}<span style="${labelStyle}">Karten 3D</span><div style="display:flex;gap:8px">`;
+  html += `<div onclick="setCard3D(false);openSetup('main')" style="padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${!is3d ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)'}">Flach</div>`;
+  html += `<div onclick="setCard3D(true);openSetup('main')" style="padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${is3d ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)'}">Plastisch</div>`;
+  html += `</div></div>`;
   html += `</div>`;
 
   // 8. Info
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v10.5 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v11.5 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4465,14 +4653,16 @@ wc.addEventListener('touchend', e => {
     }
   }
   if (touchOnButton) { touchOnButton = false; return; }
-  if (touchInScrollable) { touchInScrollable = false; return; }
   if (longPressTriggered) return;
   const card = e.target.closest('.wheel-card');
   const diffY = dragStartY - e.changedTouches[0].clientY;
   const diffX = e.changedTouches[0].clientX - dragStartX;
 
+  // Horizontaler Swipe = IMMER Flip (auch in scrollbaren Bereichen)
   if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+    touchInScrollable = false;
     flipCard();
+  } else if (touchInScrollable) { touchInScrollable = false; return;
   } else if (Math.abs(diffY) > 40) {
     spinWheel(diffY > 0 ? 1 : -1);
   } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
