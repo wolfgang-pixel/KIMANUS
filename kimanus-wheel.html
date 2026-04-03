@@ -2726,9 +2726,11 @@ function openChatOverlay() {
   const topH = Math.floor(remainH * 0.6);
   const bottomBarH = 80;
 
+  const bottomH = remainH - topH;
   const chatArea = document.getElementById('chat-scroll-area');
-  chatArea.style.top = topH + 'px';
-  chatArea.style.height = (totalH - topH) + 'px';
+  const centerTop = topH + 2;
+  chatArea.style.top = centerTop + 'px';
+  chatArea.style.height = (centerH + bottomH) + 'px';
   chatArea.style.display = 'block';
 
   // KIM Kaertchen oben zeigen (wie Flip-Label)
@@ -2745,7 +2747,27 @@ function closeChatOverlay() {
   resetSpeechState();
 }
 
+function chatShowThinking() {
+  const messages = document.getElementById('chat-messages');
+  messages.innerHTML += `<div id="chat-thinking" style="margin-bottom:12px">
+    <div style="font-size:12px;font-weight:700;color:rgba(100,200,100,0.5);margin-bottom:2px">KIM:</div>
+    <div style="display:flex;gap:4px;align-items:center;padding:4px 0">
+      <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.4);animation:bwave 0.8s ease-in-out infinite"></span>
+      <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.5);animation:bwave 0.8s ease-in-out 0.2s infinite"></span>
+      <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.4);animation:bwave 0.8s ease-in-out 0.4s infinite"></span>
+    </div>
+  </div>`;
+  const scroll = document.getElementById('chat-scroll-area');
+  if (scroll) scroll.scrollTop = scroll.scrollHeight;
+}
+
+function chatRemoveThinking() {
+  const thinking = document.getElementById('chat-thinking');
+  if (thinking) thinking.remove();
+}
+
 function chatAddMessage(role, text) {
+  chatRemoveThinking();
   const messages = document.getElementById('chat-messages');
   const cleanText = text.replace(/\n/g, '<br>');
   const color = role === 'DU' ? 'rgba(230,57,70,0.5)' : 'rgba(100,200,100,0.5)';
@@ -2782,7 +2804,8 @@ function showKimCardAbove() {
   const remainH = totalH - centerH;
   const topH = Math.floor(remainH * 0.6);
   const topMid = topH / 2;
-  fl.style.display = '';
+  fl.style.display = 'flex';
+  fl.style.opacity = '1';
   fl.style.top = (topMid - 105) + 'px';
   fl.classList.add('visible');
 }
@@ -3098,6 +3121,7 @@ async function processVoice(blob, mimeType) {
     // Zeige erkannten Text im Chat-Overlay
     pendingText = userText;
     chatAddMessage('DU', userText);
+    chatShowThinking();
     const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (getSetupConfig()['kim_mode'] === 'persoenlich' ? 'Assistentin' : 'Concierge') + ' · Denkt nach...';
     // Button auf SENDEN setzen (gruen, blinkend) + Loeschen-Button zeigen
     speechState = 'review';
