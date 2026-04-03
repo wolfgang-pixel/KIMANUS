@@ -1,0 +1,119 @@
+{
+  "name": "Agent Builder - Neue Agenten per Sprache",
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "agent-builder-v1",
+      "parameters": {
+        "path": "agent-builder",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "planen",
+      "name": "Agent planen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst userWish = body.message || 'Erstelle einen allgemeinen Berater';\n\nconst planPrompt = 'Du bist ein Agent-Architekt fuer das KIMANUS System. Der User beschreibt welchen Agenten er braucht. Erstelle ein JSON-Objekt mit: name (kurzer deutscher Name), role (1-2 Woerter), description (1 Satz), systemPrompt (ausfuehrlicher System-Prompt mit Persoenlichkeit und Faehigkeiten, mindestens 150 Woerter, auf Deutsch), model (deepseek/groq-llama/gemini-flash), icon (1 Emoji), category (Scouts/Guides/Berater/Business/Recht/Finanzen/Spezialisten), webhookPath (kebab-case). Antworte NUR mit validem JSON.';\n\nconst messages = [\n  {role: 'system', content: planPrompt},\n  {role: 'user', content: userWish}\n];\n\nreturn [{json: {messages, userWish}}];"
+      }
+    },
+    {
+      "id": "llm-plan",
+      "name": "LLM Plan erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 300],
+      "parameters": {
+        "url": "http://litellm:4000/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "Bearer sk-manus-geheimschluessel-1234"},
+            {"name": "Content-Type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'or-claude-sonnet', messages: $json.messages, max_tokens: 2000, temperature: 0.7 }) }}"
+      }
+    },
+    {
+      "id": "parse-and-build",
+      "name": "Plan parsen und Workflow bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const response = $input.first().json;\nconst content = response.choices[0].message.content;\n\nlet plan;\ntry {\n  plan = JSON.parse(content);\n} catch(e) {\n  const match = content.match(/\\{[\\s\\S]*\\}/);\n  if (match) plan = JSON.parse(match[0]);\n  else throw new Error('Parse-Fehler: ' + content.substring(0, 300));\n}\n\nconst ext = 200 + Math.floor(Math.random() * 99);\nplan.phone = 'Durchwahl ' + ext;\nplan.email = plan.webhookPath + '@kimanus.de';\n\nconst webhookPath = 'agent-' + plan.webhookPath;\nconst spJson = JSON.stringify(plan.systemPrompt);\n\nconst setupCode = 'const body=$input.first().json.body||$input.first().json;const message=body.message||\\'\\';const history=body.history||[];const sp=' + spJson + ';const messages=[{role:\"system\",content:sp},...history.slice(-20),{role:\"user\",content:message}];return[{json:{messages,model:\"' + plan.model + '\"}}];';\n\nconst extractCode = 'const r=$input.first().json;const a=r.choices&&r.choices[0]&&r.choices[0].message?r.choices[0].message.content:\"Keine Antwort.\";return[{json:{output:a,agent:\"' + plan.name + '\",model:\"' + plan.model + '\"}}];';\n\nconst workflowBody = {\n  name: plan.name + ' - KIMANUS Agent',\n  nodes: [\n    {id:'wh',name:'Webhook',type:'n8n-nodes-base.webhook',typeVersion:2,position:[0,300],webhookId:webhookPath,parameters:{path:webhookPath,httpMethod:'POST',responseMode:'responseNode'}},\n    {id:'setup',name:'Setup',type:'n8n-nodes-base.code',typeVersion:2,position:[250,300],parameters:{mode:'runOnceForAllItems',jsCode:setupCode}},\n    {id:'llm',name:'LLM',type:'n8n-nodes-base.httpRequest',typeVersion:4.2,position:[500,300],parameters:{url:'http://litellm:4000/v1/chat/completions',method:'POST',sendHeaders:true,headerParameters:{parameters:[{name:'Authorization',value:'Bearer sk-manus-geheimschluessel-1234'},{name:'Content-Type',value:'application/json'}]},sendBody:true,specifyBody:'json',jsonBody:'={{ JSON.stringify({model:$json.model,messages:$json.messages,max_tokens:2000}) }}'}},\n    {id:'extract',name:'Extract',type:'n8n-nodes-base.code',typeVersion:2,position:[750,300],parameters:{mode:'runOnceForAllItems',jsCode:extractCode}},\n    {id:'respond',name:'Respond',type:'n8n-nodes-base.respondToWebhook',typeVersion:1.1,position:[1000,300],parameters:{respondWith:'json',responseBody:'={{ JSON.stringify($json) }}'}}\n  ],\n  connections:{\n    'Webhook':{main:[[{node:'Setup',type:'main',index:0}]]},\n    'Setup':{main:[[{node:'LLM',type:'main',index:0}]]},\n    'LLM':{main:[[{node:'Extract',type:'main',index:0}]]},\n    'Extract':{main:[[{node:'Respond',type:'main',index:0}]]}\n  },\n  settings:{executionOrder:'v1'}\n};\n\nreturn [{json: {plan, workflowBody, webhookPath}}];"
+      }
+    },
+    {
+      "id": "create-wf",
+      "name": "n8n Workflow erstellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1000, 300],
+      "parameters": {
+        "url": "https://manus.kimanus.de/api/v1/workflows",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "X-N8N-API-KEY", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiOWQ5MzYyNC0yYjI3LTRiM2MtOTk1YS1mZDE5YzhkNDA5Y2IiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYzFjOGY1MGItMGQ1MC00YzEwLWI5M2ItNWY2ZmJlMTUzMjYzIiwiaWF0IjoxNzc1MjI5MTExfQ.Aq5p1MR1hP8RCvnpRPe6sjV2cbW6guvzuesPThDvQJk"},
+            {"name": "Content-Type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.workflowBody) }}"
+      }
+    },
+    {
+      "id": "activate-wf",
+      "name": "Workflow aktivieren",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1250, 300],
+      "parameters": {
+        "url": "=https://manus.kimanus.de/api/v1/workflows/{{ $json.id }}/activate",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "X-N8N-API-KEY", "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiOWQ5MzYyNC0yYjI3LTRiM2MtOTk1YS1mZDE5YzhkNDA5Y2IiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYzFjOGY1MGItMGQ1MC00YzEwLWI5M2ItNWY2ZmJlMTUzMjYzIiwiaWF0IjoxNzc1MjI5MTExfQ.Aq5p1MR1hP8RCvnpRPe6sjV2cbW6guvzuesPThDvQJk"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "respond-final",
+      "name": "Ergebnis zurueck",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1500, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ output: 'Neuer Agent erstellt: ' + $('Plan parsen und Workflow bauen').first().json.plan.name + ' (' + $('Plan parsen und Workflow bauen').first().json.plan.role + ') ' + $('Plan parsen und Workflow bauen').first().json.plan.icon, agent_info: $('Plan parsen und Workflow bauen').first().json.plan, workflow_id: $('n8n Workflow erstellen').first().json.id, webhook_url: 'https://manus.kimanus.de/webhook/' + $('Plan parsen und Workflow bauen').first().json.webhookPath }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Agent planen", "type": "main", "index": 0}]]},
+    "Agent planen": {"main": [[{"node": "LLM Plan erstellen", "type": "main", "index": 0}]]},
+    "LLM Plan erstellen": {"main": [[{"node": "Plan parsen und Workflow bauen", "type": "main", "index": 0}]]},
+    "Plan parsen und Workflow bauen": {"main": [[{"node": "n8n Workflow erstellen", "type": "main", "index": 0}]]},
+    "n8n Workflow erstellen": {"main": [[{"node": "Workflow aktivieren", "type": "main", "index": 0}]]},
+    "Workflow aktivieren": {"main": [[{"node": "Ergebnis zurueck", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}
