@@ -1,0 +1,92 @@
+{
+  "name": "KAI - Concierge & Zentrale",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kai",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-kai",
+      "name": "Webhook KAI",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// KAI Rollen-Config laden\nconst fs = require('fs');\nlet config = {};\ntry {\n  config = JSON.parse(fs.readFileSync('/home/node/.n8n/kai-config.json', 'utf8'));\n} catch(e) {\n  config = {\n    rolle: 'auskunft',\n    name: 'KAI',\n    stil: 'locker und direkt',\n    kim_beschreibung: 'KIM ist der persoenliche Assistent fuer den Nutzer',\n    abteilungen: ['Scouts','Guides','Berater','Business','Recht','Finanzen','Spezialisten']\n  };\n}\n\nconst rollen = {\n  concierge: 'Du bist der Concierge. Du kennst das Haus und hilfst den Gaesten.',\n  rezeptionist: 'Du bist der Rezeptionist. Du empfaengst Gaeste und vermittelst weiter.',\n  vermittlung: 'Du bist die Vermittlung. Du verbindest mit der richtigen Abteilung.',\n  auskunft: 'Du bist die Auskunft. Du beantwortest Fragen und hilfst weiter.'\n};\n\nconst rollenText = rollen[config.rolle] || rollen.auskunft;\n\nconst systemPrompt = `Du bist ${config.name}, die zentrale Anlaufstelle bei KIMANUS OS.\n${rollenText}\nDein Stil: ${config.stil}.\nAntworten kurz und direkt. Kein Markdown, keine Sternchen, keine Floskeln.\n\nKIM: ${config.kim_beschreibung}. Jeder Nutzer hat seine eigene KIM.\n\nKI MANUS arbeitet im Hintergrund als Orchestrator.\n\nAbteilungen: ${config.abteilungen.join(', ')}`;\n\nreturn [{\n  json: {\n    systemPrompt,\n    userMessage: $input.first().json.body.message,\n    config\n  }\n}];"
+      },
+      "id": "config-loader",
+      "name": "Config laden",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://litellm-gateway:4000/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'groq-llama', messages: [ { role: 'system', content: $json.systemPrompt }, { role: 'user', content: $json.userMessage } ], max_tokens: 2000 }) }}",
+        "options": {}
+      },
+      "id": "llm-call",
+      "name": "LLM Anfrage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst answer = response.choices?.[0]?.message?.content || 'Entschuldigung, ich konnte keine Antwort generieren.';\nreturn [{ json: { answer } }];"
+      },
+      "id": "parse-response",
+      "name": "Antwort parsen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ output: $json.answer }) }}",
+        "options": {}
+      },
+      "id": "response",
+      "name": "Antwort senden",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1130, 300]
+    }
+  ],
+  "connections": {
+    "Webhook KAI": {
+      "main": [
+        [{ "node": "Config laden", "type": "main", "index": 0 }]
+      ]
+    },
+    "Config laden": {
+      "main": [
+        [{ "node": "LLM Anfrage", "type": "main", "index": 0 }]
+      ]
+    },
+    "LLM Anfrage": {
+      "main": [
+        [{ "node": "Antwort parsen", "type": "main", "index": 0 }]
+      ]
+    },
+    "Antwort parsen": {
+      "main": [
+        [{ "node": "Antwort senden", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

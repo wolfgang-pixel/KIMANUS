@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v6.0 - Architektur v4: KIMANUS/KIM/Tools/Wallet (kein KAI, kein KI-MANUS) -->
+<!-- KIMANUS Wheel v7.7 - Sternchen weg, Text oben, kein Visionaer -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -398,6 +398,43 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .fl-card .fl-features span{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase}
 .fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:8px;font-weight:800;color:rgba(255,255,255,0.15);letter-spacing:3px}
 
+/* === KIM WAVE ANIMATION (Sprechen) === */
+@keyframes kimWaveBar {
+  0%,100% { height: 4px; }
+  50% { height: 22px; }
+}
+#kim-wave-container .wave-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: #e63946;
+  animation: kimWaveBar 0.6s ease-in-out infinite;
+}
+#kim-wave-container .wave-bar:nth-child(1) { animation-delay: 0s; }
+#kim-wave-container .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+#kim-wave-container .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+#kim-wave-container .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+#kim-wave-container .wave-bar:nth-child(5) { animation-delay: 0.15s; }
+
+/* === KIM THINKING ANIMATION (Nachdenken) === */
+@keyframes kimThinkPulse {
+  0%,100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes kimThinkDot {
+  0%,80%,100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
+#kim-think-container .think-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e63946;
+  animation: kimThinkDot 1.4s ease-in-out infinite;
+}
+#kim-think-container .think-dot:nth-child(1) { animation-delay: 0s; }
+#kim-think-container .think-dot:nth-child(2) { animation-delay: 0.2s; }
+#kim-think-container .think-dot:nth-child(3) { animation-delay: 0.4s; }
+
 /* === REGISTER === */
 #register-panel{
   display:none;
@@ -466,7 +503,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:none;
 }
 #speech-btn span{
-  font-size:14px;font-weight:800;color:#fff;letter-spacing:2px;
+  font-size:26px;font-weight:800;color:#fff;letter-spacing:0;
 }
 
 /* === TASTATUR-TOOLBAR === */
@@ -626,7 +663,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div style="flex:1">
       <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
       <div onclick="showKimInfo()" style="cursor:pointer">
-        <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KIM</span>
+        <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
       </div>
     </div>
@@ -676,7 +713,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
     <div id="tresor-panel" onclick="event.stopPropagation()">
       <div class="tresor-grid tresor-grid-3x2">
-        <div class="tresor-tab" onclick="openSetupKim()"><span>KIM</span></div>
+        <div class="tresor-tab" onclick="openSetupKim()"><span>KAI</span></div>
         <div class="tresor-tab" onclick="openSetupAgenten()"><span>Agenten</span></div>
         <div class="tresor-tab" onclick="openSetupBereiche()"><span>Abteilungen</span></div>
         <div class="tresor-tab" onclick="openSetupKimanus()"><span>KIMANUS</span></div>
@@ -691,14 +728,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   </div>
 
   <!-- Chat-Bereich (nur im Sichtfenster, Layout bleibt!) -->
-  <div id="chat-scroll-area" style="display:none;position:absolute;left:10px;right:10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;z-index:13;background:rgba(14,14,14,0.95);padding:8px 12px">
+  <div id="chat-scroll-area" style="display:none;position:absolute;left:11px;right:11px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;z-index:13;background:#0e0e0e;border:1px solid rgba(255,255,255,0.08);padding:8px 12px;border-radius:0">
     <div id="chat-messages" style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6"></div>
-    <div id="chat-bottom-bar" style="display:none;padding:6px 0;margin-top:6px;border-top:1px solid rgba(255,255,255,0.06)">
-      <div onclick="speakAnswer(lastKimAnswer)" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:6px;cursor:pointer">
-        <span style="font-size:14px;opacity:0.4">🔊</span>
-        <span style="font-size:12px;color:rgba(255,255,255,0.3)">Vorlesen</span>
-      </div>
-    </div>
   </div>
 
   <div id="bottom-bar">
@@ -706,7 +737,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <button id="setup-back-btn" type="button" onclick="closeSetup()" style="display:none;position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);-webkit-tap-highlight-color:transparent">↩</button>
     <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔒</button>
     <button id="speech-btn" ontouchstart="walkieStart(event)" ontouchend="walkieEnd(event)" onmousedown="walkieStart(event)" onmouseup="walkieEnd(event)" onclick="event.preventDefault()">
-      <span id="speech-agent">KIM</span>
+      <span id="speech-agent">🎙</span>
     </button>
     <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 62px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
   </div>
@@ -725,10 +756,10 @@ const CARDS = [
      {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
 
-  // --- 2. KIM (Einziger Agent — Privat + Business) ---
-  {id:'kim', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'0800 546 2687', phone:'kim@kimanus.de',
+  // --- 2. KAI (Concierge + Vermittlung + Auskunft) ---
+  {id:'kai', icon:'👤', title:'KAI', subtitle:'Concierge · Vermittlung · Auskunft', color:'#e63946', email:'0800 524 2687', phone:'kai@kimanus.de',
    backs:[
-     {title:'Ueber KIM', content:'Ich bin dein persoenlicher Assistent.\nIch kuemmer mich um alles.\nFrag mich einfach was du brauchst.\nIch verbinde dich mit dem richtigen Experten.'},
+     {title:'Ueber KAI', content:'Ich bin dein Concierge bei KIMANUS.\nIch verbinde dich mit dem richtigen Experten.\nIch beantworte einfache Fragen sofort.\nFuer Persoenliches stelle ich zu KIM durch.'},
      {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
      {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
      {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
@@ -939,11 +970,11 @@ const CARDS = [
 
   // --- 7. Chat (Gespraechs-Verlauf & Speicher) ---
   {id:'chat', icon:'💬', title:'Chat', subtitle:'Deine letzten Gespraeche', color:'#f472b6', email:'chat@kimanus.de', phone:'',
-   features:['KIM','Justus','Wetterfrosch','Lena','Archiv'],
+   features:['KAI','Justus','Wetterfrosch','Lena','Archiv'],
    backs:[
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'LETZTE CHATS', items:[
-         {icon:'👤', label:'KIM'},
+         {icon:'👤', label:'KAI'},
          {icon:'⚖️', label:'Justus'},
          {icon:'🌤️', label:'Wetterfrosch'},
          {icon:'💶', label:'Lena'},
@@ -963,7 +994,7 @@ const CARDS = [
      {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
      {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
    ]},
-  {id:'kim2', icon:'👤', title:'KIM', subtitle:'Dein Assistent fuer alles', color:'#e63946', email:'0800 546 2687', phone:'kim@kimanus.de',
+  {id:'kai2', icon:'👤', title:'KAI', subtitle:'Concierge · Vermittlung · Auskunft', color:'#e63946', email:'0800 524 2687', phone:'kai@kimanus.de',
    features:[
      'Scouts',
      'Guides',
@@ -1286,6 +1317,8 @@ function getOffset(i) {
 
 function spinWheel(direction) {
   if (isAnimating) return;
+  // Chat/Dialogplatte schliessen beim Wischen
+  closeChatOverlay();
   // Header-Karte entfernen wenn User am Rad dreht
   if (headerCardActive && !isFlipped) {
     hideHeaderCard();
@@ -1317,6 +1350,7 @@ function handleCardTap(i) {
 }
 
 function flipCard() {
+  closeChatOverlay();
   const el = document.getElementById('card-' + currentIndex);
   if (!el) return;
   isFlipped = !isFlipped;
@@ -1704,7 +1738,7 @@ function openSetup(mode) {
   const kimVoice = cfg['kim_voice'] || 'warm';
   html += `<div onclick="" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
   html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👤</div>`;
-  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
   html += `</div>`;
 
   // KIM Einstellungen
@@ -2133,7 +2167,7 @@ function showKimBubble() {
     <div style="display:flex;align-items:center;gap:12px">
       <div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>
       <div style="flex:1">
-        <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:1px">KIM</div>
+        <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:1px">KAI</div>
         <div style="font-size:13px;color:rgba(255,255,255,0.35)">${subtitle}</div>
       </div>
       <button onclick="document.getElementById('kim-card-overlay').style.display='none'" style="background:rgba(120,120,128,0.32);border:none;color:rgba(255,255,255,0.5);font-size:16px;cursor:pointer;width:32px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
@@ -2711,6 +2745,7 @@ let audioStream = null;
 
 let speechState = 'idle'; // idle -> recording -> processing -> review -> sending
 let pendingText = '';
+let currentAgent = 'KAI'; // Rufanlage: wer gerade angesprochen wird
 let silenceTimer = null;
 
 // === WALKIE-TALKIE MODUS ===
@@ -2718,39 +2753,51 @@ let walkieActive = false;
 
 // === CHAT-OVERLAY (eigenes Fenster statt Glasplatte) ===
 function openChatOverlay() {
-  // Chat-Bereich exakt im Sichtfenster positionieren
+  // Chat-Bereich: unter KIM-Kaertchen bis Unterkante Hauptglasplatte
   const container = document.getElementById('wheel-container');
   const totalH = container.clientHeight;
-  const centerH = 230;
+  const centerH = 230; // Sichtfenster-Hoehe
   const remainH = totalH - centerH;
-  const topH = Math.floor(remainH * 0.6);
-  const bottomBarH = 80;
+  const topH = Math.floor(remainH * 0.6); // Oberkante Sichtfenster
 
-  const bottomH = remainH - topH;
+  // KIM-Karte: 216px hoch, 5px hoeher
+  const kimTopPct = 8 / 812;
+  const kimTop = Math.round(totalH * kimTopPct);
+  const kimHeight = 216;
+  const kimBottom = kimTop + kimHeight;
+
+  // Dialogplatte: 110px unter KIM-Karte bis Unterkante Glasplatte (+25px)
+  const glasBottom = topH + centerH + 25;
+  const chatTop = kimBottom + 131; // +3px tiefer (Oberkante anpassen)
+  const chatHeight = 205; // 3px kleiner von oben
+
   const chatArea = document.getElementById('chat-scroll-area');
-  const centerTop = topH + 2;
-  chatArea.style.top = centerTop + 'px';
-  chatArea.style.height = (centerH + bottomH) + 'px';
+  chatArea.style.top = chatTop + 'px';
+  chatArea.style.height = chatHeight + 'px';
+  chatArea.style.left = '10px';
+  chatArea.style.right = '10px';
   chatArea.style.display = 'block';
 
-  // KIM Kaertchen oben zeigen (wie Flip-Label)
+  // KIM Kaertchen oben zeigen
   showKimCardAbove();
 
   // Messages leeren
   document.getElementById('chat-messages').innerHTML = '';
-  document.getElementById('chat-bottom-bar').style.display = 'none';
 }
 
 function closeChatOverlay() {
-  document.getElementById('chat-scroll-area').style.display = 'none';
-  hideKimCardAbove();
-  resetSpeechState();
+  const ca = document.getElementById('chat-scroll-area');
+  if (ca && ca.style.display !== 'none') {
+    ca.style.display = 'none';
+    hideKimCardAbove();
+    resetSpeechState();
+  }
 }
 
 function chatShowThinking() {
   const messages = document.getElementById('chat-messages');
   messages.innerHTML += `<div id="chat-thinking" style="margin-bottom:12px">
-    <div style="font-size:12px;font-weight:700;color:rgba(100,200,100,0.5);margin-bottom:2px">KIM:</div>
+    <div style="font-size:12px;font-weight:700;color:rgba(100,200,100,0.5);margin-bottom:2px">KAI:</div>
     <div style="display:flex;gap:4px;align-items:center;padding:4px 0">
       <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.4);animation:bwave 0.8s ease-in-out infinite"></span>
       <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.5);animation:bwave 0.8s ease-in-out 0.2s infinite"></span>
@@ -2758,7 +2805,7 @@ function chatShowThinking() {
     </div>
   </div>`;
   const scroll = document.getElementById('chat-scroll-area');
-  if (scroll) scroll.scrollTop = scroll.scrollHeight;
+  // Nicht nach unten scrollen - Text bleibt oben lesbar
 }
 
 function chatRemoveThinking() {
@@ -2769,50 +2816,88 @@ function chatRemoveThinking() {
 function chatAddMessage(role, text) {
   chatRemoveThinking();
   const messages = document.getElementById('chat-messages');
-  const cleanText = text.replace(/\n/g, '<br>');
+  // Markdown-Sternchen entfernen (**fett** → fett, *kursiv* → kursiv)
+  let cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+  cleanText = cleanText.replace(/\n/g, '<br>');
   const color = role === 'DU' ? 'rgba(230,57,70,0.5)' : 'rgba(100,200,100,0.5)';
   messages.innerHTML += `<div style="margin-bottom:12px">
     <div style="font-size:12px;font-weight:700;color:${color};margin-bottom:2px">${role}:</div>
     <div style="color:rgba(255,255,255,0.5)">${cleanText}</div>
   </div>`;
-  // Scroll ans Ende
+  // Immer nach oben scrollen - Frage+Antwort von oben lesbar
   const scroll = document.getElementById('chat-scroll-area');
-  if (scroll) scroll.scrollTop = scroll.scrollHeight;
+  if (scroll) scroll.scrollTop = 0;
 }
 
 function showKimCardAbove() {
-  // KIM Kaertchen oben im Flip-Label Bereich zeigen
+  // KAI Avatar-Kaertchen
   const fl = document.getElementById('flip-label');
   if (!fl) return;
-  const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
-  const mode = cfg['kim_mode'] || 'concierge';
-  const gender = cfg['kim_gender'] || 'weiblich';
-  const subtitle = mode === 'concierge' ? 'Concierge' : (gender === 'weiblich' ? 'Assistentin' : 'Assistent');
+  const subtitle = 'Concierge';
 
   document.getElementById('fl-card').innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;width:100%;padding:12px">
+    <div style="display:flex;align-items:center;gap:12px;width:100%;height:100%;padding:12px 16px">
       <div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
-      <div>
-        <div class="fl-name" style="font-size:18px">KIM</div>
+      <div style="flex:1">
+        <div class="fl-name" style="font-size:18px">KAI</div>
         <div class="fl-role" style="font-size:12px">${subtitle} · Hoert zu...</div>
       </div>
+      <div id="kim-wave-container" style="width:70px;height:34px;display:none;align-items:center;justify-content:center;gap:3px"></div>
     </div>
   `;
   const container = document.getElementById('wheel-container');
   const totalH = container.clientHeight;
-  const centerH = 230;
-  const remainH = totalH - centerH;
-  const topH = Math.floor(remainH * 0.6);
-  const topMid = topH / 2;
+
+  // KIM-Karte: 216px hoch, 5px hoeher
+  const kimTopPct = 8 / 812; // 5px hoeher (war 13)
+  const kimTop = Math.round(totalH * kimTopPct);
+
   fl.style.display = 'flex';
   fl.style.opacity = '1';
-  fl.style.top = (topMid - 105) + 'px';
+  fl.style.top = kimTop + 'px';
+  fl.style.height = '216px';
   fl.classList.add('visible');
 }
 
 function hideKimCardAbove() {
   const fl = document.getElementById('flip-label');
   if (fl) fl.classList.remove('visible');
+  kimStopWave();
+  kimStopThink();
+}
+
+// === KIM Welle (Sprechen) ===
+function kimStartWave() {
+  const wc = document.getElementById('kim-wave-container');
+  if (!wc) return;
+  wc.innerHTML = '<div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>';
+  wc.style.display = 'flex';
+  // Status-Text aktualisieren
+  const role = document.querySelector('#flip-label .fl-role');
+  if (role) role.textContent = 'Hoert zu...';
+}
+
+function kimStopWave() {
+  const wc = document.getElementById('kim-wave-container');
+  if (wc) { wc.style.display = 'none'; wc.innerHTML = ''; }
+}
+
+// === KIM Denken (Verarbeiten) ===
+function kimStartThink() {
+  kimStopWave();
+  const wc = document.getElementById('kim-wave-container');
+  if (!wc) return;
+  wc.innerHTML = '<div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div>';
+  wc.id = 'kim-think-container';
+  wc.style.display = 'flex';
+  // Status-Text aktualisieren
+  const role = document.querySelector('#flip-label .fl-role');
+  if (role) role.textContent = 'Denkt nach...';
+}
+
+function kimStopThink() {
+  const tc = document.getElementById('kim-think-container');
+  if (tc) { tc.style.display = 'none'; tc.innerHTML = ''; tc.id = 'kim-wave-container'; }
 }
 
 function walkieStart(e) {
@@ -2839,6 +2924,9 @@ function walkieStart(e) {
   btn.querySelector('span').style.fontSize = '22px';
   btn.style.background = 'radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%)';
   startRecording();
+
+  // Wave-Animation im KIM-Kaertchen starten
+  kimStartWave();
 }
 
 function walkieEnd(e) {
@@ -2858,6 +2946,9 @@ function walkieEnd(e) {
 
   const cc = document.getElementById('chat-content');
   if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.35);font-size:14px">Wird erkannt...</span>';
+
+  // Wave stoppen, Denk-Animation starten
+  kimStartThink();
 
   stopRecording();
   // processVoice wird durch mediaRecorder.onstop aufgerufen
@@ -2911,7 +3002,7 @@ function toggleSpeech() {
     if (pendingText) {
       sendToKim(pendingText).then(() => {
         speechState = 'idle';
-        btn.querySelector('span').textContent = 'KIM';
+        btn.querySelector('span').textContent = '🎙';
       });
     } else {
       resetSpeechState();
@@ -2924,10 +3015,12 @@ function resetSpeechState() {
   pendingText = '';
   isListening = false;
   walkieActive = false;
+  kimStopWave();
+  kimStopThink();
   const btn = document.getElementById('speech-btn');
   btn.classList.remove('listening');
   btn.classList.remove('send-ready');
-  btn.querySelector('span').textContent = 'KIM';
+  btn.querySelector('span').textContent = '🎙';
   btn.querySelector('span').style.fontSize = '';
   btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
   const delBtn = document.getElementById('delete-btn');
@@ -3072,13 +3165,66 @@ function cleanupMic() {
   }
 }
 
+// === RUFANLAGE: Name im gesprochenen Text erkennen ===
+function detectSpokenAgent(text) {
+  const lower = text.toLowerCase().trim();
+  // Begruessung + Name am Anfang erkennen ("hey kai", "hallo kim", "justus,")
+  const greetings = /^(hey|hallo|hi|guten tag|morgen|moin|servus)?\s*/;
+  const cleaned = lower.replace(greetings, '').trim();
+
+  // KIM = Persoenliche Assistentin
+  if (/^kim[\s,!.]/.test(cleaned) || lower.startsWith('hey kim') || lower.startsWith('hallo kim'))
+    return {name:'KIM', role:'Assistentin', agent:'kim'};
+
+  // KAI = Concierge (explizit angesprochen)
+  if (/^kai[\s,!.]/.test(cleaned) || lower.startsWith('hey kai') || lower.startsWith('hallo kai'))
+    return {name:'KAI', role:'Concierge', agent:'kai'};
+
+  // Alle Agenten aus ALL_AGENTS durchgehen
+  const agentNames = [
+    {match:['justus'], name:'Justus', role:'Recht', agent:'ag-justus'},
+    {match:['lena'], name:'Lena', role:'Buchhaltung', agent:'ag-lena'},
+    {match:['wetterfrosch','wetter'], name:'Wetterfrosch', role:'Wetter', agent:'ag-wetterfrosch'},
+    {match:['kalkulierer','kalkulation'], name:'Kalkulierer', role:'Kalkulation', agent:'ag-kalkulierer'},
+    {match:['bestellprofi','bestell'], name:'Bestellprofi', role:'Bestellung', agent:'ag-bestellprofi'},
+    {match:['lagerist','lager'], name:'Lagerist', role:'Lager', agent:'ag-lagerist'},
+    {match:['sekretaer','sekretär'], name:'Sekretaer', role:'Termine', agent:'ag-sekretaer'},
+    {match:['dolmetscher','übersetzer','uebersetzer'], name:'Dolmetscher', role:'Sprachen', agent:'ag-dolmetscher'},
+    {match:['bibliothekar','bibliothek'], name:'Bibliothekar', role:'Wissen', agent:'ag-bibliothekar'},
+    {match:['animateur','freizeit'], name:'Animateur', role:'Freizeit', agent:'ag-animateur'},
+    {match:['it-hilfe','it hilfe','technik'], name:'IT-Hilfe', role:'Support', agent:'ag-ithilfe'},
+    {match:['marketing'], name:'Marketing', role:'Werbung', agent:'ag-marketing'},
+    {match:['dj','musik'], name:'DJ', role:'Musik', agent:'ag-dj'},
+    {match:['nachtfahrer','taxi','heimfahrt'], name:'Nachtfahrer', role:'Heimfahrt', agent:'ag-nachtfahrer'},
+    {match:['dr. steuer','steuerrecht','steuer'], name:'Dr. Steuer', role:'Steuerrecht', agent:'ag-steuerrecht'},
+    {match:['patentius','patentrecht','patent'], name:'Patentius', role:'Patentrecht', agent:'ag-patentrecht'},
+    {match:['arbex','arbeitsrecht'], name:'Arbex', role:'Arbeitsrecht', agent:'ag-arbeitsrecht'},
+    {match:['eventus','veranstaltung'], name:'Eventus', role:'Veranstaltungsrecht', agent:'ag-veranstaltungsrecht'},
+    {match:['controller','controlling'], name:'Controller', role:'Controlling', agent:'ag-controlling'},
+    {match:['steuerchen'], name:'Steuerchen', role:'Steuern', agent:'ag-steuerlena'},
+    {match:['youtube','video scout'], name:'YouTube Scout', role:'Videos', agent:'ag-youtube'},
+    {match:['web scout','web-scout'], name:'Web Scout', role:'Recherche', agent:'ag-web'},
+    {match:['news','nachrichten'], name:'News Scout', role:'Nachrichten', agent:'ag-news'},
+  ];
+
+  for (const a of agentNames) {
+    for (const m of a.match) {
+      if (cleaned.startsWith(m + ' ') || cleaned.startsWith(m + ',') || cleaned.startsWith(m + '!') || cleaned === m)
+        return {name:a.name, role:a.role, agent:a.agent};
+    }
+  }
+
+  // Kein Name erkannt → KAI (Concierge) nimmt an
+  return null;
+}
+
 async function processVoice(blob, mimeType) {
   const btn = document.getElementById('speech-btn');
   btn.querySelector('span').textContent = '⏳';
 
   // Sofort-Check: Sind wir offline?
   if (!navigator.onLine) {
-    chatAddMessage('KIM', 'Ich bin gerade offline. Sobald du wieder Netz hast, bin ich sofort fuer dich da! 📡');
+    chatAddMessage('KAI', 'Ich bin gerade offline. Sobald du wieder Netz hast, bin ich sofort fuer dich da! 📡');
     const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = 'Offline 📡';
     resetSpeechState();
     return;
@@ -3111,18 +3257,29 @@ async function processVoice(blob, mimeType) {
         // User hat eine URL gesprochen
         ytUrlField.textContent = userText;
         ytUrlField.style.color = 'rgba(255,255,255,0.5)';
-        btn.querySelector('span').textContent = 'KIM';
+        btn.querySelector('span').textContent = '🎙';
         ytAnalyze();
         return;
       }
       // Kein URL - als Suchanfrage an KIM weiterleiten
     }
 
-    // Zeige erkannten Text im Chat-Overlay
+    // === RUFANLAGE: Wer wird angesprochen? ===
+    const spokenAgent = detectSpokenAgent(userText);
+    currentAgent = spokenAgent ? spokenAgent.name : 'KAI';
+    if (spokenAgent) {
+      // Agent direkt angesprochen - Avatar-Kaertchen updaten
+      const flName = document.querySelector('#flip-label .fl-name');
+      if (flName) flName.textContent = spokenAgent.name;
+      const flRole = document.querySelector('#flip-label .fl-role');
+      if (flRole) flRole.textContent = spokenAgent.role + ' · Hoert zu...';
+    }
+
+    // Erkannten Text direkt im Chat-Overlay zeigen
     pendingText = userText;
     chatAddMessage('DU', userText);
     chatShowThinking();
-    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (getSetupConfig()['kim_mode'] === 'persoenlich' ? 'Assistentin' : 'Concierge') + ' · Denkt nach...';
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (spokenAgent ? spokenAgent.role : 'Concierge') + ' · Denkt nach...';
     // Button auf SENDEN setzen (gruen, blinkend) + Loeschen-Button zeigen
     speechState = 'review';
     btn.querySelector('span').textContent = '▶';
@@ -3154,11 +3311,13 @@ async function sendToKim(userText) {
   if (delBtn) delBtn.style.display = 'none';
   btn.classList.remove('send-ready');
 
+  // Denk-Animation im KIM-Kaertchen
+  kimStartThink();
+
   // Sofort-Check: Offline?
   if (!navigator.onLine) {
-    chatAddMessage('KIM', 'Ich bin gerade offline. Deine Frage habe ich mir gemerkt - sobald du wieder Netz hast, beantworte ich sie! 📡');
+    chatAddMessage('KAI', 'Ich bin gerade offline. Deine Frage habe ich mir gemerkt - sobald du wieder Netz hast, beantworte ich sie! 📡');
     const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = 'Offline 📡';
-    document.getElementById('chat-bottom-bar').style.display = 'none';
     resetSpeechState();
     return;
   }
@@ -3270,7 +3429,7 @@ function showChatInput() {
 }
 
 function addAnswerCard(answer) {
-  const cleanAnswer = answer.replace(/\n/g, '<br>');
+  const cleanAnswer = answer.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/\n/g, '<br>');
   const safeAnswer = answer.replace(/'/g, "\\'").replace(/\n/g, " ").substring(0, 500);
   // Neue Antwort-Glasplatte zum Rad hinzufuegen
   const idx = activeCards.length;
@@ -3285,8 +3444,7 @@ function addAnswerCard(answer) {
       <div class="card-face card-front">
         <div id="chat-page-${idx}" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span>
-            <span onclick="speakAnswer('${safeAnswer}')" style="cursor:pointer;font-size:12px;opacity:0.3">🔊</span>
+            <span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KAI:</span>
           </div>
           <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.4;margin-top:2px">${cleanAnswer}</div>
         </div>
@@ -3323,10 +3481,15 @@ function showBookQuestion(question) {
   const chatContent = document.getElementById('chat-content');
   if (!chatContent) return;
   chatContent.innerHTML = `<span style="color:rgba(255,255,255,0.5)">${question}</span>
-<div><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span> <span style="display:inline-flex;gap:2px;align-items:center;vertical-align:middle"><span style="width:2px;height:8px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out infinite"></span><span style="width:2px;height:14px;background:rgba(100,200,100,0.5);border-radius:1px;animation:bwave 0.6s ease-in-out 0.15s infinite"></span><span style="width:2px;height:10px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out 0.3s infinite"></span></span></div>`;
+<div><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KAI:</span> <span style="display:inline-flex;gap:2px;align-items:center;vertical-align:middle"><span style="width:2px;height:8px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out infinite"></span><span style="width:2px;height:14px;background:rgba(100,200,100,0.5);border-radius:1px;animation:bwave 0.6s ease-in-out 0.15s infinite"></span><span style="width:2px;height:10px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out 0.3s infinite"></span></span></div>`;
 }
 
 function showKimResponse(question, answer) {
+  // Denk-Animation stoppen - KIM hat geantwortet
+  kimStopThink();
+  const role = document.querySelector('#flip-label .fl-role');
+  if (role) role.textContent = 'Antwortet';
+
   const currentCard = activeCards[currentIndex];
 
   // Im YouTube Scout: Antwort auf die Kapitel-Glasplatte
@@ -3347,17 +3510,10 @@ function showKimResponse(question, answer) {
   lastKimAnswer = answer;
 
   // Antwort ins Chat-Overlay
-  chatAddMessage('KIM', answer);
+  chatAddMessage(currentAgent, answer);
 
-  // Vorlesen-Button zeigen
-  document.getElementById('chat-bottom-bar').style.display = 'block';
-
-  // KIM Status updaten
-  const cfg2 = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
-  const mode2 = cfg2['kim_mode'] || 'concierge';
-  const gender2 = cfg2['kim_gender'] || 'weiblich';
-  const subtitle2 = mode2 === 'concierge' ? 'Concierge' : (gender2 === 'weiblich' ? 'Assistentin' : 'Assistent');
-  const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = subtitle2 + ' · Fertig ✓';
+  // Status updaten - zeigt wer geantwortet hat
+  const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (currentAgent === 'KAI' ? 'Concierge' : currentAgent) + ' · Fertig ✓';
 }
 
 function speakAnswer(text) {
