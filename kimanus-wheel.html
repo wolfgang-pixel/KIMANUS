@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v7.7 - Sternchen weg, Text oben, kein Visionaer -->
+<!-- KIMANUS Wheel v7.9 - KAI+KIM getrennt, Schliessfach, Postfach, Archiv -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -697,35 +697,22 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <button onclick="toggleSpeech()" class="kb-btn kb-kim">🎤 KIM</button>
   </div>
 
-  <!-- Setup-Overlay (scrollbare Kaertchen-Auswahl) -->
-  <div id="setup-overlay" style="display:none;position:fixed;top:60px;bottom:80px;left:0;right:0;background:rgba(0,0,0,0.85);z-index:15" onclick="if(event.target===this)closeSetup()">
-    <div id="setup-panel" style="position:absolute;inset:0;display:flex;flex-direction:column;background:#000000;overflow:hidden">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <button onclick="closeSetup()" style="background:none;border:none;color:#007aff;font-size:17px;cursor:pointer;padding:4px 0">‹ Zurueck</button>
-        <span style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">${setupMode === 'kim' ? 'KIM Setup' : 'Agenten & Bereiche'}</span>
-        <div style="width:60px"></div>
+  <!-- Settings-Folie (iPhone-Style, von unten nach oben) -->
+  <div id="setup-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:50;pointer-events:none">
+    <div id="setup-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.35s" onclick="closeSetup()"></div>
+    <div id="setup-panel" style="position:absolute;left:0;right:0;bottom:0;height:92%;background:#000;border-radius:12px 12px 0 0;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);display:flex;flex-direction:column;pointer-events:auto">
+      <div style="display:flex;justify-content:center;padding:8px 0 4px"><div style="width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,0.2)"></div></div>
+      <div id="setup-header" style="display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;flex-shrink:0">
+        <button id="setup-back" onclick="setupGoBack()" style="display:none;background:none;border:none;color:#007aff;font-size:17px;cursor:pointer;padding:4px 0;-webkit-tap-highlight-color:transparent">‹ Zurueck</button>
+        <div id="setup-back-spacer" style="width:70px"></div>
+        <span id="setup-title" style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">Einstellungen</span>
+        <button onclick="closeSetup()" style="background:none;border:none;color:#007aff;font-size:17px;cursor:pointer;padding:4px 0;-webkit-tap-highlight-color:transparent">Fertig</button>
       </div>
-      <div id="setup-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 0 20px"></div>
+      <div id="setup-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 40px"></div>
     </div>
   </div>
 
-  <!-- Tresor-Overlay (faehrt von unten hoch) -->
-  <div id="tresor-overlay" onclick="if(event.target===this)closeTresor()">
-    <div id="tresor-panel" onclick="event.stopPropagation()">
-      <div class="tresor-grid tresor-grid-3x2">
-        <div class="tresor-tab" onclick="openSetupKim()"><span>KAI</span></div>
-        <div class="tresor-tab" onclick="openSetupAgenten()"><span>Agenten</span></div>
-        <div class="tresor-tab" onclick="openSetupBereiche()"><span>Abteilungen</span></div>
-        <div class="tresor-tab" onclick="openSetupKimanus()"><span>KIMANUS</span></div>
-        <div class="tresor-tab" onclick="openSetupClaude()"><span>Claude</span></div>
-        <div class="tresor-tab"><span>System</span></div>
-      </div>
-      <div class="tresor-grid tresor-grid-2x1">
-        <div class="tresor-tab"><span>Schliessfach</span></div>
-        <div class="tresor-tab"><span>Postfach</span></div>
-      </div>
-    </div>
-  </div>
+  <!-- Tresor entfernt - Settings ist jetzt Fullscreen-Folie -->
 
   <!-- Chat-Bereich (nur im Sichtfenster, Layout bleibt!) -->
   <div id="chat-scroll-area" style="display:none;position:absolute;left:11px;right:11px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;z-index:13;background:#0e0e0e;border:1px solid rgba(255,255,255,0.08);padding:8px 12px;border-radius:0">
@@ -734,8 +721,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
   <div id="bottom-bar">
     <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
-    <button id="setup-back-btn" type="button" onclick="closeSetup()" style="display:none;position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);-webkit-tap-highlight-color:transparent">↩</button>
-    <button id="tresor-btn" onclick="event.stopPropagation();toggleTresor()" type="button">🔒</button>
+    <button id="settings-btn" onclick="event.stopPropagation();openSettings()" type="button" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);margin-top:-8px;width:36px;height:36px;border-radius:50%;background:none;border:none;cursor:pointer;font-size:20px;color:rgba(255,255,255,0.35);-webkit-tap-highlight-color:transparent">⚙️</button>
     <button id="speech-btn" ontouchstart="walkieStart(event)" ontouchend="walkieEnd(event)" onmousedown="walkieStart(event)" onmouseup="walkieEnd(event)" onclick="event.preventDefault()">
       <span id="speech-agent">🎙</span>
     </button>
@@ -1691,32 +1677,53 @@ function saveSetupConfig(cfg) {
   localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
 }
 
-function openSetupKim() {
-  closeTresor();
-  openSetup('kim');
-}
-function openSetupAgenten() {
-  closeTresor();
-  openSetup('agenten');
-}
-function openSetupBereiche() {
-  closeTresor();
-  openSetup('bereiche');
-}
-function openSetupKimanus() {
-  closeTresor();
-  openSetup('kimanus');
-}
-function openSetupClaude() {
-  closeTresor();
-  openSetup('claude');
+// === SETTINGS (iPhone-Style Fullscreen-Folie) ===
+let settingsOpen = false;
+let setupHistory = []; // Navigation-Stack
+
+function openSettings() {
+  settingsOpen = true;
+  setupHistory = [];
+  openSetup('main');
+  // Folie von unten reinschieben
+  document.getElementById('setup-panel').style.transform = 'translateY(0)';
+  document.getElementById('setup-backdrop').style.background = 'rgba(0,0,0,0.4)';
+  document.getElementById('setup-overlay').style.pointerEvents = 'auto';
 }
 
-let setupMode = 'kim';
-function openSetup(mode) {
-  setupMode = mode || 'kim';
+function setupGoBack() {
+  if (setupHistory.length > 0) {
+    const prev = setupHistory.pop();
+    openSetup(prev, true);
+  } else {
+    openSetup('main', true);
+  }
+}
+
+function openSetupKim() { setupHistory.push('main'); openSetup('kim'); }
+function openSetupKimPersoenlich() { setupHistory.push('main'); openSetup('kim_persoenlich'); }
+function openSetupAgenten() { setupHistory.push('main'); openSetup('agenten'); }
+function openSetupBereiche() { setupHistory.push('main'); openSetup('bereiche'); }
+function openSetupKimanus() { setupHistory.push('main'); openSetup('kimanus'); }
+function openSetupClaude() { setupHistory.push('main'); openSetup('claude'); }
+
+let setupMode = 'main';
+function openSetup(mode, isBack) {
+  setupMode = mode || 'main';
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
+  // Header updaten
+  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude'};
+  document.getElementById('setup-title').textContent = titles[setupMode] || 'Einstellungen';
+  const backBtn = document.getElementById('setup-back');
+  const backSpacer = document.getElementById('setup-back-spacer');
+  if (setupMode === 'main') {
+    backBtn.style.display = 'none';
+    backSpacer.style.display = 'block';
+  } else {
+    backBtn.style.display = 'block';
+    backSpacer.style.display = 'none';
+  }
   const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
   const groupStyle = 'background:#1c1c1e;border-radius:12px;overflow:hidden;margin-bottom:35px';
   const rowStyle = 'display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.12);gap:14px;min-height:44px';
@@ -1730,6 +1737,63 @@ function openSetup(mode) {
   const toggle = (key, on) => `<div onclick="event.stopPropagation();toggleSetupItem('${key}',${!on})" style="width:51px;height:31px;border-radius:16px;background:${on?'#34c759':'rgba(120,120,128,0.32)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:27px;height:27px;border-radius:14px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div></div>`;
 
   let html = '';
+
+  if (setupMode === 'main') {
+  // === HAUPTSEITE: iPhone Settings Style ===
+
+  // 1. KAI Profil (wie Apple ID oben)
+  html += `<div onclick="openSetupKim()" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer">`;
+  html += `<div style="width:54px;height:54px;border-radius:27px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
+  html += `</div>`;
+
+  // 2. KIM Profil (persoenliche Assistentin)
+  html += `<div onclick="openSetupKimPersoenlich()" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;margin-top:10px">`;
+  html += `<div style="width:54px;height:54px;border-radius:27px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
+  html += `</div>`;
+
+  // 3. Agenten & Abteilungen
+  html += `<div style="${groupStyle};margin-top:35px">`;
+  html += `<div onclick="openSetupAgenten()" style="${rowStyle}cursor:pointer">${iconBox('👥')}<span style="${labelStyle}">Agenten</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupBereiche()" style="${lastRowStyle}cursor:pointer">${iconBox('🏢')}<span style="${labelStyle}">Abteilungen</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 4. Schliessfach & Postfach
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🔐')}<div style="flex:1"><span style="${labelStyle}">Schliessfach</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Sichere Aufbewahrung</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📬')}<div style="flex:1"><span style="${labelStyle}">Postfach</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Verschluesselte Korrespondenz</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 5. Archiv (Aktenordner, Filme, CDs, Fotoalben)
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📁')}<div style="flex:1"><span style="${labelStyle}">Aktenordner</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Dokumente, Vertraege, Belege</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🎬')}<div style="flex:1"><span style="${labelStyle}">Filme & Videos</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Videothek, YouTube Favoriten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('💿')}<div style="flex:1"><span style="${labelStyle}">Musik & CDs</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Playlists, Lieblingssongs</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📸')}<div style="flex:1"><span style="${labelStyle}">Fotoalben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Erinnerungen, Familienfotos</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 6. System
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="openSetupKimanus()" style="${rowStyle}cursor:pointer">${iconBox('🤝')}<span style="${labelStyle}">KIMANUS</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupClaude()" style="${lastRowStyle}cursor:pointer">${iconBox('🧡')}<span style="${labelStyle}">Claude</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 7. Darstellung
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="100" value="${currentBrightness||30}" oninput="adjustBrightness(this.value)" style="width:100%;accent-color:#e63946"></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🎨')}<span style="${labelStyle}">Design</span><span style="color:rgba(255,255,255,0.3);font-size:14px">Dunkel ›</span></div>`;
+  html += `</div>`;
+
+  // 8. Info
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v7.9 ›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  } // Ende main
 
   if (setupMode === 'kim') {
   // KIM Profil-Karte (wie Apple ID oben in den Einstellungen)
@@ -1795,7 +1859,48 @@ function openSetup(mode) {
   html += `</div>`;
   html += `</div>`;
 
-  } // Ende KIM-Setup
+  } // Ende KAI-Setup
+
+  if (setupMode === 'kim_persoenlich') {
+  // KIM Persoenliche Assistentin
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">💜</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
+  html += `</div>`;
+
+  const kimGender = cfg['kim_gender'] || 'weiblich';
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Persoenlichkeit</div>`;
+  html += `<div style="${groupStyle}">`;
+  // Geschlecht
+  html += `<div style="${rowStyle}">${iconBox('⚥')}<span style="${labelStyle}">Anrede</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_gender','weiblich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='weiblich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Sie</div>`;
+  html += `<div onclick="toggleSetupItem('kim_gender','maennlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='maennlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Er</div>`;
+  html += `</div></div>`;
+  // Telefon
+  html += `<div style="${rowStyle}">${iconBox('📞')}<div style="flex:1"><span style="${labelStyle}">Telefonnummer</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Noch nicht eingerichtet</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  // WhatsApp
+  html += `<div style="${rowStyle}">${iconBox('💬')}<div style="flex:1"><span style="${labelStyle}">WhatsApp</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Noch nicht eingerichtet</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  // E-Mail
+  html += `<div style="${lastRowStyle}">${iconBox('📧')}<div style="flex:1"><span style="${labelStyle}">E-Mail</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">kim@kimanus.de</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Was KIM weiss</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('❤️')}<div style="flex:1"><span style="${labelStyle}">Vorlieben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Essen, Hobbys, Gewohnheiten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('👨‍👩‍👧‍👦')}<div style="flex:1"><span style="${labelStyle}">Familie & Kontakte</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Geburtstage, Namen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📅')}<div style="flex:1"><span style="${labelStyle}">Termine & Erinnerungen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Kalender, Medikamente</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🧠')}<div style="flex:1"><span style="${labelStyle}">Gedaechtnis</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Was KIM sich gemerkt hat</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Erreichbarkeit</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🎙')}<span style="${labelStyle}">In der App (Text)</span>${toggle('kim_app_active', cfg['kim_app_active'] !== false)}</div>`;
+  html += `<div style="${rowStyle}">${iconBox('📞')}<span style="${labelStyle}">Per Telefon (Stimme)</span>${toggle('kim_phone_active', cfg['kim_phone_active'] === true)}</div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('💬')}<span style="${labelStyle}">Per WhatsApp</span>${toggle('kim_whatsapp_active', cfg['kim_whatsapp_active'] === true)}</div>`;
+  html += `</div>`;
+
+  } // Ende KIM-Persoenlich
 
   if (setupMode === 'agenten') {
   // Agenten aufklappbar nach Kategorie (wie Abteilungen)
@@ -2017,20 +2122,25 @@ function openSetup(mode) {
   } // Ende Claude-Setup
 
   list.innerHTML = html;
-  document.getElementById('setup-overlay').style.display = 'block';
-  document.getElementById('setup-back-btn').style.display = 'block';
-  document.getElementById('tresor-btn').style.display = 'none';
-  document.getElementById('brightness-slider').style.display = 'none';
+  // Folie oeffnen falls noch nicht offen
+  if (!settingsOpen) {
+    settingsOpen = true;
+    document.getElementById('setup-panel').style.transform = 'translateY(0)';
+    document.getElementById('setup-backdrop').style.background = 'rgba(0,0,0,0.4)';
+    document.getElementById('setup-overlay').style.pointerEvents = 'auto';
+  }
   // Flip-Label verstecken
   const fl = document.getElementById('flip-label');
   if (fl) fl.style.display = 'none';
 }
 
 function closeSetup() {
-  document.getElementById('setup-overlay').style.display = 'none';
-  document.getElementById('setup-back-btn').style.display = 'none';
-  document.getElementById('tresor-btn').style.display = '';
-  document.getElementById('brightness-slider').style.display = '';
+  settingsOpen = false;
+  document.getElementById('setup-panel').style.transform = 'translateY(100%)';
+  document.getElementById('setup-backdrop').style.background = 'rgba(0,0,0,0)';
+  setTimeout(() => {
+    document.getElementById('setup-overlay').style.pointerEvents = 'none';
+  }, 350);
   // KIM Karte schliessen wenn offen
   const kimCard = document.getElementById('kim-card-overlay');
   if (kimCard) kimCard.style.display = 'none';
@@ -2300,25 +2410,16 @@ function updateKimBacks() {
   });
 }
 
-// === TRESOR ===
-let tresorOpen = false;
-function toggleTresor() {
-  tresorOpen = !tresorOpen;
-  document.getElementById('tresor-overlay').classList.toggle('open', tresorOpen);
-}
-function closeTresor() {
-  tresorOpen = false;
-  document.getElementById('tresor-overlay').classList.remove('open');
-}
-// Tresor runter-wischen
+// === TRESOR ENTFERNT - Settings ist jetzt Fullscreen-Folie ===
+// Settings-Folie runter-wischen zum Schliessen
 (function(){
   let tStartY = 0;
-  const tp = document.getElementById('tresor-panel');
-  if (!tp) return;
-  tp.addEventListener('touchstart', e => { tStartY = e.touches[0].clientY; }, {passive:true});
-  tp.addEventListener('touchend', e => {
+  const sp = document.getElementById('setup-panel');
+  if (!sp) return;
+  sp.addEventListener('touchstart', e => { tStartY = e.touches[0].clientY; }, {passive:true});
+  sp.addEventListener('touchend', e => {
     const diff = e.changedTouches[0].clientY - tStartY;
-    if (diff > 60) closeTresor();
+    if (diff > 80) closeSetup();
   }, {passive:true});
 })();
 
@@ -2905,7 +3006,7 @@ function walkieStart(e) {
   const btn = document.getElementById('speech-btn');
 
   // Wenn Setup offen: KIM Karte zeigen
-  if (document.getElementById('setup-overlay').style.display === 'block') {
+  if (settingsOpen) {
     showKimBubble();
     return;
   }
@@ -2959,7 +3060,7 @@ function toggleSpeech() {
   // Fallback fuer alte Aufrufe
   const btn = document.getElementById('speech-btn');
 
-  if (document.getElementById('setup-overlay').style.display === 'block') {
+  if (settingsOpen) {
     showKimBubble();
     return;
   }
