@@ -2705,6 +2705,40 @@ let silenceTimer = null;
 // === WALKIE-TALKIE MODUS ===
 let walkieActive = false;
 
+function showKimCardAbove() {
+  // KIM Kaertchen oben im Flip-Label Bereich zeigen
+  const fl = document.getElementById('flip-label');
+  if (!fl) return;
+  const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
+  const mode = cfg['kim_mode'] || 'concierge';
+  const gender = cfg['kim_gender'] || 'weiblich';
+  const subtitle = mode === 'concierge' ? 'Concierge' : (gender === 'weiblich' ? 'Assistentin' : 'Assistent');
+
+  document.getElementById('fl-card').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;width:100%;padding:12px">
+      <div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
+      <div>
+        <div class="fl-name" style="font-size:18px">KIM</div>
+        <div class="fl-role" style="font-size:12px">${subtitle} · Hoert zu...</div>
+      </div>
+    </div>
+  `;
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const topMid = topH / 2;
+  fl.style.display = '';
+  fl.style.top = (topMid - 105) + 'px';
+  fl.classList.add('visible');
+}
+
+function hideKimCardAbove() {
+  const fl = document.getElementById('flip-label');
+  if (fl) fl.classList.remove('visible');
+}
+
 function walkieStart(e) {
   e.preventDefault();
   const btn = document.getElementById('speech-btn');
@@ -2717,6 +2751,9 @@ function walkieStart(e) {
 
   if (walkieActive) return;
   walkieActive = true;
+
+  // KIM Kaertchen oben zeigen
+  showKimCardAbove();
 
   // Sofort Aufnahme starten
   speechState = 'recording';
@@ -3241,15 +3278,28 @@ function showKimResponse(question, answer) {
   if (!chatContent) return;
 
   const cleanAnswer = answer.replace(/\n/g, '<br>');
-  chatContent.innerHTML = `<span style="color:rgba(255,255,255,0.5)">${question}</span>
-<div><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span> <span id="speak-btn" style="cursor:pointer;font-size:12px;opacity:0.4;float:right">🔊</span></div>
-<div style="color:rgba(255,255,255,0.5);line-height:1.4">${cleanAnswer}</div>`;
-  // Lautsprecher klickbar machen
+  chatContent.innerHTML = `<span style="font-size:11px;color:rgba(230,57,70,0.5);font-weight:700">DU:</span><br>
+<span style="color:rgba(255,255,255,0.4)">${question}</span>
+<div style="margin-top:6px"><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KIM:</span></div>
+<div style="color:rgba(255,255,255,0.5);line-height:1.5">${cleanAnswer}</div>
+<div id="speak-btn" style="margin-top:8px;padding:8px 0;text-align:center;cursor:pointer;border-top:1px solid rgba(255,255,255,0.06)">
+  <span style="font-size:14px;opacity:0.4">🔊</span>
+  <span style="font-size:12px;color:rgba(255,255,255,0.25);margin-left:4px">Vorlesen</span>
+</div>`;
   const sb = document.getElementById('speak-btn');
   if (sb) sb.onclick = () => speakAnswer(lastKimAnswer);
   // Scroll ans Ende
   const chatPage = document.getElementById('chat-page');
   if (chatPage) chatPage.scrollTop = chatPage.scrollHeight;
+  // KIM Kaertchen oben updaten: "Fertig" statt "Hoert zu"
+  const flRole = document.querySelector('#flip-label .fl-role');
+  if (flRole) {
+    const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
+    const mode = cfg['kim_mode'] || 'concierge';
+    const gender = cfg['kim_gender'] || 'weiblich';
+    const subtitle = mode === 'concierge' ? 'Concierge' : (gender === 'weiblich' ? 'Assistentin' : 'Assistent');
+    flRole.textContent = subtitle + ' · Fertig ✓';
+  }
   adjustBrightness(currentBrightness);
 }
 
