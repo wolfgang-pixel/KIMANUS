@@ -476,18 +476,19 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .bar-item .bar-label{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;text-align:center}
 /* Settings-Button (Kaertchen) */
 #settings-btn{
-  width:100%;height:44px;border-radius:0;
-  background:rgba(255,255,255,0.06);
+  width:100%;height:44px;border-radius:10px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
   border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   -webkit-tap-highlight-color:transparent;transition:all 0.15s;
 }
 #settings-btn:active{transform:scale(0.92);background:rgba(255,255,255,0.12)}
 #settings-btn svg{width:16px;height:16px;fill:rgba(255,255,255,0.4)}
-/* Hotkey-Slots (Kaertchen) */
+/* Hotkey-Slots (Kaertchen, 3D-plastisch) */
 .hotkey-slot{
-  width:100%;height:44px;border-radius:0;
+  width:100%;height:44px;border-radius:10px;
   background:rgba(255,255,255,0.04);
   border:1.5px dashed rgba(255,255,255,0.12);
   display:flex;align-items:center;justify-content:center;
@@ -497,7 +498,8 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 .hotkey-slot.filled{
   border-style:solid;border-color:rgba(255,255,255,0.2);
-  background:rgba(255,255,255,0.08);
+  background:linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
+  box-shadow:0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 .hotkey-slot .hotkey-icon{font-size:18px;line-height:1}
 .hotkey-slot:active{transform:scale(0.92)}
@@ -533,21 +535,24 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 }
 #action-sheet.open{transform:translateX(-50%) translateY(0)}
 .action-group{
-  background:rgba(30,30,32,0.92);
+  background:linear-gradient(180deg, rgba(50,50,54,0.95) 0%, rgba(30,30,32,0.95) 100%);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-radius:0;overflow:hidden;
-  border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .action-btn{
   display:flex;align-items:center;justify-content:center;
-  padding:15px;font-size:17px;font-weight:400;
-  color:#4d9fff;background:none;border:none;
+  padding:15px;font-size:17px;font-weight:500;
+  color:#4d9fff;
+  background:linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+  border:none;
   width:100%;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  border-bottom:0.5px solid rgba(255,255,255,0.08);
+  border-bottom:0.5px solid rgba(255,255,255,0.06);
 }
 .action-btn:last-child{border-bottom:none}
-.action-btn:active{background:rgba(255,255,255,0.06)}
+.action-btn:active{background:rgba(255,255,255,0.08)}
 .action-btn.destructive{color:#ff453a}
 .action-btn.cancel{font-weight:600;font-size:17px}
 
@@ -567,7 +572,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   position:absolute;z-index:16;
   font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);
   text-align:center;white-space:nowrap;
-  pointer-events:none;letter-spacing:0.5px;
+  letter-spacing:0.5px;
+  padding:3px 10px;border-radius:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  border:1px solid rgba(255,255,255,0.08);
+  cursor:grab;-webkit-tap-highlight-color:transparent;
+  touch-action:none;
 }
 @keyframes micWiggle{
   0%,100%{transform:rotate(0deg) scale(1)}
@@ -744,6 +754,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v10.5</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -829,11 +840,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 </div>
 
 <!-- Action-Sheet (iOS-Style, von unten) -->
-<div id="action-sheet-backdrop" onclick="if(!longPressTriggered)closeActionSheet()"></div>
+<div id="action-sheet-backdrop" ontouchend="event.preventDefault();longPressTriggered=false;closeActionSheet()" onclick="longPressTriggered=false;closeActionSheet()"></div>
 <div id="action-sheet">
   <div class="action-group">
-    <button class="action-btn" onclick="actionSheetHotkey()">⬇ Als Hotkey speichern</button>
-    <button class="action-btn destructive" onclick="actionSheetRemove()">✕ Vom Rad entfernen</button>
+    <button class="action-btn" onclick="actionSheetHotkey()" ontouchend="event.preventDefault();actionSheetHotkey()">⬇ Als Hotkey speichern</button>
+    <button class="action-btn destructive" onclick="actionSheetRemove()" ontouchend="event.preventDefault();actionSheetRemove()">✕ Vom Rad entfernen</button>
   </div>
 </div>
 
@@ -1288,7 +1299,27 @@ let registerOpen = false;
 let panelH = 0;
 let isAnimating = false;
 
+// Vorgefertigte Agenten vom Server (werden einmalig ins localStorage geschrieben)
+function seedServerAgents() {
+  const SERVER_AGENTS = [
+    {"name":"Küchenmeister","role":"Koch-Berater","description":"Persönlicher Küchenassistent für Rezeptvorschläge und Kochhilfe.","model":"deepseek","icon":"👨‍🍳","category":"Berater","webhookPath":"kuechenmeister-berater","phone":"Durchwahl 214","email":"kuechenmeister-berater@kimanus.de","webhook_url":"https://manus.kimanus.de/webhook/agent-kuechenmeister-berater"},
+    {"name":"Ulli.G","role":"Energierechts-Anwalt","description":"Spezialist für deutsches Energierecht: EEG, Strompreisbremse, Photovoltaik, Balkonkraftwerke.","model":"deepseek","icon":"⚡","category":"Recht","webhookPath":"ulli-g-energie-rechtsexperte","phone":"Durchwahl 210","email":"ulli-g-energie-rechtsexperte@kimanus.de","webhook_url":"https://manus.kimanus.de/webhook/agent-ulli-g-energie-rechtsexperte"}
+  ];
+
+  const existing = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+  let changed = false;
+  SERVER_AGENTS.forEach(sa => {
+    if (!existing.find(e => e.webhookPath === sa.webhookPath)) {
+      existing.push(sa);
+      changed = true;
+    }
+  });
+  if (changed) localStorage.setItem('kimanus-built-agents', JSON.stringify(existing));
+}
+
 function init() {
+  // Server-Agenten laden (einmalig, wenn noch nicht vorhanden)
+  seedServerAgents();
   calcSizes();
   // Setup-Config anwenden BEVOR Karten gebaut werden
   rebuildWheel();
@@ -1480,7 +1511,8 @@ function activateHotkey(idx) {
   const hk = hotkeys[idx];
   if (!hk) return;
   // Direkt zur Karte springen (oder wiederherstellen wenn entfernt)
-  let cardIdx = activeCards.findIndex(c => c.id === hk.cardId);
+  // Suche mit Original-ID (Duplikate haben _dup/_d5 Suffix)
+  let cardIdx = activeCards.findIndex(c => c.id === hk.cardId || c.id.replace(/_d\d+$/, '').replace(/_dup$/, '') === hk.cardId);
   if (cardIdx < 0) {
     // Karte wurde entfernt - wieder aktivieren
     const cfg = getSetupConfig();
@@ -1509,7 +1541,7 @@ function showHotkeyRemoveConfirm(idx) {
   if (navigator.vibrate) navigator.vibrate(50);
   const sheet = document.getElementById('action-sheet');
   const group = sheet.querySelector('.action-group');
-  group.innerHTML = `<button class="action-btn destructive" onclick="confirmHotkeyRemove()">✕ ${hk.title} wirklich entfernen?</button>`;
+  group.innerHTML = `<button class="action-btn destructive" onclick="confirmHotkeyRemove()" ontouchend="event.preventDefault();confirmHotkeyRemove()">✕ ${hk.title} wirklich entfernen?</button>`;
   document.getElementById('action-sheet-backdrop').classList.add('open');
   sheet.classList.add('open');
   actionSheetJustOpened = true;
@@ -1522,6 +1554,17 @@ function openActionSheet(cardIdx) {
   actionSheetCardIdx = cardIdx;
   const card = activeCards[cardIdx];
   if (!card) return;
+  // Pruefen ob Karte schon als Hotkey existiert
+  const origId = card.id.replace(/_d\d+$/, '').replace(/_dup$/, '');
+  const alreadyHotkey = hotkeys.some(h => h && h.cardId === origId);
+  // Buttons dynamisch setzen
+  const group = document.getElementById('action-sheet').querySelector('.action-group');
+  let btns = '';
+  if (!alreadyHotkey) {
+    btns += `<button class="action-btn" onclick="actionSheetHotkey()" ontouchend="event.preventDefault();actionSheetHotkey()">⬇ Als Hotkey speichern</button>`;
+  }
+  btns += `<button class="action-btn destructive" onclick="actionSheetRemove()" ontouchend="event.preventDefault();actionSheetRemove()">✕ Vom Rad entfernen</button>`;
+  group.innerHTML = btns;
   // Karte wackeln lassen
   const el = document.getElementById('card-' + cardIdx);
   if (el) el.classList.add('wiggling');
@@ -1558,13 +1601,28 @@ function actionSheetRemove() {
   if (actionSheetCardIdx === null) return;
   const card = activeCards[actionSheetCardIdx];
   if (!card) { closeActionSheet(); return; }
-  // Setup-Config: Karte/Agent deaktivieren
+
+  // Original-ID ohne Duplikat-Suffix (_d, _dup)
+  const origId = card.id.replace(/_d\d+$/, '').replace(/_dup$/, '');
   const cfg = getSetupConfig();
-  const agentKey = 'agent_' + card.id;
-  const cardKey = 'card_' + card.id;
-  if (cfg[agentKey] !== undefined) cfg[agentKey] = false;
-  else cfg[cardKey] = false;
+
+  if (origId.startsWith('custom-')) {
+    // Custom-Agent: in Setup-Config deaktivieren
+    cfg['agent_' + origId] = false;
+  } else {
+    // Standard-Agent oder Karte
+    const agentKey = 'agent_' + origId;
+    const cardKey = 'card_' + origId;
+    if (cfg[agentKey] !== undefined || ALL_AGENTS.find(a => a.id === origId)) {
+      cfg[agentKey] = false;
+    } else {
+      cfg[cardKey] = false;
+    }
+  }
   saveSetupConfig(cfg);
+  // Force-Close: Alles sofort schliessen ohne Schutz-Checks
+  actionSheetJustOpened = false;
+  longPressTriggered = false;
   closeActionSheet();
   rebuildWheel();
 }
@@ -1573,13 +1631,17 @@ function actionSheetHotkey() {
   if (actionSheetCardIdx === null) return;
   const card = activeCards[actionSheetCardIdx];
   if (!card) { closeActionSheet(); return; }
+  // Original-ID ohne Duplikat-Suffix
+  const origId = card.id.replace(/_d\d+$/, '').replace(/_dup$/, '');
   // Naechsten freien Slot finden
   let slotIdx = hotkeys.findIndex(h => h === null);
   if (slotIdx === -1) slotIdx = 0;
-  hotkeys[slotIdx] = { cardId: card.id, icon: card.icon, title: card.title };
+  hotkeys[slotIdx] = { cardId: origId, icon: card.icon, title: card.title };
   saveHotkeys();
   renderHotkeySlot(slotIdx);
   if (navigator.vibrate) navigator.vibrate([30, 20, 30]);
+  actionSheetJustOpened = false;
+  longPressTriggered = false;
   closeActionSheet();
 }
 
@@ -1681,7 +1743,7 @@ function confirmHotkeyRemove() {
 
 function restoreActionSheetButtons() {
   const group = document.getElementById('action-sheet').querySelector('.action-group');
-  group.innerHTML = `<button class="action-btn" onclick="actionSheetHotkey()">⬇ Als Hotkey speichern</button><button class="action-btn destructive" onclick="actionSheetRemove()">✕ Vom Rad entfernen</button>`;
+  group.innerHTML = `<button class="action-btn" onclick="actionSheetHotkey()" ontouchend="event.preventDefault();actionSheetHotkey()">⬇ Als Hotkey speichern</button><button class="action-btn destructive" onclick="actionSheetRemove()" ontouchend="event.preventDefault();actionSheetRemove()">✕ Vom Rad entfernen</button>`;
 }
 
 function flipCard() {
@@ -1937,7 +1999,8 @@ function updateFlipLabel() {
     const topH = Math.floor(remainH * 0.6);
     const topMid = topH / 2;
     const cardH = 210;
-    fl.style.display = '';
+    fl.style.display = 'flex';
+    fl.style.opacity = '1';
     fl.style.top = (topMid - cardH / 2) + 'px';
     fl.classList.add('visible');
     adjustBrightness(currentBrightness);
@@ -1959,15 +2022,15 @@ function updateMicLabel() {
   const label = document.getElementById('mic-agent-label');
   const btn = document.getElementById('speech-btn');
   if (!label || !btn) return;
-  label.textContent = currentMicAgent;
-  // Position: unter dem Mic-Button
   const btnRect = btn.getBoundingClientRect();
   const panel = document.getElementById('panel-bottom');
   if (!panel) return;
   const panelRect = panel.getBoundingClientRect();
-  label.style.left = (btnRect.left - panelRect.left + btnRect.width/2) + 'px';
-  label.style.top = (btnRect.top - panelRect.top + btnRect.height + 2) + 'px';
-  label.style.transform = 'translateX(-50%)';
+  label.textContent = currentMicAgent;
+  // Rechts neben dem Mic-Button (wie ein Bratpfannen-Stiel)
+  label.style.left = (btnRect.left - panelRect.left + btnRect.width + 4) + 'px';
+  label.style.top = (btnRect.top - panelRect.top + btnRect.height/2) + 'px';
+  label.style.transform = 'translateY(-50%)';
 }
 
 function setMicAgent(name) {
@@ -2082,6 +2145,49 @@ function openSetupAgenten() { setupHistory.push('main'); openSetup('agenten'); }
 function openSetupBereiche() { setupHistory.push('main'); openSetup('bereiche'); }
 function openSetupKimanus() { setupHistory.push('main'); openSetup('kimanus'); }
 function openSetupClaude() { setupHistory.push('main'); openSetup('claude'); }
+function openAgentBuilder() { setupHistory.push('main'); openSetup('agent_builder'); }
+
+async function buildAgent() {
+  const input = document.getElementById('agent-builder-input');
+  const status = document.getElementById('agent-builder-status');
+  const btn = document.getElementById('build-agent-btn');
+  if (!input || !input.value.trim()) { status.textContent = 'Bitte beschreibe deinen Agenten.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Wird gebaut...';
+  btn.style.opacity = '0.5';
+  status.innerHTML = '<div style="display:flex;gap:4px;justify-content:center;padding:8px"><span style="width:6px;height:6px;border-radius:3px;background:rgba(245,158,11,0.6);animation:bwave 0.8s ease-in-out infinite"></span><span style="width:6px;height:6px;border-radius:3px;background:rgba(245,158,11,0.8);animation:bwave 0.8s ease-in-out 0.2s infinite"></span><span style="width:6px;height:6px;border-radius:3px;background:rgba(245,158,11,0.6);animation:bwave 0.8s ease-in-out 0.4s infinite"></span></div>';
+
+  try {
+    const resp = await fetch('https://manus.kimanus.de/webhook/agent-builder', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: input.value.trim()})
+    });
+    const data = await resp.json();
+
+    if (data.agent_info) {
+      // Erfolg! Agent speichern
+      const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+      builtAgents.push(data.agent_info);
+      localStorage.setItem('kimanus-built-agents', JSON.stringify(builtAgents));
+
+      // Webhook URL speichern
+      data.agent_info.webhook_url = data.webhook_url;
+      status.innerHTML = '<div style="color:rgba(100,200,100,0.8);font-size:16px;font-weight:700">' + (data.agent_info.icon || '✅') + ' ' + data.agent_info.name + ' ist bereit!</div><div style="color:rgba(255,255,255,0.3);font-size:12px;margin-top:4px">' + data.agent_info.role + ' · ' + (data.agent_info.phone || '') + '</div><div style="color:rgba(255,255,255,0.2);font-size:11px;margin-top:4px">Schliesse die Einstellungen - die Karte ist auf dem Rad!</div>';
+      input.value = '';
+      btn.textContent = 'Noch einen bauen';
+      // Rad neu bauen damit die neue Karte erscheint
+      rebuildWheel();
+    } else {
+      status.textContent = 'Fehler: ' + (data.output || 'Unbekannter Fehler');
+    }
+  } catch(e) {
+    status.textContent = 'Verbindungsfehler: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
 
 let setupMode = 'main';
 function openSetup(mode, isBack) {
@@ -2089,7 +2195,7 @@ function openSetup(mode, isBack) {
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
   // Header updaten
-  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude'};
+  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent'};
   document.getElementById('setup-title').textContent = titles[setupMode] || 'Einstellungen';
   const backBtn = document.getElementById('setup-back');
   const backSpacer = document.getElementById('setup-back-spacer');
@@ -2134,7 +2240,8 @@ function openSetup(mode, isBack) {
   // 3. Agenten & Abteilungen
   html += `<div style="${groupStyle};margin-top:35px">`;
   html += `<div onclick="openSetupAgenten()" style="${rowStyle}cursor:pointer">${iconBox('👥')}<span style="${labelStyle}">Agenten</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div onclick="openSetupBereiche()" style="${lastRowStyle}cursor:pointer">${iconBox('🏢')}<span style="${labelStyle}">Abteilungen</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupBereiche()" style="${rowStyle}cursor:pointer">${iconBox('🏢')}<span style="${labelStyle}">Abteilungen</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openAgentBuilder()" style="${lastRowStyle}cursor:pointer">${iconBox('🔨')}<div style="flex:1"><span style="${labelStyle}">Neuen Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KI erstellt einen Experten fuer dich</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
   // 4. Schliessfach & Postfach
@@ -2165,7 +2272,7 @@ function openSetup(mode, isBack) {
 
   // 8. Info
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v7.9 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v10.5 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -2497,6 +2604,40 @@ function openSetup(mode, isBack) {
   html += `</div>`;
   } // Ende Claude-Setup
 
+  if (setupMode === 'agent_builder') {
+  // Agent Builder UI
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔨</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Agent Builder</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Beschreibe deinen Experten</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="padding:0 16px 8px;font-size:14px;color:rgba(255,255,255,0.4);line-height:1.5">Was fuer einen Agenten brauchst du? Beschreibe ihn in ein paar Worten:</div>`;
+
+  html += `<div style="${groupStyle};padding:12px">`;
+  html += `<textarea id="agent-builder-input" placeholder="z.B. Einen Steuerberater fuer Selbststaendige..." style="width:100%;height:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;color:#f0f0f0;font-size:15px;font-family:inherit;resize:none;outline:none"></textarea>`;
+  html += `</div>`;
+
+  html += `<div style="padding:8px 16px">`;
+  html += `<button onclick="buildAgent()" id="build-agent-btn" style="width:100%;padding:14px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:10px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent">Agent erstellen</button>`;
+  html += `</div>`;
+
+  html += `<div id="agent-builder-status" style="padding:8px 16px;font-size:14px;color:rgba(255,255,255,0.4);text-align:center;min-height:50px"></div>`;
+
+  // Zuletzt erstellte Agenten
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:8px 16px 6px">Zuletzt erstellt</div>`;
+  html += `<div style="${groupStyle}" id="agent-builder-history">`;
+  const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+  if (builtAgents.length === 0) {
+    html += `<div style="${lastRowStyle}color:rgba(255,255,255,0.2);font-size:14px">Noch keine Agenten erstellt</div>`;
+  } else {
+    builtAgents.forEach((a, idx) => {
+      const st = idx === builtAgents.length - 1 ? lastRowStyle : rowStyle;
+      html += `<div style="${st}">${iconBox(a.icon || '🤖')}<div style="flex:1"><span style="${labelStyle}">${a.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${a.role} · ${a.phone || ''}</div></div></div>`;
+    });
+  }
+  html += `</div>`;
+  } // Ende Agent Builder
+
   list.innerHTML = html;
   // Folie oeffnen falls noch nicht offen
   if (!settingsOpen) {
@@ -2587,6 +2728,27 @@ function rebuildWheel() {
     }
   });
 
+  // Custom-Agenten (vom Agent Builder erstellt) hinzufuegen
+  const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+  builtAgents.forEach(agent => {
+    const customId = 'custom-' + (agent.webhookPath || agent.name.toLowerCase().replace(/\s+/g,'-'));
+    const key = 'agent_' + customId;
+    if (cfg[key] !== false) { // Default: aktiv (ausser explizit deaktiviert)
+      wheelCards.push({
+        id: customId,
+        icon: agent.icon || '🤖',
+        title: agent.name,
+        subtitle: agent.role,
+        color: '#f59e0b',
+        email: agent.email || '',
+        phone: agent.phone || '',
+        category: agent.category || 'Spezialisten',
+        webhookUrl: agent.webhook_url || ('https://manus.kimanus.de/webhook/agent-' + agent.webhookPath),
+        backs: [{title: 'Ueber mich', content: agent.description || ''}]
+      });
+    }
+  });
+
   // Haupt-Karten (Tools, Wallet, Archiv, Apps, Chat) wenn aktiv
   const mainCards = CARDS.filter(c =>
     !c.id.endsWith('2') &&
@@ -2600,11 +2762,7 @@ function rebuildWheel() {
     }
   });
 
-  // Chat immer wenn mindestens ein Agent aktiv
-  const chat = CARDS.find(c => c.id === 'chat');
-  if (wheelCards.length > 2 && chat) {
-    wheelCards.push(chat);
-  }
+  // Chat-Karte entfernt - Chatverlaeufe werden in Ordnern gespeichert
 
   // Hinweis-Karte wenn Rad leer
   if (wheelCards.length === 0) {
@@ -2786,16 +2944,26 @@ function updateKimBacks() {
   });
 }
 
-// === TRESOR ENTFERNT - Settings ist jetzt Fullscreen-Folie ===
-// Settings-Folie runter-wischen zum Schliessen
+// === Settings-Folie runter-wischen zum Schliessen ===
+// NUR schliessen wenn am oberen Rand (Header/Griff) gewischt wird, NICHT beim Scrollen
 (function(){
   let tStartY = 0;
+  let tInScrollable = false;
   const sp = document.getElementById('setup-panel');
   if (!sp) return;
-  sp.addEventListener('touchstart', e => { tStartY = e.touches[0].clientY; }, {passive:true});
+  sp.addEventListener('touchstart', e => {
+    tStartY = e.touches[0].clientY;
+    // Pruefen ob Touch innerhalb der scrollbaren Liste ist
+    const list = document.getElementById('setup-list');
+    tInScrollable = list && list.contains(e.target) && list.scrollTop > 0;
+  }, {passive:true});
   sp.addEventListener('touchend', e => {
+    if (tInScrollable) { tInScrollable = false; return; }
     const diff = e.changedTouches[0].clientY - tStartY;
-    if (diff > 80) closeSetup();
+    // Nur schliessen wenn nach unten gewischt UND Liste ganz oben ist
+    const list = document.getElementById('setup-list');
+    const listAtTop = !list || list.scrollTop <= 5;
+    if (diff > 80 && listAtTop) closeSetup();
   }, {passive:true});
 })();
 
@@ -3255,29 +3423,34 @@ function openChatOverlay() {
   chatArea.style.right = '10px';
   chatArea.style.display = 'block';
 
-  // KIM Kaertchen oben zeigen
+  // Aktuelle Wheel-Karte verstecken (sonst scheint sie unter dem Avatar durch)
+  const activeEl = document.getElementById('card-' + currentIndex);
+  if (activeEl) activeEl.style.visibility = 'hidden';
+
+  // Avatar-Kaertchen oben zeigen
   showKimCardAbove();
 
   // Messages leeren
   document.getElementById('chat-messages').innerHTML = '';
 }
 
+let chatClosing = false;
 function closeChatOverlay() {
+  if (chatClosing) return; // Verhindere Mehrfach-Aufruf
   const ca = document.getElementById('chat-scroll-area');
   if (ca && ca.style.display !== 'none') {
-    // Nach links rausschieben (Animation)
-    ca.style.transition = 'transform 0.3s ease-in, opacity 0.3s';
-    ca.style.transform = 'translateX(-110%)';
-    ca.style.opacity = '0';
-    setTimeout(() => {
-      ca.style.display = 'none';
-      ca.style.transform = '';
-      ca.style.opacity = '';
-      ca.style.transition = '';
-    }, 300);
+    chatClosing = true;
+    // Wheel-Karte wieder sichtbar machen
+    const activeEl = document.getElementById('card-' + currentIndex);
+    if (activeEl) activeEl.style.visibility = 'visible';
+    // Sofort alles schliessen
+    ca.style.display = 'none';
+    ca.style.transform = '';
+    ca.style.opacity = '';
     hideKimCardAbove();
     resetSpeechState();
-    setMicAgent('KAI'); // Zurueck zum Standard
+    setMicAgent('KAI');
+    setTimeout(() => { chatClosing = false; }, 100);
   }
 }
 
@@ -3301,9 +3474,10 @@ function closeChatOverlay() {
 })();
 
 function chatShowThinking() {
+  const agentName = currentMicAgent || 'KAI';
   const messages = document.getElementById('chat-messages');
   messages.innerHTML += `<div id="chat-thinking" style="margin-bottom:12px">
-    <div style="font-size:12px;font-weight:700;color:rgba(100,200,100,0.5);margin-bottom:2px">KAI:</div>
+    <div style="font-size:12px;font-weight:700;color:rgba(100,200,100,0.5);margin-bottom:2px">${agentName}:</div>
     <div style="display:flex;gap:4px;align-items:center;padding:4px 0">
       <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.4);animation:bwave 0.8s ease-in-out infinite"></span>
       <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.5);animation:bwave 0.8s ease-in-out 0.2s infinite"></span>
@@ -3336,17 +3510,30 @@ function chatAddMessage(role, text) {
 }
 
 function showKimCardAbove() {
-  // KAI Avatar-Kaertchen
+  // Avatar-Kaertchen: zeigt den aktuellen Agenten (nicht immer KAI)
   const fl = document.getElementById('flip-label');
   if (!fl) return;
-  const subtitle = 'Concierge';
+
+  const currentCard = activeCards[currentIndex];
+  let agentName = 'KAI';
+  let agentRole = 'Concierge';
+  let agentIcon = '👤';
+  let agentColor = '#e63946';
+
+  if (currentCard && currentCard.webhookUrl) {
+    // Custom-Agent
+    agentName = currentCard.title;
+    agentRole = currentCard.subtitle || currentCard.role || '';
+    agentIcon = currentCard.icon || '🤖';
+    agentColor = currentCard.color || '#f59e0b';
+  }
 
   document.getElementById('fl-card').innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;width:100%;height:100%;padding:12px 16px">
-      <div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
+      <div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,${agentColor},${agentColor}aa);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${agentIcon}</div>
       <div style="flex:1">
-        <div class="fl-name" style="font-size:18px">KAI</div>
-        <div class="fl-role" style="font-size:12px">${subtitle} · Hoert zu...</div>
+        <div class="fl-name" style="font-size:18px">${agentName}</div>
+        <div class="fl-role" style="font-size:12px">${agentRole} · Hoert zu...</div>
       </div>
       <div id="kim-wave-container" style="width:70px;height:34px;display:none;align-items:center;justify-content:center;gap:3px"></div>
     </div>
@@ -3367,7 +3554,11 @@ function showKimCardAbove() {
 
 function hideKimCardAbove() {
   const fl = document.getElementById('flip-label');
-  if (fl) fl.classList.remove('visible');
+  if (fl) {
+    fl.classList.remove('visible');
+    fl.style.display = 'none';
+    fl.style.opacity = '0';
+  }
   kimStopWave();
   kimStopThink();
 }
@@ -3435,20 +3626,13 @@ function initMicPosition() {
 
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('speech-btn');
+  const handle = document.getElementById('mic-drag-handle');
   if (!btn) return;
 
+  // === MIC-BUTTON: Nur Sprechen (kein Drag mehr) ===
   btn.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    const t = e.touches[0];
-    micDragStartX = t.clientX;
-    micDragStartY = t.clientY;
-    const rect = btn.getBoundingClientRect();
-    micOffsetX = t.clientX - rect.left;
-    micOffsetY = t.clientY - rect.top;
-    micDragging = false;
     micRecording = false;
-
-    // Nach 400ms Halten: Aufnahme starten
     micHoldTimer = setTimeout(() => {
       micRecording = true;
       walkieStartDirect();
@@ -3456,13 +3640,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }, MIC_HOLD_MS);
   });
 
-  btn.addEventListener('touchmove', (e) => {
-    const t = e.touches[0];
-    const dx = Math.abs(t.clientX - micDragStartX);
-    const dy = Math.abs(t.clientY - micDragStartY);
+  btn.addEventListener('touchend', () => {
+    if (micHoldTimer) { clearTimeout(micHoldTimer); micHoldTimer = null; }
+    if (micRecording) {
+      micRecording = false;
+      walkieEndDirect();
+    }
+  });
 
-    // Finger bewegt sich genug = verschieben (waehrend Aufnahme oder davor)
-    if (dx > MIC_DRAG_PX || dy > MIC_DRAG_PX) {
+  // === AGENT-LABEL = DRAG-HANDLE: Name anfassen zum Verschieben ===
+  const label = document.getElementById('mic-agent-label');
+  if (label) {
+    label.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const t = e.touches[0];
+      micDragStartX = t.clientX;
+      micDragStartY = t.clientY;
+      const rect = btn.getBoundingClientRect();
+      micOffsetX = t.clientX - rect.left;
+      micOffsetY = t.clientY - rect.top;
+      micDragging = false;
+    });
+
+    label.addEventListener('touchmove', (e) => {
+      e.stopPropagation();
+      const t = e.touches[0];
       micDragging = true;
       const panel = document.getElementById('panel-bottom');
       const pr = panel.getBoundingClientRect();
@@ -3472,34 +3675,29 @@ document.addEventListener('DOMContentLoaded', () => {
       newTop = Math.max(0, Math.min(newTop, pr.height - 64));
       btn.style.left = newLeft + 'px';
       btn.style.top = newTop + 'px';
-    }
-  }, {passive: true});
+    }, {passive: true});
 
-  btn.addEventListener('touchend', () => {
-    // Hold-Timer aufraeumen
-    if (micHoldTimer) { clearTimeout(micHoldTimer); micHoldTimer = null; }
-
-    // Position speichern wenn verschoben
-    if (micDragging) {
-      micDragging = false;
-      localStorage.setItem('kimanus-mic-pos', JSON.stringify({
-        left: parseInt(btn.style.left),
-        top: parseInt(btn.style.top)
-      }));
-      setTimeout(updateMicLabel, 50);
-    }
-
-    // Aufnahme beenden wenn aktiv
-    if (micRecording) {
-      micRecording = false;
-      walkieEndDirect();
-    }
-    // Kurzer Tap (< 400ms) = nichts passiert
-  });
+    label.addEventListener('touchend', () => {
+      if (micDragging) {
+        micDragging = false;
+        localStorage.setItem('kimanus-mic-pos', JSON.stringify({
+          left: parseInt(btn.style.left),
+          top: parseInt(btn.style.top)
+        }));
+        setTimeout(updateMicLabel, 50);
+      }
+    });
+  }
 });
 
 // Direkte Start/End ohne Event (von neuem Mic-Handler aufgerufen)
 function walkieStartDirect() {
+  // Aktuellen Agenten SOFORT setzen (bevor Aufnahme startet)
+  const card = activeCards[currentIndex];
+  if (card && card.webhookUrl) {
+    currentAgent = card.title;
+    setMicAgent(card.title);
+  }
   const e = {preventDefault:()=>{}};
   walkieStart(e);
 }
@@ -3822,6 +4020,15 @@ function detectSpokenAgent(text) {
     }
   }
 
+  // Custom-Agenten (vom Agent Builder) pruefen
+  const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+  for (const ba of builtAgents) {
+    const baName = ba.name.toLowerCase();
+    if (cleaned.startsWith(baName + ' ') || cleaned.startsWith(baName + ',') || cleaned === baName) {
+      return {name: ba.name, role: ba.role, agent: 'custom-' + (ba.webhookPath || ba.name.toLowerCase().replace(/\s+/g,'-'))};
+    }
+  }
+
   // Kein Name erkannt → KAI (Concierge) nimmt an
   return null;
 }
@@ -3874,9 +4081,17 @@ async function processVoice(blob, mimeType) {
 
     // === RUFANLAGE: Wer wird angesprochen? ===
     const spokenAgent = detectSpokenAgent(userText);
-    currentAgent = spokenAgent ? spokenAgent.name : 'KAI';
-    // Mic-Label aktualisieren: zeigt mit wem man spricht
-    setMicAgent(currentAgent);
+    if (spokenAgent) {
+      currentAgent = spokenAgent.name;
+      setMicAgent(currentAgent);
+    } else if (!currentAgent || currentAgent === 'KAI') {
+      // Kein Name erkannt - pruefen ob aktuelle Karte ein Custom-Agent ist
+      const cc = activeCards[currentIndex];
+      if (cc && cc.webhookUrl) {
+        currentAgent = cc.title;
+        setMicAgent(cc.title);
+      }
+    }
     if (spokenAgent) {
       // Agent direkt angesprochen - Avatar-Kaertchen updaten
       const flName = document.querySelector('#flip-label .fl-name');
@@ -3939,15 +4154,36 @@ async function sendToKim(userText) {
   showBookQuestion(userText);
 
   try {
-    const chatResp = await fetch('/api/chat', {
+    // Custom-Agent? Direkt an seinen Webhook senden
+    let chatUrl = '/api/chat';
+    let chatBody = { message: userText, agent: 'kim', model: 'groq-llama', session: 'wheel-' + Date.now() };
+
+    // 1. Pruefen ob ein Custom-Agent per Name angesprochen wird
+    const spokenAg = detectSpokenAgent(userText);
+    if (spokenAg && spokenAg.agent.startsWith('custom-')) {
+      const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+      const customAgent = builtAgents.find(a => ('custom-' + (a.webhookPath || a.name.toLowerCase().replace(/\s+/g,'-'))) === spokenAg.agent);
+      if (customAgent && customAgent.webhook_url) {
+        chatUrl = customAgent.webhook_url;
+        chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
+      }
+    }
+    // 2. Pruefen ob aktuelle Karte (sichtbar oder geflippt) ein Custom-Agent ist
+    if (chatUrl === '/api/chat') {
+      const currentCard = activeCards[currentIndex];
+      if (currentCard && currentCard.webhookUrl) {
+        chatUrl = currentCard.webhookUrl;
+        chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
+        // Chat-Anzeige auf den richtigen Agenten setzen
+        currentAgent = currentCard.title;
+        setMicAgent(currentCard.title);
+      }
+    }
+
+    const chatResp = await fetch(chatUrl, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: userText,
-        agent: 'kim',
-        model: 'groq-llama',
-        session: 'wheel-' + Date.now()
-      })
+      body: JSON.stringify(chatBody)
     });
 
     let kimAnswer = '';
@@ -4197,8 +4433,8 @@ wc.addEventListener('touchstart', e => {
     }
     node = node.parentElement;
   }
-  // Long-Press Timer: 1.5s auf Panel/Karte = Action-Sheet
-  if (!isFlipped && !touchInScrollable && (el.closest('.panel') || el.closest('.wheel-card'))) {
+  // Long-Press Timer: 1.5s NUR auf Sichtfenster (panel-center) oder Karte, NICHT auf panel-bottom
+  if (!isFlipped && !touchInScrollable && (el.closest('#panel-center') || el.closest('#panel-top') || el.closest('.wheel-card')) && !el.closest('#panel-bottom')) {
     panelLongTimer = setTimeout(() => {
       longPressTriggered = true;
       openActionSheet(currentIndex);
@@ -4218,9 +4454,19 @@ wc.addEventListener('touchmove', (e) => {
 }, {passive:true});
 wc.addEventListener('touchend', e => {
   if (panelLongTimer) { clearTimeout(panelLongTimer); panelLongTimer = null; }
+  // Wenn Action-Sheet offen: kurzer Tap schliesst es sofort
+  if (actionSheetCardIdx !== null && !longPressTriggered) {
+    const diffY = Math.abs(dragStartY - e.changedTouches[0].clientY);
+    const diffX = Math.abs(e.changedTouches[0].clientX - dragStartX);
+    if (diffX < 15 && diffY < 15) {
+      actionSheetJustOpened = false;
+      closeActionSheet();
+      return;
+    }
+  }
   if (touchOnButton) { touchOnButton = false; return; }
   if (touchInScrollable) { touchInScrollable = false; return; }
-  if (longPressTriggered) return; // NICHT zuruecksetzen - handleCardTap braucht das Flag noch
+  if (longPressTriggered) return;
   const card = e.target.closest('.wheel-card');
   const diffY = dragStartY - e.changedTouches[0].clientY;
   const diffX = e.changedTouches[0].clientX - dragStartX;
