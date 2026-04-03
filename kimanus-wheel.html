@@ -690,26 +690,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     </div>
   </div>
 
-  <!-- Chat-Overlay (ueberlagert das Rad komplett) -->
-  <div id="chat-overlay" style="display:none;position:fixed;top:60px;bottom:80px;left:0;right:0;z-index:18;background:#0e0e0e;flex-direction:column">
-    <!-- KIM Kaertchen oben (spaeter Avatar) -->
-    <div id="chat-kim-card" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0">
-      <div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
-      <div style="flex:1">
-        <div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div>
-        <div id="chat-kim-status" style="font-size:13px;color:rgba(255,255,255,0.3)">Concierge</div>
-      </div>
-      <button onclick="closeChatOverlay()" style="background:rgba(120,120,128,0.32);border:none;color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
-    <!-- Chat-Inhalt (scrollbar!) -->
-    <div id="chat-scroll" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px">
-      <div id="chat-messages" style="font-size:15px;color:rgba(255,255,255,0.5);line-height:1.6"></div>
-    </div>
-    <!-- Vorlesen-Button unten -->
-    <div id="chat-bottom-bar" style="display:none;padding:8px 16px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0">
-      <div onclick="speakAnswer(lastKimAnswer)" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;cursor:pointer">
-        <span style="font-size:16px;opacity:0.4">🔊</span>
-        <span style="font-size:13px;color:rgba(255,255,255,0.3)">Vorlesen</span>
+  <!-- Chat-Bereich (nur im Sichtfenster, Layout bleibt!) -->
+  <div id="chat-scroll-area" style="display:none;position:absolute;left:10px;right:10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;z-index:13;background:rgba(14,14,14,0.95);padding:8px 12px">
+    <div id="chat-messages" style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6"></div>
+    <div id="chat-bottom-bar" style="display:none;padding:6px 0;margin-top:6px;border-top:1px solid rgba(255,255,255,0.06)">
+      <div onclick="speakAnswer(lastKimAnswer)" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:6px;cursor:pointer">
+        <span style="font-size:14px;opacity:0.4">🔊</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.3)">Vorlesen</span>
       </div>
     </div>
   </div>
@@ -2731,21 +2718,30 @@ let walkieActive = false;
 
 // === CHAT-OVERLAY (eigenes Fenster statt Glasplatte) ===
 function openChatOverlay() {
-  const overlay = document.getElementById('chat-overlay');
-  overlay.style.display = 'flex';
-  // KIM Status updaten
-  const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
-  const mode = cfg['kim_mode'] || 'concierge';
-  const gender = cfg['kim_gender'] || 'weiblich';
-  const subtitle = mode === 'concierge' ? 'Concierge' : (gender === 'weiblich' ? 'Assistentin' : 'Assistent');
-  document.getElementById('chat-kim-status').textContent = subtitle + ' · Hoert zu...';
-  // Messages leeren fuer neue Konversation
+  // Chat-Bereich exakt im Sichtfenster positionieren
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomBarH = 80;
+
+  const chatArea = document.getElementById('chat-scroll-area');
+  chatArea.style.top = topH + 'px';
+  chatArea.style.height = (totalH - topH) + 'px';
+  chatArea.style.display = 'block';
+
+  // KIM Kaertchen oben zeigen (wie Flip-Label)
+  showKimCardAbove();
+
+  // Messages leeren
   document.getElementById('chat-messages').innerHTML = '';
   document.getElementById('chat-bottom-bar').style.display = 'none';
 }
 
 function closeChatOverlay() {
-  document.getElementById('chat-overlay').style.display = 'none';
+  document.getElementById('chat-scroll-area').style.display = 'none';
+  hideKimCardAbove();
   resetSpeechState();
 }
 
@@ -2758,7 +2754,7 @@ function chatAddMessage(role, text) {
     <div style="color:rgba(255,255,255,0.5)">${cleanText}</div>
   </div>`;
   // Scroll ans Ende
-  const scroll = document.getElementById('chat-scroll');
+  const scroll = document.getElementById('chat-scroll-area');
   if (scroll) scroll.scrollTop = scroll.scrollHeight;
 }
 
@@ -3060,7 +3056,7 @@ async function processVoice(blob, mimeType) {
   // Sofort-Check: Sind wir offline?
   if (!navigator.onLine) {
     chatAddMessage('KIM', 'Ich bin gerade offline. Sobald du wieder Netz hast, bin ich sofort fuer dich da! 📡');
-    document.getElementById('chat-kim-status').textContent = 'Offline 📡';
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = 'Offline 📡';
     resetSpeechState();
     return;
   }
@@ -3102,7 +3098,7 @@ async function processVoice(blob, mimeType) {
     // Zeige erkannten Text im Chat-Overlay
     pendingText = userText;
     chatAddMessage('DU', userText);
-    document.getElementById('chat-kim-status').textContent = (getSetupConfig()['kim_mode'] === 'persoenlich' ? 'Assistentin' : 'Concierge') + ' · Denkt nach...';
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (getSetupConfig()['kim_mode'] === 'persoenlich' ? 'Assistentin' : 'Concierge') + ' · Denkt nach...';
     // Button auf SENDEN setzen (gruen, blinkend) + Loeschen-Button zeigen
     speechState = 'review';
     btn.querySelector('span').textContent = '▶';
@@ -3137,7 +3133,7 @@ async function sendToKim(userText) {
   // Sofort-Check: Offline?
   if (!navigator.onLine) {
     chatAddMessage('KIM', 'Ich bin gerade offline. Deine Frage habe ich mir gemerkt - sobald du wieder Netz hast, beantworte ich sie! 📡');
-    document.getElementById('chat-kim-status').textContent = 'Offline 📡';
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = 'Offline 📡';
     document.getElementById('chat-bottom-bar').style.display = 'none';
     resetSpeechState();
     return;
@@ -3337,7 +3333,7 @@ function showKimResponse(question, answer) {
   const mode2 = cfg2['kim_mode'] || 'concierge';
   const gender2 = cfg2['kim_gender'] || 'weiblich';
   const subtitle2 = mode2 === 'concierge' ? 'Concierge' : (gender2 === 'weiblich' ? 'Assistentin' : 'Assistent');
-  document.getElementById('chat-kim-status').textContent = subtitle2 + ' · Fertig ✓';
+  const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = subtitle2 + ' · Fertig ✓';
 }
 
 function speakAnswer(text) {
