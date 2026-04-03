@@ -2964,6 +2964,14 @@ async function processVoice(blob, mimeType) {
   const btn = document.getElementById('speech-btn');
   btn.querySelector('span').textContent = '⏳';
 
+  // Sofort-Check: Sind wir offline?
+  if (!navigator.onLine) {
+    const cc = document.getElementById('chat-content');
+    if (cc) cc.innerHTML = '<span style="font-size:11px;color:rgba(230,57,70,0.6);font-weight:700">KIM:</span><br><span style="color:rgba(255,255,255,0.5)">Ich bin gerade offline. Sobald du wieder Netz hast, bin ich sofort fuer dich da! 📡</span>';
+    resetSpeechState();
+    return;
+  }
+
   // 1. Sprache -> Text (Groq Whisper)
   const formData = new FormData();
   const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'wav';
@@ -3037,6 +3045,14 @@ async function sendToKim(userText) {
   const delBtn = document.getElementById('delete-btn');
   if (delBtn) delBtn.style.display = 'none';
   btn.classList.remove('send-ready');
+
+  // Sofort-Check: Offline?
+  if (!navigator.onLine) {
+    showKimResponse(userText, 'Ich bin gerade offline. Deine Frage habe ich mir gemerkt - sobald du wieder Netz hast, beantworte ich sie! 📡');
+    resetSpeechState();
+    return;
+  }
+
   btn.querySelector('span').textContent = '⏳';
   btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
 
