@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v9.0 - Mic auf Milchglas, 4 Kaertchen in Bar -->
+<!-- KIMANUS Wheel v15.5 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -566,29 +566,40 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .action-btn.destructive{color:#ff453a}
 .action-btn.cancel{font-weight:600;font-size:17px}
 
-#speech-btn{
+/* Mic-Ring-Wrapper (verschiebbar ueber Ring) */
+#mic-ring-wrap{
   position:absolute;z-index:16;
-  width:64px;height:64px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%);
-  border:4px solid rgba(220,220,220,0.5);
-  box-shadow:0 4px 20px rgba(34,197,94,0.4);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  touch-action:none;/* Fuer Drag */
-  -webkit-tap-highlight-color:transparent;
+  width:92px;height:92px;
 }
-#speech-btn:active{transform:scale(0.95)}
-#mic-agent-label{
-  position:absolute;z-index:16;
-  font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);
-  text-align:center;white-space:nowrap;
-  letter-spacing:0.5px;
-  padding:3px 10px;border-radius:8px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-  border:1px solid rgba(255,255,255,0.08);
+#mic-ring{
+  position:absolute;inset:0;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.03);
   cursor:grab;-webkit-tap-highlight-color:transparent;
   touch-action:none;
 }
+#mic-ring-text{
+  position:absolute;inset:0;
+  pointer-events:none;
+}
+#mic-ring-text text{
+  font-size:8px;font-weight:700;fill:rgba(255,255,255,0.5);
+  letter-spacing:2px;
+}
+#speech-btn{
+  position:absolute;z-index:17;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:58px;height:58px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%);
+  border:3px solid rgba(220,220,220,0.5);
+  box-shadow:0 4px 16px rgba(34,197,94,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+#speech-btn:active{transform:translate(-50%,-50%) scale(0.92)}
+#speech-btn span{font-size:20px;color:#fff}
 @keyframes micWiggle{
   0%,100%{transform:rotate(0deg) scale(1)}
   20%{transform:rotate(-4deg) scale(1.05)}
@@ -764,7 +775,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v11.5</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v15.5</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -780,10 +791,16 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="panel" id="panel-top"></div>
     <div class="panel" id="panel-center"></div>
     <div class="panel" id="panel-bottom">
-      <button id="speech-btn">
-        <span id="speech-agent">🎙</span>
-      </button>
-      <div id="mic-agent-label">KAI</div>
+      <div id="mic-ring-wrap">
+        <div id="mic-ring"></div>
+        <svg id="mic-ring-text" viewBox="0 0 92 92">
+          <defs><path id="ring-top-arc" d="M 12,46 A 34,34 0 0,1 80,46"/></defs>
+          <text><textPath id="ring-text-content" href="#ring-top-arc" startOffset="50%" text-anchor="middle">KAI</textPath></text>
+        </svg>
+        <button id="speech-btn">
+          <span id="speech-agent">🎙</span>
+        </button>
+      </div>
     </div>
 
     <div id="swipe-hint-behind">&#x276E;</div>
@@ -1346,6 +1363,8 @@ function init() {
   initHotkeys();
   setupCardLongPress();
   initMicPosition();
+  // KAI-Avatar beim Start zeigen
+  setTimeout(() => showKimCardAbove(), 300);
 }
 
 function calcSizes() {
@@ -2018,6 +2037,8 @@ function updateFlipLabel() {
     fl.classList.remove('visible');
     fl.style.display = 'none';
     fl.style.opacity = '0';
+    // KAI-Avatar wieder zeigen nach Zurueck-Flip
+    setTimeout(() => showKimCardAbove(), 400);
   }
 }
 
@@ -2031,18 +2052,8 @@ function updateStatus() {
 let currentMicAgent = 'KAI'; // Default immer KAI
 
 function updateMicLabel() {
-  const label = document.getElementById('mic-agent-label');
-  const btn = document.getElementById('speech-btn');
-  if (!label || !btn) return;
-  const btnRect = btn.getBoundingClientRect();
-  const panel = document.getElementById('panel-bottom');
-  if (!panel) return;
-  const panelRect = panel.getBoundingClientRect();
-  label.textContent = currentMicAgent;
-  // Rechts neben dem Mic-Button (wie ein Bratpfannen-Stiel)
-  label.style.left = (btnRect.left - panelRect.left + btnRect.width + 4) + 'px';
-  label.style.top = (btnRect.top - panelRect.top + btnRect.height/2) + 'px';
-  label.style.transform = 'translateY(-50%)';
+  const tp = document.getElementById('ring-text-content');
+  if (tp) tp.textContent = currentMicAgent;
 }
 
 function setMicAgent(name) {
@@ -2460,7 +2471,7 @@ function openSetup(mode, isBack) {
 
   // 8. Info
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v11.5 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v15.5 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3075,15 +3086,8 @@ function hideHeaderCard() {
 
 // Header-Status updaten
 function updateHeaderKimStatus() {
-  const cfg = getSetupConfig();
-  const mode = cfg['kim_mode'] || 'concierge';
   const el = document.getElementById('header-kim-status');
-  const gender = cfg['kim_gender'] || 'weiblich';
-  if (mode === 'concierge') {
-    el.textContent = 'Concierge';
-  } else {
-    el.textContent = gender === 'weiblich' ? 'Persoenliche Assistentin' : 'Persoenlicher Assistent';
-  }
+  el.textContent = 'Concierge';
 }
 
 // KIM Kontakt-Funktionen
@@ -3635,7 +3639,7 @@ function closeChatOverlay() {
     ca.style.display = 'none';
     ca.style.transform = '';
     ca.style.opacity = '';
-    hideKimCardAbove();
+    // KAI-Avatar bleibt sichtbar nach Chat
     resetSpeechState();
     setMicAgent('KAI');
     setTimeout(() => { chatClosing = false; }, 100);
@@ -3795,34 +3799,35 @@ const MIC_HOLD_MS = 400; // Ab 400ms = Aufnahme starten
 const MIC_DRAG_PX = 15;  // Ab 15px = verschieben
 
 function initMicPosition() {
-  const btn = document.getElementById('speech-btn');
+  const wrap = document.getElementById('mic-ring-wrap');
   const panel = document.getElementById('panel-bottom');
-  if (!btn || !panel) return;
+  if (!wrap || !panel) return;
   const saved = localStorage.getItem('kimanus-mic-pos');
   const pr = panel.getBoundingClientRect();
   if (saved) {
     const pos = JSON.parse(saved);
-    btn.style.left = pos.left + 'px';
-    btn.style.top = pos.top + 'px';
+    wrap.style.left = pos.left + 'px';
+    wrap.style.top = pos.top + 'px';
   } else {
-    btn.style.left = (pr.width * 0.55) + 'px';
-    btn.style.top = ((pr.height - 64) / 2) + 'px';
+    wrap.style.left = (pr.width / 2 - 46) + 'px';
+    wrap.style.top = ((pr.height - 92) / 2) + 'px';
   }
-  // Label initial positionieren (kurz verzoegert damit Layout steht)
-  setTimeout(updateMicLabel, 100);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('speech-btn');
-  const handle = document.getElementById('mic-drag-handle');
+  const ring = document.getElementById('mic-ring');
+  const wrap = document.getElementById('mic-ring-wrap');
   if (!btn) return;
 
-  // === MIC-BUTTON: Nur Sprechen (kein Drag mehr) ===
+  // === MIC-BUTTON: Nur Sprechen ===
+  let micRecordStart = 0;
   btn.addEventListener('touchstart', (e) => {
     e.preventDefault();
     micRecording = false;
     micHoldTimer = setTimeout(() => {
       micRecording = true;
+      micRecordStart = Date.now();
       walkieStartDirect();
       micHoldTimer = null;
     }, MIC_HOLD_MS);
@@ -3831,27 +3836,32 @@ document.addEventListener('DOMContentLoaded', () => {
   btn.addEventListener('touchend', () => {
     if (micHoldTimer) { clearTimeout(micHoldTimer); micHoldTimer = null; }
     if (micRecording) {
+      const dur = Date.now() - micRecordStart;
       micRecording = false;
-      walkieEndDirect();
+      if (dur >= 800) {
+        walkieEndDirect();
+      } else {
+        resetSpeechState();
+        closeChatOverlay();
+      }
     }
   });
 
-  // === AGENT-LABEL = DRAG-HANDLE: Name anfassen zum Verschieben ===
-  const label = document.getElementById('mic-agent-label');
-  if (label) {
-    label.addEventListener('touchstart', (e) => {
+  // === RING = DRAG-HANDLE: Ring anfassen zum Verschieben ===
+  if (ring && wrap) {
+    ring.addEventListener('touchstart', (e) => {
       e.preventDefault();
       e.stopPropagation();
       const t = e.touches[0];
       micDragStartX = t.clientX;
       micDragStartY = t.clientY;
-      const rect = btn.getBoundingClientRect();
+      const rect = wrap.getBoundingClientRect();
       micOffsetX = t.clientX - rect.left;
       micOffsetY = t.clientY - rect.top;
       micDragging = false;
     });
 
-    label.addEventListener('touchmove', (e) => {
+    ring.addEventListener('touchmove', (e) => {
       e.stopPropagation();
       const t = e.touches[0];
       micDragging = true;
@@ -3859,20 +3869,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const pr = panel.getBoundingClientRect();
       let newLeft = t.clientX - pr.left - micOffsetX;
       let newTop = t.clientY - pr.top - micOffsetY;
-      newLeft = Math.max(0, Math.min(newLeft, pr.width - 64));
-      newTop = Math.max(0, Math.min(newTop, pr.height - 64));
-      btn.style.left = newLeft + 'px';
-      btn.style.top = newTop + 'px';
+      newLeft = Math.max(-10, Math.min(newLeft, pr.width - 70));
+      newTop = Math.max(-5, Math.min(newTop, pr.height - 70));
+      wrap.style.left = newLeft + 'px';
+      wrap.style.top = newTop + 'px';
     }, {passive: true});
 
-    label.addEventListener('touchend', () => {
+    ring.addEventListener('touchend', () => {
       if (micDragging) {
         micDragging = false;
         localStorage.setItem('kimanus-mic-pos', JSON.stringify({
-          left: parseInt(btn.style.left),
-          top: parseInt(btn.style.top)
+          left: parseInt(wrap.style.left),
+          top: parseInt(wrap.style.top)
         }));
-        setTimeout(updateMicLabel, 50);
       }
     });
   }
@@ -4606,6 +4615,11 @@ wc.addEventListener('touchstart', e => {
   touchInScrollable = false;
   longPressTriggered = false; // Erst hier zuruecksetzen - beim NEUEN Touch
   const el = e.target;
+  // Unteres Panel + Mic-Ring = touch-sicher
+  if (el.closest('#panel-bottom') || el.closest('#mic-ring-wrap')) {
+    touchOnButton = true;
+    return;
+  }
   // Pruefen ob Touch auf einem Button oder klickbaren Element ist
   if (el.tagName === 'BUTTON' || el.id === 'trash-btn-glass' || el.closest('button')) {
     touchOnButton = true;
