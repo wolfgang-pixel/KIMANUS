@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v15.5 - Ring-Button, KAI permanent, Clean rebuild -->
+<!-- KIMANUS Wheel v15.6 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -775,7 +775,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v15.5</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v15.6</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2471,7 +2471,7 @@ function openSetup(mode, isBack) {
 
   // 8. Info
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v15.5 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v15.6 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3847,10 +3847,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // === RING = DRAG-HANDLE: Ring anfassen zum Verschieben ===
+  // === RING = DRAG-HANDLE: 300ms halten dann verschieben ===
   if (ring && wrap) {
+    let ringHoldTimer = null;
+    let ringReady = false;
+
     ring.addEventListener('touchstart', (e) => {
-      e.preventDefault();
       e.stopPropagation();
       const t = e.touches[0];
       micDragStartX = t.clientX;
@@ -3859,9 +3861,20 @@ document.addEventListener('DOMContentLoaded', () => {
       micOffsetX = t.clientX - rect.left;
       micOffsetY = t.clientY - rect.top;
       micDragging = false;
+      ringReady = false;
+      ringHoldTimer = setTimeout(() => {
+        ringReady = true;
+        if (navigator.vibrate) navigator.vibrate(30);
+        ringHoldTimer = null;
+      }, 300);
     });
 
     ring.addEventListener('touchmove', (e) => {
+      if (!ringReady) {
+        // Noch nicht bereit - Timer abbrechen bei Bewegung
+        if (ringHoldTimer) { clearTimeout(ringHoldTimer); ringHoldTimer = null; }
+        return;
+      }
       e.stopPropagation();
       const t = e.touches[0];
       micDragging = true;
@@ -3876,6 +3889,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, {passive: true});
 
     ring.addEventListener('touchend', () => {
+      if (ringHoldTimer) { clearTimeout(ringHoldTimer); ringHoldTimer = null; }
+      ringReady = false;
       if (micDragging) {
         micDragging = false;
         localStorage.setItem('kimanus-mic-pos', JSON.stringify({
@@ -4615,8 +4630,8 @@ wc.addEventListener('touchstart', e => {
   touchInScrollable = false;
   longPressTriggered = false; // Erst hier zuruecksetzen - beim NEUEN Touch
   const el = e.target;
-  // Unteres Panel + Mic-Ring = touch-sicher
-  if (el.closest('#panel-bottom') || el.closest('#mic-ring-wrap')) {
+  // Mic-Ring = touch-sicher (kein Rad-Drehen)
+  if (el.closest('#mic-ring-wrap')) {
     touchOnButton = true;
     return;
   }
