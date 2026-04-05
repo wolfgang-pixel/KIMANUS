@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v15.6 - Ring-Button, KAI permanent, Clean rebuild -->
+<!-- KIMANUS Wheel v15.7 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -775,7 +775,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v15.6</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v15.7</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2351,6 +2351,7 @@ async function buildAgent() {
 
 let setupMode = 'main';
 function openSetup(mode, isBack) {
+  const oldMode = setupMode;
   setupMode = mode || 'main';
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
@@ -2365,6 +2366,18 @@ function openSetup(mode, isBack) {
   } else {
     backBtn.style.display = 'block';
     backSpacer.style.display = 'none';
+  }
+  // iPhone-Style Slide Animation
+  if (oldMode && oldMode !== setupMode) {
+    const dir = isBack ? 1 : -1; // Zurueck = von links, Vorwaerts = von rechts
+    list.style.transition = 'none';
+    list.style.transform = `translateX(${-dir * 100}%)`;
+    list.style.opacity = '0';
+    requestAnimationFrame(() => {
+      list.style.transition = 'transform 0.3s cubic-bezier(0.23,1,0.32,1), opacity 0.2s';
+      list.style.transform = 'translateX(0)';
+      list.style.opacity = '1';
+    });
   }
   const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
   const groupStyle = 'background:#1c1c1e;border-radius:12px;overflow:hidden;margin-bottom:35px';
@@ -2471,7 +2484,7 @@ function openSetup(mode, isBack) {
 
   // 8. Info
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v15.6 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v15.7 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
