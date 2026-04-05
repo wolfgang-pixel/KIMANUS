@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v17.0 - Ring-Button, KAI permanent, Clean rebuild -->
+<!-- KIMANUS Wheel v17.7 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -775,7 +775,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v17.0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v17.7</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2372,7 +2372,7 @@ function openSetup(mode, isBack) {
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
   // Header updaten
-  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent',design:'Darstellung',skins:'Skins',projekte:'Projekte'};
+  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent',design:'Darstellung',skins:'Skins',projekte:'Projekte',archiv:'Archiv',kai_rolle:'KAI Rolle'};
   let title = titles[setupMode] || 'Einstellungen';
   if (setupMode.startsWith('agcat_')) title = setupMode.replace('agcat_', '');
   if (setupMode.startsWith('agent_')) {
@@ -2422,27 +2422,35 @@ function openSetup(mode, isBack) {
   const subLabelOffStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.25);margin-left:2px';
   const iconColors = {'⚖️':'#5856d6','💶':'#34c759','📦':'#ff9500','📣':'#ff2d55','🏛️':'#5ac8fa','🔍':'#007aff','💡':'#ffcc00','🔒':'#8e8e93','🛠️':'#ff9500','💳':'#34c759','📁':'#5856d6','📱':'#007aff','🤝':'#e63946','👤':'#ff2d55','🧠':'#5856d6','⚙️':'#8e8e93','🔗':'#007aff','🔀':'#34c759','🎭':'#ff9500','🌤️':'#5ac8fa','🌐':'#007aff','🎬':'#ff0000','📰':'#34c759','💰':'#ffcc00','📱':'#e1306c','🧭':'#ff9500','💼':'#5856d6','🔧':'#8e8e93','👥':'#007aff','🏢':'#34c759','📊':'#5856d6','📈':'#34c759','🧮':'#ff9500','🏭':'#8e8e93','📅':'#007aff','📚':'#5856d6','🌍':'#5ac8fa','🚗':'#1a1a2e','📍':'#34c759','🎵':'#ff2d55','🖨️':'#ff9500','💻':'#007aff','📣':'#ff2d55','🎪':'#ff9500','👷':'#ffcc00','🧾':'#8e8e93','📸':'#ff2d55','☀️':'#ffcc00','🎨':'#5856d6'};
   const iconBox = (emoji) => `<div style="width:30px;height:30px;border-radius:7px;background:${iconColors[emoji]||'#636366'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emoji}</div>`;
-  const toggle = (key, on) => `<div onclick="event.stopPropagation();toggleSetupItem('${key}',${!on})" style="width:51px;height:31px;border-radius:16px;background:${on?'#34c759':'rgba(120,120,128,0.32)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:27px;height:27px;border-radius:14px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div></div>`;
+  const toggle = (key, on) => `<div onclick="event.stopPropagation();${key.startsWith('main_contact_') ? `setMainContact('${key.replace('main_contact_','')}')` : `toggleSetupItem('${key}',${!on})`}" style="width:51px;height:31px;border-radius:16px;background:${on?'#34c759':'rgba(120,120,128,0.32)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:27px;height:27px;border-radius:14px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div></div>`;
 
   let html = '';
+  const sectionTitle = (text) => `<div style="font-size:10px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:1px;padding:2px 16px 2px;margin-top:4px">${text}</div>`;
 
   if (setupMode === 'main') {
   // === HAUPTSEITE: iPhone Settings Style mit Ueberschriften ===
-  const sectionTitle = (text) => `<div style="font-size:10px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:1px;padding:2px 16px 2px;margin-top:4px">${text}</div>`;
 
   // --- PROFILE ---
   // KAI Profil
-  html += `<div onclick="openSetupKim()" style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer">`;
+  const kaiActive = (cfg['main_contact'] || 'kai') === 'kai';
+  html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px">`;
+  html += `<div onclick="openSetupKim()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
   html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
-  html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
+  html += `</div>`;
+  html += toggle('main_contact_kai', kaiActive);
   html += `</div>`;
 
   // KIM Profil
-  html += `<div onclick="openSetupKimPersoenlich()" style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer">`;
+  const kimActive = (cfg['main_contact'] || 'kai') === 'kim';
+  html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px">`;
+  html += `<div onclick="openSetupKimPersoenlich()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
   html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
-  html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
+  html += `</div>`;
+  html += toggle('main_contact_kim', kimActive);
   html += `</div>`;
 
   // --- SYSTEM ---
@@ -2474,10 +2482,7 @@ function openSetup(mode, isBack) {
   // --- ARCHIV ---
   html += sectionTitle('Archiv');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📁')}<div style="flex:1"><span style="${labelStyle}">Aktenordner</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Dokumente, Vertraege, Belege</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🎬')}<div style="flex:1"><span style="${labelStyle}">Filme & Videos</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Videothek, YouTube Favoriten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div style="${rowStyle}cursor:pointer">${iconBox('💿')}<div style="flex:1"><span style="${labelStyle}">Musik & CDs</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Playlists, Lieblingssongs</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📸')}<div style="flex:1"><span style="${labelStyle}">Fotoalben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Erinnerungen, Familienfotos</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="setupHistory.push('main');openSetup('archiv')" style="${lastRowStyle}cursor:pointer">${iconBox('📚')}<div style="flex:1"><span style="${labelStyle}">Archiv & Medien</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Dokumente, Videos, Musik, Fotos, Buecher</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
   // --- DARSTELLUNG ---
@@ -2489,103 +2494,151 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v17.0 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v17.7 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
   } // Ende main
 
   if (setupMode === 'kim') {
-  // KIM Profil-Karte (wie Apple ID oben in den Einstellungen)
-  const kimMode = cfg['kim_mode'] || 'persoenlich';
-  const kimGender = cfg['kim_gender'] || 'weiblich';
-  const kimVoice = cfg['kim_voice'] || 'warm';
-  html += `<div onclick="" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  // KAI Profil
+  html += `<div style="${groupStyle};padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:default">`;
   html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👤</div>`;
-  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein Ansprechpartner Nr. 1</div></div>`;
   html += `</div>`;
 
-  // KIM Einstellungen
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">KIM Einstellungen</div>`;
+  // Rolle / Modus
+  const segBtn = (key, val, label) => {
+    const active = (cfg[key] || 'concierge') === val;
+    return `<div onclick="toggleSetupItem('${key}','${val}')" style="padding:5px 10px;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;${active?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">${label}</div>`;
+  };
+
+  html += sectionTitle('Rolle');
   html += `<div style="${groupStyle}">`;
-  // Modus
-  html += `<div style="${rowStyle}">`;
-  html += iconBox('🎭');
-  html += `<span style="${labelStyle}">Modus</span>`;
-  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += `<div onclick="toggleSetupItem('kim_mode','concierge')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimMode==='concierge'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Concierge</div>`;
-  html += `<div onclick="toggleSetupItem('kim_mode','persoenlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimMode==='persoenlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Persoenlich</div>`;
-  html += `</div></div>`;
-  // Geschlecht
-  html += `<div style="${rowStyle}">`;
-  html += iconBox('⚥');
-  html += `<span style="${labelStyle}">Geschlecht</span>`;
-  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += `<div onclick="toggleSetupItem('kim_gender','weiblich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='weiblich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Weiblich</div>`;
-  html += `<div onclick="toggleSetupItem('kim_gender','maennlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='maennlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Maennlich</div>`;
-  html += `</div></div>`;
-  // Stimme
-  html += `<div style="${rowStyle}">`;
-  html += iconBox('🔊');
-  html += `<span style="${labelStyle}">Stimme</span>`;
-  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += `<div onclick="toggleSetupItem('kim_voice','warm')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimVoice==='warm'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Warm</div>`;
-  html += `<div onclick="toggleSetupItem('kim_voice','kuhl')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimVoice==='kuhl'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Kuhl</div>`;
-  html += `</div></div>`;
-  // Sprache
-  html += `<div style="${lastRowStyle}">`;
-  html += iconBox('🌐');
-  html += `<span style="${labelStyle}">Sprache</span>`;
-  html += `<span style="color:rgba(255,255,255,0.3);font-size:14px">Deutsch ›</span>`;
-  html += `</div>`;
+  html += `<div onclick="setupHistory.push('kim');openSetup('kai_rolle')" style="${lastRowStyle}cursor:pointer">${iconBox('🎭')}<div style="flex:1"><span style="${labelStyle}">Modus</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${cfg['kai_rolle'] || 'Concierge'}</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  // KI MANUS (Erweitert)
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">KI MANUS</div>`;
+  // Stimme
+  html += sectionTitle('Stimme');
+  html += `<div style="${groupStyle}">`;
+  const kaiVoice = cfg['kai_voice'] || 'rex';
+  html += `<div style="${rowStyle}">${iconBox('🔊')}<span style="${labelStyle}">Stimme</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn('kai_voice','rex','Rex');
+  html += segBtn('kai_voice','ara','Ara');
+  html += segBtn('kai_voice','leo','Leo');
+  html += `</div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🌐')}<span style="${labelStyle}">Sprache</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Deutsch</span></div>`;
+  html += `</div>`;
+
+  // KI-Modell
+  html += sectionTitle('KI-Modell');
   html += `<div style="${groupStyle}">`;
   const llmQuality = cfg['llm_quality'] || 'ausgewogen';
-  html += `<div style="${rowStyle}">`;
-  html += iconBox('🧠');
-  html += `<span style="${labelStyle}">KI-Qualitaet</span>`;
+  html += `<div style="${rowStyle}">${iconBox('🧠')}<span style="${labelStyle}">Qualitaet</span>`;
   html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += `<div onclick="toggleSetupItem('llm_quality','schnell')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='schnell'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Schnell</div>`;
-  html += `<div onclick="toggleSetupItem('llm_quality','ausgewogen')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='ausgewogen'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Ausgewogen</div>`;
-  html += `<div onclick="toggleSetupItem('llm_quality','premium')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='premium'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Premium</div>`;
+  html += segBtn('llm_quality','schnell','Schnell');
+  html += segBtn('llm_quality','ausgewogen','Balance');
+  html += segBtn('llm_quality','premium','Premium');
   html += `</div></div>`;
-  html += `<div style="${lastRowStyle}">`;
-  html += iconBox('⚙️');
-  html += `<span style="${labelStyle}">Orchestrator</span>`;
-  html += `<span style="color:rgba(255,255,255,0.3);font-size:14px">Automatisch ›</span>`;
+  html += `<div style="${rowStyle}">${iconBox('🔀')}<span style="${labelStyle}">Aktuelles Modell</span><span style="color:rgba(255,255,255,0.3);font-size:12px">Groq Llama 3.3 70B</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('⚙️')}<span style="${labelStyle}">Routing</span><span style="color:rgba(255,255,255,0.3);font-size:12px">LiteLLM (automatisch)</span></div>`;
   html += `</div>`;
+
+  // Kontakt
+  html += sectionTitle('Kontakt');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('📞')}<span style="${labelStyle}">Telefon</span><span style="color:rgba(255,255,255,0.3);font-size:12px">0800 524 2687</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📧')}<span style="${labelStyle}">Email</span><span style="color:rgba(255,255,255,0.3);font-size:12px">kai@kimanus.de</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('💬')}<span style="${labelStyle}">WhatsApp</span><span style="color:rgba(255,255,255,0.3);font-size:12px">Geplant</span></div>`;
   html += `</div>`;
 
   } // Ende KAI-Setup
 
+  // KAI Rolle Auswahl
+  if (setupMode === 'kai_rolle') {
+  html += `<div style="${groupStyle};padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:default">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎭</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KAI Rolle</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Was soll KAI fuer dich sein?</div></div>`;
+  html += `</div>`;
+
+  const rollen = [
+    {id:'concierge', icon:'🏨', name:'Concierge', sub:'Hotel-Style, vermittelt und beratet'},
+    {id:'rezeptionist', icon:'🏛️', name:'Rezeptionist', sub:'Empfang, Gastronomie, erster Kontakt'},
+    {id:'vermittlung', icon:'📞', name:'Vermittlung', sub:'Telefonzentrale, leitet weiter'},
+    {id:'auskunft', icon:'ℹ️', name:'Auskunft', sub:'Beantwortet Fragen, informiert'},
+    {id:'mitarbeiter', icon:'👔', name:'Mitarbeiter', sub:'Kollege, arbeitet mit dir zusammen'},
+    {id:'lager', icon:'📦', name:'Lager-Assistent', sub:'Bestand, Bestellungen, Inventur'},
+    {id:'service', icon:'🍽️', name:'Service-Assistent', sub:'Bestellungen, Kasse, Gaeste'},
+    {id:'sicherheit', icon:'🔒', name:'Sicherheit', sub:'Rundgaenge, Protokolle, Safety'},
+    {id:'management', icon:'📊', name:'Management', sub:'Ueberblick, Finanzen, Strategie'},
+  ];
+  const currentRolle = cfg['kai_rolle'] || 'concierge';
+
+  html += `<div style="${groupStyle}">`;
+  rollen.forEach((r, ri) => {
+    const active = currentRolle === r.id;
+    const isLast = ri === rollen.length - 1;
+    html += `<div onclick="toggleSetupItem('kai_rolle','${r.id}')" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(r.icon);
+    html += `<div style="flex:1"><span style="${labelStyle}">${r.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${r.sub}</div></div>`;
+    if (active) html += `<span style="color:#4d9fff;font-size:14px">✓</span>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  } // Ende KAI Rolle
+
   if (setupMode === 'kim_persoenlich') {
-  // KIM Persoenliche Assistentin
-  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  // KIM Profil
+  const segBtn2 = (key, val, label, def) => {
+    const active = (cfg[key] || def) === val;
+    return `<div onclick="toggleSetupItem('${key}','${val}')" style="padding:5px 10px;font-size:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;${active?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">${label}</div>`;
+  };
+
+  html += `<div style="${groupStyle};padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:default">`;
   html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">💜</div>`;
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
   html += `</div>`;
 
-  const kimGender = cfg['kim_gender'] || 'weiblich';
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Persoenlichkeit</div>`;
+  // Stimme
+  html += sectionTitle('Stimme');
   html += `<div style="${groupStyle}">`;
-  // Geschlecht
-  html += `<div style="${rowStyle}">${iconBox('⚥')}<span style="${labelStyle}">Anrede</span>`;
+  html += `<div style="${rowStyle}">${iconBox('🔊')}<span style="${labelStyle}">Stimme</span>`;
   html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += `<div onclick="toggleSetupItem('kim_gender','weiblich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='weiblich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Sie</div>`;
-  html += `<div onclick="toggleSetupItem('kim_gender','maennlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='maennlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Er</div>`;
+  html += segBtn2('kim_voice','ara','Ara','ara');
+  html += segBtn2('kim_voice','nova','Nova','ara');
+  html += segBtn2('kim_voice','luna','Luna','ara');
+  html += segBtn2('kim_voice','stella','Stella','ara');
   html += `</div></div>`;
-  // Telefon
-  html += `<div style="${rowStyle}">${iconBox('📞')}<div style="flex:1"><span style="${labelStyle}">Telefonnummer</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Noch nicht eingerichtet</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  // WhatsApp
-  html += `<div style="${rowStyle}">${iconBox('💬')}<div style="flex:1"><span style="${labelStyle}">WhatsApp</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Noch nicht eingerichtet</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  // E-Mail
-  html += `<div style="${lastRowStyle}">${iconBox('📧')}<div style="flex:1"><span style="${labelStyle}">E-Mail</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">kim@kimanus.de</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🎵')}<span style="${labelStyle}">Tonhoehe</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn2('kim_pitch','tief','Tief','normal');
+  html += segBtn2('kim_pitch','normal','Normal','normal');
+  html += segBtn2('kim_pitch','hoch','Hoch','normal');
+  html += `</div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🌐')}<span style="${labelStyle}">Sprache</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Deutsch</span></div>`;
   html += `</div>`;
 
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Was KIM weiss</div>`;
+  // Charakter
+  html += sectionTitle('Charakter');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('😊')}<span style="${labelStyle}">Stil</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn2('kim_style','sachlich','Sachlich','freundlich');
+  html += segBtn2('kim_style','freundlich','Freundlich','freundlich');
+  html += segBtn2('kim_style','flippig','Flippig','freundlich');
+  html += segBtn2('kim_style','lustig','Lustig','freundlich');
+  html += `</div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('💬')}<span style="${labelStyle}">Antwortlaenge</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn2('kim_length','kurz','Kurz','normal');
+  html += segBtn2('kim_length','normal','Normal','normal');
+  html += segBtn2('kim_length','ausfuehrlich','Viel','normal');
+  html += `</div></div>`;
+  html += `</div>`;
+
+  // Was KIM weiss
+  html += sectionTitle('Was KIM weiss');
   html += `<div style="${groupStyle}">`;
   html += `<div style="${rowStyle}">${iconBox('❤️')}<div style="flex:1"><span style="${labelStyle}">Vorlieben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Essen, Hobbys, Gewohnheiten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `<div style="${rowStyle}">${iconBox('👨‍👩‍👧‍👦')}<div style="flex:1"><span style="${labelStyle}">Familie & Kontakte</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Geburtstage, Namen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
@@ -2593,11 +2646,12 @@ function openSetup(mode, isBack) {
   html += `<div style="${lastRowStyle}">${iconBox('🧠')}<div style="flex:1"><span style="${labelStyle}">Gedaechtnis</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Was KIM sich gemerkt hat</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Erreichbarkeit</div>`;
+  // Kontakt
+  html += sectionTitle('Kontakt');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('🎙')}<span style="${labelStyle}">In der App (Text)</span>${toggle('kim_app_active', cfg['kim_app_active'] !== false)}</div>`;
-  html += `<div style="${rowStyle}">${iconBox('📞')}<span style="${labelStyle}">Per Telefon (Stimme)</span>${toggle('kim_phone_active', cfg['kim_phone_active'] === true)}</div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('💬')}<span style="${labelStyle}">Per WhatsApp</span>${toggle('kim_whatsapp_active', cfg['kim_whatsapp_active'] === true)}</div>`;
+  html += `<div style="${rowStyle}">${iconBox('📞')}<span style="${labelStyle}">Telefon</span><span style="color:rgba(255,255,255,0.3);font-size:12px">Geplant</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('💬')}<span style="${labelStyle}">WhatsApp</span><span style="color:rgba(255,255,255,0.3);font-size:12px">Geplant</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('📧')}<span style="${labelStyle}">Email</span><span style="color:rgba(255,255,255,0.3);font-size:12px">kim@kimanus.de</span></div>`;
   html += `</div>`;
 
   } // Ende KIM-Persoenlich
@@ -2669,7 +2723,7 @@ function openSetup(mode, isBack) {
       html += iconBox(agent.icon);
       html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
       html += toggle(key, enabled);
-      html += `<span onclick="setupHistory.push('${setupMode}');openSetup('agent_${agent.id}')" style="color:rgba(255,255,255,0.2);font-size:18px;cursor:pointer;padding:0 0 0 10px;-webkit-tap-highlight-color:transparent">›</span>`;
+      html += `<span onclick="event.stopPropagation();setupHistory.push('${setupMode}');openSetup('agent_${agent.id}')" style="color:rgba(255,255,255,0.2);font-size:18px;cursor:pointer;padding:4px 0 4px 12px;-webkit-tap-highlight-color:transparent">›</span>`;
       html += `</div>`;
     });
     html += `</div>`;
@@ -2855,7 +2909,7 @@ function openSetup(mode, isBack) {
           html += iconBox(agent.icon);
           html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
           html += toggle(key, enabled);
-          html += `<span onclick="setupHistory.push('${setupMode}');openSetup('agent_${agent.id}')" style="color:rgba(255,255,255,0.2);font-size:18px;cursor:pointer;padding:0 0 0 10px;-webkit-tap-highlight-color:transparent">›</span>`;
+          html += `<span onclick="event.stopPropagation();setupHistory.push('${setupMode}');openSetup('agent_${agent.id}')" style="color:rgba(255,255,255,0.2);font-size:18px;cursor:pointer;padding:4px 0 4px 12px;-webkit-tap-highlight-color:transparent">›</span>`;
           html += `</div>`;
         });
       } else if (abt.cardId) {
@@ -2902,23 +2956,91 @@ function openSetup(mode, isBack) {
       html += `<div style="${lastRowStyle}">${iconBox('📞')}<span style="${labelStyle}">Telefon</span><span style="color:rgba(255,255,255,0.3);font-size:12px">${agent.phone || '-'}</span></div>`;
       html += `</div>`;
 
-      // KI-Modell & Skills
-      html += sectionTitle('KI & Skills');
+      // KI-Modell
+      html += sectionTitle('KI-Modell');
       html += `<div style="${groupStyle}">`;
-      html += `<div style="${rowStyle}">${iconBox('🧠')}<span style="${labelStyle}">LLM Modell</span><span style="color:rgba(255,255,255,0.3);font-size:12px">${modelMap[agent.model] || agent.model || 'Standard (Groq)'}</span></div>`;
-      html += `<div style="${rowStyle}">${iconBox('💬')}<span style="${labelStyle}">System-Prompt</span><span style="color:rgba(255,255,255,0.2);font-size:14px">›</span></div>`;
-      html += `<div style="${lastRowStyle}">${iconBox('🔧')}<span style="${labelStyle}">Skills & Tools</span><span style="color:rgba(255,255,255,0.2);font-size:14px">›</span></div>`;
+      html += `<div style="${rowStyle}">${iconBox('🧠')}<span style="${labelStyle}">LLM</span><span style="color:rgba(255,255,255,0.3);font-size:12px">${modelMap[agent.model] || agent.model || 'Groq Llama 3.3 70B'}</span></div>`;
+      html += `<div style="${lastRowStyle}">${iconBox('🌡️')}<span style="${labelStyle}">Routing</span><span style="color:rgba(255,255,255,0.3);font-size:12px">via LiteLLM Gateway</span></div>`;
       html += `</div>`;
 
-      // Beschreibung
-      if (agent.backs && agent.backs[0]) {
-        html += sectionTitle('Beschreibung');
-        html += `<div style="${groupStyle};padding:12px 16px">`;
-        html += `<div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.5;white-space:pre-line">${agent.backs[0].content}</div>`;
-        html += `</div>`;
-      }
+      // Skills & Faehigkeiten (pro Agent spezifisch)
+      const agentSkills = {
+        'ag-youtube': {skills:['YouTube Data API','Video-Analyse','Kapitel-Erkennung','Timestamps'],sources:['youtube.com'],prompt:'Findet und analysiert YouTube-Videos, extrahiert Kapitel und Kernaussagen.'},
+        'ag-web': {skills:['Web-Suche','Fakten-Check','Zusammenfassung','Quellen-Pruefung'],sources:['SearXNG','Firecrawl'],prompt:'Durchsucht das Internet, prueft Fakten und fasst Ergebnisse zusammen.'},
+        'ag-news': {skills:['News-Aggregation','Trend-Erkennung','Regional-Filter'],sources:['NewsAPI','RSS Feeds'],prompt:'Sammelt aktuelle Nachrichten, erkennt Trends, filtert nach Region.'},
+        'ag-deals': {skills:['Preisvergleich','Angebots-Erkennung','Preis-Historie'],sources:['idealo','geizhals'],prompt:'Findet die besten Angebote und vergleicht Preise.'},
+        'ag-social': {skills:['Trend-Analyse','Viral-Erkennung','Hashtag-Tracking'],sources:['Twitter/X','Instagram','TikTok'],prompt:'Analysiert Social-Media-Trends und virale Inhalte.'},
+        'ag-wetterfrosch': {skills:['Wetter-Vorhersage','Lifestyle-Tipps','Outdoor-Score'],sources:['BrightSky (DWD)','Open-Meteo'],prompt:'Gibt Wettervorhersagen mit persoenlichen Lifestyle-Empfehlungen.'},
+        'ag-justus': {skills:['Rechtsberatung','Vertragsanalyse','Gesetzessuche'],sources:['dejure.org','gesetze-im-internet.de'],prompt:'Beratet zu allgemeinem Recht, analysiert Vertraege, erklaert Gesetze.'},
+        'ag-lena': {skills:['Buchhaltung','Rechnungspruefung','Steuertipps'],sources:['ELSTER','Steuerrecht'],prompt:'Hilft bei Buchhaltung, prueft Rechnungen, gibt Steuertipps.'},
+        'ag-bestellprofi': {skills:['Bestellvorschlaege','Lieferanten-Vergleich','Mengenoptimierung'],sources:['Lieferanten-APIs'],prompt:'Optimiert Bestellungen, vergleicht Lieferanten, berechnet Mengen.'},
+        'ag-lagerist': {skills:['Bestandsfuehrung','Inventur','Schwund-Erkennung'],sources:['Barcode/NFC Scanner'],prompt:'Verwaltet Lagerbestaende, erkennt Schwund, plant Nachbestellungen.'},
+        'ag-kalkulierer': {skills:['Rohaufschlag','Preiskalkulation','Margenberechnung'],sources:['Einkaufspreise','VK-Preise'],prompt:'Berechnet Rohaufschlag, kalkuliert Preise, optimiert Margen.'},
+        'ag-dolmetscher': {skills:['Uebersetzung','Simultandolmetschen','Kulturberatung'],sources:['DeepL','Google Translate'],prompt:'Uebersetzt in alle Sprachen und beratet zu kulturellen Unterschieden.'},
+        'ag-sekretaer': {skills:['Terminplanung','Erinnerungen','Tagesplanung'],sources:['Kalender-API'],prompt:'Plant Termine, erinnert an Aufgaben, organisiert den Tag.'},
+        'ag-bibliothekar': {skills:['Wissenssuche','Dokument-Analyse','RAG'],sources:['Vault','PDFs','Notizen'],prompt:'Durchsucht dein Wissensarchiv, analysiert Dokumente, findet Antworten.'},
+      };
+      const skills = agentSkills[agent.id] || {skills:['Beratung','Dialog'],sources:['Allgemeinwissen'],prompt:agent.backs?.[0]?.content || 'Allgemeiner Assistent'};
+
+      html += sectionTitle('Skills & Faehigkeiten');
+      html += `<div style="${groupStyle};padding:12px 16px">`;
+      html += `<div style="display:flex;gap:6px;flex-wrap:wrap">`;
+      skills.skills.forEach(s => {
+        html += `<span style="padding:4px 10px;border-radius:8px;background:rgba(100,150,255,0.1);border:1px solid rgba(100,150,255,0.2);font-size:11px;color:rgba(100,150,255,0.7)">${s}</span>`;
+      });
+      html += `</div></div>`;
+
+      // Quellen & APIs
+      html += sectionTitle('Quellen & APIs');
+      html += `<div style="${groupStyle}">`;
+      skills.sources.forEach((src, si) => {
+        const isLast = si === skills.sources.length - 1;
+        html += `<div style="${isLast ? lastRowStyle : rowStyle}">${iconBox('🔗')}<span style="${labelStyle}">${src}</span></div>`;
+      });
+      html += `</div>`;
+
+      // Aufgabe / Prompt
+      html += sectionTitle('Aufgabe');
+      html += `<div style="${groupStyle};padding:12px 16px">`;
+      html += `<div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.5">${skills.prompt}</div>`;
+      html += `</div>`;
     }
   } // Ende Agent-Detail
+
+  if (setupMode === 'archiv') {
+  html += `<div style="${groupStyle};padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:default">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📚</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Archiv & Medien</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenliches Gedaechtnis</div></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Dokumente');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📁')}<div style="flex:1"><span style="${labelStyle}">Aktenordner</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Vertraege, Belege, Rechnungen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📋')}<div style="flex:1"><span style="${labelStyle}">Notizen & Tagebuch</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Gespraeche, Ideen, Tagesnotizen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('✉️')}<div style="flex:1"><span style="${labelStyle}">Korrespondenz</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Briefe, E-Mails, Postfach</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Medien');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🎬')}<div style="flex:1"><span style="${labelStyle}">Filme & Videos</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Videothek, YouTube Favoriten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('💿')}<div style="flex:1"><span style="${labelStyle}">Musik & CDs</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Playlists, Lieblingssongs</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📸')}<div style="flex:1"><span style="${labelStyle}">Fotoalben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Erinnerungen, Familienfotos, Fotoalbum-Service</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Wissen');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📖')}<div style="flex:1"><span style="${labelStyle}">Buecherregal</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">E-Books, PDFs, Anleitungen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🔎')}<div style="flex:1"><span style="${labelStyle}">Nachschlagewerke</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Lexikon, Brockhaus, Wikipedia</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('🎓')}<div style="flex:1"><span style="${labelStyle}">Kurse & Tutorials</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Lernmaterial, Schulungen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Persoenlich');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🧠')}<div style="flex:1"><span style="${labelStyle}">Gedaechtnis</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Was KIM sich ueber dich merkt</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📱')}<div style="flex:1"><span style="${labelStyle}">Meine Geraete</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Handy, Laptop, Smart Home</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('⭐')}<div style="flex:1"><span style="${labelStyle}">Favoriten & Merkliste</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Gespeicherte Tipps, Rezepte, Links</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+  } // Ende Archiv
 
   if (setupMode === 'projekte') {
   html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
@@ -3084,6 +3206,15 @@ function closeSetup() {
   updateHeaderKimStatus();
   updateKimBacks();
   rebuildWheel();
+}
+
+function setMainContact(who) {
+  const cfg = getSetupConfig();
+  cfg['main_contact'] = who;
+  saveSetupConfig(cfg);
+  openSetup(setupMode);
+  // Header updaten
+  updateHeaderKimStatus();
 }
 
 function toggleSetupItem(key, enabled) {
