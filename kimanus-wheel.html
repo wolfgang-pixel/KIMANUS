@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v15.7 - Ring-Button, KAI permanent, Clean rebuild -->
+<!-- KIMANUS Wheel v17.0 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -775,7 +775,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v15.7</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v17.0</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2175,6 +2175,22 @@ function setGlassTint(value) {
   localStorage.setItem('kimanus-custom-tint', value);
 }
 
+function setGlassTintHue(hue) {
+  localStorage.setItem('kimanus-custom-hue', hue);
+  const alpha = localStorage.getItem('kimanus-custom-tint-alpha') || '0';
+  const a = parseInt(alpha) / 100;
+  const value = a > 0 ? `hsla(${hue},70%,50%,${a})` : 'transparent';
+  setGlassTint(value);
+}
+
+function setGlassTintAlpha(alpha) {
+  localStorage.setItem('kimanus-custom-tint-alpha', alpha);
+  const hue = localStorage.getItem('kimanus-custom-hue') || '0';
+  const a = parseInt(alpha) / 100;
+  const value = a > 0 ? `hsla(${hue},70%,50%,${a})` : 'transparent';
+  setGlassTint(value);
+}
+
 function setCard3D(on) {
   if (on) {
     document.documentElement.style.setProperty('--skin-card-bg', 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%)');
@@ -2356,8 +2372,22 @@ function openSetup(mode, isBack) {
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
   // Header updaten
-  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent'};
-  document.getElementById('setup-title').textContent = titles[setupMode] || 'Einstellungen';
+  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent',design:'Darstellung',skins:'Skins',projekte:'Projekte'};
+  let title = titles[setupMode] || 'Einstellungen';
+  if (setupMode.startsWith('agcat_')) title = setupMode.replace('agcat_', '');
+  if (setupMode.startsWith('agent_')) {
+    const ag = ALL_AGENTS.find(a => a.id === setupMode.replace('agent_',''));
+    if (ag) title = ag.title;
+  }
+  if (setupMode.startsWith('proj_')) {
+    const projTitles = {capcoin:'Cap-Coin',safety:'Safety-Check',alkomat:'Alkomat',safehome:'Safe Home',regioframe:'RegioFrame',regiopick:'RegioPic',jukebox:'Jukebox',postfach:'Postfach',smarteinkauf:'Smart Einkauf',antbetrug:'Anti-Betrug',kinderschutz:'Kinderschutz'};
+    title = projTitles[setupMode.replace('proj_','')] || 'Projekt';
+  }
+  if (setupMode.startsWith('abt_')) {
+    const abtNames = {rechtsabteilung:'Rechtsabteilung',finanzabteilung:'Finanzabteilung',einkauf:'Einkauf & Lager',marketing:'Marketing',empfang:'Empfang',recherche:'Recherche',beratung:'Beratung',sicherheit:'Sicherheit',tools:'Werkstatt',finanzen_kasse:'Kasse',archiv_abt:'Archiv',it_abt:'IT & Apps'};
+    title = abtNames[setupMode.replace('abt_','')] || 'Abteilung';
+  }
+  document.getElementById('setup-title').textContent = title;
   const backBtn = document.getElementById('setup-back');
   const backSpacer = document.getElementById('setup-back-spacer');
   if (setupMode === 'main') {
@@ -2366,6 +2396,9 @@ function openSetup(mode, isBack) {
   } else {
     backBtn.style.display = 'block';
     backSpacer.style.display = 'none';
+    // Zurueck-Text: zeigt wohin es zurueckgeht
+    const parentTitle = setupHistory.length > 0 ? (titles[setupHistory[setupHistory.length-1]] || 'Zurueck') : 'Zurueck';
+    backBtn.textContent = '‹ ' + parentTitle;
   }
   // iPhone-Style Slide Animation
   if (oldMode && oldMode !== setupMode) {
@@ -2380,9 +2413,9 @@ function openSetup(mode, isBack) {
     });
   }
   const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
-  const groupStyle = 'background:#1c1c1e;border-radius:12px;overflow:hidden;margin-bottom:35px';
-  const rowStyle = 'display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.12);gap:14px;min-height:44px';
-  const lastRowStyle = 'display:flex;align-items:center;padding:12px 16px;gap:14px;min-height:44px';
+  const groupStyle = 'background:#1c1c1e;border-radius:10px;overflow:hidden;margin-bottom:8px';
+  const rowStyle = 'display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08);gap:12px;min-height:40px';
+  const lastRowStyle = 'display:flex;align-items:center;padding:10px 16px;gap:12px;min-height:40px';
   const labelStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.85)';
   const labelOffStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.3)';
   const subLabelStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.7);margin-left:2px';
@@ -2394,36 +2427,52 @@ function openSetup(mode, isBack) {
   let html = '';
 
   if (setupMode === 'main') {
-  // === HAUPTSEITE: iPhone Settings Style ===
+  // === HAUPTSEITE: iPhone Settings Style mit Ueberschriften ===
+  const sectionTitle = (text) => `<div style="font-size:10px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:1px;padding:2px 16px 2px;margin-top:4px">${text}</div>`;
 
-  // 1. KAI Profil (wie Apple ID oben)
-  html += `<div onclick="openSetupKim()" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer">`;
-  html += `<div style="width:54px;height:54px;border-radius:27px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
+  // --- PROFILE ---
+  // KAI Profil
+  html += `<div onclick="openSetupKim()" style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
   html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
   html += `</div>`;
 
-  // 2. KIM Profil (persoenliche Assistentin)
-  html += `<div onclick="openSetupKimPersoenlich()" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;margin-top:10px">`;
-  html += `<div style="width:54px;height:54px;border-radius:27px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
+  // KIM Profil
+  html += `<div onclick="openSetupKimPersoenlich()" style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px;cursor:pointer">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
   html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
   html += `</div>`;
 
-  // 3. Agenten & Abteilungen
-  html += `<div style="${groupStyle};margin-top:35px">`;
-  html += `<div onclick="openSetupAgenten()" style="${rowStyle}cursor:pointer">${iconBox('👥')}<span style="${labelStyle}">Agenten</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div onclick="openSetupBereiche()" style="${rowStyle}cursor:pointer">${iconBox('🏢')}<span style="${labelStyle}">Abteilungen</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div onclick="openAgentBuilder()" style="${lastRowStyle}cursor:pointer">${iconBox('🔨')}<div style="flex:1"><span style="${labelStyle}">Neuen Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KI erstellt einen Experten fuer dich</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  // --- SYSTEM ---
+  html += `<div style="${groupStyle};margin-top:10px">`;
+  html += `<div onclick="openSetupKimanus()" style="${rowStyle}cursor:pointer">${iconBox('🤝')}<span style="${labelStyle}">KIMANUS</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupClaude()" style="${lastRowStyle}cursor:pointer">${iconBox('🧡')}<span style="${labelStyle}">Claude</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  // 4. Schliessfach & Postfach
+  // --- MITARBEITER ---
+  html += sectionTitle('Mitarbeiter');
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="openSetupAgenten()" style="${rowStyle}cursor:pointer">${iconBox('👥')}<span style="${labelStyle}">Agenten</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupBereiche()" style="${lastRowStyle}cursor:pointer">${iconBox('🏢')}<span style="${labelStyle}">Abteilungen</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // --- PROJEKTE & MODULE ---
+  html += sectionTitle('Projekte & Module');
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="setupHistory.push('main');openSetup('projekte')" style="${lastRowStyle}cursor:pointer">${iconBox('🚀')}<div style="flex:1"><span style="${labelStyle}">Projekte</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Cap-Coin, Safety, RegioFrame & mehr</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // --- SICHERHEIT ---
+  html += sectionTitle('Sicherheit');
   html += `<div style="${groupStyle}">`;
   html += `<div style="${rowStyle}cursor:pointer">${iconBox('🔐')}<div style="flex:1"><span style="${labelStyle}">Schliessfach</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Sichere Aufbewahrung</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📬')}<div style="flex:1"><span style="${labelStyle}">Postfach</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Verschluesselte Korrespondenz</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  // 5. Archiv (Aktenordner, Filme, CDs, Fotoalben)
+  // --- ARCHIV ---
+  html += sectionTitle('Archiv');
   html += `<div style="${groupStyle}">`;
   html += `<div style="${rowStyle}cursor:pointer">${iconBox('📁')}<div style="flex:1"><span style="${labelStyle}">Aktenordner</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Dokumente, Vertraege, Belege</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `<div style="${rowStyle}cursor:pointer">${iconBox('🎬')}<div style="flex:1"><span style="${labelStyle}">Filme & Videos</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Videothek, YouTube Favoriten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
@@ -2431,60 +2480,16 @@ function openSetup(mode, isBack) {
   html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📸')}<div style="flex:1"><span style="${labelStyle}">Fotoalben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Erinnerungen, Familienfotos</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  // 6. System
+  // --- DARSTELLUNG ---
+  html += sectionTitle('Darstellung');
   html += `<div style="${groupStyle}">`;
-  html += `<div onclick="openSetupKimanus()" style="${rowStyle}cursor:pointer">${iconBox('🤝')}<span style="${labelStyle}">KIMANUS</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div onclick="openSetupClaude()" style="${lastRowStyle}cursor:pointer">${iconBox('🧡')}<span style="${labelStyle}">Claude</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="setupHistory.push('main');openSetup('design')" style="${lastRowStyle}cursor:pointer">${iconBox('🎨')}<div style="flex:1"><span style="${labelStyle}">Aussehen anpassen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Helligkeit, Skins, Glas, Ecken</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  // 7. Darstellung
+  // --- INFO ---
+  html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="100" value="${currentBrightness||30}" oninput="adjustBrightness(this.value)" style="width:100%;accent-color:#e63946"></div></div>`;
-  // --- Design Presets ---
-  const currentSkin = localStorage.getItem('kimanus-skin') || 'dark';
-  html += `<div style="${rowStyle};flex-wrap:wrap;gap:8px;padding-bottom:12px">${iconBox('🎨')}<span style="${labelStyle};flex:1">Vorlagen</span><div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;padding-top:6px">`;
-  Object.entries(SKINS).forEach(([id, skin]) => {
-    const active = id === currentSkin;
-    html += `<div onclick="applySkin('${id}');openSetup('main')" style="padding:6px 12px;border-radius:10px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${active ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4)'}">${skin.icon} ${skin.name}</div>`;
-  });
-  html += `</div></div>`;
-
-  // --- Glasplatten ---
-  const curBlur = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--skin-glass-blur')) || 12;
-  html += `<div style="${rowStyle}">${iconBox('🧊')}<span style="${labelStyle}">Frost</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="8" value="${Math.min(curBlur,8)}" oninput="document.documentElement.style.setProperty('--skin-glass-blur',this.value+'px');localStorage.setItem('kimanus-custom-blur',this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
-
-  // --- Glas-Tonung ---
-  const tints = [
-    {label:'Klar',value:'transparent',color:'#888'},
-    {label:'Blau',value:'rgba(100,150,255,0.15)',color:'#6496ff'},
-    {label:'Gruen',value:'rgba(34,197,94,0.12)',color:'#22c55e'},
-    {label:'Rot',value:'rgba(230,57,70,0.1)',color:'#e63946'},
-    {label:'Gold',value:'rgba(245,158,11,0.1)',color:'#f59e0b'},
-    {label:'Lila',value:'rgba(168,85,247,0.12)',color:'#a855f7'}
-  ];
-  const curTint = localStorage.getItem('kimanus-custom-tint') || 'transparent';
-  html += `<div style="${rowStyle};flex-wrap:wrap">${iconBox('💎')}<span style="${labelStyle};flex:1">Glas-Tonung</span><div style="display:flex;gap:8px;width:100%;padding-top:8px">`;
-  tints.forEach(t => {
-    const isActive = curTint === t.value;
-    html += `<div onclick="setGlassTint('${t.value}');openSetup('main')" style="width:32px;height:32px;border-radius:50%;background:${t.color};border:3px solid ${isActive ? '#fff' : 'rgba(255,255,255,0.08)'};cursor:pointer;-webkit-tap-highlight-color:transparent;opacity:${isActive ? '1' : '0.4'};transform:${isActive ? 'scale(1.15)' : 'scale(1)'};transition:all 0.2s" title="${t.label}"></div>`;
-  });
-  html += `</div></div>`;
-
-  // --- Karten-Rundung ---
-  const curRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--skin-card-radius')) || 0;
-  html += `<div style="${rowStyle}">${iconBox('⬜')}<span style="${labelStyle}">Karten-Ecken</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="20" value="${curRadius}" oninput="document.documentElement.style.setProperty('--skin-card-radius',this.value+'px');localStorage.setItem('kimanus-custom-radius',this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
-
-  // --- Karten-3D ---
-  const is3d = localStorage.getItem('kimanus-custom-3d') === '1';
-  html += `<div style="${lastRowStyle}">${iconBox('🎲')}<span style="${labelStyle}">Karten 3D</span><div style="display:flex;gap:8px">`;
-  html += `<div onclick="setCard3D(false);openSetup('main')" style="padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${!is3d ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)'}">Flach</div>`;
-  html += `<div onclick="setCard3D(true);openSetup('main')" style="padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${is3d ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)'}">Plastisch</div>`;
-  html += `</div></div>`;
-  html += `</div>`;
-
-  // 8. Info
-  html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v15.7 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v17.0 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -2630,33 +2635,105 @@ function openSetup(mode, isBack) {
   categories.forEach((cat, ci) => {
     const agents = ALL_AGENTS.filter(a => a.category === cat);
     const activeCount = agents.filter(a => cfg['agent_' + a.id] === true).length;
-    const catKey = 'agcat_open_' + cat;
-    const isOpen = cfg[catKey] === true;
-    const isLast = ci === categories.length - 1 && !isOpen;
+    const isLast = ci === categories.length - 1;
 
-    // Kategorie-Zeile mit Pfeil
-    html += `<div onclick="toggleSetupItem('${catKey}',${!isOpen})" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    // Kategorie-Zeile → slidet nach rechts zu eigener Seite
+    html += `<div onclick="setupHistory.push('agenten');openSetup('agcat_${cat}')" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
     html += iconBox(catIcons[cat] || '📦');
     html += `<div style="flex:1"><span style="${labelStyle}">${cat}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${activeCount > 0 ? activeCount + ' aktiv' : agents.length + ' verfuegbar'}</div></div>`;
-    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
+    html += `<span style="color:rgba(255,255,255,0.4);font-size:13px;margin-right:4px">${activeCount}/${agents.length}</span>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px">›</span>`;
     html += `</div>`;
-
-    // Aufgeklappt: einzelne Agenten
-    if (isOpen) {
-      agents.forEach((agent, ai) => {
-        const key = 'agent_' + agent.id;
-        const enabled = cfg[key] === true;
-        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${ai < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.08)':''}gap:10px">`;
-        html += `<div style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
-        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
-        html += toggle(key, enabled);
-        html += `</div>`;
-      });
-    }
   });
   html += `</div>`;
 
   } // Ende Agenten-Setup
+
+  // Agenten-Kategorie Detailseite (z.B. agcat_Scouts)
+  if (setupMode.startsWith('agcat_')) {
+    const cat = setupMode.replace('agcat_', '');
+    const catIcons2 = {Scouts:'🔍',Guides:'🧭',Berater:'💡',Business:'💼',Spezialisten:'🔧',Recht:'⚖️',Finanzen:'💶'};
+    const agents = ALL_AGENTS.filter(a => a.category === cat);
+
+    html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+    html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">${catIcons2[cat] || '📦'}</div>`;
+    html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">${cat}</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">${agents.length} Agenten</div></div>`;
+    html += `</div>`;
+
+    html += `<div style="${groupStyle}">`;
+    agents.forEach((agent, ai) => {
+      const key = 'agent_' + agent.id;
+      const enabled = cfg[key] === true;
+      const isLast = ai === agents.length - 1;
+      html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+      html += iconBox(agent.icon);
+      html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
+      html += toggle(key, enabled);
+      html += `<span onclick="setupHistory.push('${setupMode}');openSetup('agent_${agent.id}')" style="color:rgba(255,255,255,0.2);font-size:18px;cursor:pointer;padding:0 0 0 10px;-webkit-tap-highlight-color:transparent">›</span>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+  } // Ende Agenten-Kategorie
+
+  if (setupMode === 'design') {
+  // Design / Darstellung
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#f59e0b,#e63946);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🎨</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Darstellung</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Aussehen anpassen</div></div>`;
+  html += `</div>`;
+
+  // Helligkeit
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${lastRowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="100" value="${currentBrightness||30}" oninput="adjustBrightness(this.value)" style="width:100%;accent-color:#e63946"></div></div>`;
+  html += `</div>`;
+
+  // Skins → eigene Seite
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="setupHistory.push('design');openSetup('skins')" style="${lastRowStyle}cursor:pointer">${iconBox('🖌️')}<div style="flex:1"><span style="${labelStyle}">Skins</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Farbschemata und Themes</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // Feintuning
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:8px 16px 6px">Feintuning</div>`;
+  html += `<div style="${groupStyle}">`;
+
+  const curBlur = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--skin-glass-blur')) || 12;
+  html += `<div style="${rowStyle}">${iconBox('🧊')}<span style="${labelStyle}">Frost</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="8" value="${Math.min(curBlur,8)}" oninput="document.documentElement.style.setProperty('--skin-glass-blur',this.value+'px');localStorage.setItem('kimanus-custom-blur',this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
+
+  const curHue = localStorage.getItem('kimanus-custom-hue') || '0';
+  const curTintAlpha = localStorage.getItem('kimanus-custom-tint-alpha') || '0';
+  html += `<div style="${rowStyle}">${iconBox('💎')}<span style="${labelStyle}">Glas-Farbe</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="360" value="${curHue}" oninput="setGlassTintHue(this.value)" style="width:100%;accent-color:#fff;background:linear-gradient(90deg,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000);border-radius:4px;height:6px;-webkit-appearance:none;appearance:none"></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🔆')}<span style="${labelStyle}">Glas-Staerke</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="20" value="${curTintAlpha}" oninput="setGlassTintAlpha(this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
+
+  const curRadius = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--skin-card-radius')) || 0;
+  html += `<div style="${rowStyle}">${iconBox('⬜')}<span style="${labelStyle}">Karten-Ecken</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="20" value="${curRadius}" oninput="document.documentElement.style.setProperty('--skin-card-radius',this.value+'px');localStorage.setItem('kimanus-custom-radius',this.value)" style="width:100%;accent-color:#4d9fff"></div></div>`;
+
+  const is3d = localStorage.getItem('kimanus-custom-3d') === '1';
+  html += `<div style="${lastRowStyle}">${iconBox('🎲')}<span style="${labelStyle}">Karten 3D</span><div style="display:flex;gap:8px">`;
+  html += `<div onclick="setCard3D(false);openSetup('design')" style="padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${!is3d ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)'}">Flach</div>`;
+  html += `<div onclick="setCard3D(true);openSetup('design')" style="padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;${is3d ? 'background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:600' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3)'}">Plastisch</div>`;
+  html += `</div></div>`;
+  html += `</div>`;
+  } // Ende Design
+
+  if (setupMode === 'skins') {
+  const currentSkin = localStorage.getItem('kimanus-skin') || 'dark';
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#f59e0b,#e63946,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🖌️</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Skins</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Waehle dein Farbschema</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="${groupStyle}">`;
+  Object.entries(SKINS).forEach(([id, skin], idx, arr) => {
+    const active = id === currentSkin;
+    const isLast = idx === arr.length - 1;
+    html += `<div onclick="applySkin('${id}');openSetup('skins')" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += `<div style="width:28px;height:28px;border-radius:50%;background:${skin.vars?.['--skin-accent'] || '#e63946'};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:2px solid ${active ? '#fff' : 'rgba(255,255,255,0.1)'}">${skin.icon}</div>`;
+    html += `<span style="${labelStyle};flex:1">${skin.name}</span>`;
+    if (active) html += `<span style="color:#4d9fff;font-size:14px">✓</span>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  } // Ende Skins
 
   if (setupMode === 'bereiche') {
   // Abteilungen wie in einer Firma
@@ -2719,11 +2796,9 @@ function openSetup(mode, isBack) {
      sub:'WhatsApp, Maps, Handy-Hilfe'},
   ];
 
-  // Alle Abteilungen in einer Gruppe wie iPhone Einstellungen
+  // Alle Abteilungen - jede als eigene Seite (Slide rechts)
   html += `<div style="${groupStyle}">`;
   abteilungen.forEach((abt, ai) => {
-    const abtKey = 'abt_open_' + abt.id;
-    const isOpen = cfg[abtKey] === true;
     let activeCount = 0, totalCount = 0;
     if (abt.agents) {
       totalCount = abt.agents.length;
@@ -2732,48 +2807,181 @@ function openSetup(mode, isBack) {
       totalCount = 1;
       activeCount = cfg['card_' + abt.cardId] === true ? 1 : 0;
     }
-    const isLast = ai === abteilungen.length - 1 && !isOpen;
+    const isLast = ai === abteilungen.length - 1;
 
-    // Abteilungs-Zeile (antippbar -> aufklappen)
-    html += `<div onclick="toggleSetupItem('${abtKey}',${!isOpen})" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += `<div onclick="setupHistory.push('bereiche');openSetup('abt_${abt.id}')" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
     html += iconBox(abt.icon);
-    html += `<div style="flex:1"><span style="${labelStyle}">${abt.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${activeCount > 0 ? activeCount + ' aktiv' : abt.sub}</div></div>`;
-    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
+    html += `<div style="flex:1"><span style="${labelStyle}">${abt.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${abt.sub}</div></div>`;
+    html += `<span style="color:rgba(255,255,255,0.4);font-size:13px;margin-right:4px">${activeCount}/${totalCount}</span>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px">›</span>`;
     html += `</div>`;
 
-    // Aufgeklappte Mitarbeiter
-    if (isOpen) {
+  });
+  html += `</div>`;
+  } // Ende Bereiche-Setup
+
+  // Abteilung-Detailseite (z.B. abt_rechtsabteilung)
+  if (setupMode.startsWith('abt_')) {
+    const abtId = setupMode.replace('abt_', '');
+    const abteilungen2 = [
+      {id:'rechtsabteilung', icon:'⚖️', name:'Rechtsabteilung', agents:['ag-justus','ag-steuerrecht','ag-patentrecht','ag-arbeitsrecht','ag-veranstaltungsrecht']},
+      {id:'finanzabteilung', icon:'💶', name:'Finanzabteilung', agents:['ag-lena','ag-steuerlena','ag-controlling']},
+      {id:'einkauf', icon:'📦', name:'Einkauf & Lager', agents:['ag-bestellprofi','ag-lagerist','ag-kalkulierer']},
+      {id:'marketing', icon:'📣', name:'Marketing & Medien', agents:['ag-marketing','ag-dj','ag-print']},
+      {id:'empfang', icon:'🏛️', name:'Empfang & Concierge', agents:['ag-stadtfuehrer','ag-gastro','ag-animateur','ag-regiopilot']},
+      {id:'recherche', icon:'🔍', name:'Recherche & Scouts', agents:['ag-youtube','ag-web','ag-news','ag-deals','ag-social']},
+      {id:'beratung', icon:'💡', name:'Beratung', agents:['ag-wetterfrosch','ag-dolmetscher','ag-sekretaer','ag-bibliothekar']},
+      {id:'sicherheit', icon:'🔒', name:'Sicherheit & IT', agents:['ag-ithilfe','ag-safety','ag-nachtfahrer']},
+      {id:'tools', icon:'🛠️', name:'Werkstatt & Tools', cardId:'tools'},
+      {id:'finanzen_kasse', icon:'💳', name:'Kasse & Wallet', cardId:'wallet'},
+      {id:'archiv_abt', icon:'📁', name:'Archiv & Ablage', cardId:'archiv'},
+      {id:'it_abt', icon:'📱', name:'IT & Apps', cardId:'apps'},
+    ];
+    const abt = abteilungen2.find(a => a.id === abtId);
+    if (abt) {
+      html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+      html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">${abt.icon}</div>`;
+      html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">${abt.name}</div></div>`;
+      html += `</div>`;
+
+      html += `<div style="${groupStyle}">`;
       if (abt.agents) {
         const agents = abt.agents.map(id => ALL_AGENTS.find(a => a.id === id)).filter(Boolean);
-        agents.forEach((agent, agi) => {
+        agents.forEach((agent, ai) => {
           const key = 'agent_' + agent.id;
           const enabled = cfg[key] === true;
-          const isAgentLast = agi === agents.length - 1 && (isLast || ai < abteilungen.length - 1);
-          html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${agi < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.08)':''}gap:10px">`;
-          html += `<div style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
-          html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+          const isLast = ai === agents.length - 1;
+          html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+          html += iconBox(agent.icon);
+          html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${agent.subtitle}</div></div>`;
           html += toggle(key, enabled);
+          html += `<span onclick="setupHistory.push('${setupMode}');openSetup('agent_${agent.id}')" style="color:rgba(255,255,255,0.2);font-size:18px;cursor:pointer;padding:0 0 0 10px;-webkit-tap-highlight-color:transparent">›</span>`;
           html += `</div>`;
         });
       } else if (abt.cardId) {
         const key = 'card_' + abt.cardId;
         const enabled = cfg[key] === true;
-        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;gap:10px">`;
-        html += `<span style="font-size:18px;flex-shrink:0">${abt.icon}</span>`;
-        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${abt.sub}</span></div>`;
+        html += `<div style="${lastRowStyle}">`;
+        html += iconBox(abt.icon);
+        html += `<div style="flex:1"><span style="${labelStyle}">Aktivieren</span></div>`;
         html += toggle(key, enabled);
         html += `</div>`;
       }
+      html += `</div>`;
     }
+  } // Ende Abteilung-Detail
+
+  // Agent-Detail-Seite (Profil, Skills, LLM)
+  if (setupMode.startsWith('agent_')) {
+    const agentId = setupMode.replace('agent_', '');
+    const agent = ALL_AGENTS.find(a => a.id === agentId);
+    if (agent) {
+      const key = 'agent_' + agent.id;
+      const enabled = cfg[key] === true;
+      const onWheel = enabled ? 'Auf dem Rad' : 'Nicht auf dem Rad';
+      const modelMap = {deepseek:'DeepSeek V3',groq:'Groq Llama','groq-llama':'Groq Llama','gemini-flash':'Gemini Flash','or-claude-sonnet':'Claude Sonnet'};
+
+      // Profil-Header
+      html += `<div style="${groupStyle};padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:default">`;
+      html += `<div style="width:64px;height:64px;border-radius:32px;background:${agent.color || '#636366'};display:flex;align-items:center;justify-content:center;font-size:32px">${agent.icon}</div>`;
+      html += `<div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.9)">${agent.title}</div>`;
+      html += `<div style="font-size:13px;color:rgba(255,255,255,0.35)">${agent.subtitle}</div>`;
+      html += `</div>`;
+
+      // Status
+      html += `<div style="${groupStyle}">`;
+      html += `<div style="${rowStyle}">${iconBox('🎡')}<span style="${labelStyle}">Rad-Status</span><span style="color:${enabled?'rgba(100,200,100,0.6)':'rgba(255,255,255,0.3)'};font-size:13px">${onWheel}</span></div>`;
+      html += `<div style="${rowStyle}">${iconBox('📂')}<span style="${labelStyle}">Kategorie</span><span style="color:rgba(255,255,255,0.3);font-size:13px">${agent.category}</span></div>`;
+      html += `<div style="${lastRowStyle}">${iconBox('📱')}<span style="${labelStyle}">Aktiviert</span>${toggle(key, enabled)}</div>`;
+      html += `</div>`;
+
+      // Kontakt
+      html += sectionTitle('Kontakt');
+      html += `<div style="${groupStyle}">`;
+      html += `<div style="${rowStyle}">${iconBox('📧')}<span style="${labelStyle}">Email</span><span style="color:rgba(255,255,255,0.3);font-size:12px">${agent.email || '-'}</span></div>`;
+      html += `<div style="${lastRowStyle}">${iconBox('📞')}<span style="${labelStyle}">Telefon</span><span style="color:rgba(255,255,255,0.3);font-size:12px">${agent.phone || '-'}</span></div>`;
+      html += `</div>`;
+
+      // KI-Modell & Skills
+      html += sectionTitle('KI & Skills');
+      html += `<div style="${groupStyle}">`;
+      html += `<div style="${rowStyle}">${iconBox('🧠')}<span style="${labelStyle}">LLM Modell</span><span style="color:rgba(255,255,255,0.3);font-size:12px">${modelMap[agent.model] || agent.model || 'Standard (Groq)'}</span></div>`;
+      html += `<div style="${rowStyle}">${iconBox('💬')}<span style="${labelStyle}">System-Prompt</span><span style="color:rgba(255,255,255,0.2);font-size:14px">›</span></div>`;
+      html += `<div style="${lastRowStyle}">${iconBox('🔧')}<span style="${labelStyle}">Skills & Tools</span><span style="color:rgba(255,255,255,0.2);font-size:14px">›</span></div>`;
+      html += `</div>`;
+
+      // Beschreibung
+      if (agent.backs && agent.backs[0]) {
+        html += sectionTitle('Beschreibung');
+        html += `<div style="${groupStyle};padding:12px 16px">`;
+        html += `<div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.5;white-space:pre-line">${agent.backs[0].content}</div>`;
+        html += `</div>`;
+      }
+    }
+  } // Ende Agent-Detail
+
+  if (setupMode === 'projekte') {
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🚀</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Projekte</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Module und Erweiterungen</div></div>`;
+  html += `</div>`;
+
+  const projekte = [
+    {id:'capcoin', icon:'🪙', name:'Cap-Coin', sub:'QR-Stempel, Loyalty, Kronkorken', status:'aktiv'},
+    {id:'safety', icon:'🔥', name:'Safety-Check', sub:'Feuerloescher, Notausgaenge, NFC-Pruefung', status:'geplant'},
+    {id:'alkomat', icon:'🍺', name:'Alkomat', sub:'USB-Sensor, Promille-Check', status:'hardware'},
+    {id:'safehome', icon:'🚕', name:'Safe Home', sub:'Taxi, Heimfahrt, Nachtfahrer', status:'geplant'},
+    {id:'regioframe', icon:'🖼️', name:'RegioFrame', sub:'Digitale Bilderrahmen fuer Gastro', status:'aktiv'},
+    {id:'regiopick', icon:'📸', name:'RegioPic', sub:'Fotodrucker, Sofortbilder', status:'aktiv'},
+    {id:'jukebox', icon:'🎵', name:'Jukebox / DJ', sub:'Musik, DoublePlayer, GEMA', status:'prototyp'},
+    {id:'postfach', icon:'📬', name:'Sicheres Postfach', sub:'NFC-verschluesselte Post', status:'geplant'},
+    {id:'smarteinkauf', icon:'🛒', name:'Smart Einkauf', sub:'Handy-Scanner, Bodenwaage', status:'konzept'},
+    {id:'antbetrug', icon:'🛡️', name:'Anti-Betrug', sub:'Fake-Erkennung, Seniorenschutz', status:'konzept'},
+    {id:'kinderschutz', icon:'👶', name:'Kinderschutz', sub:'KAI-FA, Mutterstimme, Filter', status:'konzept'},
+  ];
+
+  const statusColors = {aktiv:'rgba(34,197,94,0.6)',geplant:'rgba(245,158,11,0.5)',prototyp:'rgba(100,150,255,0.5)',konzept:'rgba(255,255,255,0.2)',hardware:'rgba(168,85,247,0.5)'};
+
+  html += `<div style="${groupStyle}">`;
+  projekte.forEach((p, pi) => {
+    const isLast = pi === projekte.length - 1;
+    html += `<div onclick="setupHistory.push('projekte');openSetup('proj_${p.id}')" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(p.icon);
+    html += `<div style="flex:1"><span style="${labelStyle}">${p.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${p.sub}</div></div>`;
+    html += `<span style="font-size:9px;padding:2px 8px;border-radius:6px;background:${statusColors[p.status]};color:#fff;font-weight:600">${p.status}</span>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-left:6px">›</span>`;
+    html += `</div>`;
   });
   html += `</div>`;
-  } // Ende Bereiche-Setup
+  } // Ende Projekte
+
+  // Projekt-Detailseite (Platzhalter)
+  if (setupMode.startsWith('proj_')) {
+    const projId = setupMode.replace('proj_', '');
+    const projNames = {capcoin:'Cap-Coin',safety:'Safety-Check',alkomat:'Alkomat',safehome:'Safe Home',regioframe:'RegioFrame',regiopick:'RegioPic',jukebox:'Jukebox',postfach:'Postfach',smarteinkauf:'Smart Einkauf',antbetrug:'Anti-Betrug',kinderschutz:'Kinderschutz'};
+    const projIcons = {capcoin:'🪙',safety:'🔥',alkomat:'🍺',safehome:'🚕',regioframe:'🖼️',regiopick:'📸',jukebox:'🎵',postfach:'📬',smarteinkauf:'🛒',antbetrug:'🛡️',kinderschutz:'👶'};
+
+    html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+    html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">${projIcons[projId]||'🚀'}</div>`;
+    html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">${projNames[projId]||projId}</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Projekt-Details</div></div>`;
+    html += `</div>`;
+
+    html += `<div style="${groupStyle}">`;
+    html += `<div style="${rowStyle}">${iconBox('📋')}<span style="${labelStyle}">Status</span><span style="color:rgba(255,255,255,0.3);font-size:13px">In Planung</span></div>`;
+    html += `<div style="${rowStyle}">${iconBox('👥')}<span style="${labelStyle}">Zustaendige Agenten</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+    html += `<div style="${lastRowStyle}">${iconBox('📄')}<span style="${labelStyle}">Dokumentation</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+    html += `</div>`;
+  } // Ende Projekt-Detail
 
   if (setupMode === 'kimanus') {
   // KIMANUS Orchestrator Einstellungen
   html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
   html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🤝</div>`;
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIMANUS</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Orchestrator & Agenten-Manager</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="setupHistory.push('kimanus');openSetup('agent_builder')" style="${lastRowStyle}cursor:pointer">${iconBox('🔨')}<div style="flex:1"><span style="${labelStyle}">Neuen Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KI erstellt einen Experten fuer dich</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
   html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Orchestrierung</div>`;
@@ -3149,28 +3357,8 @@ function updateKimBacks() {
   });
 }
 
-// === Settings-Folie runter-wischen zum Schliessen ===
-// NUR schliessen wenn am oberen Rand (Header/Griff) gewischt wird, NICHT beim Scrollen
-(function(){
-  let tStartY = 0;
-  let tInScrollable = false;
-  const sp = document.getElementById('setup-panel');
-  if (!sp) return;
-  sp.addEventListener('touchstart', e => {
-    tStartY = e.touches[0].clientY;
-    // Pruefen ob Touch innerhalb der scrollbaren Liste ist
-    const list = document.getElementById('setup-list');
-    tInScrollable = list && list.contains(e.target) && list.scrollTop > 0;
-  }, {passive:true});
-  sp.addEventListener('touchend', e => {
-    if (tInScrollable) { tInScrollable = false; return; }
-    const diff = e.changedTouches[0].clientY - tStartY;
-    // Nur schliessen wenn nach unten gewischt UND Liste ganz oben ist
-    const list = document.getElementById('setup-list');
-    const listAtTop = !list || list.scrollTop <= 5;
-    if (diff > 80 && listAtTop) closeSetup();
-  }, {passive:true});
-})();
+// Settings schliessen: nur ueber "Fertig" Button oder Backdrop-Tap
+// Runter-Wischen deaktiviert (schloss sich zu oft unbeabsichtigt)
 
 // === TASTATUR-TOOLBAR ===
 function kbDismiss() {
