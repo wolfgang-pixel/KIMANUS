@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v18.7 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v19.0 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -471,27 +471,33 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 /* === REGIOPRESS VOLLBILD === */
 #regio-fullpage{
   display:none;position:fixed;left:0;right:0;z-index:50;
-  background:#111;
+  background:#0a0a0a;
   overflow:hidden;
-  transition:transform 0.4s cubic-bezier(0.25,0.1,0.25,1), opacity 0.3s ease;
-  transform:translateY(100%);opacity:0;
 }
-#regio-fullpage.visible{display:block;transform:translateY(0);opacity:1}
+#regio-fullpage.visible{display:flex;flex-direction:column}
 #regio-fullpage .rp-close{
-  position:absolute;top:8px;right:12px;z-index:55;
-  width:32px;height:32px;border-radius:50%;
-  background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);
-  color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;
+  position:absolute;top:6px;right:8px;z-index:60;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(204,0,0,0.9);border:2px solid #fff;
+  color:#fff;font-size:20px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
   cursor:pointer;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 10px rgba(0,0,0,0.5);
 }
 #regio-fullpage .rp-page{
-  width:100%;height:100%;overflow-y:auto;scrollbar-width:none;
-  transition:transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+  flex:1;width:100%;overflow:hidden;position:relative;
 }
-#regio-fullpage .rp-page::-webkit-scrollbar{display:none}
+#regio-fullpage .rp-page iframe{
+  position:absolute;top:0;left:0;width:100%;height:100%;border:none;
+  z-index:1;
+}
+/* Touch-Zone oben rechts damit X-Button immer erreichbar */
+#regio-fullpage .rp-close-zone{
+  position:absolute;top:0;right:0;width:60px;height:60px;z-index:58;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
 #regio-fullpage .rp-dots{
-  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-  display:flex;gap:6px;z-index:55;
+  padding:6px 0;display:flex;justify-content:center;gap:6px;flex-shrink:0;
 }
 #regio-fullpage .rp-dot{
   width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.2);
@@ -869,7 +875,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.7</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v19.0</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -962,6 +968,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <!-- REGIOPRESS Vollbild-Overlay -->
 <div id="regio-fullpage">
+  <div class="rp-close-zone" onclick="closeRegioPage()" ontouchend="event.preventDefault();closeRegioPage()"></div>
   <div class="rp-close" onclick="closeRegioPage()" ontouchend="event.preventDefault();closeRegioPage()">✕</div>
   <div class="rp-page" id="regio-page-content"></div>
   <div class="rp-dots" id="regio-dots"></div>
@@ -2178,12 +2185,19 @@ function buildBackCards() {
         <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center;line-height:1.5">Sag KAI welche Club-Apps du hast,<br>oder teile sie direkt aus der App.</div>
       </div>`;
     } else if (back.type === 'newspaper-doppel') {
+      const pNums = (back.pages||'1-2').split('-');
+      const leftPage = pNums[0] || '1';
+      const rightPage = pNums[1] || '2';
       inner = `
-        <div onclick="openRegioDoppel('${back.src}',${i})" style="width:100%;height:100%;position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#111">
-          <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none" scrolling="no"></iframe>
-          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:6px 10px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-family:'Oswald',sans-serif;font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:1px">REGIOPRESS</span>
-            <span style="font-family:'Oswald',sans-serif;font-size:8px;color:rgba(255,255,255,0.4)">S. ${back.pages}</span>
+        <div style="width:100%;height:100%;position:relative;overflow:hidden;background:#111;display:flex">
+          <div onclick="openRegioEinzel('${back.src}','left',${i})" style="flex:1;position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none" scrolling="no"></iframe>
+            <div style="position:absolute;bottom:2px;left:4px;font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3)">S.${leftPage}</div>
+          </div>
+          <div style="width:1px;background:rgba(255,255,255,0.1);flex-shrink:0"></div>
+          <div onclick="openRegioEinzel('${back.src}','right',${i})" style="flex:1;position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top right;pointer-events:none" scrolling="no"></iframe>
+            <div style="position:absolute;bottom:2px;right:4px;font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3)">S.${rightPage}</div>
           </div>
         </div>`;
     } else if (back.type === 'newspaper') {
@@ -2844,7 +2858,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.7 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v19.0 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -5571,9 +5585,57 @@ function openRegioPage(backIdx) {
   regioFullpageOpen = true;
 }
 
+function openRegioEinzel(src, side, backIdx) {
+  const overlay = document.getElementById('regio-fullpage');
+  overlay.style.top = '60px';
+  overlay.style.bottom = '40px';
+
+  const card = activeCards[currentIndex];
+  const doppelPages = (card.backs || []).filter(b => b.type === 'newspaper-doppel');
+  const realIdx = backIdx % doppelPages.length;
+  regioPageIndex = realIdx;
+  regioPages = doppelPages;
+  regioCurrentSide = side;
+
+  renderRegioEinzel(realIdx, side);
+  overlay.classList.add('visible');
+  regioFullpageOpen = true;
+}
+
+let regioCurrentSide = 'left';
+
+function renderRegioEinzel(idx, side) {
+  const pages = regioPages.length ? regioPages : getRegioDoppelPages();
+  if (pages.length === 0) return;
+  regioPageIndex = Math.max(0, Math.min(idx, pages.length - 1));
+  regioCurrentSide = side || 'left';
+  const p = pages[regioPageIndex];
+
+  // Die Doppelseite ist 710px breit. Linke Haelfte = 0-355px, rechte = 355-710px.
+  // Wir skalieren eine Haelfte (355px) auf die volle Screenbreite.
+  const screenW = window.innerWidth;
+  const pageW = 355; // halbe Doppelseite
+  const pageH = 420;
+  const scale = screenW / pageW;
+  const offsetX = side === 'right' ? -355 * scale : 0;
+
+  document.getElementById('regio-page-content').innerHTML = `
+    <div style="width:100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch">
+      <iframe src="${p.src}" style="width:710px;height:${pageH}px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;margin-left:${offsetX.toFixed(0)}px;display:block;pointer-events:none" scrolling="no"></iframe>
+    </div>
+  `;
+
+  // Dots + Seiten-Info
+  const pNums = (p.pages||'').split('-');
+  const pageNum = side === 'right' ? (pNums[1]||'') : (pNums[0]||'');
+  const dotsEl = document.getElementById('regio-dots');
+  dotsEl.innerHTML = `<span style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.4)">Seite ${pageNum}</span>`;
+}
+
 function openRegioDoppel(src, backIdx) {
   const overlay = document.getElementById('regio-fullpage');
-  overlay.style.top = '0px';
+  // Direkt unter Header (60px) bis ueber Bottom-Bar (40px sichtbar)
+  overlay.style.top = '60px';
   overlay.style.bottom = '40px';
 
   const card = activeCards[currentIndex];
@@ -5583,8 +5645,7 @@ function openRegioDoppel(src, backIdx) {
   regioPages = doppelPages;
 
   renderRegioDoppelFullpage(realIdx);
-  overlay.style.display = 'block';
-  requestAnimationFrame(() => { overlay.classList.add('visible'); });
+  overlay.classList.add('visible');
   regioFullpageOpen = true;
 }
 
@@ -5594,8 +5655,9 @@ function renderRegioDoppelFullpage(idx) {
   regioPageIndex = Math.max(0, Math.min(idx, pages.length - 1));
   const p = pages[regioPageIndex];
 
+  // iframe füllt den ganzen rp-page Container (via CSS position:absolute)
   document.getElementById('regio-page-content').innerHTML = `
-    <iframe src="${p.src}" style="width:100%;height:100%;border:none" scrolling="auto"></iframe>
+    <iframe src="${p.src}" scrolling="auto"></iframe>
   `;
 
   const dotsEl = document.getElementById('regio-dots');
@@ -5613,7 +5675,8 @@ function getRegioDoppelPages() {
 function closeRegioPage() {
   const overlay = document.getElementById('regio-fullpage');
   overlay.classList.remove('visible');
-  setTimeout(() => { overlay.style.display = 'none'; }, 400);
+  // iframe sofort entfernen um Ressourcen freizugeben
+  document.getElementById('regio-page-content').innerHTML = '';
   regioFullpageOpen = false;
 }
 
@@ -5636,15 +5699,23 @@ function closeRegioPage() {
       return;
     }
 
-    // Links/Rechts Wischen = Seite wechseln
+    // Links/Rechts Wischen = Einzelseite blaettern
     if (Math.abs(dx) > 50 && Math.abs(dy) < 80) {
-      const pages = regioPages.length ? regioPages : getRegioPages();
-      const isDoppel = pages.length > 0 && pages[0].type === 'newspaper-doppel';
-      const renderFn = isDoppel ? renderRegioDoppelFullpage : renderRegioFullpage;
-      if (dx < 0 && regioPageIndex < pages.length - 1) {
-        renderFn(regioPageIndex + 1);
-      } else if (dx > 0 && regioPageIndex > 0) {
-        renderFn(regioPageIndex - 1);
+      const pages = regioPages.length ? regioPages : getRegioDoppelPages();
+      if (dx < 0) {
+        // Swipe links = naechste Seite
+        if (regioCurrentSide === 'left') {
+          renderRegioEinzel(regioPageIndex, 'right');
+        } else if (regioPageIndex < pages.length - 1) {
+          renderRegioEinzel(regioPageIndex + 1, 'left');
+        }
+      } else {
+        // Swipe rechts = vorherige Seite
+        if (regioCurrentSide === 'right') {
+          renderRegioEinzel(regioPageIndex, 'left');
+        } else if (regioPageIndex > 0) {
+          renderRegioEinzel(regioPageIndex - 1, 'right');
+        }
       }
     }
   }, {passive: true});
