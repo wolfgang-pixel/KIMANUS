@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v18.6 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v18.7 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -869,7 +869,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.6</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.7</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1130,13 +1130,10 @@ const CARDS = [
   // --- 4c. REGIOPRESS (Lokalnachrichten als Zeitungs-Glasplatten) ---
   {id:'regiopresse', icon:'📰', title:'REGIOPRESS', subtitle:'Coburg · Ebersdorf · Frohnlach', color:'#CC0000', email:'', phone:'',
    backs:[
-     {type:'newspaper', page:1, total:7, category:'TITELSEITE', headline:'COBURG IST\nNUMMER 1!', subline:'Digitalste Kleinstadt Deutschlands', text:'SENSATIONELLER ERFOLG! Die Stadt Coburg hat beim Digital Award 2026 den ersten Platz geholt. In der Kategorie Staedte bis 100.000 Einwohner laesst Coburg alle hinter sich!', img:'https://images.unsplash.com/photo-1580130379624-3a069adbffc5?w=400&h=120&fit=crop'},
-     {type:'newspaper', page:2, total:7, category:'POLITIK', headline:'EBERSDORF HAT\nGEWAEHLT!', subline:'Neuer Gemeinderat steht fest', text:'Sieben Ortsteile, ein Ergebnis. Die Kommunalwahl bringt frischen Wind nach Ebersdorf. Ausserdem: Ganztagsbetreuung ab August 2026 — Umbau an der Grundschule beschlossen.', img:'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=400&h=120&fit=crop'},
-     {type:'newspaper', page:3, total:7, category:'BLAULICHT', headline:'FEIGE FLUCHT\nNACH CRASH!', subline:'Zwei Verletzte auf der B303', text:'DRAMA AUF DER BUNDESSTRASSE! Bei einem schweren Unfall nahe Ebersdorf wurden zwei Menschen verletzt. Der Verursacher? Fluechtig! Die Polizei sucht Zeugen.', img:'https://images.unsplash.com/photo-1557862921-37829c790f19?w=400&h=120&fit=crop'},
-     {type:'newspaper', page:4, total:7, category:'WIRTSCHAFT', headline:'GASTRO-BOOM\nIN COBURG!', subline:'Neue Laeden ueberall in der Innenstadt', text:'Doener, Currywurst, Bistros — die Coburger Innenstadt blueht auf! Der neue Stadtfuehrer listet ueber 240 Geschaefte und Gastro-Betriebe. Darunter 130 inhabergefuehrte Laeden.', img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=120&fit=crop'},
-     {type:'newspaper', page:5, total:7, category:'EVENTS', headline:'FRUEHLINGSFEST\nAM ANGER!', subline:'10 Tage Party — Eintritt FREI', text:'Ab 24. April verwandelt sich der Anger in eine riesige Festmeile! Fahrgeschaefte, Festzelt, Essensklassiker. Ausserdem: Literaturtage, Jazz im Cafe Victoria, Carolls Black meets House.', img:'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&h=120&fit=crop'},
-     {type:'newspaper', page:6, total:7, category:'SPORT', headline:'COBURG EHRT\nSEINE HELDEN!', subline:'Sportlerehrung im Globe Theater', text:'Die Stadt ehrte zahlreiche Athleten bei der feierlichen Sportlerehrung. Ausserdem: Futsal-Hallenmeisterschaft ausgelost! TSV Coburg-Scheuerfeld mit ueber 600 Mitgliedern.', img:'https://images.unsplash.com/photo-1461896836934-bd45ba8fcb9b?w=400&h=120&fit=crop'},
-     {type:'newspaper', page:7, total:7, category:'WETTER', headline:'SONNE SATT!\n16 GRAD!', subline:'Fruehlingsstart in Oberfranken', text:'Der Fruehling meint es gut! Montag 13°C, Dienstag schon 16°C mit viel Sonnenschein. Rund 10,5 Sonnenstunden pro Tag erwartet. Raus an die frische Luft!', img:'https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=400&h=120&fit=crop'},
+     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-1-2.html', pages:'1-2', label:'Titel + Politik'},
+     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-3-4.html', pages:'3-4', label:'Blaulicht + Wirtschaft'},
+     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-5-6.html', pages:'5-6', label:'Events + Sport'},
+     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-7.html', pages:'7-8', label:'Wetter + Impressum'},
    ]},
 
   // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
@@ -2180,6 +2177,15 @@ function buildBackCards() {
         <div style="font-size:14px;color:rgba(255,255,255,0.3)">Noch keine Clubkarten</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center;line-height:1.5">Sag KAI welche Club-Apps du hast,<br>oder teile sie direkt aus der App.</div>
       </div>`;
+    } else if (back.type === 'newspaper-doppel') {
+      inner = `
+        <div onclick="openRegioDoppel('${back.src}',${i})" style="width:100%;height:100%;position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;background:#111">
+          <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none" scrolling="no"></iframe>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:6px 10px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:'Oswald',sans-serif;font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:1px">REGIOPRESS</span>
+            <span style="font-family:'Oswald',sans-serif;font-size:8px;color:rgba(255,255,255,0.4)">S. ${back.pages}</span>
+          </div>
+        </div>`;
     } else if (back.type === 'newspaper') {
       const catColors = {TITELSEITE:'#CC0000',POLITIK:'#1a5276',BLAULICHT:'#CC0000',WIRTSCHAFT:'#1e8449',EVENTS:'#7d3c98',SPORT:'#2e86c1',WETTER:'#d4ac0d'};
       const catColor = catColors[back.category] || '#CC0000';
@@ -2292,7 +2298,7 @@ function updateFlipLabel() {
       // Nachrichtenstudio-Design
       const backs = card.backs || [];
       const currentBack = backs[backIndex % backs.length] || {};
-      const tickerHeadlines = backs.filter(b=>b.type==='newspaper').map(b=>(b.headline||'').replace(/\n/g,' ')).join('  +++  ');
+      const tickerHeadlines = backs.filter(b=>b.type==='newspaper-doppel').map(b=>b.label||'').join('  +++  ') || backs.filter(b=>b.type==='newspaper').map(b=>(b.headline||'').replace(/\n/g,' ')).join('  +++  ');
       document.getElementById('fl-card').innerHTML = `
         <div class="fl-studio">
           <div class="studio-header">
@@ -2838,7 +2844,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.6 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.7 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -5554,7 +5560,6 @@ function openRegioPage(backIdx) {
   const realIdx = backIdx % pages.length;
 
   const overlay = document.getElementById('regio-fullpage');
-  // Position: von Oberkante bis Bottom-Bar
   overlay.style.top = '0px';
   overlay.style.bottom = '40px';
 
@@ -5564,6 +5569,45 @@ function openRegioPage(backIdx) {
     overlay.classList.add('visible');
   });
   regioFullpageOpen = true;
+}
+
+function openRegioDoppel(src, backIdx) {
+  const overlay = document.getElementById('regio-fullpage');
+  overlay.style.top = '0px';
+  overlay.style.bottom = '40px';
+
+  const card = activeCards[currentIndex];
+  const doppelPages = (card.backs || []).filter(b => b.type === 'newspaper-doppel');
+  const realIdx = backIdx % doppelPages.length;
+  regioPageIndex = realIdx;
+  regioPages = doppelPages;
+
+  renderRegioDoppelFullpage(realIdx);
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => { overlay.classList.add('visible'); });
+  regioFullpageOpen = true;
+}
+
+function renderRegioDoppelFullpage(idx) {
+  const pages = regioPages.length ? regioPages : getRegioDoppelPages();
+  if (pages.length === 0) return;
+  regioPageIndex = Math.max(0, Math.min(idx, pages.length - 1));
+  const p = pages[regioPageIndex];
+
+  document.getElementById('regio-page-content').innerHTML = `
+    <iframe src="${p.src}" style="width:100%;height:100%;border:none" scrolling="auto"></iframe>
+  `;
+
+  const dotsEl = document.getElementById('regio-dots');
+  dotsEl.innerHTML = pages.map((pg, j) =>
+    `<div class="rp-dot${j === regioPageIndex ? ' active' : ''}" onclick="renderRegioDoppelFullpage(${j})"></div>`
+  ).join('');
+}
+
+function getRegioDoppelPages() {
+  const card = activeCards[currentIndex];
+  if (!card) return [];
+  return (card.backs || []).filter(b => b.type === 'newspaper-doppel');
 }
 
 function closeRegioPage() {
@@ -5594,13 +5638,13 @@ function closeRegioPage() {
 
     // Links/Rechts Wischen = Seite wechseln
     if (Math.abs(dx) > 50 && Math.abs(dy) < 80) {
-      const pages = getRegioPages();
+      const pages = regioPages.length ? regioPages : getRegioPages();
+      const isDoppel = pages.length > 0 && pages[0].type === 'newspaper-doppel';
+      const renderFn = isDoppel ? renderRegioDoppelFullpage : renderRegioFullpage;
       if (dx < 0 && regioPageIndex < pages.length - 1) {
-        // Swipe links = naechste Seite
-        renderRegioFullpage(regioPageIndex + 1);
+        renderFn(regioPageIndex + 1);
       } else if (dx > 0 && regioPageIndex > 0) {
-        // Swipe rechts = vorherige Seite
-        renderRegioFullpage(regioPageIndex - 1);
+        renderFn(regioPageIndex - 1);
       }
     }
   }, {passive: true});
