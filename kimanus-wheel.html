@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v17.7 - Ring-Button, KAI permanent, Clean rebuild -->
+<!-- KIMANUS Wheel v18.2 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0e0e0e">
+<link rel="manifest" href="/manifest.json">
 <title>KIMANUS</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--skin-bg);color:var(--skin-glass-text)}
@@ -775,7 +777,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v17.7</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.2</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1018,6 +1020,24 @@ const CARDS = [
          {icon:'🎗️', label:'Helfen'},
        ]},
      ]},
+   ]},
+
+  // --- 4b. Clubkarten (eigene Glasplatte, Rueckseite = Karten-Liste) ---
+  {id:'clubkarten', icon:'🎴', title:'Clubkarten', subtitle:'Deine Mitgliedskarten', color:'#e63946', email:'', phone:'',
+   backs:[ // Werden dynamisch befuellt in buildBackCards
+     {title:'Clubkarten', content:'Wische nach oben fuer mehr'}
+   ]},
+
+  // --- 4c. REGIOPRESS (Lokalnachrichten als Zeitungs-Glasplatten) ---
+  {id:'regiopresse', icon:'📰', title:'REGIOPRESS', subtitle:'Coburg · Ebersdorf · Frohnlach', color:'#CC0000', email:'', phone:'',
+   backs:[
+     {type:'newspaper', page:1, total:7, category:'TITELSEITE', headline:'COBURG IST\nNUMMER 1!', subline:'Digitalste Kleinstadt Deutschlands', text:'SENSATIONELLER ERFOLG! Die Stadt Coburg hat beim Digital Award 2026 den ersten Platz geholt. In der Kategorie Staedte bis 100.000 Einwohner laesst Coburg alle hinter sich!', img:'https://images.unsplash.com/photo-1580130379624-3a069adbffc5?w=400&h=120&fit=crop'},
+     {type:'newspaper', page:2, total:7, category:'POLITIK', headline:'EBERSDORF HAT\nGEWAEHLT!', subline:'Neuer Gemeinderat steht fest', text:'Sieben Ortsteile, ein Ergebnis. Die Kommunalwahl bringt frischen Wind nach Ebersdorf. Ausserdem: Ganztagsbetreuung ab August 2026 — Umbau an der Grundschule beschlossen.', img:'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=400&h=120&fit=crop'},
+     {type:'newspaper', page:3, total:7, category:'BLAULICHT', headline:'FEIGE FLUCHT\nNACH CRASH!', subline:'Zwei Verletzte auf der B303', text:'DRAMA AUF DER BUNDESSTRASSE! Bei einem schweren Unfall nahe Ebersdorf wurden zwei Menschen verletzt. Der Verursacher? Fluechtig! Die Polizei sucht Zeugen.', img:'https://images.unsplash.com/photo-1557862921-37829c790f19?w=400&h=120&fit=crop'},
+     {type:'newspaper', page:4, total:7, category:'WIRTSCHAFT', headline:'GASTRO-BOOM\nIN COBURG!', subline:'Neue Laeden ueberall in der Innenstadt', text:'Doener, Currywurst, Bistros — die Coburger Innenstadt blueht auf! Der neue Stadtfuehrer listet ueber 240 Geschaefte und Gastro-Betriebe. Darunter 130 inhabergefuehrte Laeden.', img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=120&fit=crop'},
+     {type:'newspaper', page:5, total:7, category:'EVENTS', headline:'FRUEHLINGSFEST\nAM ANGER!', subline:'10 Tage Party — Eintritt FREI', text:'Ab 24. April verwandelt sich der Anger in eine riesige Festmeile! Fahrgeschaefte, Festzelt, Essensklassiker. Ausserdem: Literaturtage, Jazz im Cafe Victoria, Carolls Black meets House.', img:'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&h=120&fit=crop'},
+     {type:'newspaper', page:6, total:7, category:'SPORT', headline:'COBURG EHRT\nSEINE HELDEN!', subline:'Sportlerehrung im Globe Theater', text:'Die Stadt ehrte zahlreiche Athleten bei der feierlichen Sportlerehrung. Ausserdem: Futsal-Hallenmeisterschaft ausgelost! TSV Coburg-Scheuerfeld mit ueber 600 Mitgliedern.', img:'https://images.unsplash.com/photo-1461896836934-bd45ba8fcb9b?w=400&h=120&fit=crop'},
+     {type:'newspaper', page:7, total:7, category:'WETTER', headline:'SONNE SATT!\n16 GRAD!', subline:'Fruehlingsstart in Oberfranken', text:'Der Fruehling meint es gut! Montag 13°C, Dienstag schon 16°C mit viel Sonnenschein. Rund 10,5 Sonnenstunden pro Tag erwartet. Raus an die frische Luft!', img:'https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=400&h=120&fit=crop'},
    ]},
 
   // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
@@ -1327,6 +1347,77 @@ let panelH = 0;
 let isAnimating = false;
 
 // Vorgefertigte Agenten vom Server (werden einmalig ins localStorage geschrieben)
+// Demo-Clubkarten beim ersten Start
+function seedClubCards() {
+  const existing = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
+  if (existing.length > 0) return;
+  const demo = [
+    {id:'carolls', name:'Carolls', icon:'🍺', color:'#8b4513', sub:'Tanzlokal · Frohnlach', memberId:'CRL-00042', appScheme:''},
+    {id:'feierzimmer', name:'Feierzimmer', icon:'🎉', color:'#e63946', sub:'Club · Coburg', memberId:'FZ-01337', appScheme:''},
+  ];
+  localStorage.setItem('kimanus-clubkarten', JSON.stringify(demo));
+}
+
+function openClubApp(scheme) {
+  if (scheme) {
+    window.location.href = scheme;
+  }
+}
+
+function addClubCard() {
+  // Einfacher Prompt - spaeter schoener machen
+  const name = prompt('Name der Clubkarte:');
+  if (!name) return;
+  const memberId = prompt('Mitgliedsnummer (optional):') || '';
+  const clubs = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
+  clubs.push({
+    id: 'club-' + Date.now(),
+    name: name,
+    icon: '🎴',
+    color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+    sub: 'Clubkarte',
+    memberId: memberId,
+    appScheme: ''
+  });
+  localStorage.setItem('kimanus-clubkarten', JSON.stringify(clubs));
+  // Rueckseiten neu bauen
+  buildBackCards();
+  positionBackCards(false);
+}
+
+// Share-Target Handler: erkennt geteilte Links/Texte
+function handleShareTarget() {
+  const params = new URLSearchParams(window.location.search);
+  const sharedTitle = params.get('shared_title') || '';
+  const sharedText = params.get('shared_text') || '';
+  const sharedUrl = params.get('shared_url') || '';
+
+  if (!sharedTitle && !sharedText && !sharedUrl) return; // Kein Share
+
+  // URL bereinigen (Share-Parameter entfernen)
+  history.replaceState(null, '', window.location.pathname);
+
+  // Verzoeert anzeigen (nach init)
+  setTimeout(() => {
+    const name = sharedTitle || sharedText.split('\n')[0] || sharedUrl.split('/').pop() || 'Unbekannt';
+    const confirmed = confirm('KAI: "' + name + '" als Clubkarte hinzufuegen?');
+    if (confirmed) {
+      const clubs = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
+      clubs.push({
+        id: 'club-' + Date.now(),
+        name: name.substring(0, 30),
+        icon: '🎴',
+        color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+        sub: sharedUrl || 'Clubkarte',
+        memberId: '',
+        appScheme: sharedUrl || ''
+      });
+      localStorage.setItem('kimanus-clubkarten', JSON.stringify(clubs));
+      rebuildWheel();
+    }
+  }, 1000);
+}
+
 function seedServerAgents() {
   const SERVER_AGENTS = [
     {"name":"Küchenmeister","role":"Koch-Berater","description":"Persönlicher Küchenassistent für Rezeptvorschläge und Kochhilfe.","model":"deepseek","icon":"👨‍🍳","category":"Berater","webhookPath":"kuechenmeister-berater","phone":"Durchwahl 214","email":"kuechenmeister-berater@kimanus.de","webhook_url":"https://manus.kimanus.de/webhook/agent-kuechenmeister-berater"},
@@ -1345,8 +1436,11 @@ function seedServerAgents() {
 }
 
 function init() {
-  // Server-Agenten laden (einmalig, wenn noch nicht vorhanden)
+  // Server-Agenten und Demo-Clubkarten laden
   seedServerAgents();
+  seedClubCards();
+  // Share-Target: wurde KIMANUS ueber "Teilen" geoeffnet?
+  handleShareTarget();
   calcSizes();
   // Setup-Config anwenden BEVOR Karten gebaut werden
   rebuildWheel();
@@ -1586,10 +1680,11 @@ function openActionSheet(cardIdx) {
   // Pruefen ob Karte schon als Hotkey existiert
   const origId = card.id.replace(/_d\d+$/, '').replace(/_dup$/, '');
   const alreadyHotkey = hotkeys.some(h => h && h.cardId === origId);
+  const hasFreSlot = hotkeys.some(h => h === null);
   // Buttons dynamisch setzen
   const group = document.getElementById('action-sheet').querySelector('.action-group');
   let btns = '';
-  if (!alreadyHotkey) {
+  if (!alreadyHotkey && hasFreSlot) {
     btns += `<button class="action-btn" onclick="actionSheetHotkey()" ontouchend="event.preventDefault();actionSheetHotkey()">⬇ Als Hotkey speichern</button>`;
   }
   btns += `<button class="action-btn destructive" onclick="actionSheetRemove()" ontouchend="event.preventDefault();actionSheetRemove()">✕ Vom Rad entfernen</button>`;
@@ -1662,9 +1757,9 @@ function actionSheetHotkey() {
   if (!card) { closeActionSheet(); return; }
   // Original-ID ohne Duplikat-Suffix
   const origId = card.id.replace(/_d\d+$/, '').replace(/_dup$/, '');
-  // Naechsten freien Slot finden
+  // Naechsten freien Slot finden - nicht ueberschreiben wenn voll
   let slotIdx = hotkeys.findIndex(h => h === null);
-  if (slotIdx === -1) slotIdx = 0;
+  if (slotIdx === -1) { closeActionSheet(); return; } // Kein freier Platz
   hotkeys[slotIdx] = { cardId: origId, icon: card.icon, title: card.title };
   saveHotkeys();
   renderHotkeySlot(slotIdx);
@@ -1818,6 +1913,27 @@ function flipCard() {
 function buildBackCards() {
   const card = activeCards[currentIndex];
   let backs = card.backs || [];
+
+  // Clubkarten: dynamisch aus localStorage laden
+  if (card.id === 'clubkarten' || card.id === 'clubkarten_dup' || card.id?.startsWith('clubkarten_d')) {
+    const clubs = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
+    backs = [];
+    clubs.forEach(club => {
+      backs.push({
+        title: club.name,
+        content: '',
+        type: 'clubcard',
+        club: club
+      });
+    });
+    // "Neue Karte" am Ende
+    backs.push({title:'', content:'', type:'clubcard-add'});
+    if (backs.length < 5) {
+      // Mindestens Platzhalter
+      while (backs.length < 3) backs.push({title:'', content:'Wische um Karten zu sehen', type:'clubcard-empty'});
+    }
+    card.backs = backs;
+  }
   // Bei weniger als 5 Backs: verdoppeln fuer fluessiges Endlos-Drehen
   if (backs.length > 0 && backs.length < 5) {
     const orig = [...backs];
@@ -1941,6 +2057,56 @@ function buildBackCards() {
         <div class="bwc-title">${back.title}</div>
         <div class="bwc-content">${back.content}</div>
         <div class="bwc-search-hint">🎤 Drück den KIM-Button und sag was du suchst</div>`;
+    } else if (back.type === 'clubcard' && back.club) {
+      const c = back.club;
+      inner = `
+        <div onclick="openClubApp('${c.appScheme||''}')" style="width:100%;height:100%;display:flex;align-items:center;padding:12px 16px;gap:14px;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <div style="width:50px;height:50px;border-radius:12px;background:${c.color||'#e63946'};display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">${c.icon||'🎴'}</div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.85)">${c.name}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.3)">${c.sub||'Clubkarte'}</div>
+            ${c.memberId ? `<div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:2px">Nr: ${c.memberId}</div>` : ''}
+          </div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.2)">›</div>
+        </div>`;
+    } else if (back.type === 'clubcard-add') {
+      inner = `
+        <div onclick="addClubCard()" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:12px">
+          <div style="width:40px;height:40px;border-radius:50%;border:2px dashed rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;color:rgba(255,255,255,0.2)">+</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.25)">Neue Clubkarte</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.12);text-align:center;line-height:1.4;max-width:80%">Tipp: Oeffne deine Club-App, halte sie gedrueckt und waehle "Teilen → KIMANUS"</div>
+        </div>`;
+    } else if (back.type === 'clubcard-empty') {
+      inner = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+        <div style="font-size:14px;color:rgba(255,255,255,0.3)">Noch keine Clubkarten</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center;line-height:1.5">Sag KAI welche Club-Apps du hast,<br>oder teile sie direkt aus der App.</div>
+      </div>`;
+    } else if (back.type === 'newspaper') {
+      const catColors = {TITELSEITE:'#CC0000',POLITIK:'#1a5276',BLAULICHT:'#CC0000',WIRTSCHAFT:'#1e8449',EVENTS:'#7d3c98',SPORT:'#2e86c1',WETTER:'#d4ac0d'};
+      const catColor = catColors[back.category] || '#CC0000';
+      const headlineLines = (back.headline||'').split('\n');
+      inner = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;font-family:'Merriweather',serif;background:#1a1a1a;position:relative">
+          <div style="background:${catColor};padding:3px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span style="font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1.5px">${back.category}</span>
+            <span style="font-family:'Oswald',sans-serif;font-size:8px;color:rgba(255,255,255,0.7)">${back.page} / ${back.total}</span>
+          </div>
+          ${back.img ? `<img src="${back.img}" style="width:100%;height:70px;object-fit:cover;flex-shrink:0;display:block" onerror="this.style.display='none'">` : ''}
+          <div style="background:${catColor};padding:6px 10px;flex-shrink:0">
+            <div style="font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;color:#fff;text-transform:uppercase;line-height:1.05">${headlineLines.join('<br>')}</div>
+          </div>
+          <div style="padding:5px 10px 3px;flex-shrink:0">
+            <div style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px">${back.subline||''}</div>
+          </div>
+          <div style="padding:2px 10px 8px;flex:1;overflow:hidden">
+            <div style="font-size:10px;line-height:1.45;color:rgba(255,255,255,0.7)">${back.text||''}</div>
+          </div>
+          <div style="background:${catColor};height:2px;flex-shrink:0"></div>
+          <div style="background:#111;padding:2px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+            <span style="font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3);letter-spacing:1px">REGIOPRESS</span>
+            <span style="font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.2)">6. April 2026</span>
+          </div>
+        </div>`;
     } else {
       inner = `
         <div class="bwc-title">${back.title}</div>
@@ -2323,6 +2489,45 @@ function openSetupKimanus() { setupHistory.push('main'); openSetup('kimanus'); }
 function openSetupClaude() { setupHistory.push('main'); openSetup('claude'); }
 function openAgentBuilder() { setupHistory.push('main'); openSetup('agent_builder'); }
 
+async function buildFirma() {
+  const input = document.getElementById('firma-builder-input');
+  const status = document.getElementById('firma-builder-status');
+  const btn = document.getElementById('build-firma-btn');
+  if (!input || !input.value.trim()) { status.textContent = 'Bitte beschreibe deine Firma.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Firma wird gegruendet...';
+  btn.style.opacity = '0.5';
+  status.innerHTML = '<div style="display:flex;gap:4px;justify-content:center;padding:8px"><span style="width:6px;height:6px;border-radius:3px;background:rgba(100,150,255,0.6);animation:bwave 0.8s ease-in-out infinite"></span><span style="width:6px;height:6px;border-radius:3px;background:rgba(100,150,255,0.8);animation:bwave 0.8s ease-in-out 0.2s infinite"></span><span style="width:6px;height:6px;border-radius:3px;background:rgba(100,150,255,0.6);animation:bwave 0.8s ease-in-out 0.4s infinite"></span></div>';
+
+  try {
+    // Agent Builder aufrufen mit Firma-Beschreibung
+    const resp = await fetch('https://manus.kimanus.de/webhook/agent-builder', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: 'Baue ein Team von Agenten fuer folgende Firma: ' + input.value.trim() + '. Erstelle den ERSTEN und wichtigsten Agenten dieser Firma.'})
+    });
+    const data = await resp.json();
+
+    if (data.agent_info) {
+      data.agent_info.webhook_url = data.webhook_url;
+      const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+      builtAgents.push(data.agent_info);
+      localStorage.setItem('kimanus-built-agents', JSON.stringify(builtAgents));
+      rebuildWheel();
+
+      status.innerHTML = '<div style="color:rgba(100,200,100,0.8);font-size:14px;font-weight:700">' + (data.agent_info.icon || '✅') + ' ' + data.agent_info.name + ' eingestellt!</div><div style="color:rgba(255,255,255,0.2);font-size:11px;margin-top:4px">Erster Mitarbeiter deiner Firma ist bereit.</div>';
+      btn.textContent = 'Naechsten Mitarbeiter einstellen';
+    } else {
+      status.textContent = 'Fehler: ' + (data.output || 'Unbekannter Fehler');
+    }
+  } catch(e) {
+    status.textContent = 'Verbindungsfehler: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+
 async function buildAgent() {
   const input = document.getElementById('agent-builder-input');
   const status = document.getElementById('agent-builder-status');
@@ -2372,7 +2577,7 @@ function openSetup(mode, isBack) {
   const cfg = getSetupConfig();
   const list = document.getElementById('setup-list');
   // Header updaten
-  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent',design:'Darstellung',skins:'Skins',projekte:'Projekte',archiv:'Archiv',kai_rolle:'KAI Rolle'};
+  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude',agent_builder:'Neuer Agent',design:'Darstellung',skins:'Skins',projekte:'Projekte',archiv:'Archiv',wallet:'Wallet',firma_builder:'Firma bauen',kai_rolle:'KAI Rolle'};
   let title = titles[setupMode] || 'Einstellungen';
   if (setupMode.startsWith('agcat_')) title = setupMode.replace('agcat_', '');
   if (setupMode.startsWith('agent_')) {
@@ -2472,6 +2677,12 @@ function openSetup(mode, isBack) {
   html += `<div onclick="setupHistory.push('main');openSetup('projekte')" style="${lastRowStyle}cursor:pointer">${iconBox('🚀')}<div style="flex:1"><span style="${labelStyle}">Projekte</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Cap-Coin, Safety, RegioFrame & mehr</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
+  // --- WALLET ---
+  html += sectionTitle('Wallet');
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="setupHistory.push('main');openSetup('wallet')" style="${lastRowStyle}cursor:pointer">${iconBox('💳')}<div style="flex:1"><span style="${labelStyle}">Wallet</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Karten, Bezahlen, Stempel, Cap-Coin</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
   // --- SICHERHEIT ---
   html += sectionTitle('Sicherheit');
   html += `<div style="${groupStyle}">`;
@@ -2494,7 +2705,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v17.7 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.2 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3042,6 +3253,42 @@ function openSetup(mode, isBack) {
   html += `</div>`;
   } // Ende Archiv
 
+  if (setupMode === 'wallet') {
+  html += `<div style="${groupStyle};padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:default">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#f59e0b,#eab308);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">💳</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Wallet</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Deine digitale Geldboerse</div></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Bezahlen');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('💳')}<div style="flex:1"><span style="${labelStyle}">Bankkarten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Kredit- & Debitkarten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🅿️')}<div style="flex:1"><span style="${labelStyle}">PayPal</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Verknuepftes Konto</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📱')}<div style="flex:1"><span style="${labelStyle}">Apple / Google Pay</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Kontaktlos bezahlen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Cap-Coin');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🪙')}<div style="flex:1"><span style="${labelStyle}">Meine Cap-Coins</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Guthaben, Verlauf, Einloesen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📲')}<div style="flex:1"><span style="${labelStyle}">QR-Scanner</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Kronkorken scannen, Coins sammeln</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('🌍')}<div style="flex:1"><span style="${labelStyle}">Regio-Coins</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Regionale Waehrung</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Karten');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🏪')}<div style="flex:1"><span style="${labelStyle}">Clubkarten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Restaurant, Fitness, Friseur</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('⭐')}<div style="flex:1"><span style="${labelStyle}">Stempelkarten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Treuepunkte, 10. Kaffee gratis</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🎫')}<div style="flex:1"><span style="${labelStyle}">Gutscheine</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Geschenk-, Rabatt-, Bonuskarten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('👤')}<div style="flex:1"><span style="${labelStyle}">Visitenkarten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Kontakte, NFC-Visitenkarten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('🎟️')}<div style="flex:1"><span style="${labelStyle}">Tickets & Eintrittskarten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Events, Konzerte, Kino</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += sectionTitle('Sammeln');
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🃏')}<div style="flex:1"><span style="${labelStyle}">Sammelkarten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Digitale Sammelkarten, Serien</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('❤️')}<div style="flex:1"><span style="${labelStyle}">Verschenktes Glueck</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Spenden, Helfen, Teilen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+  } // Ende Wallet
+
   if (setupMode === 'projekte') {
   html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
   html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🚀</div>`;
@@ -3103,7 +3350,8 @@ function openSetup(mode, isBack) {
   html += `</div>`;
 
   html += `<div style="${groupStyle}">`;
-  html += `<div onclick="setupHistory.push('kimanus');openSetup('agent_builder')" style="${lastRowStyle}cursor:pointer">${iconBox('🔨')}<div style="flex:1"><span style="${labelStyle}">Neuen Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KI erstellt einen Experten fuer dich</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="setupHistory.push('kimanus');openSetup('agent_builder')" style="${rowStyle}cursor:pointer">${iconBox('🔨')}<div style="flex:1"><span style="${labelStyle}">Neuen Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KI erstellt einen Experten fuer dich</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="setupHistory.push('kimanus');openSetup('firma_builder')" style="${lastRowStyle}cursor:pointer">${iconBox('🏢')}<div style="flex:1"><span style="${labelStyle}">Firma bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Ganzes Team aus KI-Agenten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
   html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Orchestrierung</div>`;
@@ -3179,6 +3427,42 @@ function openSetup(mode, isBack) {
   }
   html += `</div>`;
   } // Ende Agent Builder
+
+  if (setupMode === 'firma_builder') {
+  html += `<div style="${groupStyle};padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🏢</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Firma bauen</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Ein ganzes Team aus KI-Agenten</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="padding:0 16px 8px;font-size:13px;color:rgba(255,255,255,0.3);line-height:1.5">Beschreibe was fuer eine Firma du brauchst - KI MANUS baut das komplette Team:</div>`;
+
+  html += `<div style="${groupStyle};padding:12px">`;
+  html += `<textarea id="firma-builder-input" placeholder="z.B. Eine lokale Zeitung fuer Frohnlach mit Reporter, Redakteur und Layout..." style="width:100%;height:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;color:#f0f0f0;font-size:14px;font-family:inherit;resize:none;outline:none"></textarea>`;
+  html += `</div>`;
+
+  html += `<div style="padding:8px 16px">`;
+  html += `<button onclick="buildFirma()" id="build-firma-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;border-radius:10px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent">Firma gruenden</button>`;
+  html += `</div>`;
+
+  html += `<div id="firma-builder-status" style="padding:8px 16px;font-size:13px;color:rgba(255,255,255,0.3);text-align:center;min-height:40px"></div>`;
+
+  html += sectionTitle('Vorlagen');
+  html += `<div style="${groupStyle}">`;
+  const templates = [
+    {icon:'📰', name:'Lokaler Verlag', desc:'Reporter, Redakteur, Layout, Druck', prompt:'Eine lokale Zeitung mit Reporter (Horst, wie Horst Schlaemmer), Redakteur, Layout-Designer und Verteiler fuer Social Media'},
+    {icon:'🎪', name:'Event-Agentur', desc:'Planer, DJ, Security, Marketing', prompt:'Eine Event-Agentur mit Eventplaner, DJ-Berater, Security-Koordinator und Marketing-Agent'},
+    {icon:'🍽️', name:'Gastro-Management', desc:'Bestellung, Lager, Kalkulation', prompt:'Ein Gastronomie-Management Team mit Bestellprofi, Lagerist, Kalkulierer und Buchhalter'},
+    {icon:'📣', name:'Marketing-Agentur', desc:'Texter, Designer, Social Media', prompt:'Eine Marketing-Agentur mit Texter, Grafik-Designer, Social-Media-Manager und SEO-Experte'},
+  ];
+  templates.forEach((t, ti) => {
+    const isLast = ti === templates.length - 1;
+    html += `<div onclick="document.getElementById('firma-builder-input').value='${t.prompt}'" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(t.icon);
+    html += `<div style="flex:1"><span style="${labelStyle}">${t.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${t.desc}</div></div>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  } // Ende Firma Builder
 
   list.innerHTML = html;
   // Folie oeffnen falls noch nicht offen
@@ -3300,10 +3584,20 @@ function rebuildWheel() {
     }
   });
 
-  // Haupt-Karten (Tools, Wallet, Archiv, Apps, Chat) wenn aktiv
+  // Clubkarten-Karte: immer zeigen wenn Clubkarten vorhanden
+  const clubs = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
+  if (clubs.length > 0) {
+    const clubCard = CARDS.find(c => c.id === 'clubkarten');
+    if (clubCard) {
+      clubCard.subtitle = clubs.length + ' Karte' + (clubs.length > 1 ? 'n' : '');
+      wheelCards.push(clubCard);
+    }
+  }
+
+  // Haupt-Karten (Tools, Wallet, Archiv, Apps) wenn aktiv
   const mainCards = CARDS.filter(c =>
     !c.id.endsWith('2') &&
-    !['landing','kim'].includes(c.id) &&
+    !['landing','kim','clubkarten'].includes(c.id) &&
     c.id !== 'chat'
   );
   mainCards.forEach(card => {
