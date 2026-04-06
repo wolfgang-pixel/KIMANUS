@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v18.2 - Ring-Button, KAI permanent, Clean rebuild -->
+<!-- KIMANUS Wheel v18.4 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -468,6 +468,85 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .register-tab .tab-icon{font-size:20px}
 .register-tab .tab-name{font-size:14px;font-weight:600;color:#ccc;flex:1}
 
+/* === REGIOPRESS VOLLBILD === */
+#regio-fullpage{
+  display:none;position:fixed;left:0;right:0;z-index:50;
+  background:#111;
+  overflow:hidden;
+  transition:transform 0.4s cubic-bezier(0.25,0.1,0.25,1), opacity 0.3s ease;
+  transform:translateY(100%);opacity:0;
+}
+#regio-fullpage.visible{display:block;transform:translateY(0);opacity:1}
+#regio-fullpage .rp-close{
+  position:absolute;top:8px;right:12px;z-index:55;
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);
+  color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+#regio-fullpage .rp-page{
+  width:100%;height:100%;overflow-y:auto;scrollbar-width:none;
+  transition:transform 0.35s cubic-bezier(0.25,0.1,0.25,1);
+}
+#regio-fullpage .rp-page::-webkit-scrollbar{display:none}
+#regio-fullpage .rp-dots{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;z-index:55;
+}
+#regio-fullpage .rp-dot{
+  width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.2);
+  transition:background 0.3s;
+}
+#regio-fullpage .rp-dot.active{background:#CC0000}
+/* Nachrichtenstudio Flip-Label */
+.fl-studio{
+  width:100%;height:100%;display:flex;flex-direction:column;
+  background:linear-gradient(135deg,#0a1628 0%,#1a2744 50%,#0d1b33 100%);
+  position:relative;overflow:hidden;
+}
+.fl-studio::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 80%, rgba(40,80,160,0.15) 0%, transparent 70%);
+  pointer-events:none;
+}
+.fl-studio .studio-header{
+  padding:8px 12px 4px;display:flex;align-items:center;gap:8px;
+}
+.fl-studio .studio-logo{
+  font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;
+  color:#CC0000;letter-spacing:2px;text-transform:uppercase;
+}
+.fl-studio .studio-live{
+  font-size:8px;font-weight:700;color:#fff;background:#CC0000;
+  padding:1px 5px;border-radius:2px;animation:livePulse 2s infinite;
+}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.fl-studio .studio-body{
+  flex:1;display:flex;align-items:center;padding:0 16px;gap:14px;
+}
+.fl-studio .studio-avatar{
+  width:64px;height:64px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#1e3a5f,#2a4a7f);
+  border:2px solid rgba(100,150,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+}
+.fl-studio .studio-text{flex:1}
+.fl-studio .studio-greeting{
+  font-family:'Merriweather',serif;font-size:12px;color:rgba(255,255,255,0.7);
+  line-height:1.4;
+}
+.fl-studio .studio-ticker{
+  background:rgba(204,0,0,0.9);padding:5px 12px;
+  overflow:hidden;white-space:nowrap;
+}
+.fl-studio .studio-ticker span{
+  font-family:'Oswald',sans-serif;font-size:11px;color:#fff;
+  letter-spacing:0.5px;
+  display:inline-block;animation:tickerScroll 15s linear infinite;
+}
+@keyframes tickerScroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
 /* === BOTTOM BAR === */
 #bottom-bar{
   display:flex;align-items:center;justify-content:center;gap:6px;
@@ -777,7 +856,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.2</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.4</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -866,6 +945,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <!-- Delete-Button (nur beim Sprechen sichtbar) -->
     <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 62px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
   </div>
+</div>
+
+<!-- REGIOPRESS Vollbild-Overlay -->
+<div id="regio-fullpage">
+  <div class="rp-close" onclick="closeRegioPage()" ontouchend="event.preventDefault();closeRegioPage()">✕</div>
+  <div class="rp-page" id="regio-page-content"></div>
+  <div class="rp-dots" id="regio-dots"></div>
 </div>
 
 <!-- Action-Sheet (iOS-Style, von unten) -->
@@ -2086,7 +2172,7 @@ function buildBackCards() {
       const catColor = catColors[back.category] || '#CC0000';
       const headlineLines = (back.headline||'').split('\n');
       inner = `
-        <div style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;font-family:'Merriweather',serif;background:#1a1a1a;position:relative">
+        <div onclick="openRegioPage(${i})" style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;font-family:'Merriweather',serif;background:#1a1a1a;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent">
           <div style="background:${catColor};padding:3px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
             <span style="font-family:'Oswald',sans-serif;font-size:9px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1.5px">${back.category}</span>
             <span style="font-family:'Oswald',sans-serif;font-size:8px;color:rgba(255,255,255,0.7)">${back.page} / ${back.total}</span>
@@ -2177,15 +2263,38 @@ function updateFlipLabel() {
   const fl = document.getElementById('flip-label');
   if (isFlipped) {
     const card = activeCards[currentIndex];
-    document.getElementById('fl-card').innerHTML = `
-      <div class="fl-icon">${card.icon}</div>
-      <div>
-        <div class="fl-name">${card.title}</div>
-        <div class="fl-role">${card.subtitle}</div>
-      </div>
-      <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
-      <div class="fl-brand">KIMANUS</div>
-    `;
+    const isRegio = card.id === 'regiopresse' || card.id.startsWith('regiopresse');
+    if (isRegio) {
+      // Nachrichtenstudio-Design
+      const backs = card.backs || [];
+      const currentBack = backs[backIndex % backs.length] || {};
+      const tickerHeadlines = backs.filter(b=>b.type==='newspaper').map(b=>(b.headline||'').replace(/\n/g,' ')).join('  +++  ');
+      document.getElementById('fl-card').innerHTML = `
+        <div class="fl-studio">
+          <div class="studio-header">
+            <span class="studio-logo">REGIOPRESS</span>
+            <span class="studio-live">LIVE</span>
+          </div>
+          <div class="studio-body">
+            <div class="studio-avatar">🎙️</div>
+            <div class="studio-text">
+              <div class="studio-greeting">Guten Abend aus Coburg.<br>Die Nachrichten vom 6. April.</div>
+            </div>
+          </div>
+          <div class="studio-ticker"><span>${tickerHeadlines}  +++  ${tickerHeadlines}</span></div>
+        </div>
+      `;
+    } else {
+      document.getElementById('fl-card').innerHTML = `
+        <div class="fl-icon">${card.icon}</div>
+        <div>
+          <div class="fl-name">${card.title}</div>
+          <div class="fl-role">${card.subtitle}</div>
+        </div>
+        <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
+        <div class="fl-brand">KIMANUS</div>
+      `;
+    }
     // Position: gleich wie die obere Milchglas-Karte
     const container = document.getElementById('wheel-container');
     const totalH = container.clientHeight;
@@ -2705,7 +2814,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.2 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.4 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3592,6 +3701,12 @@ function rebuildWheel() {
       clubCard.subtitle = clubs.length + ' Karte' + (clubs.length > 1 ? 'n' : '');
       wheelCards.push(clubCard);
     }
+  }
+
+  // REGIOPRESS: immer zeigen (Lokalnachrichten)
+  const regioCard = CARDS.find(c => c.id === 'regiopresse');
+  if (regioCard && cfg['card_regiopresse'] !== false) {
+    wheelCards.push(regioCard);
   }
 
   // Haupt-Karten (Tools, Wallet, Archiv, Apps) wenn aktiv
@@ -5352,6 +5467,122 @@ if ('serviceWorker' in navigator) {
     .then(reg => console.log('SW registriert:', reg.scope))
     .catch(err => console.log('SW Fehler:', err));
 }
+
+// === REGIOPRESS VOLLBILD ===
+let regioFullpageOpen = false;
+let regioPageIndex = 0;
+let regioPages = [];
+let regioSwipeStartX = 0;
+let regioSwipeStartY = 0;
+
+function getRegioPages() {
+  const card = activeCards[currentIndex];
+  if (!card) return [];
+  return (card.backs || []).filter(b => b.type === 'newspaper');
+}
+
+function renderRegioFullpage(pageIdx) {
+  const pages = getRegioPages();
+  if (pages.length === 0) return;
+  regioPages = pages;
+  regioPageIndex = Math.max(0, Math.min(pageIdx, pages.length - 1));
+  const p = pages[regioPageIndex];
+  const catColors = {TITELSEITE:'#CC0000',POLITIK:'#1a5276',BLAULICHT:'#CC0000',WIRTSCHAFT:'#1e8449',EVENTS:'#7d3c98',SPORT:'#2e86c1',WETTER:'#d4ac0d'};
+  const catColor = catColors[p.category] || '#CC0000';
+  const headlineLines = (p.headline||'').split('\n');
+
+  document.getElementById('regio-page-content').innerHTML = `
+    <div style="min-height:100%;display:flex;flex-direction:column;font-family:'Merriweather',serif;background:#111">
+      <div style="background:${catColor};padding:6px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:2px">${p.category}</span>
+        <span style="font-family:'Oswald',sans-serif;font-size:11px;color:rgba(255,255,255,0.8)">Seite ${p.page} von ${p.total}</span>
+      </div>
+      ${p.img ? `<img src="${p.img.replace('h=120','h=250')}" style="width:100%;height:200px;object-fit:cover;display:block" onerror="this.style.height='0'">` : ''}
+      <div style="background:${catColor};padding:12px 16px">
+        <div style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:#fff;text-transform:uppercase;line-height:1.05">${headlineLines.join('<br>')}</div>
+      </div>
+      <div style="padding:8px 16px 4px">
+        <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px">${p.subline||''}</div>
+      </div>
+      <div style="padding:8px 16px 20px;flex:1">
+        <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,0.8)">${p.text||''}</div>
+      </div>
+      <div style="background:${catColor};height:3px"></div>
+      <div style="background:#0a0a0a;padding:6px 16px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:2px">REGIOPRESS</span>
+        <span style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">6. April 2026</span>
+      </div>
+    </div>
+  `;
+
+  // Dots aktualisieren
+  const dotsEl = document.getElementById('regio-dots');
+  dotsEl.innerHTML = pages.map((_, idx) =>
+    `<div class="rp-dot${idx === regioPageIndex ? ' active' : ''}" onclick="renderRegioFullpage(${idx})"></div>`
+  ).join('');
+}
+
+function openRegioPage(backIdx) {
+  // backIdx ist der Index im backs-Array (inkl. Duplikate fuer Endlos-Rad)
+  const card = activeCards[currentIndex];
+  const pages = (card.backs || []).filter(b => b.type === 'newspaper');
+  // Finde die echte Seite (backIdx kann durch Duplikation groesser sein)
+  const realIdx = backIdx % pages.length;
+
+  const overlay = document.getElementById('regio-fullpage');
+  // Position berechnen: unter Flip-Label, ueber Bottom-Bar
+  const fl = document.getElementById('flip-label');
+  const flBottom = fl.offsetTop + fl.offsetHeight + 4;
+  overlay.style.top = flBottom + 'px';
+  overlay.style.bottom = '80px';
+
+  renderRegioFullpage(realIdx);
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+  });
+  regioFullpageOpen = true;
+}
+
+function closeRegioPage() {
+  const overlay = document.getElementById('regio-fullpage');
+  overlay.classList.remove('visible');
+  setTimeout(() => { overlay.style.display = 'none'; }, 400);
+  regioFullpageOpen = false;
+}
+
+// Swipe-Handler fuer Vollbild
+(function() {
+  const el = document.getElementById('regio-fullpage');
+  el.addEventListener('touchstart', function(e) {
+    regioSwipeStartX = e.touches[0].clientX;
+    regioSwipeStartY = e.touches[0].clientY;
+  }, {passive: true});
+
+  el.addEventListener('touchend', function(e) {
+    if (!regioFullpageOpen) return;
+    const dx = e.changedTouches[0].clientX - regioSwipeStartX;
+    const dy = e.changedTouches[0].clientY - regioSwipeStartY;
+
+    // Runter-Wischen = schliessen
+    if (dy > 100 && Math.abs(dx) < 80) {
+      closeRegioPage();
+      return;
+    }
+
+    // Links/Rechts Wischen = Seite wechseln
+    if (Math.abs(dx) > 50 && Math.abs(dy) < 80) {
+      const pages = getRegioPages();
+      if (dx < 0 && regioPageIndex < pages.length - 1) {
+        // Swipe links = naechste Seite
+        renderRegioFullpage(regioPageIndex + 1);
+      } else if (dx > 0 && regioPageIndex > 0) {
+        // Swipe rechts = vorherige Seite
+        renderRegioFullpage(regioPageIndex - 1);
+      }
+    }
+  }, {passive: true});
+})();
 
 // Init
 init();
