@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v18.4 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v18.5 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -543,9 +543,22 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .fl-studio .studio-ticker span{
   font-family:'Oswald',sans-serif;font-size:11px;color:#fff;
   letter-spacing:0.5px;
-  display:inline-block;animation:tickerScroll 15s linear infinite;
+  display:inline-block;animation:tickerScroll 35s linear infinite;
 }
 @keyframes tickerScroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+/* Doppelseite im Studio */
+.fl-studio .studio-preview{
+  flex:1;display:flex;gap:3px;padding:4px 8px;overflow:hidden;min-height:0;
+}
+.fl-studio .studio-mini-page{
+  flex:1;background:#1a1a1a;border-radius:2px;overflow:hidden;
+  display:flex;flex-direction:column;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.08);
+  -webkit-tap-highlight-color:transparent;
+}
+.fl-studio .studio-mini-page img{width:100%;height:32px;object-fit:cover;display:block}
+.fl-studio .smp-cat{font-family:'Oswald',sans-serif;font-size:7px;color:#fff;padding:1px 4px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.fl-studio .smp-headline{font-family:'Oswald',sans-serif;font-size:8px;color:rgba(255,255,255,0.8);padding:2px 4px;line-height:1.1;font-weight:700;text-transform:uppercase;flex:1}
 
 /* === BOTTOM BAR === */
 #bottom-bar{
@@ -856,7 +869,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.4</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.5</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2269,6 +2282,22 @@ function updateFlipLabel() {
       const backs = card.backs || [];
       const currentBack = backs[backIndex % backs.length] || {};
       const tickerHeadlines = backs.filter(b=>b.type==='newspaper').map(b=>(b.headline||'').replace(/\n/g,' ')).join('  +++  ');
+      // Doppelseite: aktuelle + naechste Seite als Mini-Vorschau
+      const newsPages = backs.filter(b=>b.type==='newspaper');
+      const curPage = newsPages[backIndex % newsPages.length] || newsPages[0] || {};
+      const nextPage = newsPages[(backIndex + 1) % newsPages.length] || newsPages[1] || {};
+      const catColors = {TITELSEITE:'#CC0000',POLITIK:'#1a5276',BLAULICHT:'#CC0000',WIRTSCHAFT:'#1e8449',EVENTS:'#7d3c98',SPORT:'#2e86c1',WETTER:'#d4ac0d'};
+      function miniPage(p, idx) {
+        const cc = catColors[p.category]||'#CC0000';
+        const hl = (p.headline||'').replace(/\n/g,' ');
+        return `<div class="studio-mini-page" onclick="openRegioPage(${idx})">
+          ${p.img?`<img src="${p.img}" onerror="this.style.display='none'">`:''}
+          <div class="smp-cat" style="background:${cc}">${p.category||''}</div>
+          <div class="smp-headline">${hl}</div>
+        </div>`;
+      }
+      const curIdx = backIndex % backs.length;
+      const nextIdx = (backIndex + 1) % backs.length;
       document.getElementById('fl-card').innerHTML = `
         <div class="fl-studio">
           <div class="studio-header">
@@ -2280,6 +2309,10 @@ function updateFlipLabel() {
             <div class="studio-text">
               <div class="studio-greeting">Guten Abend aus Coburg.<br>Die Nachrichten vom 6. April.</div>
             </div>
+          </div>
+          <div class="studio-preview">
+            ${miniPage(curPage, curIdx)}
+            ${miniPage(nextPage, nextIdx)}
           </div>
           <div class="studio-ticker"><span>${tickerHeadlines}  +++  ${tickerHeadlines}</span></div>
         </div>
@@ -2814,7 +2847,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.4 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.5 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -5530,11 +5563,9 @@ function openRegioPage(backIdx) {
   const realIdx = backIdx % pages.length;
 
   const overlay = document.getElementById('regio-fullpage');
-  // Position berechnen: unter Flip-Label, ueber Bottom-Bar
-  const fl = document.getElementById('flip-label');
-  const flBottom = fl.offsetTop + fl.offsetHeight + 4;
-  overlay.style.top = flBottom + 'px';
-  overlay.style.bottom = '80px';
+  // Position: von Oberkante bis Bottom-Bar
+  overlay.style.top = '0px';
+  overlay.style.bottom = '40px';
 
   renderRegioFullpage(realIdx);
   overlay.style.display = 'block';
