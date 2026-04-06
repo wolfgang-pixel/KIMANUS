@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v19.0 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v19.9 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -875,7 +875,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div onclick="showKimInfo()" style="cursor:pointer">
         <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v19.0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v19.9</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1135,12 +1135,13 @@ const CARDS = [
    ]},
 
   // --- 4c. REGIOPRESS (Lokalnachrichten als Zeitungs-Glasplatten) ---
-  {id:'regiopresse', icon:'📰', title:'REGIOPRESS', subtitle:'Coburg · Ebersdorf · Frohnlach', color:'#CC0000', email:'', phone:'',
+  {id:'regiopresse', icon:'📰', title:'REGIOPRESS', subtitle:'Ebersdorf · Frohnlach · Umgebung', color:'#CC0000', email:'', phone:'',
    backs:[
-     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-1-2.html', pages:'1-2', label:'Titel + Politik'},
-     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-3-4.html', pages:'3-4', label:'Blaulicht + Wirtschaft'},
-     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-5-6.html', pages:'5-6', label:'Events + Sport'},
-     {type:'newspaper-doppel', src:'/regio-presse-druck/doppel-7.html', pages:'7-8', label:'Wetter + Impressum'},
+     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-1-2.html', pages:'1-2', label:'Titel + Rathaus'},
+     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-3-4.html', pages:'3-4', label:'Vereine + Events'},
+     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-5-6.html', pages:'5-6', label:'Bauprojekte + Ortsteile'},
+     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-7-8.html', pages:'7-8', label:'Termine + Service'},
+     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-service.html', pages:'9-10', label:'Notruf + Meine Gemeinde'},
    ]},
 
   // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
@@ -2188,16 +2189,15 @@ function buildBackCards() {
       const pNums = (back.pages||'1-2').split('-');
       const leftPage = pNums[0] || '1';
       const rightPage = pNums[1] || '2';
+      // Glasplatte ~355px breit, 210px hoch. Doppelseite 710x420 → scale 0.5 passt genau
       inner = `
-        <div style="width:100%;height:100%;position:relative;overflow:hidden;background:#111;display:flex">
-          <div onclick="openRegioEinzel('${back.src}','left',${i})" style="flex:1;position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none" scrolling="no"></iframe>
-            <div style="position:absolute;bottom:2px;left:4px;font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3)">S.${leftPage}</div>
-          </div>
-          <div style="width:1px;background:rgba(255,255,255,0.1);flex-shrink:0"></div>
-          <div onclick="openRegioEinzel('${back.src}','right',${i})" style="flex:1;position:relative;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent">
-            <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top right;pointer-events:none" scrolling="no"></iframe>
-            <div style="position:absolute;bottom:2px;right:4px;font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3)">S.${rightPage}</div>
+        <div style="width:100%;height:100%;position:relative;overflow:hidden;background:#111;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none;position:absolute;top:0;left:0" scrolling="no"></iframe>
+          <div onclick="openRegioEinzel('${back.src}','left',${i})" style="position:absolute;top:0;left:0;width:50%;height:100%;z-index:2"></div>
+          <div onclick="openRegioEinzel('${back.src}','right',${i})" style="position:absolute;top:0;right:0;width:50%;height:100%;z-index:2"></div>
+          <div style="position:absolute;bottom:1px;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:2px 8px;display:flex;justify-content:space-between;z-index:3;pointer-events:none">
+            <span style="font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3);letter-spacing:1px">REGIOPRESS</span>
+            <span style="font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.25)">S. ${leftPage}-${rightPage}</span>
           </div>
         </div>`;
     } else if (back.type === 'newspaper') {
@@ -2858,7 +2858,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v19.0 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v19.9 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -5588,21 +5588,68 @@ function openRegioPage(backIdx) {
 function openRegioEinzel(src, side, backIdx) {
   const overlay = document.getElementById('regio-fullpage');
   overlay.style.top = '60px';
-  overlay.style.bottom = '40px';
+  overlay.style.bottom = '0px';
 
   const card = activeCards[currentIndex];
   const doppelPages = (card.backs || []).filter(b => b.type === 'newspaper-doppel');
-  const realIdx = backIdx % doppelPages.length;
-  regioPageIndex = realIdx;
   regioPages = doppelPages;
-  regioCurrentSide = side;
-
-  renderRegioEinzel(realIdx, side);
-  overlay.classList.add('visible');
   regioFullpageOpen = true;
+
+  // backIdx ist der Index der Doppelseite im backs-Array (inkl. Duplikate)
+  // Finde welche echte Doppelseite das ist
+  const allBacks = card.backs || [];
+  const doppelOnly = allBacks.filter(b => b.type === 'newspaper-doppel');
+  const doppelIdx = backIdx % doppelOnly.length;
+  // Einzelseiten-Index: jede Doppelseite hat 2 Einzelseiten
+  const einzelIdx = (doppelIdx * 2) + (side === 'right' ? 1 : 0);
+
+  renderRegioFeed(einzelIdx);
+  overlay.classList.add('visible');
 }
 
 let regioCurrentSide = 'left';
+
+function renderRegioFeed(startAtPage) {
+  const pages = regioPages.length ? regioPages : getRegioDoppelPages();
+  if (pages.length === 0) return;
+
+  const screenW = window.innerWidth;
+  const scale = screenW / 355;
+  const pageH = Math.ceil(420 * scale);
+
+  // Alle Einzelseiten (links + rechts aus jeder Doppelseite) untereinander
+  let html = '';
+  pages.forEach((p, doppelIdx) => {
+    const pNums = (p.pages||'1-2').split('-');
+    // Linke Seite
+    html += `<div style="width:${screenW}px;height:${pageH}px;overflow:hidden;position:relative;border-bottom:3px solid #CC0000">
+      <iframe src="${p.src}" style="width:710px;height:420px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none" scrolling="no"></iframe>
+    </div>`;
+    // Rechte Seite
+    html += `<div style="width:${screenW}px;height:${pageH}px;overflow:hidden;position:relative;border-bottom:3px solid #CC0000">
+      <iframe src="${p.src}" style="width:710px;height:420px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;position:absolute;top:0;left:${(-355*scale).toFixed(0)}px;pointer-events:none" scrolling="no"></iframe>
+    </div>`;
+  });
+
+  document.getElementById('regio-page-content').innerHTML = `
+    <div id="regio-feed-scroll" style="width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">${html}</div>
+  `;
+
+  // Zum angeklickten Seite scrollen
+  if (startAtPage > 0) {
+    const scrollTo = startAtPage * pageH;
+    // Mehrfach versuchen weil iframes Zeit brauchen
+    const scroller = document.getElementById('regio-feed-scroll');
+    if (scroller) {
+      scroller.scrollTop = scrollTo;
+      setTimeout(() => { scroller.scrollTop = scrollTo; }, 50);
+      setTimeout(() => { scroller.scrollTop = scrollTo; }, 200);
+      setTimeout(() => { scroller.scrollTop = scrollTo; }, 500);
+    }
+  }
+
+  document.getElementById('regio-dots').innerHTML = '';
+}
 
 function renderRegioEinzel(idx, side) {
   const pages = regioPages.length ? regioPages : getRegioDoppelPages();
@@ -5611,21 +5658,22 @@ function renderRegioEinzel(idx, side) {
   regioCurrentSide = side || 'left';
   const p = pages[regioPageIndex];
 
-  // Die Doppelseite ist 710px breit. Linke Haelfte = 0-355px, rechte = 355-710px.
-  // Wir skalieren eine Haelfte (355px) auf die volle Screenbreite.
+  // Doppelseite = 710px breit, jede Haelfte 355px.
+  // Wir zeigen nur eine Haelfte, skaliert auf volle Screenbreite.
   const screenW = window.innerWidth;
-  const pageW = 355; // halbe Doppelseite
-  const pageH = 420;
-  const scale = screenW / pageW;
-  const offsetX = side === 'right' ? -355 * scale : 0;
+  const scale = screenW / 355;
+  // clip-path schneidet die andere Haelfte ab
+  const clipLeft = side === 'right' ? 'clip-path:inset(0 0 0 50%)' : 'clip-path:inset(0 50% 0 0)';
+  const translateX = side === 'right' ? -355 * scale : 0;
 
   document.getElementById('regio-page-content').innerHTML = `
-    <div style="width:100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch">
-      <iframe src="${p.src}" style="width:710px;height:${pageH}px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;margin-left:${offsetX.toFixed(0)}px;display:block;pointer-events:none" scrolling="no"></iframe>
+    <div style="width:100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative">
+      <div style="width:${screenW}px;height:${420*scale}px;overflow:hidden;position:relative">
+        <iframe src="${p.src}" style="width:710px;height:420px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;position:absolute;top:0;left:${translateX.toFixed(0)}px;pointer-events:none" scrolling="no"></iframe>
+      </div>
     </div>
   `;
 
-  // Dots + Seiten-Info
   const pNums = (p.pages||'').split('-');
   const pageNum = side === 'right' ? (pNums[1]||'') : (pNums[0]||'');
   const dotsEl = document.getElementById('regio-dots');
@@ -5673,11 +5721,14 @@ function getRegioDoppelPages() {
 }
 
 function closeRegioPage() {
+  if (!regioFullpageOpen) return;
+  regioFullpageOpen = false;
   const overlay = document.getElementById('regio-fullpage');
   overlay.classList.remove('visible');
-  // iframe sofort entfernen um Ressourcen freizugeben
   document.getElementById('regio-page-content').innerHTML = '';
-  regioFullpageOpen = false;
+  // Kurz Touch-Events blockieren damit kein versehentlicher Flip passiert
+  document.body.style.pointerEvents = 'none';
+  setTimeout(() => { document.body.style.pointerEvents = ''; }, 400);
 }
 
 // Swipe-Handler fuer Vollbild
