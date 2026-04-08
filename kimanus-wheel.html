@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.7 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.8 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -875,7 +875,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v20.7</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v20.8</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1764,14 +1764,17 @@ function activateHotkey(idx) {
     rebuildWheel();
     cardIdx = activeCards.findIndex(c => c.id === hk.cardId);
   }
-  if (cardIdx >= 0 && cardIdx !== currentIndex) {
-    // Erst Header-Karte und KAI-Vorschau verstecken
+  if (cardIdx >= 0) {
+    // Erst zurueckflippen wenn eine Karte geflippt ist
+    if (isFlipped) flipCard();
+    // Header-Karte und KAI-Vorschau verstecken
     if (headerCardActive) hideHeaderCard();
     hideKimCardAbove();
+    // Zur Hotkey-Karte springen
     currentIndex = cardIdx;
     positionCards(true);
     localStorage.setItem('kimanus-lastCard', currentIndex);
-    // KAI-Vorschau nach kurzer Verzoegerung wieder zeigen (ueber der neuen Karte)
+    // KAI-Vorschau nach kurzer Verzoegerung wieder zeigen
     setTimeout(() => showKimCardAbove(), 500);
   }
 }
@@ -2874,7 +2877,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.7 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.8 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
