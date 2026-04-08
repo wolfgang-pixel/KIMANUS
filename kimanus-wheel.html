@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.0 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.1 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -877,12 +877,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
           <span style="font-size:13px;font-weight:700;color:rgba(230,57,70,0.8);letter-spacing:2px">KAI</span>
           <span style="font-size:9px;color:rgba(255,255,255,0.2);margin-left:2px">Concierge</span>
         </div>
-        <div style="width:1px;height:14px;background:rgba(255,255,255,0.1)"></div>
+        <div id="hdr-agent-sep" style="width:1px;height:14px;background:rgba(255,255,255,0.1)"></div>
         <div onclick="switchAgent('kim')" id="hdr-kim" style="cursor:pointer;padding:2px 0">
           <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:2px">KIM</span>
           <span style="font-size:9px;color:rgba(255,255,255,0.2);margin-left:2px">Assistentin</span>
         </div>
-        <span style="font-size:9px;color:rgba(255,255,255,0.15);margin-left:4px">v20.0</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.15);margin-left:4px">v20.1</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1555,6 +1555,7 @@ function init() {
   calcSizes();
   // Setup-Config anwenden BEVOR Karten gebaut werden
   rebuildWheel();
+  updateHeaderAgents();
 
   // Wiederkehrende Nutzer: letzte Position wiederherstellen
   const visited = localStorage.getItem('kimanus-visited');
@@ -2616,6 +2617,7 @@ function getSetupConfig() {
 }
 function saveSetupConfig(cfg) {
   localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
+  updateHeaderAgents();
 }
 
 // === SETTINGS (iPhone-Style Fullscreen-Folie) ===
@@ -2865,7 +2867,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.0 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.1 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4379,18 +4381,31 @@ let currentAgent = 'KAI'; // Rufanlage: wer gerade angesprochen wird
 function switchAgent(agent) {
   currentAgent = agent.toUpperCase();
   setMicAgent(currentAgent);
-  // Header-Highlight aktualisieren
+  updateHeaderHighlight();
+}
+
+function updateHeaderHighlight() {
   const hdrKai = document.getElementById('hdr-kai');
   const hdrKim = document.getElementById('hdr-kim');
-  if (hdrKai && hdrKim) {
-    if (currentAgent === 'KAI') {
-      hdrKai.querySelector('span').style.color = 'rgba(230,57,70,0.8)';
-      hdrKim.querySelector('span').style.color = 'rgba(255,255,255,0.35)';
-    } else {
-      hdrKim.querySelector('span').style.color = 'rgba(230,57,70,0.8)';
-      hdrKai.querySelector('span').style.color = 'rgba(255,255,255,0.35)';
-    }
-  }
+  if (hdrKai) hdrKai.querySelector('span').style.color = currentAgent === 'KAI' ? 'rgba(230,57,70,0.8)' : 'rgba(255,255,255,0.35)';
+  if (hdrKim) hdrKim.querySelector('span').style.color = currentAgent === 'KIM' ? 'rgba(230,57,70,0.8)' : 'rgba(255,255,255,0.35)';
+}
+
+function updateHeaderAgents() {
+  const cfg = getSetupConfig();
+  const hdrKai = document.getElementById('hdr-kai');
+  const hdrKim = document.getElementById('hdr-kim');
+  const hdrSep = document.getElementById('hdr-agent-sep');
+  // Default: KAI aktiv, KIM optional
+  const kaiActive = cfg['agent_kai'] !== false; // Default true
+  const kimActive = cfg['agent_kim'] === true;
+  if (hdrKai) hdrKai.style.display = kaiActive ? '' : 'none';
+  if (hdrKim) hdrKim.style.display = kimActive ? '' : 'none';
+  if (hdrSep) hdrSep.style.display = (kaiActive && kimActive) ? '' : 'none';
+  // Wenn nur einer aktiv: den als currentAgent setzen
+  if (kaiActive && !kimActive) { currentAgent = 'KAI'; setMicAgent('KAI'); }
+  if (kimActive && !kaiActive) { currentAgent = 'KIM'; setMicAgent('KIM'); }
+  updateHeaderHighlight();
 }
 let silenceTimer = null;
 
