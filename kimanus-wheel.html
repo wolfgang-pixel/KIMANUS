@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.8 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.9 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -875,7 +875,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v20.8</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v20.9</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1505,30 +1505,62 @@ function handleShareTarget() {
   const sharedText = params.get('shared_text') || '';
   const sharedUrl = params.get('shared_url') || '';
 
-  if (!sharedTitle && !sharedText && !sharedUrl) return; // Kein Share
+  if (!sharedTitle && !sharedText && !sharedUrl) return;
 
-  // URL bereinigen (Share-Parameter entfernen)
+  // URL bereinigen
   history.replaceState(null, '', window.location.pathname);
 
-  // Verzoeert anzeigen (nach init)
+  // In Notiz-Ablage speichern
+  const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
+  const notiz = {
+    id: 'note-' + Date.now(),
+    title: sharedTitle || (sharedText ? sharedText.substring(0, 50) : 'Link'),
+    text: sharedText || '',
+    url: sharedUrl || '',
+    date: new Date().toLocaleString('de-DE'),
+    gelesen: false
+  };
+  notizen.unshift(notiz);
+  localStorage.setItem('kimanus-notizen', JSON.stringify(notizen));
+
+  // Anzeige nach init
   setTimeout(() => {
-    const name = sharedTitle || sharedText.split('\n')[0] || sharedUrl.split('/').pop() || 'Unbekannt';
-    const confirmed = confirm('KAI: "' + name + '" als Clubkarte hinzufuegen?');
-    if (confirmed) {
-      const clubs = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
-      clubs.push({
-        id: 'club-' + Date.now(),
-        name: name.substring(0, 30),
-        icon: '🎴',
-        color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
-        sub: sharedUrl || 'Clubkarte',
-        memberId: '',
-        appScheme: sharedUrl || ''
-      });
-      localStorage.setItem('kimanus-clubkarten', JSON.stringify(clubs));
-      rebuildWheel();
-    }
-  }, 1000);
+    const name = notiz.title.substring(0, 40);
+    const count = notizen.filter(n => !n.gelesen).length;
+
+    // Bestaetigungs-Overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-tap-highlight-color:transparent';
+    overlay.innerHTML = `
+      <div style="font-size:40px;margin-bottom:12px">📥</div>
+      <div style="font-size:18px;font-weight:700;color:#fff;text-align:center;margin-bottom:8px">Gespeichert!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.6);text-align:center;margin-bottom:4px">${name}</div>
+      ${sharedUrl ? '<div style="font-size:11px;color:rgba(139,92,246,0.6);text-align:center;word-break:break-all;max-width:280px">' + sharedUrl.substring(0, 60) + '</div>' : ''}
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:12px">${count} Notiz${count > 1 ? 'en' : ''} in der Ablage</div>
+      <div style="margin-top:20px;display:flex;gap:10px">
+        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding:10px 24px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:14px;border-radius:8px;cursor:pointer">OK</button>
+        <button onclick="this.parentElement.parentElement.parentElement.remove();openSharedWithKim('${notiz.id}')" style="padding:10px 24px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);color:rgba(139,92,246,0.8);font-size:14px;border-radius:8px;cursor:pointer">KIM fragen</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  }, 800);
+}
+
+function openSharedWithKim(noteId) {
+  const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
+  const notiz = notizen.find(n => n.id === noteId);
+  if (!notiz) return;
+  // Sende an KIM als Frage
+  const frage = notiz.url
+    ? 'Schau dir das mal an und fass es kurz zusammen: ' + notiz.url
+    : 'Was sagst du dazu: ' + notiz.text;
+  if (typeof sendToKim === 'function') sendToKim(frage);
+}
+
+function getUnreadNotizen() {
+  const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
+  return notizen.filter(n => !n.gelesen);
 }
 
 function seedServerAgents() {
@@ -2877,7 +2909,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.8 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.9 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
