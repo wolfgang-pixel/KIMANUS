@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.2 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.3 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -879,7 +879,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
         <div onclick="switchAgent('kim')" id="hdr-kim" style="cursor:pointer;padding:4px 8px;border-radius:6px;-webkit-tap-highlight-color:transparent">
           <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:2px">KIM</span>
         </div>
-        <span style="font-size:9px;color:rgba(255,255,255,0.12)">v20.2</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.12)">v20.3</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1050,6 +1050,15 @@ const CARDS = [
          {icon:'🖨️', label:'Print'},
        ]},
      ]},
+   ]},
+
+  // --- 2b. KIM (Persoenliche Assistentin) ---
+  {id:'kim', icon:'💜', title:'KIM', subtitle:'Deine persoenliche Assistentin', color:'#8b5cf6', email:'kim@kimanus.de', phone:'0800 546 2687',
+   backs:[
+     {title:'Ueber KIM', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich, deine Vorlieben,\ndeine Familie, deine Termine.\nAlles Persoenliche bleibt bei mir.'},
+     {title:'Was ich fuer dich tue', content:'Termine erinnern\nGeburtstage merken\nEinkaufslisten fuehren\nRezepte vorschlagen\nAlltag organisieren'},
+     {title:'Ich bin verschwiegen', content:'Deine Daten gehoeren dir.\nIch teile nichts mit anderen.\nVerschluesselt und sicher.\nNur du hast Zugriff.'},
+     {title:'So erreichst du mich', content:'Roter Button unten = Sprechen\nIch hoere immer zu.\nOder ruf mich an:\n0800 546 2687'},
    ]},
 
   // --- 3. Tools (Werkzeuge, Hardware, Services) ---
@@ -2864,7 +2873,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.2 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.3 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3711,8 +3720,12 @@ function rebuildWheel() {
   if (isFlipped) flipCard();
   const cfg = getSetupConfig();
 
-  // KIMANUS und KIM sind jetzt im Header, nicht mehr auf dem Rad
+  // KAI und KIM Karten aufs Rad wenn im Setup aktiviert
   let wheelCards = [];
+  const kaiCard = CARDS.find(c => c.id === 'kai');
+  const kimCard = CARDS.find(c => c.id === 'kim');
+  if (kaiCard && cfg['agent_kai'] !== false) wheelCards.push(kaiCard);
+  if (kimCard && cfg['agent_kim'] !== false) wheelCards.push(kimCard);
 
   // Aktivierte Agenten als eigene Karten hinzufuegen
   ALL_AGENTS.forEach(agent => {
