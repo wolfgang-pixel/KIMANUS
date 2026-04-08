@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v19.9 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.0 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -872,10 +872,17 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="logo-circle" onclick="showKimanusInfo()">K</div>
     <div style="flex:1">
       <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
-      <div onclick="showKimInfo()" style="cursor:pointer">
-        <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
-        <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v19.9</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div onclick="switchAgent('kai')" id="hdr-kai" style="cursor:pointer;padding:2px 0">
+          <span style="font-size:13px;font-weight:700;color:rgba(230,57,70,0.8);letter-spacing:2px">KAI</span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.2);margin-left:2px">Concierge</span>
+        </div>
+        <div style="width:1px;height:14px;background:rgba(255,255,255,0.1)"></div>
+        <div onclick="switchAgent('kim')" id="hdr-kim" style="cursor:pointer;padding:2px 0">
+          <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:2px">KIM</span>
+          <span style="font-size:9px;color:rgba(255,255,255,0.2);margin-left:2px">Assistentin</span>
+        </div>
+        <span style="font-size:9px;color:rgba(255,255,255,0.15);margin-left:4px">v20.0</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2858,7 +2865,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v19.9 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.0 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4368,6 +4375,23 @@ let audioStream = null;
 let speechState = 'idle'; // idle -> recording -> processing -> review -> sending
 let pendingText = '';
 let currentAgent = 'KAI'; // Rufanlage: wer gerade angesprochen wird
+
+function switchAgent(agent) {
+  currentAgent = agent.toUpperCase();
+  setMicAgent(currentAgent);
+  // Header-Highlight aktualisieren
+  const hdrKai = document.getElementById('hdr-kai');
+  const hdrKim = document.getElementById('hdr-kim');
+  if (hdrKai && hdrKim) {
+    if (currentAgent === 'KAI') {
+      hdrKai.querySelector('span').style.color = 'rgba(230,57,70,0.8)';
+      hdrKim.querySelector('span').style.color = 'rgba(255,255,255,0.35)';
+    } else {
+      hdrKim.querySelector('span').style.color = 'rgba(230,57,70,0.8)';
+      hdrKai.querySelector('span').style.color = 'rgba(255,255,255,0.35)';
+    }
+  }
+}
 let silenceTimer = null;
 
 // === WALKIE-TALKIE MODUS ===
