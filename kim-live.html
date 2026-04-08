@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KIM Live</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0e0e0e;color:#fff;font-family:-apple-system,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+#header{padding:12px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.1)}
+#header h1{font-size:20px;font-weight:800;letter-spacing:3px;color:rgba(255,255,255,0.4)}
+#header span{font-size:11px;color:rgba(255,255,255,0.2)}
+#status{padding:8px 16px;font-size:12px;color:rgba(255,255,255,0.3);text-align:center}
+#transcript{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;scrollbar-width:none}
+#transcript::-webkit-scrollbar{display:none}
+.msg{padding:10px 14px;border-radius:12px;max-width:85%;font-size:15px;line-height:1.5}
+.msg.user{background:rgba(230,57,70,0.15);color:rgba(255,255,255,0.8);align-self:flex-end;border:1px solid rgba(230,57,70,0.2)}
+.msg.kim{background:rgba(139,92,246,0.1);color:rgba(255,255,255,0.85);align-self:flex-start;border:1px solid rgba(139,92,246,0.15)}
+.msg.system{background:none;color:rgba(255,255,255,0.2);font-size:11px;text-align:center;align-self:center}
+#controls{padding:20px;display:flex;justify-content:center;align-items:center;gap:16px;border-top:1px solid rgba(255,255,255,0.1)}
+#mic-btn{width:70px;height:70px;border-radius:50%;border:none;cursor:pointer;font-size:28px;transition:all 0.3s;-webkit-tap-highlight-color:transparent}
+#mic-btn.idle{background:radial-gradient(circle at 30% 30%,#e63946,#c62828);box-shadow:0 4px 20px rgba(230,57,70,0.3)}
+#mic-btn.listening{background:radial-gradient(circle at 30% 30%,#4caf50,#2e7d32);box-shadow:0 4px 30px rgba(76,175,80,0.5);animation:pulse 1.5s infinite}
+#mic-btn.speaking{background:radial-gradient(circle at 30% 30%,#8b5cf6,#6d28d9);box-shadow:0 4px 20px rgba(139,92,246,0.4)}
+#mic-btn.connecting{background:radial-gradient(circle at 30% 30%,#f59e0b,#d97706);box-shadow:0 4px 20px rgba(245,158,11,0.3)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+#end-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer;display:none}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1>KIM LIVE</h1>
+  <span>Echtzeit-Gespraech · Gemini Native Audio</span>
+</div>
+<div id="status">Tippe den Button um zu sprechen</div>
+<div id="transcript"></div>
+<div id="controls">
+  <button id="end-btn" onclick="endSession()">✕</button>
+  <button id="mic-btn" class="idle" onclick="toggleLive()">🎤</button>
+</div>
+
+<script>
+const API_KEY = 'AIzaSyDYYuM-dXB5fTqzG_YMkvo0vbukGwvnelg';
+const MODEL = 'gemini-2.5-flash-native-audio-latest';
+const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`;
+
+let ws = null;
+let audioContext = null;
+let micStream = null;
+let processor = null;
+let isLive = false;
+let playbackQueue = [];
+let isPlaying = false;
+
+const btn = document.getElementById('mic-btn');
+const statusEl = document.getElementById('status');
+const transcript = document.getElementById('transcript');
+const endBtn = document.getElementById('end-btn');
+
+function addMsg(text, cls) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + cls;
+  d.textContent = text;
+  transcript.appendChild(d);
+  transcript.scrollTop = transcript.scrollHeight;
+}
+
+function setStatus(text) { statusEl.textContent = text; }
+
+async function toggleLive() {
+  if (isLive) {
+    endSession();
+  } else {
+    startSession();
+  }
+}
+
+async function startSession() {
+  btn.className = 'connecting';
+  btn.textContent = '⏳';
+  setStatus('Verbinde mit KIM...');
+
+  try {
+    ws = new WebSocket(WS_URL);
+
+    ws.onopen = () => {
+      // Setup senden
+      const setup = {
+        setup: {
+          model: `models/${MODEL}`,
+          generationConfig: {
+            responseModalities: ['AUDIO'],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: 'Aoede' }
+              }
+            },
+            temperature: 0.7
+          },
+          systemInstruction: {
+            parts: [{
+              text: `Du bist KIM, die persoenliche Assistentin von KIMANUS. Du sprichst Deutsch.
+REGELN:
+- Antworte IMMER auf Deutsch
+- Maximal 2-3 Saetze, kurz und knapp
+- Sei freundlich und hilfsbereit
+- Du kennst die KIMANUS App: Riesenrad mit Glasplatten, Sprache-first
+- Stelle dich nicht vor, sag nicht "Hallo"
+- Direkt zur Sache`
+            }]
+          },
+          realtimeInputConfig: {
+            automaticActivityDetection: {
+              disabled: false,
+              startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
+              endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH'
+            },
+            activityHandling: 'START_OF_ACTIVITY_INTERRUPTS'
+          }
+        }
+      };
+      ws.send(JSON.stringify(setup));
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.setupComplete) {
+        isLive = true;
+        btn.className = 'listening';
+        btn.textContent = '🟢';
+        endBtn.style.display = 'block';
+        setStatus('KIM hoert zu... Sprich einfach los!');
+        addMsg('KIM Live gestartet', 'system');
+        startMicrophone();
+      }
+
+      if (data.serverContent) {
+        const sc = data.serverContent;
+
+        // Audio-Antwort abspielen
+        if (sc.modelTurn && sc.modelTurn.parts) {
+          btn.className = 'speaking';
+          btn.textContent = '💜';
+          setStatus('KIM spricht...');
+          for (const part of sc.modelTurn.parts) {
+            if (part.inlineData && part.inlineData.mimeType.startsWith('audio')) {
+              playbackQueue.push(part.inlineData.data);
+              if (!isPlaying) playNextAudio();
+            }
+          }
+        }
+
+        // Transkriptionen anzeigen
+        if (sc.inputTranscription && sc.inputTranscription.text) {
+          addMsg(sc.inputTranscription.text, 'user');
+        }
+        if (sc.outputTranscription && sc.outputTranscription.text) {
+          addMsg(sc.outputTranscription.text, 'kim');
+        }
+
+        // Turn fertig
+        if (sc.turnComplete) {
+          btn.className = 'listening';
+          btn.textContent = '🟢';
+          setStatus('KIM hoert zu...');
+        }
+      }
+    };
+
+    ws.onerror = (err) => {
+      console.error('WebSocket Fehler:', err);
+      setStatus('Verbindungsfehler');
+      endSession();
+    };
+
+    ws.onclose = () => {
+      if (isLive) endSession();
+    };
+
+  } catch(err) {
+    console.error('Fehler:', err);
+    setStatus('Fehler: ' + err.message);
+    btn.className = 'idle';
+    btn.textContent = '🎤';
+  }
+}
+
+async function startMicrophone() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
+    });
+
+    // Safari: AudioContext muss mit webkitAudioContext Fallback erstellt werden
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AC({ sampleRate: 16000 });
+    // Safari: AudioContext muss nach User-Geste resumed werden
+    if (audioContext.state === 'suspended') await audioContext.resume();
+
+    const source = audioContext.createMediaStreamSource(micStream);
+
+    // ScriptProcessor funktioniert in Safari besser als AudioWorklet
+    processor = audioContext.createScriptProcessor(4096, 1, 1);
+    processor.onaudioprocess = (e) => {
+      if (!isLive || !ws || ws.readyState !== WebSocket.OPEN) return;
+      const float32 = e.inputBuffer.getChannelData(0);
+      const int16 = new Int16Array(float32.length);
+      for (let i = 0; i < float32.length; i++) {
+        int16[i] = Math.max(-32768, Math.min(32767, float32[i] * 32768));
+      }
+      // Base64 encode
+      const bytes = new Uint8Array(int16.buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      const b64 = btoa(binary);
+
+      ws.send(JSON.stringify({
+        realtimeInput: {
+          audio: { data: b64, mimeType: 'audio/pcm;rate=16000' }
+        }
+      }));
+    };
+
+    source.connect(processor);
+    processor.connect(audioContext.destination);
+  } catch(err) {
+    console.error('Mikrofon-Fehler:', err);
+    setStatus('Mikrofon nicht verfuegbar');
+  }
+}
+
+// Safari: Ein globaler Playback-Context (nicht jedes Mal neu erstellen)
+let playCtx = null;
+
+async function playNextAudio() {
+  if (playbackQueue.length === 0) { isPlaying = false; return; }
+  isPlaying = true;
+  const b64 = playbackQueue.shift();
+
+  try {
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const int16 = new Int16Array(bytes.buffer);
+
+    // Safari: Einen globalen Context wiederverwenden
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!playCtx || playCtx.state === 'closed') {
+      playCtx = new AC({ sampleRate: 24000 });
+    }
+    if (playCtx.state === 'suspended') await playCtx.resume();
+
+    const buffer = playCtx.createBuffer(1, int16.length, 24000);
+    const channel = buffer.getChannelData(0);
+    for (let i = 0; i < int16.length; i++) channel[i] = int16[i] / 32768;
+
+    const source = playCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(playCtx.destination);
+    source.onended = () => playNextAudio();
+    source.start();
+  } catch(err) {
+    console.error('Playback-Fehler:', err);
+    playNextAudio();
+  }
+}
+
+function endSession() {
+  isLive = false;
+  if (ws) { ws.close(); ws = null; }
+  if (processor) { processor.disconnect(); processor = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  if (audioContext) { audioContext.close(); audioContext = null; }
+  playbackQueue = [];
+  isPlaying = false;
+  btn.className = 'idle';
+  btn.textContent = '🎤';
+  endBtn.style.display = 'none';
+  setStatus('Tippe den Button um zu sprechen');
+  addMsg('Gespraech beendet', 'system');
+}
+</script>
+</body>
+</html>
