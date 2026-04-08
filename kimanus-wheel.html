@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.3 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.4 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -879,7 +879,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
         <div onclick="switchAgent('kim')" id="hdr-kim" style="cursor:pointer;padding:4px 8px;border-radius:6px;-webkit-tap-highlight-color:transparent">
           <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:2px">KIM</span>
         </div>
-        <span style="font-size:9px;color:rgba(255,255,255,0.12)">v20.3</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.12)">v20.4</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2805,25 +2805,25 @@ function openSetup(mode, isBack) {
 
   // --- PROFILE ---
   // KAI Profil
-  const kaiActive = (cfg['main_contact'] || 'kai') === 'kai';
+  const kaiOn = cfg['agent_kai'] !== false; // Default: aktiv
   html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px">`;
   html += `<div onclick="openSetupKim()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
   html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
   html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
   html += `</div>`;
-  html += toggle('main_contact_kai', kaiActive);
+  html += toggle('agent_kai', kaiOn);
   html += `</div>`;
 
   // KIM Profil
-  const kimActive = (cfg['main_contact'] || 'kai') === 'kim';
+  const kimOn = cfg['agent_kim'] !== false; // Default: aktiv
   html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px">`;
   html += `<div onclick="openSetupKimPersoenlich()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
   html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
   html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
   html += `</div>`;
-  html += toggle('main_contact_kim', kimActive);
+  html += toggle('agent_kim', kimOn);
   html += `</div>`;
 
   // --- SYSTEM ---
@@ -2873,7 +2873,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.3 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.4 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3673,6 +3673,9 @@ function toggleSetupItem(key, enabled) {
   const cfg = getSetupConfig();
   cfg[key] = enabled;
   saveSetupConfig(cfg);
+  // Rad und Header aktualisieren
+  rebuildWheel();
+  updateHeaderAgents();
   // Setup neu rendern aber offen lassen
   openSetup(setupMode);
 }
@@ -4399,6 +4402,19 @@ function switchAgent(agent) {
   } else if (agent === 'kim') {
     showKimInfo();
   }
+}
+
+function updateHeaderAgents() {
+  const cfg = getSetupConfig();
+  const hdrKai = document.getElementById('hdr-kai');
+  const hdrKim = document.getElementById('hdr-kim');
+  const kaiOn = cfg['agent_kai'] !== false;
+  const kimOn = cfg['agent_kim'] !== false;
+  if (hdrKai) hdrKai.style.display = kaiOn ? '' : 'none';
+  if (hdrKim) hdrKim.style.display = kimOn ? '' : 'none';
+  if (kaiOn && !kimOn) { currentAgent = 'KAI'; setMicAgent('KAI'); }
+  if (kimOn && !kaiOn) { currentAgent = 'KIM'; setMicAgent('KIM'); }
+  updateHeaderHighlight();
 }
 
 function updateHeaderHighlight() {
