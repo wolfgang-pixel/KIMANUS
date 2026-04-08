@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.4 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v20.5 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -872,14 +872,10 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="logo-circle" onclick="showKimanusInfo()">K</div>
     <div style="flex:1">
       <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div onclick="switchAgent('kai')" id="hdr-kai" style="cursor:pointer;padding:4px 8px;border-radius:6px;background:rgba(230,57,70,0.1);-webkit-tap-highlight-color:transparent">
-          <span style="font-size:14px;font-weight:700;color:rgba(230,57,70,0.8);letter-spacing:2px">KAI</span>
-        </div>
-        <div onclick="switchAgent('kim')" id="hdr-kim" style="cursor:pointer;padding:4px 8px;border-radius:6px;-webkit-tap-highlight-color:transparent">
-          <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:2px">KIM</span>
-        </div>
-        <span style="font-size:9px;color:rgba(255,255,255,0.12)">v20.4</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
+        <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v20.5</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -2873,7 +2869,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.4 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.5 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4418,16 +4414,10 @@ function updateHeaderAgents() {
 }
 
 function updateHeaderHighlight() {
-  const hdrKai = document.getElementById('hdr-kai');
-  const hdrKim = document.getElementById('hdr-kim');
-  if (hdrKai) {
-    hdrKai.querySelector('span').style.color = currentAgent === 'KAI' ? 'rgba(230,57,70,0.9)' : 'rgba(255,255,255,0.3)';
-    hdrKai.style.background = currentAgent === 'KAI' ? 'rgba(230,57,70,0.12)' : 'transparent';
-  }
-  if (hdrKim) {
-    hdrKim.querySelector('span').style.color = currentAgent === 'KIM' ? 'rgba(230,57,70,0.9)' : 'rgba(255,255,255,0.3)';
-    hdrKim.style.background = currentAgent === 'KIM' ? 'rgba(230,57,70,0.12)' : 'transparent';
-  }
+  const nameEl = document.getElementById('hdr-agent-name');
+  const roleEl = document.getElementById('hdr-agent-role');
+  if (nameEl) nameEl.textContent = currentAgent;
+  if (roleEl) roleEl.textContent = currentAgent === 'KIM' ? 'Assistentin' : 'Concierge';
 }
 let silenceTimer = null;
 
