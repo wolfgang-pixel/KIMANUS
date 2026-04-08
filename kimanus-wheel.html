@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v21.1 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v21.2 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -875,7 +875,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v21.1</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v21.2</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="clipPaste()" title="Einfuegen" style="font-size:18px;padding:4px 2px">📋</button>
@@ -3037,7 +3037,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v21.1 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v21.2 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3937,6 +3937,25 @@ function rebuildWheel() {
   const regioCard = CARDS.find(c => c.id === 'regiopresse');
   if (regioCard && cfg['card_regiopresse'] !== false) {
     wheelCards.push(regioCard);
+  }
+
+  // NOTIZEN: zeigen wenn Notizen vorhanden
+  const notizenList = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
+  if (notizenList.length > 0) {
+    const notizenBacks = notizenList.slice(0, 20).map(n => ({
+      title: n.title || 'Notiz',
+      content: (n.url ? '🔗 ' + n.url + '\n' : '') + (n.text || '') + '\n\n📅 ' + (n.date || '')
+    }));
+    wheelCards.push({
+      id: 'notizen',
+      icon: '📋',
+      title: 'Notizen',
+      subtitle: notizenList.length + ' gespeichert',
+      color: '#8b5cf6',
+      email: '',
+      phone: '',
+      backs: notizenBacks
+    });
   }
 
   // Haupt-Karten (Tools, Wallet, Archiv, Apps) wenn aktiv
