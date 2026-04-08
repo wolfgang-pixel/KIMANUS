@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v20.9 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v21.0 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -875,7 +875,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v20.9</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v21.0</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
@@ -1563,6 +1563,78 @@ function getUnreadNotizen() {
   return notizen.filter(n => !n.gelesen);
 }
 
+// Clipboard-Check: Beim App-Oeffnen Zwischenablage lesen
+async function checkClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text || text.trim().length < 5) return;
+    const trimmed = text.trim();
+
+    // Nur URLs oder laengere Texte (keine einzelnen Woerter)
+    const isUrl = /^https?:\/\//i.test(trimmed);
+    const isLongText = trimmed.length > 30;
+    if (!isUrl && !isLongText) return;
+
+    // Pruefen ob schon gespeichert (Duplikat-Schutz)
+    const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
+    const duplicate = notizen.find(n => n.url === trimmed || n.text === trimmed);
+    if (duplicate) return;
+
+    // Letzte Clipboard-Pruefung merken (nicht bei jedem Fokus nerven)
+    const lastClip = localStorage.getItem('kimanus-last-clip');
+    if (lastClip === trimmed) return;
+    localStorage.setItem('kimanus-last-clip', trimmed);
+
+    // Frage-Overlay anzeigen
+    const preview = isUrl ? trimmed.substring(0, 50) + '...' : trimmed.substring(0, 60) + '...';
+    const overlay = document.createElement('div');
+    overlay.id = 'clip-overlay';
+    overlay.style.cssText = 'position:fixed;bottom:100px;left:12px;right:12px;z-index:200;background:#1c1c1e;border:1px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,0.5);-webkit-tap-highlight-color:transparent';
+    overlay.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:22px">📋</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.7)">In der Zwischenablage gefunden:</div>
+          <div style="font-size:11px;color:rgba(139,92,246,0.6);margin-top:2px;word-break:break-all">${preview}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('clip-overlay').remove()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:13px;border-radius:8px;cursor:pointer">Ignorieren</button>
+        <button onclick="clipSave('${isUrl ? trimmed.replace(/'/g,'') : ''}')" style="flex:1;padding:10px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:rgba(139,92,246,0.8);font-size:13px;border-radius:8px;cursor:pointer">📥 Speichern</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    // Auto-ausblenden nach 8 Sekunden
+    setTimeout(() => { const el = document.getElementById('clip-overlay'); if (el) el.remove(); }, 8000);
+  } catch(e) {
+    // Clipboard nicht verfuegbar (kein HTTPS oder Permission denied) - still ignorieren
+  }
+}
+
+function clipSave(url) {
+  const el = document.getElementById('clip-overlay');
+  if (el) el.remove();
+  navigator.clipboard.readText().then(text => {
+    const trimmed = text.trim();
+    const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
+    notizen.unshift({
+      id: 'note-' + Date.now(),
+      title: url ? new URL(url).hostname.replace('www.','') : trimmed.substring(0, 50),
+      text: url ? '' : trimmed,
+      url: url || '',
+      date: new Date().toLocaleString('de-DE'),
+      gelesen: false
+    });
+    localStorage.setItem('kimanus-notizen', JSON.stringify(notizen));
+    // Kurze Bestaetigung
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(139,92,246,0.9);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:200';
+    toast.textContent = '📥 Gespeichert!';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  });
+}
+
 function seedServerAgents() {
   const SERVER_AGENTS = [
     {"name":"Küchenmeister","role":"Koch-Berater","description":"Persönlicher Küchenassistent für Rezeptvorschläge und Kochhilfe.","model":"deepseek","icon":"👨‍🍳","category":"Berater","webhookPath":"kuechenmeister-berater","phone":"Durchwahl 214","email":"kuechenmeister-berater@kimanus.de","webhook_url":"https://manus.kimanus.de/webhook/agent-kuechenmeister-berater"},
@@ -1590,6 +1662,12 @@ function init() {
   // Setup-Config anwenden BEVOR Karten gebaut werden
   rebuildWheel();
   updateHeaderAgents();
+  // Zwischenablage pruefen (nach 2s damit App erst geladen ist)
+  setTimeout(() => checkClipboard(), 2000);
+  // Auch pruefen wenn App aus dem Hintergrund zurueckkommt
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') setTimeout(() => checkClipboard(), 500);
+  });
 
   // Wiederkehrende Nutzer: letzte Position wiederherstellen
   const visited = localStorage.getItem('kimanus-visited');
@@ -2909,7 +2987,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v20.9 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v21.0 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
