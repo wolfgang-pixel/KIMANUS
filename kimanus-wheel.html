@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v24.13 - Tastatur ueberlagert Rad (viewport fix), Swipe wechselt Modus, Walkie-PTT im Input-Button -->
+<!-- KIMANUS Wheel v24.14 - Tastatur visualViewport-fix, Swipe Cool-down 800ms gegen versehentliches Live -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -580,11 +580,11 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   transition:opacity 0.2s, transform 0.25s;
 }
 /* Wenn Tastatur offen: body wird fixiert damit Safari das Layout nicht hochschiebt */
+/* Der JS setzt body.style.top dynamisch auf die Scroll-Position (als negative Zahl) */
 body.keyboard-open{
   position:fixed;
-  top:0;left:0;right:0;
+  left:0;right:0;
   width:100%;
-  height:100vh;
   overflow:hidden;
 }
 /* Wheel bleibt an seiner Position, die Tastatur legt sich darueber */
@@ -966,7 +966,7 @@ body.keyboard-open::before{
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.13</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.14</span>
       </div>
     </div>
     <!-- Hamburger-Menu (ersetzt Clipboard + Refresh + Logo-Langdruck als Setup-Zugang) -->
@@ -3205,7 +3205,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.13 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.14 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4994,6 +4994,7 @@ function triggerCurrentInputMode() {
 // - Tap (kurz) = Aktion starten (je nach Modus)
 // - Hold im Walkie-Modus = Push-to-Talk sprechen
 // - Swipe links/rechts = Modus wechseln (durch alle 4 Modi rotieren)
+// - Nach Swipe: 800ms Cool-down damit kein Tap mehr triggert
 const INPUT_MODES_ORDER = ['walkie', 'keyboard', 'stt', 'live'];
 let inputModeBtnTouchStartX = 0;
 let inputModeBtnTouchStartY = 0;
@@ -5001,11 +5002,18 @@ let inputModeBtnTouchStartTime = 0;
 let inputModeBtnSwipeFired = false;
 let inputModeBtnWalkieActive = false;
 let inputModeBtnHandledTouch = false;
-const INPUT_SWIPE_THRESHOLD = 40; // Pixel horizontal fuer Modus-Wechsel
+let inputModeBtnRecentSwipe = 0; // Zeitpunkt des letzten Swipes (fuer Cool-down)
+const INPUT_SWIPE_THRESHOLD = 35; // Pixel horizontal fuer Modus-Wechsel
+const INPUT_SWIPE_COOLDOWN_MS = 800; // Nach Swipe 800ms keine Aktion triggern
 const INPUT_WALKIE_HOLD_MS = 180;  // Kurze Verzoegerung bevor Walkie-Aufnahme startet (gibt Zeit fuer Swipe-Erkennung)
 let inputModeBtnWalkieTimer = null;
 
 function inputModeBtnTouchStart(e) {
+  // Cool-down: Wenn gerade eben geswiped, diesen Touch ignorieren
+  if (Date.now() - inputModeBtnRecentSwipe < INPUT_SWIPE_COOLDOWN_MS) {
+    inputModeBtnHandledTouch = true;
+    return;
+  }
   inputModeBtnSwipeFired = false;
   inputModeBtnWalkieActive = false;
   inputModeBtnHandledTouch = false;
@@ -5036,6 +5044,7 @@ function inputModeBtnTouchMove(e) {
   if (!inputModeBtnSwipeFired && !inputModeBtnWalkieActive && adx > INPUT_SWIPE_THRESHOLD && adx > ady * 1.5) {
     inputModeBtnSwipeFired = true;
     inputModeBtnHandledTouch = true;
+    inputModeBtnRecentSwipe = Date.now(); // Cool-down starten
     // Walkie-Timer abbrechen
     if (inputModeBtnWalkieTimer) {
       clearTimeout(inputModeBtnWalkieTimer);
@@ -5048,7 +5057,14 @@ function inputModeBtnTouchMove(e) {
     else newIdx = (idx + 1) % INPUT_MODES_ORDER.length;
     if (navigator.vibrate) navigator.vibrate(15);
     animateInputModeSwitch(dx > 0 ? 'right' : 'left');
-    setInputMode(INPUT_MODES_ORDER[newIdx]);
+    // Nur Modus wechseln, KEIN openKeyboardInput automatisch bei Tastatur
+    currentInputMode = INPUT_MODES_ORDER[newIdx];
+    updateMainInputButton(currentInputMode);
+    localStorage.setItem('kimanus-input-mode', currentInputMode);
+    // Legacy Update
+    document.querySelectorAll('.input-mode-btn').forEach(b => b.classList.remove('active'));
+    const legacyBtn = document.getElementById('btn-' + currentInputMode);
+    if (legacyBtn) legacyBtn.classList.add('active');
   }
 }
 function inputModeBtnTouchEnd(e) {
@@ -5059,8 +5075,10 @@ function inputModeBtnTouchEnd(e) {
     clearTimeout(inputModeBtnWalkieTimer);
     inputModeBtnWalkieTimer = null;
   }
-  // Wenn Swipe gefeuert hat: nichts mehr tun (Modus wurde bereits gewechselt)
+  // Wenn Swipe gefeuert hat: nichts mehr tun (Cool-down laeuft)
   if (inputModeBtnSwipeFired) return;
+  // Cool-down: Wenn gerade eben geswiped, ignorieren
+  if (Date.now() - inputModeBtnRecentSwipe < INPUT_SWIPE_COOLDOWN_MS) return;
   // Wenn Walkie aktiv war: Aufnahme beenden + senden
   if (inputModeBtnWalkieActive) {
     inputModeBtnWalkieActive = false;
@@ -5088,6 +5106,8 @@ function inputModeBtnClickFallback(e) {
     inputModeBtnHandledTouch = false;
     return;
   }
+  // Cool-down: Wenn gerade eben geswiped, Click ignorieren
+  if (Date.now() - inputModeBtnRecentSwipe < INPUT_SWIPE_COOLDOWN_MS) return;
   triggerCurrentInputMode();
 }
 
@@ -5190,9 +5210,16 @@ function closeHamburgerOutside(e) {
   }
 }
 
+// Scroll-Position merken, wenn Tastatur oeffnet/schliesst
+let keyboardSavedScrollY = 0;
+
 function openKeyboardInput() {
+  // Aktuelle Scroll-Position merken
+  keyboardSavedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
   // Body-Klasse setzen: versteckt Bottom-Bar + andere Elemente die beim Hochfahren stoeren
   document.body.classList.add('keyboard-open');
+  // Body fixieren auf aktueller Position damit Safari nicht scrollt
+  document.body.style.top = (-keyboardSavedScrollY) + 'px';
   // Erzeuge oder fokussiere ein verstecktes Eingabefeld
   let inp = document.getElementById('kb-hidden-input');
   if (!inp) {
@@ -5200,29 +5227,62 @@ function openKeyboardInput() {
     inp.id = 'kb-hidden-input';
     inp.type = 'text';
     inp.placeholder = 'Nachricht an KIM...';
-    inp.style.cssText = 'position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0) + 8px);z-index:250;padding:14px 18px;border-radius:14px;border:1.5px solid rgba(74,222,128,0.45);background:rgba(15,15,15,0.98);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -8px 30px rgba(0,0,0,0.6),0 0 20px rgba(74,222,128,0.15)';
+    inp.autocomplete = 'off';
+    inp.autocapitalize = 'sentences';
+    inp.style.cssText = 'position:fixed;left:16px;right:16px;bottom:8px;z-index:10000;padding:14px 18px;border-radius:14px;border:1.5px solid rgba(74,222,128,0.45);background:rgba(15,15,15,0.98);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -8px 30px rgba(0,0,0,0.65),0 0 20px rgba(74,222,128,0.15);transform:translateY(0);transition:bottom 0.15s';
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && inp.value.trim()) {
         const text = inp.value.trim();
         inp.value = '';
-        inp.blur();
-        inp.style.display = 'none';
-        document.body.classList.remove('keyboard-open');
+        closeKeyboardInput();
         // Nachricht an KIM senden (gleicher Weg wie Sprache)
         if (typeof sendToAgent === 'function') sendToAgent(text);
         else if (typeof sendChatMessage === 'function') sendChatMessage(text);
       }
     });
     inp.addEventListener('blur', () => {
-      setTimeout(() => {
-        inp.style.display = 'none';
-        document.body.classList.remove('keyboard-open');
-      }, 200);
+      setTimeout(() => closeKeyboardInput(), 150);
     });
     document.body.appendChild(inp);
   }
   inp.style.display = 'block';
-  inp.focus();
+  // Fokus mit kurzem Delay damit body-fix angewendet wird
+  setTimeout(() => {
+    inp.focus();
+    // Nach dem Fokus die Tastatur-Hoehe auslesen und Input entsprechend positionieren
+    updateKeyboardInputPosition();
+  }, 50);
+}
+
+function closeKeyboardInput() {
+  const inp = document.getElementById('kb-hidden-input');
+  if (inp) {
+    inp.blur();
+    inp.style.display = 'none';
+  }
+  document.body.classList.remove('keyboard-open');
+  document.body.style.top = '';
+  // Scroll-Position wiederherstellen
+  window.scrollTo(0, keyboardSavedScrollY);
+}
+
+// Input-Feld Position updaten basierend auf visualViewport (iOS-Tastatur)
+function updateKeyboardInputPosition() {
+  const inp = document.getElementById('kb-hidden-input');
+  if (!inp || inp.style.display === 'none') return;
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    // Abstand vom Fenster-Boden bis zum Tastatur-Oberkante
+    const bottomOffset = (window.innerHeight - vv.height - vv.offsetTop);
+    // Input-Feld direkt ueber der Tastatur positionieren
+    inp.style.bottom = Math.max(8, bottomOffset + 8) + 'px';
+  }
+}
+
+// Auf visualViewport-Aenderungen reagieren (Tastatur oeffnet/schliesst/Groesse aendert)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateKeyboardInputPosition);
+  window.visualViewport.addEventListener('scroll', updateKeyboardInputPosition);
 }
 
 // Beim Start gespeicherten Modus laden
