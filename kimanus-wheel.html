@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v24.9 - Untere Leiste umgebaut: Input-Modus links, Logo-Langdruck = Setup -->
+<!-- KIMANUS Wheel v24.10 - Ring weg, Live-Animation nur bei Druck, Hamburger-Menu rechts oben -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -604,6 +604,17 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border-color:rgba(74,222,128,0.7);
   box-shadow:0 0 12px rgba(74,222,128,0.5);
 }
+/* Aktiver Zustand: rot pulsierend (gedrueckt/Live aktiv) */
+#settings-btn.live-active{
+  background:linear-gradient(180deg, rgba(239,68,68,0.45) 0%, rgba(220,38,38,0.25) 100%);
+  border-color:rgba(239,68,68,0.8);
+  box-shadow:0 0 14px rgba(239,68,68,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+  animation:liveActivePulse 1.3s ease-in-out infinite;
+}
+@keyframes liveActivePulse{
+  0%,100%{box-shadow:0 0 14px rgba(239,68,68,0.55), inset 0 1px 0 rgba(255,255,255,0.2)}
+  50%{box-shadow:0 0 22px rgba(239,68,68,0.9), inset 0 1px 0 rgba(255,255,255,0.25)}
+}
 /* Hotkey-Slots (Kaertchen, 3D-plastisch) */
 .hotkey-slot{
   width:100%;height:44px;border-radius:10px;
@@ -905,28 +916,20 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <div id="app">
   <div id="header">
-    <div class="logo-circle"
-         onclick="logoClick()"
-         ontouchstart="logoTouchStart(event)"
-         ontouchend="logoTouchEnd(event)"
-         ontouchmove="logoTouchMove(event)"
-         ontouchcancel="logoTouchCancel()">K</div>
+    <div class="logo-circle" onclick="showKimanusInfo()">K</div>
     <div style="flex:1">
-      <div style="cursor:pointer"
-           onclick="logoClick()"
-           ontouchstart="logoTouchStart(event)"
-           ontouchend="logoTouchEnd(event)"
-           ontouchmove="logoTouchMove(event)"
-           ontouchcancel="logoTouchCancel()"><span class="title" style="margin:0">KIMANUS</span></div>
+      <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.9</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.10</span>
       </div>
     </div>
-    <button class="hdr-btn" onclick="clipPaste()" title="Einfuegen" style="font-size:18px;padding:4px 2px">📋</button>
-    <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
-      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    <!-- Hamburger-Menu (ersetzt Clipboard + Refresh + Logo-Langdruck als Setup-Zugang) -->
+    <button class="hdr-btn hamburger-btn" id="hamburger-btn" title="Menu" onclick="event.stopPropagation();toggleHamburgerMenu()" type="button" style="display:flex;flex-direction:column;gap:4px;padding:8px;justify-content:center;align-items:center;width:32px;height:32px">
+      <span style="display:block;width:18px;height:2px;background:rgba(255,255,255,0.85);border-radius:1px"></span>
+      <span style="display:block;width:18px;height:2px;background:rgba(255,255,255,0.85);border-radius:1px"></span>
+      <span style="display:block;width:18px;height:2px;background:rgba(255,255,255,0.85);border-radius:1px"></span>
     </button>
   </div>
 
@@ -938,13 +941,13 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="panel" id="panel-top"></div>
     <div class="panel" id="panel-center"></div>
     <div class="panel" id="panel-bottom">
-      <div id="mic-ring-wrap">
+      <div id="mic-ring-wrap" class="legacy-hidden">
         <div id="mic-ring"></div>
         <svg id="mic-ring-text" viewBox="0 0 92 92">
           <defs><path id="ring-top-arc" d="M 12,46 A 34,34 0 0,1 80,46"/></defs>
           <text><textPath id="ring-text-content" href="#ring-top-arc" startOffset="50%" text-anchor="middle">KAI</textPath></text>
         </svg>
-        <button id="speech-btn" class="legacy-hidden">
+        <button id="speech-btn">
           <span id="speech-agent">🎙</span>
         </button>
       </div>
@@ -3158,7 +3161,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.9 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.10 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4892,17 +4895,40 @@ function setInputMode(mode) {
 function updateMainInputButton(mode) {
   const iconEl = document.getElementById('main-input-icon');
   const labelEl = document.getElementById('main-input-label');
+  const btnEl = document.getElementById('settings-btn');
   if (!iconEl || !labelEl) return;
+  // Statische Wellen-Icon fuer Live (ohne permanente Animation)
+  const staticLiveSvg = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="20" y1="8" x2="20" y2="16"/></svg>';
   const config = {
     walkie:   { icon: '🎙',  label: 'Walkie' },
     keyboard: { icon: '⌨️',  label: 'Tastatur' },
     stt:      { icon: '💬',  label: 'Sprechen' },
-    live:     { icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>', label: 'Live' }
+    live:     { icon: staticLiveSvg, label: 'Live' }
   };
   const c = config[mode] || config.walkie;
   if (c.icon.startsWith('<svg')) iconEl.innerHTML = c.icon;
   else iconEl.textContent = c.icon;
   labelEl.textContent = c.label;
+  // Im Idle-Zustand: KEINE active-Animation (gruen, statisch)
+  if (btnEl) btnEl.classList.remove('listening', 'live-active');
+}
+
+// Setzt den Button auf "aktiv" (rot, animiert) - wird beim Druecken gerufen
+function setMainInputButtonActive(active) {
+  const btnEl = document.getElementById('settings-btn');
+  const iconEl = document.getElementById('main-input-icon');
+  if (!btnEl) return;
+  if (active) {
+    btnEl.classList.add('live-active');
+    // Fuer Live-Modus: animiertes rotes Wellen-SVG
+    if (currentInputMode === 'live' && iconEl) {
+      iconEl.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>';
+    }
+  } else {
+    btnEl.classList.remove('live-active');
+    // Icon zurueck auf statischen Zustand
+    updateMainInputButton(currentInputMode);
+  }
 }
 
 // Haupt-Input-Button Klick: startet die Aktion je nach aktuellem Modus
@@ -5005,57 +5031,45 @@ function closeInputModeSelectorOutside(e) {
   }
 }
 
-// LOGO Click + Long-Press (Setup-Zugang)
-let logoLongPressTimer = null;
-let logoLongPressFired = false;
-let logoTouchStartX = 0;
-let logoTouchStartY = 0;
-
-function logoClick() {
-  if (logoLongPressFired) {
-    logoLongPressFired = false;
+// HAMBURGER-MENU (rechts oben im Header)
+// Ersetzt frueheres Clipboard + Refresh und Logo-Langdruck als Setup-Zugang
+function toggleHamburgerMenu() {
+  let menu = document.getElementById('hamburger-menu');
+  if (menu) {
+    menu.remove();
     return;
   }
-  // Kurzer Klick = Info anzeigen (wie frueher)
-  if (typeof showKimanusInfo === 'function') showKimanusInfo();
+  menu = document.createElement('div');
+  menu.id = 'hamburger-menu';
+  menu.style.cssText = 'position:fixed;top:58px;right:8px;z-index:500;background:rgba(20,20,20,0.97);border:1.5px solid rgba(255,255,255,0.15);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:4px;min-width:180px;box-shadow:0 12px 40px rgba(0,0,0,0.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)';
+  const btnStyle = 'padding:12px 16px;background:rgba(255,255,255,0.05);border:none;border-radius:10px;color:#fff;font-size:14px;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:12px;transition:background 0.15s';
+  menu.innerHTML = `
+    <button style="${btnStyle}" onclick="hamburgerAction('setup')"><span style="font-size:18px">⚙️</span>Setup</button>
+    <button style="${btnStyle}" onclick="hamburgerAction('paste')"><span style="font-size:18px">📋</span>Einfuegen</button>
+    <button style="${btnStyle}" onclick="hamburgerAction('reload')"><span style="font-size:18px">🔄</span>Aktualisieren</button>
+    <button style="${btnStyle}" onclick="hamburgerAction('info')"><span style="font-size:18px">ℹ️</span>Ueber KIMANUS</button>
+  `;
+  document.body.appendChild(menu);
+  setTimeout(() => {
+    document.addEventListener('click', closeHamburgerOutside, { once: true });
+    document.addEventListener('touchstart', closeHamburgerOutside, { once: true });
+  }, 100);
 }
-function logoTouchStart(e) {
-  logoLongPressFired = false;
-  if (e.touches && e.touches[0]) {
-    logoTouchStartX = e.touches[0].clientX;
-    logoTouchStartY = e.touches[0].clientY;
+function hamburgerAction(action) {
+  const menu = document.getElementById('hamburger-menu');
+  if (menu) menu.remove();
+  switch (action) {
+    case 'setup':  if (typeof openSettings === 'function') openSettings(); break;
+    case 'paste':  if (typeof clipPaste === 'function') clipPaste(); break;
+    case 'reload': location.reload(); break;
+    case 'info':   if (typeof showKimanusInfo === 'function') showKimanusInfo(); break;
   }
-  logoLongPressTimer = setTimeout(() => {
-    logoLongPressFired = true;
-    // Haptic feedback wenn verfuegbar
-    if (navigator.vibrate) navigator.vibrate(30);
-    // Setup oeffnen (Stufe 1)
-    if (typeof openSettings === 'function') openSettings();
-  }, 700);
 }
-function logoTouchMove(e) {
-  if (!e.touches || !e.touches[0]) return;
-  const dx = Math.abs(e.touches[0].clientX - logoTouchStartX);
-  const dy = Math.abs(e.touches[0].clientY - logoTouchStartY);
-  if (dx > 10 || dy > 10) logoTouchCancel();
-}
-function logoTouchEnd(e) {
-  if (logoLongPressTimer) {
-    clearTimeout(logoLongPressTimer);
-    logoLongPressTimer = null;
-  }
-  if (logoLongPressFired) {
-    e.preventDefault();
-    return;
-  }
-  // Normal Klick
-  e.preventDefault();
-  logoClick();
-}
-function logoTouchCancel() {
-  if (logoLongPressTimer) {
-    clearTimeout(logoLongPressTimer);
-    logoLongPressTimer = null;
+function closeHamburgerOutside(e) {
+  const menu = document.getElementById('hamburger-menu');
+  const btn = document.getElementById('hamburger-btn');
+  if (menu && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
+    menu.remove();
   }
 }
 
@@ -6945,6 +6959,10 @@ async function startLiveSession() {
       if (data.setupComplete) {
         console.log('LIVE SETUP COMPLETE!');
         liveIsActive = true;
+        // NEU: Haupt-Input-Button aktiv (rot + animiertes Wellen-Icon)
+        setMainInputButtonActive(true);
+        // Agent-Name oben im Kaertchen anzeigen
+        showLiveAgentBadge(currentAgent || 'KAI');
         agent.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>';
         btn.style.background = 'radial-gradient(circle at 30% 30%,#8b5cf6 0%,#7c3aed 50%,#6d28d9 100%)';
         // Status auf Glasplatte aktualisieren
@@ -7150,8 +7168,29 @@ function endLiveSession() {
   const agent = document.getElementById('speech-agent');
   if (btn) btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
   setInputMode(currentInputMode); // Reset icon
+  // NEU: Haupt-Input-Button zurueck auf Idle (gruen statisch)
+  setMainInputButtonActive(false);
+  hideLiveAgentBadge();
   // Glasplatte zuruecksetzen - Original-Karte wiederherstellen
   rebuildWheel();
+}
+
+// Agent-Badge oben im Kaertchen (wer spricht gerade)
+function showLiveAgentBadge(agentName) {
+  let badge = document.getElementById('live-agent-badge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'live-agent-badge';
+    badge.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:30;background:linear-gradient(135deg,rgba(239,68,68,0.9),rgba(220,38,38,0.85));color:#fff;padding:5px 14px;border-radius:14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 3px 12px rgba(239,68,68,0.4);border:1px solid rgba(255,255,255,0.25);pointer-events:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)';
+    const panel = document.getElementById('panel-center') || document.getElementById('wheel-container');
+    if (panel) panel.appendChild(badge);
+  }
+  badge.innerHTML = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:6px;animation:liveActivePulse 1.3s infinite"></span>Live mit ' + agentName;
+  badge.style.display = 'block';
+}
+function hideLiveAgentBadge() {
+  const badge = document.getElementById('live-agent-badge');
+  if (badge) badge.style.display = 'none';
 }
 // === END GEMINI LIVE ===
 
