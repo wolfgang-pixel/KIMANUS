@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v24.11 - Langdruck laenger (900ms), Quick-Menu direkt ueber Bottom-Bar -->
+<!-- KIMANUS Wheel v24.12 - Bug-Fix: Langdruck startet nicht mehr Action, Tastatur versteckt Bottom-Bar -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -577,6 +577,19 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   border-bottom:2px solid rgba(255,255,255,0.2);
   flex-shrink:0;z-index:20;
   position:relative;
+  transition:opacity 0.2s, transform 0.25s;
+}
+/* Wenn Tastatur offen: Bottom-Bar + untere Glasplatte ausblenden */
+body.keyboard-open #bottom-bar{
+  opacity:0;
+  transform:translateY(100%);
+  pointer-events:none;
+}
+body.keyboard-open #panel-bottom{
+  opacity:0.3;
+}
+body.keyboard-open #input-mode-selector{
+  display:none !important;
 }
 /* Settings-Button + Hotkey-Slots: Wrapper mit Label darunter */
 .bar-item{
@@ -926,7 +939,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.11</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.12</span>
       </div>
     </div>
     <!-- Hamburger-Menu (ersetzt Clipboard + Refresh + Logo-Langdruck als Setup-Zugang) -->
@@ -1007,7 +1020,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="bar-item">
       <button id="settings-btn"
               type="button"
-              onclick="event.stopPropagation();triggerCurrentInputMode()"
+              onclick="inputModeBtnClickFallback(event)"
               ontouchstart="event.stopPropagation();inputModeBtnTouchStart(event)"
               ontouchend="event.stopPropagation();inputModeBtnTouchEnd(event)"
               ontouchmove="inputModeBtnTouchMove(event)"
@@ -3165,7 +3178,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.11 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.12 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4955,15 +4968,18 @@ let inputModeBtnLongPressTimer = null;
 let inputModeBtnLongPressFired = false;
 let inputModeBtnTouchStartX = 0;
 let inputModeBtnTouchStartY = 0;
+let inputModeBtnHandledTouch = false; // Flag: Touch wurde schon behandelt, onclick ignorieren
 
 function inputModeBtnTouchStart(e) {
   inputModeBtnLongPressFired = false;
+  inputModeBtnHandledTouch = false;
   if (e.touches && e.touches[0]) {
     inputModeBtnTouchStartX = e.touches[0].clientX;
     inputModeBtnTouchStartY = e.touches[0].clientY;
   }
   inputModeBtnLongPressTimer = setTimeout(() => {
     inputModeBtnLongPressFired = true;
+    inputModeBtnHandledTouch = true;
     // Haptic feedback beim Oeffnen des Menus
     if (navigator.vibrate) navigator.vibrate(30);
     showInputModeSelector();
@@ -4980,12 +4996,14 @@ function inputModeBtnTouchEnd(e) {
     clearTimeout(inputModeBtnLongPressTimer);
     inputModeBtnLongPressTimer = null;
   }
+  // Verhindern dass der nachfolgende click-Event auch feuert
+  e.preventDefault();
+  inputModeBtnHandledTouch = true;
   if (inputModeBtnLongPressFired) {
-    e.preventDefault();
+    // Langdruck: nur Menu, keine Aktion
     return;
   }
-  // Kein Langdruck = Klick = Modus starten
-  e.preventDefault();
+  // Kein Langdruck = kurzer Tap = Modus starten
   triggerCurrentInputMode();
 }
 function inputModeBtnTouchCancel() {
@@ -4993,6 +5011,17 @@ function inputModeBtnTouchCancel() {
     clearTimeout(inputModeBtnLongPressTimer);
     inputModeBtnLongPressTimer = null;
   }
+  inputModeBtnHandledTouch = true;
+}
+// Click-Fallback fuer Desktop-Maus (nicht fuer Touch)
+function inputModeBtnClickFallback(e) {
+  e.stopPropagation();
+  // Wenn gerade durch Touch behandelt, ignorieren (iOS sendet click nach touchend)
+  if (inputModeBtnHandledTouch) {
+    inputModeBtnHandledTouch = false;
+    return;
+  }
+  triggerCurrentInputMode();
 }
 
 // Input-Mode Selector (Quick-Switch Menu)
@@ -5086,6 +5115,8 @@ function closeHamburgerOutside(e) {
 }
 
 function openKeyboardInput() {
+  // Body-Klasse setzen: versteckt Bottom-Bar + andere Elemente die beim Hochfahren stoeren
+  document.body.classList.add('keyboard-open');
   // Erzeuge oder fokussiere ein verstecktes Eingabefeld
   let inp = document.getElementById('kb-hidden-input');
   if (!inp) {
@@ -5093,20 +5124,24 @@ function openKeyboardInput() {
     inp.id = 'kb-hidden-input';
     inp.type = 'text';
     inp.placeholder = 'Nachricht an KIM...';
-    inp.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:200;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(20,20,20,0.95);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(10px)';
+    inp.style.cssText = 'position:fixed;bottom:12px;left:16px;right:16px;z-index:200;padding:14px 16px;border-radius:12px;border:1.5px solid rgba(74,222,128,0.4);background:rgba(20,20,20,0.97);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && inp.value.trim()) {
         const text = inp.value.trim();
         inp.value = '';
         inp.blur();
         inp.style.display = 'none';
+        document.body.classList.remove('keyboard-open');
         // Nachricht an KIM senden (gleicher Weg wie Sprache)
         if (typeof sendToAgent === 'function') sendToAgent(text);
         else if (typeof sendChatMessage === 'function') sendChatMessage(text);
       }
     });
     inp.addEventListener('blur', () => {
-      setTimeout(() => { inp.style.display = 'none'; }, 200);
+      setTimeout(() => {
+        inp.style.display = 'none';
+        document.body.classList.remove('keyboard-open');
+      }, 200);
     });
     document.body.appendChild(inp);
   }
