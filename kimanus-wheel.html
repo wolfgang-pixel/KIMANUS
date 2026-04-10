@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v24.12 - Bug-Fix: Langdruck startet nicht mehr Action, Tastatur versteckt Bottom-Bar -->
+<!-- KIMANUS Wheel v24.13 - Tastatur ueberlagert Rad (viewport fix), Swipe wechselt Modus, Walkie-PTT im Input-Button -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, interactive-widget=overlays-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0e0e0e">
@@ -579,17 +579,33 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   position:relative;
   transition:opacity 0.2s, transform 0.25s;
 }
-/* Wenn Tastatur offen: Bottom-Bar + untere Glasplatte ausblenden */
+/* Wenn Tastatur offen: body wird fixiert damit Safari das Layout nicht hochschiebt */
+body.keyboard-open{
+  position:fixed;
+  top:0;left:0;right:0;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+}
+/* Wheel bleibt an seiner Position, die Tastatur legt sich darueber */
+body.keyboard-open #wheel-container{
+  /* keine Transformation - Rad bleibt wo es ist */
+}
 body.keyboard-open #bottom-bar{
   opacity:0;
   transform:translateY(100%);
   pointer-events:none;
 }
-body.keyboard-open #panel-bottom{
-  opacity:0.3;
-}
 body.keyboard-open #input-mode-selector{
   display:none !important;
+}
+/* Abdunkelndes Overlay ueber dem Rad wenn Tastatur offen (Fokus auf Eingabe) */
+body.keyboard-open::before{
+  content:"";
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:150;
+  pointer-events:none;
 }
 /* Settings-Button + Hotkey-Slots: Wrapper mit Label darunter */
 .bar-item{
@@ -631,6 +647,17 @@ body.keyboard-open #input-mode-selector{
 @keyframes inputMenuSlideUp{
   0%{opacity:0;transform:translateY(15px)}
   100%{opacity:1;transform:translateY(0)}
+}
+/* Swipe-Animation: Icon slided bei Modus-Wechsel */
+#settings-btn.swipe-right #main-input-icon{animation:swipeRight 0.25s ease-out}
+#settings-btn.swipe-left #main-input-icon{animation:swipeLeft 0.25s ease-out}
+@keyframes swipeRight{
+  0%{transform:translateX(-18px);opacity:0}
+  100%{transform:translateX(0);opacity:1}
+}
+@keyframes swipeLeft{
+  0%{transform:translateX(18px);opacity:0}
+  100%{transform:translateX(0);opacity:1}
 }
 /* Hotkey-Slots (Kaertchen, 3D-plastisch) */
 .hotkey-slot{
@@ -939,7 +966,7 @@ body.keyboard-open #input-mode-selector{
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.12</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.13</span>
       </div>
     </div>
     <!-- Hamburger-Menu (ersetzt Clipboard + Refresh + Logo-Langdruck als Setup-Zugang) -->
@@ -3178,7 +3205,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.12 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.13 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4963,65 +4990,114 @@ function triggerCurrentInputMode() {
   }
 }
 
-// Input-Modus-Button Touch-Handler (fuer Langdruck = Menu)
-let inputModeBtnLongPressTimer = null;
-let inputModeBtnLongPressFired = false;
+// Input-Modus-Button Touch-Handler (Option A: Swipe + Walkie-PTT)
+// - Tap (kurz) = Aktion starten (je nach Modus)
+// - Hold im Walkie-Modus = Push-to-Talk sprechen
+// - Swipe links/rechts = Modus wechseln (durch alle 4 Modi rotieren)
+const INPUT_MODES_ORDER = ['walkie', 'keyboard', 'stt', 'live'];
 let inputModeBtnTouchStartX = 0;
 let inputModeBtnTouchStartY = 0;
-let inputModeBtnHandledTouch = false; // Flag: Touch wurde schon behandelt, onclick ignorieren
+let inputModeBtnTouchStartTime = 0;
+let inputModeBtnSwipeFired = false;
+let inputModeBtnWalkieActive = false;
+let inputModeBtnHandledTouch = false;
+const INPUT_SWIPE_THRESHOLD = 40; // Pixel horizontal fuer Modus-Wechsel
+const INPUT_WALKIE_HOLD_MS = 180;  // Kurze Verzoegerung bevor Walkie-Aufnahme startet (gibt Zeit fuer Swipe-Erkennung)
+let inputModeBtnWalkieTimer = null;
 
 function inputModeBtnTouchStart(e) {
-  inputModeBtnLongPressFired = false;
+  inputModeBtnSwipeFired = false;
+  inputModeBtnWalkieActive = false;
   inputModeBtnHandledTouch = false;
   if (e.touches && e.touches[0]) {
     inputModeBtnTouchStartX = e.touches[0].clientX;
     inputModeBtnTouchStartY = e.touches[0].clientY;
+    inputModeBtnTouchStartTime = Date.now();
   }
-  inputModeBtnLongPressTimer = setTimeout(() => {
-    inputModeBtnLongPressFired = true;
-    inputModeBtnHandledTouch = true;
-    // Haptic feedback beim Oeffnen des Menus
-    if (navigator.vibrate) navigator.vibrate(30);
-    showInputModeSelector();
-  }, 900);
+  // Nur im Walkie-Modus: nach kurzer Verzoegerung Walkie-Aufnahme starten
+  if (currentInputMode === 'walkie') {
+    inputModeBtnWalkieTimer = setTimeout(() => {
+      inputModeBtnWalkieTimer = null;
+      if (!inputModeBtnSwipeFired) {
+        inputModeBtnWalkieActive = true;
+        if (navigator.vibrate) navigator.vibrate(20);
+        if (typeof walkieStartDirect === 'function') walkieStartDirect();
+      }
+    }, INPUT_WALKIE_HOLD_MS);
+  }
 }
 function inputModeBtnTouchMove(e) {
   if (!e.touches || !e.touches[0]) return;
-  const dx = Math.abs(e.touches[0].clientX - inputModeBtnTouchStartX);
-  const dy = Math.abs(e.touches[0].clientY - inputModeBtnTouchStartY);
-  if (dx > 10 || dy > 10) inputModeBtnTouchCancel();
+  const dx = e.touches[0].clientX - inputModeBtnTouchStartX;
+  const dy = e.touches[0].clientY - inputModeBtnTouchStartY;
+  const adx = Math.abs(dx);
+  const ady = Math.abs(dy);
+  // Horizontaler Swipe erkannt?
+  if (!inputModeBtnSwipeFired && !inputModeBtnWalkieActive && adx > INPUT_SWIPE_THRESHOLD && adx > ady * 1.5) {
+    inputModeBtnSwipeFired = true;
+    inputModeBtnHandledTouch = true;
+    // Walkie-Timer abbrechen
+    if (inputModeBtnWalkieTimer) {
+      clearTimeout(inputModeBtnWalkieTimer);
+      inputModeBtnWalkieTimer = null;
+    }
+    // Modus wechseln: links = vorheriger, rechts = naechster
+    const idx = INPUT_MODES_ORDER.indexOf(currentInputMode);
+    let newIdx;
+    if (dx < 0) newIdx = (idx - 1 + INPUT_MODES_ORDER.length) % INPUT_MODES_ORDER.length;
+    else newIdx = (idx + 1) % INPUT_MODES_ORDER.length;
+    if (navigator.vibrate) navigator.vibrate(15);
+    animateInputModeSwitch(dx > 0 ? 'right' : 'left');
+    setInputMode(INPUT_MODES_ORDER[newIdx]);
+  }
 }
 function inputModeBtnTouchEnd(e) {
-  if (inputModeBtnLongPressTimer) {
-    clearTimeout(inputModeBtnLongPressTimer);
-    inputModeBtnLongPressTimer = null;
-  }
-  // Verhindern dass der nachfolgende click-Event auch feuert
   e.preventDefault();
   inputModeBtnHandledTouch = true;
-  if (inputModeBtnLongPressFired) {
-    // Langdruck: nur Menu, keine Aktion
+  // Walkie-Timer aufraeumen
+  if (inputModeBtnWalkieTimer) {
+    clearTimeout(inputModeBtnWalkieTimer);
+    inputModeBtnWalkieTimer = null;
+  }
+  // Wenn Swipe gefeuert hat: nichts mehr tun (Modus wurde bereits gewechselt)
+  if (inputModeBtnSwipeFired) return;
+  // Wenn Walkie aktiv war: Aufnahme beenden + senden
+  if (inputModeBtnWalkieActive) {
+    inputModeBtnWalkieActive = false;
+    if (typeof walkieEndDirect === 'function') walkieEndDirect();
     return;
   }
-  // Kein Langdruck = kurzer Tap = Modus starten
+  // Sonst: kurzer Tap = Aktion starten je nach Modus
   triggerCurrentInputMode();
 }
 function inputModeBtnTouchCancel() {
-  if (inputModeBtnLongPressTimer) {
-    clearTimeout(inputModeBtnLongPressTimer);
-    inputModeBtnLongPressTimer = null;
+  if (inputModeBtnWalkieTimer) {
+    clearTimeout(inputModeBtnWalkieTimer);
+    inputModeBtnWalkieTimer = null;
+  }
+  if (inputModeBtnWalkieActive) {
+    inputModeBtnWalkieActive = false;
+    if (typeof walkieEndDirect === 'function') walkieEndDirect();
   }
   inputModeBtnHandledTouch = true;
 }
-// Click-Fallback fuer Desktop-Maus (nicht fuer Touch)
+// Click-Fallback fuer Desktop-Maus (Touch setzt Flag, dann ignoriert)
 function inputModeBtnClickFallback(e) {
   e.stopPropagation();
-  // Wenn gerade durch Touch behandelt, ignorieren (iOS sendet click nach touchend)
   if (inputModeBtnHandledTouch) {
     inputModeBtnHandledTouch = false;
     return;
   }
   triggerCurrentInputMode();
+}
+
+// Animation beim Modus-Wechsel (Icon slided raus und neues kommt rein)
+function animateInputModeSwitch(direction) {
+  const btn = document.getElementById('settings-btn');
+  if (!btn) return;
+  const className = direction === 'right' ? 'swipe-right' : 'swipe-left';
+  btn.classList.add(className);
+  setTimeout(() => btn.classList.remove(className), 250);
 }
 
 // Input-Mode Selector (Quick-Switch Menu)
@@ -5124,7 +5200,7 @@ function openKeyboardInput() {
     inp.id = 'kb-hidden-input';
     inp.type = 'text';
     inp.placeholder = 'Nachricht an KIM...';
-    inp.style.cssText = 'position:fixed;bottom:12px;left:16px;right:16px;z-index:200;padding:14px 16px;border-radius:12px;border:1.5px solid rgba(74,222,128,0.4);background:rgba(20,20,20,0.97);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 -4px 20px rgba(0,0,0,0.5)';
+    inp.style.cssText = 'position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0) + 8px);z-index:250;padding:14px 18px;border-radius:14px;border:1.5px solid rgba(74,222,128,0.45);background:rgba(15,15,15,0.98);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -8px 30px rgba(0,0,0,0.6),0 0 20px rgba(74,222,128,0.15)';
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && inp.value.trim()) {
         const text = inp.value.trim();
