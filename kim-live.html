@@ -30,7 +30,7 @@ body{background:#0e0e0e;color:#fff;font-family:-apple-system,sans-serif;height:1
 <body>
 <div id="header">
   <h1>KIM LIVE</h1>
-  <span>Echtzeit-Gespraech · Gemini Native Audio</span>
+  <span>v2.3 · Echtzeit-Gespraech · Gemini Native Audio</span>
 </div>
 <div id="status">Tippe den Button um zu sprechen</div>
 <div id="transcript"></div>
@@ -40,9 +40,9 @@ body{background:#0e0e0e;color:#fff;font-family:-apple-system,sans-serif;height:1
 </div>
 
 <script>
-const API_KEY = 'AIzaSyDYYuM-dXB5fTqzG_YMkvo0vbukGwvnelg';
-const MODEL = 'gemini-2.5-flash-native-audio-latest';
-const WS_URL = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${API_KEY}`;
+const MODEL = 'gemini-3.1-flash-live-preview';
+// WebSocket ueber Proxy-Server (API-Key sicher auf Server)
+const WS_URL = 'wss://voice.kimanus.de/ws/live';
 
 let ws = null;
 let audioContext = null;
@@ -76,6 +76,9 @@ async function toggleLive() {
 }
 
 async function startSession() {
+  // WICHTIG: AudioContext bei User-Geste erstellen (Safari Requirement)
+  ensurePlaybackContext();
+
   btn.className = 'connecting';
   btn.textContent = '⏳';
   setStatus('Verbinde mit KIM...');
@@ -103,7 +106,11 @@ async function startSession() {
 REGELN:
 - Antworte IMMER auf Deutsch
 - Maximal 2-3 Saetze, kurz und knapp
-- Sei freundlich und hilfsbereit
+- Sei freundlich und hilfsbereit wie eine gute Freundin
+- Sprich in ruhigem, gleichmaessigem Tempo - nicht zu schnell
+- Warte bis der Mensch fertig gesprochen hat bevor du antwortest
+- Unterbreche NIEMALS den Menschen
+- Kurze Pausen sind normal - nicht sofort reinreden
 - Du kennst die KIMANUS App: Riesenrad mit Glasplatten, Sprache-first
 - Stelle dich nicht vor, sag nicht "Hallo"
 - Direkt zur Sache`
@@ -112,8 +119,8 @@ REGELN:
           realtimeInputConfig: {
             automaticActivityDetection: {
               disabled: false,
-              startOfSpeechSensitivity: 'START_SENSITIVITY_HIGH',
-              endOfSpeechSensitivity: 'END_SENSITIVITY_HIGH'
+              startOfSpeechSensitivity: 'START_SENSITIVITY_LOW',
+              endOfSpeechSensitivity: 'END_SENSITIVITY_LOW'
             },
             activityHandling: 'START_OF_ACTIVITY_INTERRUPTS'
           }
@@ -122,8 +129,9 @@ REGELN:
       ws.send(JSON.stringify(setup));
     };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+    ws.onmessage = async (event) => {
+      const raw = event.data instanceof Blob ? await event.data.text() : event.data;
+      const data = JSON.parse(raw);
 
       if (data.setupComplete) {
         isLive = true;
@@ -233,6 +241,24 @@ async function startMicrophone() {
 // Safari: Ein globaler Playback-Context (nicht jedes Mal neu erstellen)
 let playCtx = null;
 
+// Safari: AudioContext MUSS bei User-Geste erstellt werden
+function ensurePlaybackContext() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!playCtx || playCtx.state === 'closed') {
+    playCtx = new AC({ sampleRate: 24000 });
+  }
+  // Stilles Audio abspielen um Safari zu entsperren
+  if (playCtx.state === 'suspended') {
+    playCtx.resume();
+    const silent = playCtx.createBuffer(1, 1, 24000);
+    const src = playCtx.createBufferSource();
+    src.buffer = silent;
+    src.connect(playCtx.destination);
+    src.start();
+  }
+  return playCtx;
+}
+
 async function playNextAudio() {
   if (playbackQueue.length === 0) { isPlaying = false; return; }
   isPlaying = true;
@@ -244,20 +270,27 @@ async function playNextAudio() {
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     const int16 = new Int16Array(bytes.buffer);
 
-    // Safari: Einen globalen Context wiederverwenden
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!playCtx || playCtx.state === 'closed') {
-      playCtx = new AC({ sampleRate: 24000 });
-    }
-    if (playCtx.state === 'suspended') await playCtx.resume();
+    const ctx = ensurePlaybackContext();
+    if (ctx.state === 'suspended') await ctx.resume();
 
-    const buffer = playCtx.createBuffer(1, int16.length, 24000);
+    const buffer = ctx.createBuffer(1, int16.length, 24000);
     const channel = buffer.getChannelData(0);
-    for (let i = 0; i < int16.length; i++) channel[i] = int16[i] / 32768;
+    // Audio normalisieren: Peak finden und auf konstante Lautstaerke bringen
+    let maxSample = 0;
+    for (let i = 0; i < int16.length; i++) {
+      const abs = Math.abs(int16[i]);
+      if (abs > maxSample) maxSample = abs;
+    }
+    const normalizeScale = maxSample > 0 ? 28000 / maxSample : 1;
+    for (let i = 0; i < int16.length; i++) channel[i] = (int16[i] * normalizeScale) / 32768;
 
-    const source = playCtx.createBufferSource();
+    const source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.connect(playCtx.destination);
+    // GainNode fuer gleichmaessige Lautstaerke
+    const gainNode = ctx.createGain();
+    gainNode.gain.value = 1.5; // Etwas lauter als Standard
+    source.connect(gainNode);
+    gainNode.connect(ctx.destination);
     source.onended = () => playNextAudio();
     source.start();
   } catch(err) {

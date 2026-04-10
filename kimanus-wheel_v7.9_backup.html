@@ -1,0 +1,3736 @@
+<!DOCTYPE html>
+<!-- KIMANUS Wheel v7.9 - KAI+KIM getrennt, Schliessfach, Postfach, Archiv -->
+<html lang="de" style="color-scheme:dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0e0e0e">
+<title>KIMANUS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--skin-bg);color:var(--skin-glass-text)}
+
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --kim-red:#e63946;
+  /* === SKIN VARIABLEN (austauschbar) === */
+  --skin-header-bg:#1a1a1a;
+  --skin-header-border:rgba(255,255,255,0.1);
+  --skin-bar-bg:#1a1a1a;
+  --skin-bar-border:rgba(255,255,255,0.12);
+  --skin-glass-bg:rgba(35,35,38,0.88);
+  --skin-glass-blur:12px;
+  --skin-glass-border:rgba(255,255,255,0.12);
+  --skin-glass-text:#f0f0f0;
+  --skin-tresor-bg:rgba(35,35,38,0.96);
+  --skin-tresor-blur:20px;
+  --skin-bg:#111111;
+}
+
+#app{
+  display:flex;flex-direction:column;
+  height:100dvh;
+  padding-top:var(--sat);padding-bottom:var(--sab);
+  position:fixed;inset:0;
+}
+
+/* === HEADER === */
+#header{
+  display:flex;align-items:center;gap:8px;
+  height:60px;
+  padding:0 12px;
+  background:var(--skin-header-bg);
+  border-bottom:2px solid rgba(255,255,255,0.15);
+  flex-shrink:0;z-index:20;
+}
+.logo-circle{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--kim-red);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:14px;color:#fff;
+}
+#header .title{font-size:18px;font-weight:800;letter-spacing:3px;flex:1}
+#header .hdr-btn{background:none;border:none;cursor:pointer;padding:4px}
+#header .hdr-btn svg{width:22px;height:22px;fill:#888}
+
+/* === DREI GLEICH GROSSE FELDER === */
+#wheel-container{
+  flex:1;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+
+.panel{
+  flex:1;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+/* Obere Glasplatte groesser (Platz fuer geflippte Karte) */
+#panel-top{
+  flex:1.2;
+}
+/* Sichtfenster fest */
+#panel-center{
+  flex:none;
+  height:230px;
+}
+/* Untere Glasplatte kleiner */
+#panel-bottom{
+  flex:0.8;
+}
+
+/* Milchiges Glas oben */
+#panel-top{
+  position:relative;
+}
+#panel-top::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  pointer-events:none;z-index:14;
+  border-bottom:2px solid rgba(255,255,255,0.2);
+}
+
+/* Sichtfenster - klar */
+#panel-center{
+  position:relative;z-index:5;
+}
+
+/* Milchiges Glas unten */
+#panel-bottom{
+  position:relative;
+}
+#panel-bottom::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(0deg, rgba(14,14,14,0.35) 0%, rgba(14,14,14,0.08) 80%, transparent 100%);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  pointer-events:none;z-index:14;
+  border-top:2px solid rgba(255,255,255,0.2);
+}
+
+/* === SWIPE HINT (pulsender Pfeil unter Milchglas) === */
+#swipe-hint-behind{
+  position:absolute;
+  bottom:calc(40% - 75px);
+  left:22px;
+  font-size:34px;
+  font-weight:200;
+  color:rgba(230,57,70,0.8);
+  z-index:0;
+  pointer-events:none;
+  animation:swipeHintGlow 2s ease-in-out infinite;
+}
+@keyframes swipeHintPulse{
+  0%{color:rgba(230,57,70,0);text-shadow:none}
+  50%{color:rgba(230,57,70,1);text-shadow:0 0 12px rgba(230,57,70,0.8)}
+  100%{color:rgba(230,57,70,0);text-shadow:none}
+}
+@keyframes swipeHintGlow{
+  0%{opacity:0}
+  50%{opacity:1}
+  100%{opacity:0}
+}
+#swipe-hint-behind.hidden{display:none}
+
+/* === RAD-MECHANISMUS === */
+#wheel-track,#back-track{
+  position:absolute;
+  left:0;right:0;
+  transition:transform 1.2s cubic-bezier(0.23,1,0.32,1);
+  will-change:transform;
+}
+#back-track{z-index:12}
+.back-wheel-card{
+  width:calc(100% - 20px);
+  height:210px;
+  position:absolute;
+  left:10px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px;
+  transition:all 1.2s cubic-bezier(0.23,1,0.32,1);
+}
+.back-wheel-card .bwc-title{
+  font-size:15px;font-weight:700;color:rgba(255,255,255,0.6);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:10px;
+}
+.back-wheel-card .bwc-content{
+  font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.8;
+  white-space:pre-line;
+}
+.back-wheel-card .bwc-video-full{
+  width:100%;
+  height:100%;
+  border-radius:0;
+}
+.back-wheel-card .bwc-video{
+  width:calc(100% - 16px);
+  height:calc(100% - 40px);
+  border-radius:4px;
+  margin-top:4px;
+}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes bwave{0%,100%{transform:scaleY(0.5)}50%{transform:scaleY(1.2)}}
+@keyframes sendPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,0.6)}50%{box-shadow:0 0 0 12px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@keyframes slideArrow{0%{transform:translateX(-30px);opacity:0}50%{opacity:1}100%{transform:translateX(30px);opacity:0}}
+.back-wheel-card .bwc-search-hint{
+  margin-top:12px;
+  font-size:10px;
+  color:rgba(230,57,70,0.4);
+  letter-spacing:0.5px;
+}
+
+.wheel-card{
+  height:210px;
+  width:calc(100% - 20px);
+  left:50%;
+  transform:translateX(-50%);
+  margin-left:0;
+  position:absolute;
+  border-radius:0;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  perspective:800px;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+
+/* Card-Inneres fuer Flip */
+.card-inner{
+  width:100%;height:100%;
+  position:relative;
+  transition:transform 1.2s cubic-bezier(0.25,0.1,0.25,1);
+  transform-style:preserve-3d;
+}
+.wheel-card.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.card-face{
+  position:absolute;inset:0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:0;
+  padding:16px;
+}
+
+/* Vorderseite */
+.card-front{
+  background:transparent;
+  padding:16px 20px;
+  justify-content:space-between;
+  align-items:stretch;
+}
+.card-front .card-icon{
+  font-size:48px;
+  position:absolute;top:14px;right:18px;
+}
+.card-front .card-header{
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-front .card-name{
+  font-size:26px;font-weight:700;color:rgba(255,255,255,0.6);
+  letter-spacing:1px;
+}
+.card-front .card-role{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.4);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.card-front .card-contact{
+  display:flex;flex-direction:column;gap:3px;
+}
+.card-front .card-contact span{
+  font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;
+}
+.card-front .card-brand{
+  position:absolute;bottom:14px;right:18px;
+  font-size:10px;font-weight:800;color:rgba(255,255,255,0.2);
+  letter-spacing:3px;
+}
+
+/* === Features-Layout (KIM-Karte etc.) === */
+.card-front .card-body{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  flex:1;margin-top:12px;gap:12px;
+}
+.card-front .card-features{
+  display:flex;flex-direction:column;gap:5px;
+  flex:1;
+}
+.card-front .card-features span{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.45);
+  letter-spacing:2px;text-transform:uppercase;line-height:1.4;
+}
+.card-front .card-features span::before{
+  content:'· ';font-weight:700;
+}
+.card-front .card-contact-right{
+  display:flex;flex-direction:column;gap:3px;
+  align-items:flex-end;text-align:right;
+  min-width:fit-content;padding-bottom:2px;
+}
+.card-front .card-contact-right span{
+  font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;
+}
+/* Subtitle fuer Karten mit features: KIMANUS nach dem Namen */
+.card-front .card-name .card-name-sub{
+  font-size:14px;font-weight:400;color:rgba(255,255,255,0.3);
+  letter-spacing:2px;margin-left:6px;
+}
+
+/* Rückseite */
+.card-back{
+  background:transparent;
+  transform:rotateY(180deg);
+}
+.card-back .back-title{
+  font-size:15px;font-weight:700;color:rgba(255,255,255,0.6);
+  text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:10px;
+}
+.card-back .back-content{
+  font-size:14px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.8;
+  white-space:pre-line;padding:0 20px;
+}
+
+/* === Grid-Layout (Scouts etc.) === */
+.grid-header{
+  position:absolute;top:12px;left:16px;
+  font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.grid-container{
+  display:grid;gap:6px;
+  width:100%;padding:0 4px;
+}
+.grid-cell{
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:3px;
+  background:rgba(255,255,255,0.02);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:2px;padding:2px;
+  overflow:hidden;
+}
+.grid-cell-filled{
+  background:rgba(255,255,255,0.05);
+  border-color:rgba(255,255,255,0.1);
+  cursor:pointer;
+}
+.grid-cell-filled:active{
+  background:rgba(255,255,255,0.1);
+}
+.grid-cell-icon{
+  font-size:22px;line-height:1;
+}
+.grid-cell-label{
+  font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);
+  text-align:center;letter-spacing:0.3px;text-transform:uppercase;
+  line-height:1.1;
+}
+
+.grid-sections{
+  width:100%;height:100%;display:flex;flex-direction:column;
+  padding:0;gap:0;
+  overflow:hidden;
+}
+.grid-section-header{
+  font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);
+  letter-spacing:3px;text-transform:uppercase;
+  padding:6px 6px 4px;
+  flex-shrink:0;
+}
+.grid-section{
+  min-height:0;
+}
+.grid-section .grid-cell{
+  height:auto;min-height:50px;
+}
+/* Grid-Karten: kein Padding, Inhalt fuellt ganze Karte */
+.back-wheel-card:has(.grid-sections),
+.back-wheel-card:has([style*="position:relative"]){
+  padding:0;
+}
+
+/* Keine Extra-Effekte - reine Glasplatte */
+
+/* === FLIP LABEL (Vorderseite oben beim Flip) === */
+#flip-label{
+  display:none;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%) scale(0.85);
+  z-index:30;
+  width:100%;
+  height:210px;
+  background:var(--skin-tresor-bg);
+  border:1px solid var(--skin-glass-border);
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  align-items:center;justify-content:center;
+  opacity:0;
+  transition:all 0.8s ease;
+}
+#flip-label.visible{
+  display:flex;
+  opacity:1;
+}
+.fl-card{
+  width:100%;height:100%;
+  padding:12px 16px;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+}
+.fl-card .fl-icon{font-size:36px;position:absolute;top:10px;right:14px}
+.fl-card .fl-name{font-size:22px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px}
+.fl-card .fl-role{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.fl-card .fl-contact{font-size:11px;color:rgba(255,255,255,0.25)}
+.fl-card .fl-features{display:flex;flex-direction:column;gap:1px;margin-top:4px}
+.fl-card .fl-features span{font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase}
+.fl-card .fl-brand{position:absolute;bottom:10px;right:14px;font-size:8px;font-weight:800;color:rgba(255,255,255,0.15);letter-spacing:3px}
+
+/* === KIM WAVE ANIMATION (Sprechen) === */
+@keyframes kimWaveBar {
+  0%,100% { height: 4px; }
+  50% { height: 22px; }
+}
+#kim-wave-container .wave-bar {
+  width: 3px;
+  border-radius: 2px;
+  background: #e63946;
+  animation: kimWaveBar 0.6s ease-in-out infinite;
+}
+#kim-wave-container .wave-bar:nth-child(1) { animation-delay: 0s; }
+#kim-wave-container .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+#kim-wave-container .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+#kim-wave-container .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+#kim-wave-container .wave-bar:nth-child(5) { animation-delay: 0.15s; }
+
+/* === KIM THINKING ANIMATION (Nachdenken) === */
+@keyframes kimThinkPulse {
+  0%,100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes kimThinkDot {
+  0%,80%,100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
+#kim-think-container .think-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e63946;
+  animation: kimThinkDot 1.4s ease-in-out infinite;
+}
+#kim-think-container .think-dot:nth-child(1) { animation-delay: 0s; }
+#kim-think-container .think-dot:nth-child(2) { animation-delay: 0.2s; }
+#kim-think-container .think-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* === REGISTER === */
+#register-panel{
+  display:none;
+  position:absolute;bottom:0;left:0;right:0;
+  height:33.33%;z-index:15;
+  background:#161616;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+#register-panel.visible{display:flex;flex-direction:column}
+#register-tabs{flex:1;overflow-y:auto;padding:6px 12px;scrollbar-width:none}
+#register-tabs::-webkit-scrollbar{display:none}
+.register-tab{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  cursor:pointer;
+}
+.register-tab:active{background:rgba(255,255,255,0.06)}
+.register-tab .tab-icon{font-size:20px}
+.register-tab .tab-name{font-size:14px;font-weight:600;color:#ccc;flex:1}
+
+/* === BOTTOM BAR === */
+#bottom-bar{
+  display:flex;align-items:center;justify-content:center;gap:20px;
+  height:80px;
+  margin-bottom:-40px;
+  padding:0 16px;
+  background:#161616;
+  border-top:2px solid rgba(255,255,255,0.15);
+  border-bottom:2px solid rgba(255,255,255,0.2);
+  flex-shrink:0;z-index:20;
+  position:relative;
+}
+
+#speech-btn{
+  width:70px;height:70px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%);
+  border:4px solid rgba(220,220,220,0.5);
+  box-shadow:0 4px 20px rgba(230,57,70,0.4);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform 0.15s;
+  margin-top:-35px;
+}
+#speech-btn:active{transform:scale(0.9)}
+#speech-btn svg{width:28px;height:28px;fill:#fff}
+#speech-btn.listening{animation:pulse 1s infinite}
+#speech-btn.send-ready{animation:sendPulse 1.5s infinite}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(230,57,70,0.7);transform:scale(1)}
+  50%{box-shadow:0 0 0 18px rgba(230,57,70,0);transform:scale(1.05)}
+  100%{box-shadow:0 0 0 0 rgba(230,57,70,0);transform:scale(1)}
+}
+
+.small-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.small-btn:active{transform:scale(0.9);background:rgba(255,255,255,0.1)}
+.small-btn svg{width:18px;height:18px;fill:#888}
+
+/* Status */
+#status-text{
+  display:none;
+}
+#speech-btn span{
+  font-size:26px;font-weight:800;color:#fff;letter-spacing:0;
+}
+
+/* === TASTATUR-TOOLBAR === */
+#kb-toolbar{
+  display:none;
+  position:fixed;
+  left:0;right:0;
+  bottom:0;
+  height:44px;
+  background:#1e1e1e;
+  border-top:1px solid rgba(255,255,255,0.1);
+  z-index:100;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 8px;
+  gap:6px;
+}
+#kb-toolbar.visible{display:flex}
+.kb-btn{
+  padding:6px 12px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);
+  font-size:12px;
+  cursor:pointer;
+  border-radius:4px;
+  white-space:nowrap;
+}
+.kb-btn:active{background:rgba(255,255,255,0.12)}
+.kb-analyze{background:rgba(230,57,70,0.15);border-color:rgba(230,57,70,0.3);color:rgba(230,57,70,0.6)}
+.kb-kim{background:rgba(230,57,70,0.1);border-color:rgba(230,57,70,0.2);color:rgba(230,57,70,0.5)}
+.kb-done{margin-left:auto}
+
+/* === TRESOR === */
+#tresor-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:15;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.5s;
+}
+#tresor-overlay.open{opacity:1;pointer-events:auto}
+/* Tresor-Panel: hinter Bottom Bar, gleiche Breite wie Karten */
+#tresor-panel{
+  position:fixed;
+  left:50%;
+  width:calc((100% - 10px) * 0.9);
+  bottom:-500px;
+  transform:translateX(-50%);
+  background:var(--skin-tresor-bg);
+  backdrop-filter:blur(var(--skin-tresor-blur));-webkit-backdrop-filter:blur(var(--skin-tresor-blur));
+  border:1px solid var(--skin-glass-border);
+  z-index:16;
+  transition:bottom 0.5s cubic-bezier(0.25,0.1,0.25,1);
+  padding:2px;
+}
+#tresor-overlay.open #tresor-panel{
+  bottom:80px;
+}
+/* Section-Titel: ganz schmal, fein */
+.tresor-section-title{
+  font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:1.5px;
+  padding:0 6px;
+  height:17px;
+  line-height:17px;
+  background:rgba(255,255,255,0.06);
+}
+.tresor-divider{
+  padding:0 6px;
+  height:17px;
+  line-height:17px;
+  margin:0;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;
+}
+.tresor-divider span{
+  font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.25);
+  letter-spacing:1.5px;
+}
+/* Grids: eng */
+.tresor-grid{
+  width:100%;
+  display:grid;
+  gap:0;
+}
+.tresor-grid-3x2{
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+.tresor-grid-2x2{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
+}
+.tresor-grid-2x1{
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:1fr;
+}
+.tresor-tab{
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;
+  border-right:1px solid rgba(255,255,255,0.07);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  cursor:pointer;
+  padding:10px 3px;
+  min-height:42px;
+}
+.tresor-tab:last-child{border-right:none}
+.tresor-tab:active{background:rgba(255,255,255,0.05)}
+.tresor-tab span{font-size:14px;font-weight:600;color:rgba(255,255,255,0.35);text-align:center}
+
+/* Tresor-Button links in Bar */
+#tresor-btn{
+  position:absolute;
+  left:15px;top:50%;transform:translateY(-50%);
+  font-size:20px;
+  cursor:pointer;
+  padding:8px;
+  opacity:0.4;
+  transition:opacity 0.3s;
+  border:none;background:none;
+  -webkit-tap-highlight-color:transparent;
+}
+#tresor-btn:active{opacity:0.7}
+
+/* Helligkeits-Schieber rechts in Bar */
+#brightness-slider{
+  position:absolute;
+  right:12px;top:50%;transform:translateY(-50%);
+  -webkit-appearance:none;appearance:none;
+  width:90px;height:4px;
+  background:rgba(255,255,255,0.15);
+  border-radius:2px;
+  outline:none;
+  opacity:0.5;
+  transition:opacity 0.3s;
+}
+#brightness-slider:active{opacity:0.9}
+#brightness-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;
+  background:#f0f0f0;
+  border:2px solid rgba(255,255,255,0.3);
+  cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="header">
+    <div class="logo-circle" onclick="showKimanusInfo()">K</div>
+    <div style="flex:1">
+      <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
+      <div onclick="showKimInfo()" style="cursor:pointer">
+        <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
+        <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
+      </div>
+    </div>
+    <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+  </div>
+
+  <div id="wheel-container">
+    <div id="flip-label">
+      <div class="fl-card" id="fl-card"></div>
+    </div>
+
+    <div class="panel" id="panel-top"></div>
+    <div class="panel" id="panel-center"></div>
+    <div class="panel" id="panel-bottom"></div>
+
+    <div id="swipe-hint-behind">&#x276E;</div>
+    <div id="wheel-track"></div>
+    <div id="back-track" style="display:none"></div>
+    <!-- Register-Panel entfernt -->
+  </div>
+
+  <div id="status-text"></div>
+
+  <!-- Tastatur-Toolbar (erscheint ueber der Tastatur) -->
+  <div id="kb-toolbar">
+    <button onclick="ytPaste()" class="kb-btn">📋 Einfügen</button>
+    <button onclick="ytAnalyze()" class="kb-btn kb-analyze">🔍 Los</button>
+    <button onclick="kbDismiss()" class="kb-btn kb-done">✓</button>
+    <button onclick="toggleSpeech()" class="kb-btn kb-kim">🎤 KIM</button>
+  </div>
+
+  <!-- Settings-Folie (iPhone-Style, von unten nach oben) -->
+  <div id="setup-overlay" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:50;pointer-events:none">
+    <div id="setup-backdrop" style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.35s" onclick="closeSetup()"></div>
+    <div id="setup-panel" style="position:absolute;left:0;right:0;bottom:0;height:92%;background:#000;border-radius:12px 12px 0 0;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);display:flex;flex-direction:column;pointer-events:auto">
+      <div style="display:flex;justify-content:center;padding:8px 0 4px"><div style="width:36px;height:5px;border-radius:3px;background:rgba(255,255,255,0.2)"></div></div>
+      <div id="setup-header" style="display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;flex-shrink:0">
+        <button id="setup-back" onclick="setupGoBack()" style="display:none;background:none;border:none;color:#007aff;font-size:17px;cursor:pointer;padding:4px 0;-webkit-tap-highlight-color:transparent">‹ Zurueck</button>
+        <div id="setup-back-spacer" style="width:70px"></div>
+        <span id="setup-title" style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.85)">Einstellungen</span>
+        <button onclick="closeSetup()" style="background:none;border:none;color:#007aff;font-size:17px;cursor:pointer;padding:4px 0;-webkit-tap-highlight-color:transparent">Fertig</button>
+      </div>
+      <div id="setup-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 40px"></div>
+    </div>
+  </div>
+
+  <!-- Tresor entfernt - Settings ist jetzt Fullscreen-Folie -->
+
+  <!-- Chat-Bereich (nur im Sichtfenster, Layout bleibt!) -->
+  <div id="chat-scroll-area" style="display:none;position:absolute;left:11px;right:11px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;z-index:13;background:#0e0e0e;border:1px solid rgba(255,255,255,0.08);padding:8px 12px;border-radius:0">
+    <div id="chat-messages" style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.6"></div>
+  </div>
+
+  <div id="bottom-bar">
+    <input type="range" id="brightness-slider" min="0" max="100" value="30" oninput="adjustBrightness(this.value)">
+    <button id="settings-btn" onclick="event.stopPropagation();openSettings()" type="button" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);margin-top:-8px;width:36px;height:36px;border-radius:50%;background:none;border:none;cursor:pointer;font-size:20px;color:rgba(255,255,255,0.35);-webkit-tap-highlight-color:transparent">⚙️</button>
+    <button id="speech-btn" ontouchstart="walkieStart(event)" ontouchend="walkieEnd(event)" onmousedown="walkieStart(event)" onmouseup="walkieEnd(event)" onclick="event.preventDefault()">
+      <span id="speech-agent">🎙</span>
+    </button>
+    <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 62px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  // --- 1. KIMANUS (Projekt-Vorstellung, Flip = PowerPoint-Praesentation) ---
+  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
+   backs:[
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
+     {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
+     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
+   ]},
+
+  // --- 2. KAI (Concierge + Vermittlung + Auskunft) ---
+  {id:'kai', icon:'👤', title:'KAI', subtitle:'Concierge · Vermittlung · Auskunft', color:'#e63946', email:'0800 524 2687', phone:'kai@kimanus.de',
+   backs:[
+     {title:'Ueber KAI', content:'Ich bin dein Concierge bei KIMANUS.\nIch verbinde dich mit dem richtigen Experten.\nIch beantworte einfache Fragen sofort.\nFuer Persoenliches stelle ich zu KIM durch.'},
+     {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
+     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
+     {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
+     {title:'Mein Team', content:'Ich habe ein ganzes Team hinter mir:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nDu sprichst nur mit mir.'},
+     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+     // --- Duplikate fuer fluessiges Endlos-Scrollen ---
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'SCOUTS', items:[
+         {icon:'🎬', label:'YouTube'},
+         {icon:'🌐', label:'Web'},
+         {icon:'📰', label:'News'},
+         {icon:'💰', label:'Deals'},
+         {icon:'📱', label:'Social'},
+       ]},
+       {label:'GUIDES', items:[
+         {icon:'🎭', label:'Animateur'},
+         {icon:'🍽️', label:'Gastro'},
+         {icon:'🚗', label:'Nachtfahrer'},
+         {icon:'📍', label:'RegioPilot'},
+         {icon:'🏛️', label:'Stadtfuehrer'},
+       ]},
+       {label:'BERATER', items:[
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'🌍', label:'Dolmetscher'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BERATER', items:[
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
+       {label:'BUSINESS', items:[
+         {icon:'🧮', label:'Kalkulierer'},
+         {icon:'📦', label:'Bestellprofi'},
+         {icon:'🏭', label:'Lagerist'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'💶', label:'Lena'},
+       ]},
+       {label:'SPEZIALISTEN', items:[
+         {icon:'💻', label:'IT-Hilfe'},
+         {icon:'🔒', label:'Safety'},
+         {icon:'📣', label:'Marketing'},
+         {icon:'🎵', label:'DJ'},
+         {icon:'🖨️', label:'Print'},
+       ]},
+     ]},
+   ]},
+
+  // --- 3. Tools (Werkzeuge, Hardware, Services) ---
+  {id:'tools', icon:'🛠️', title:'Tools', subtitle:'Scanner, Laser, Print & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+   features:['Scanner','Laser & Print','RegioPic','Fotoalbum','Alltagshelfer'],
+   backs:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'SCANNER', items:[
+         {icon:'📄', label:'Dokumente'},
+         {icon:'📷', label:'QR-Code'},
+         {icon:'💳', label:'Visitenkarte'},
+         {icon:'🧾', label:'Belege'},
+       ]},
+       {label:'LASER & PRINT', items:[
+         {icon:'✨', label:'Gravur'},
+         {icon:'🎁', label:'Geschenke'},
+         {icon:'🏆', label:'Pokale'},
+         {icon:'🖼️', label:'Leinwand'},
+       ]},
+       {label:'REGIOPIC', items:[
+         {icon:'🖨️', label:'Fotodruck'},
+         {icon:'📺', label:'Display'},
+         {icon:'🖼️', label:'E-Ink'},
+         {icon:'👴', label:'Oma & Opa'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'FOTOALBUM', items:[
+         {icon:'📸', label:'Album'},
+         {icon:'🌙', label:'Overnight'},
+         {icon:'📖', label:'Hardcover'},
+         {icon:'✈️', label:'Urlaub'},
+       ]},
+       {label:'ALLTAGSHELFER', items:[
+         {icon:'🍺', label:'Alkomat'},
+         {icon:'🔢', label:'Rechner'},
+         {icon:'🔦', label:'Lampe'},
+         {icon:'📌', label:'Brett'},
+       ]},
+     ]},
+   ]},
+
+  // --- 4. Wallet (Karten, Cap-Coin, NFC-Stempel, Bezahlen) ---
+  {id:'wallet', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
+   features:['Cap-Coin','NFC-Stempel','Bezahlen','Clubkarten','Glueck'],
+   backs:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'CAP-COIN', items:[
+         {icon:'🪙', label:'CapCoins'},
+         {icon:'🌍', label:'RegioCoins'},
+         {icon:'📱', label:'QR-Scan'},
+         {icon:'🍺', label:'Brauerei'},
+       ]},
+       {label:'NFC-STEMPEL', items:[
+         {icon:'📲', label:'Stempel'},
+         {icon:'🔒', label:'Sicher'},
+         {icon:'☕', label:'Kaffee'},
+         {icon:'🎯', label:'Treue'},
+       ]},
+       {label:'BEZAHLEN', items:[
+         {icon:'💳', label:'Karte'},
+         {icon:'🅿️', label:'PayPal'},
+         {icon:'🪙', label:'Coin'},
+         {icon:'🎁', label:'Gutschein'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'CLUBKARTEN', items:[
+         {icon:'🍽️', label:'Restaurant'},
+         {icon:'💪', label:'Fitness'},
+         {icon:'✂️', label:'Friseur'},
+         {icon:'🥐', label:'Baecker'},
+       ]},
+       {label:'GLUECK', items:[
+         {icon:'❤️', label:'Spenden'},
+         {icon:'🤝', label:'Direkt'},
+         {icon:'🌐', label:'Transparent'},
+         {icon:'🎗️', label:'Helfen'},
+       ]},
+     ]},
+   ]},
+
+  // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
+  {id:'archiv', icon:'📁', title:'Archiv', subtitle:'Dein zweites Gedaechtnis', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+   features:['Gedaechtnis','Fotos & Videos','Dokumente','Geraete','Buecher'],
+   backs:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'GEDAECHTNIS', items:[
+         {icon:'🧠', label:'Notizen'},
+         {icon:'📅', label:'Termine'},
+         {icon:'👤', label:'Kontakte'},
+         {icon:'❤️', label:'Vorlieben'},
+       ]},
+       {label:'FOTOS & VIDEOS', items:[
+         {icon:'📸', label:'Alben'},
+         {icon:'🎬', label:'Clips'},
+         {icon:'📖', label:'Druck'},
+         {icon:'👨‍👩‍👧', label:'Teilen'},
+       ]},
+       {label:'DOKUMENTE', items:[
+         {icon:'🧾', label:'Rechnungen'},
+         {icon:'📋', label:'Vertraege'},
+         {icon:'🪪', label:'Ausweise'},
+         {icon:'🔒', label:'Sicher'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'GERAETE', items:[
+         {icon:'📱', label:'Handy'},
+         {icon:'🔲', label:'Mikrowelle'},
+         {icon:'🖥️', label:'PC'},
+         {icon:'📘', label:'Anleitung'},
+       ]},
+       {label:'BUECHER', items:[
+         {icon:'📚', label:'Buecher'},
+         {icon:'🍳', label:'Rezepte'},
+         {icon:'🗺️', label:'Reisefuehrer'},
+         {icon:'📖', label:'Duden'},
+       ]},
+     ]},
+   ]},
+
+  // --- 6. Apps (Lieblings-Apps, Handy-Hilfe, Schutz) ---
+  {id:'apps', icon:'📱', title:'Apps', subtitle:'Deine Lieblings-Apps', color:'#06b6d4', email:'apps@kimanus.de', phone:'',
+   features:['Kommunikation','Navigation','Alltag','Handy-Hilfe','Schutz'],
+   backs:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'KOMMUNIKATION', items:[
+         {icon:'💬', label:'WhatsApp'},
+         {icon:'✈️', label:'Telegram'},
+         {icon:'📞', label:'Telefon'},
+         {icon:'📧', label:'E-Mail'},
+       ]},
+       {label:'NAVIGATION', items:[
+         {icon:'🗺️', label:'Maps'},
+         {icon:'🚂', label:'DB'},
+         {icon:'🎵', label:'Spotify'},
+         {icon:'🎬', label:'Netflix'},
+       ]},
+       {label:'ALLTAG', items:[
+         {icon:'🏦', label:'Banking'},
+         {icon:'🛒', label:'Amazon'},
+         {icon:'🍕', label:'Lieferando'},
+         {icon:'📅', label:'Kalender'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'HANDY-HILFE', items:[
+         {icon:'❓', label:'Erklaerung'},
+         {icon:'👆', label:'Anleitung'},
+         {icon:'👴', label:'Senioren'},
+         {icon:'🎓', label:'Profis'},
+       ]},
+       {label:'HANDY-SCHUTZ', items:[
+         {icon:'🚫', label:'Fake-Anruf'},
+         {icon:'🎣', label:'Phishing'},
+         {icon:'👶', label:'Kinder'},
+         {icon:'🔐', label:'Datenschutz'},
+       ]},
+     ]},
+   ]},
+
+  // --- 7. Chat (Gespraechs-Verlauf & Speicher) ---
+  {id:'chat', icon:'💬', title:'Chat', subtitle:'Deine letzten Gespraeche', color:'#f472b6', email:'chat@kimanus.de', phone:'',
+   features:['KAI','Justus','Wetterfrosch','Lena','Archiv'],
+   backs:[
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'LETZTE CHATS', items:[
+         {icon:'👤', label:'KAI'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'💶', label:'Lena'},
+         {icon:'🎭', label:'Animateur'},
+         {icon:'💻', label:'IT-Hilfe'},
+       ]},
+     ]},
+   ]},
+
+  // --- Verdoppelt fuer fluessiges Endlos-Rad ---
+  {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
+   backs:[
+     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
+     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
+     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
+     {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
+     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
+   ]},
+  {id:'kai2', icon:'👤', title:'KAI', subtitle:'Concierge · Vermittlung · Auskunft', color:'#e63946', email:'0800 524 2687', phone:'kai@kimanus.de',
+   features:[
+     'Scouts',
+     'Guides',
+     'Berater',
+     'Business',
+     'Spezialisten',
+   ],
+   backs:[
+     {title:'Ueber KIM', content:'Ich bin dein persoenlicher Assistent.\nIch kuemmer mich um alles.\nFrag mich einfach was du brauchst.\nIch verbinde dich mit dem richtigen Experten.'},
+     {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
+     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
+     {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
+     {title:'Mein Team', content:'Ich habe ein ganzes Team hinter mir:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nDu sprichst nur mit mir.'},
+     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+     // --- Duplikate fuer fluessiges Endlos-Scrollen ---
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'SCOUTS', items:[
+         {icon:'🎬', label:'YouTube'},
+         {icon:'🌐', label:'Web'},
+         {icon:'📰', label:'News'},
+         {icon:'💰', label:'Deals'},
+         {icon:'📱', label:'Social'},
+       ]},
+       {label:'GUIDES', items:[
+         {icon:'🎭', label:'Animateur'},
+         {icon:'🍽️', label:'Gastro'},
+         {icon:'🚗', label:'Nachtfahrer'},
+         {icon:'📍', label:'RegioPilot'},
+         {icon:'🏛️', label:'Stadtfuehrer'},
+       ]},
+       {label:'BERATER', items:[
+         {icon:'🌤️', label:'Wetterfrosch'},
+         {icon:'🌍', label:'Dolmetscher'},
+       ]},
+     ]},
+     {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
+       {label:'BERATER', items:[
+         {icon:'📅', label:'Sekretaer'},
+         {icon:'📚', label:'Bibliothekar'},
+       ]},
+       {label:'BUSINESS', items:[
+         {icon:'🧮', label:'Kalkulierer'},
+         {icon:'📦', label:'Bestellprofi'},
+         {icon:'🏭', label:'Lagerist'},
+         {icon:'⚖️', label:'Justus'},
+         {icon:'💶', label:'Lena'},
+       ]},
+       {label:'SPEZIALISTEN', items:[
+         {icon:'💻', label:'IT-Hilfe'},
+         {icon:'🔒', label:'Safety'},
+         {icon:'📣', label:'Marketing'},
+         {icon:'🎵', label:'DJ'},
+         {icon:'🖨️', label:'Print'},
+       ]},
+     ]},
+   ]},
+  {id:'tools2', icon:'🛠️', title:'Tools', subtitle:'Scanner, Laser, Print & mehr', color:'#10b981', email:'tools@kimanus.de', phone:'',
+   backs:[
+     {title:'Ueber Tools', content:'Werkzeuge die einfach\nfunktionieren.\nHardware + Software + Service.\nTippe oder sag KIM Bescheid.'},
+     {title:'Scanner', content:'Dokumente scannen\nQR-Codes & Cap-Coins lesen\nVisitenkarten erfassen\nBelege & Z-Bons fotografieren'},
+     {title:'Laser & Print', content:'Gravuren auf Glas, Holz, Leder\nPersonalisierte Geschenke\nSouvenirs & Pokale\nFotodruck & Leinwand'},
+     {title:'RegioPic', content:'Fotodrucker an der Rezeption\nDigitale Bilderrahmen (Display)\nE-Ink Wandbilder (32 Zoll)\nFamilienfotos fuer Oma & Opa'},
+     {title:'Fotoalbum-Service', content:'KIM layoutet dein Album\nwaehrend du Urlaub machst.\nOvernight-Druck ans Hotel.\nHardcover — am Morgen im Zimmer.'},
+     {title:'Alltagshelfer', content:'Alkomat — Promille-Check\nTaschenrechner & Timer\nTaschenlampe & Kompass\nSchwarzes Brett & Notizen'},
+   ]},
+  {id:'wallet2', icon:'💳', title:'Wallet', subtitle:'Karten, Coins & Bezahlen', color:'#f59e0b', email:'wallet@kimanus.de', phone:'',
+   backs:[
+     {title:'Dein Wallet', content:'Alle Karten und Coins\nan einem Ort.\nDigital bezahlen.\nFaelschungssicher per NFC.'},
+     {title:'Cap-Coin', content:'CapCoins sammeln per QR-Code.\nRegioCoins regional einloesen.\n1 Cap-Coin = 10 Cent\nBei allen Partnern gueltig.'},
+     {title:'NFC-Stempelkarte', content:'Handy an den Stempel halten.\nFaelschungssicher — kein Betrug!\nAlle Stempelkarten in einer App.\nNie wieder Karte vergessen.'},
+     {title:'Bezahlen', content:'PayPal • Kreditkarte\nCap-Coin Guthaben\nGutscheine einloesen & verschenken\nSicher & verschluesselt.'},
+     {title:'Clubkarten', content:'Lieblingslokal • Fitnessstudio\nFriseur • Stammbaeckerei\nMitgliedskarten digital.\nImmer dabei, nie verloren.'},
+     {title:'Verschenktes Glueck', content:'Ein Teil geht an Menschen in Not.\nTransparent & direkt.\nKeine Verwaltungskosten.\nDein Konsum hilft automatisch.'},
+   ]},
+  {id:'archiv2', icon:'📁', title:'Archiv', subtitle:'Dein zweites Gedaechtnis', color:'#8b5cf6', email:'archiv@kimanus.de', phone:'',
+   backs:[
+     {title:'Dein Gedaechtnis', content:'KIM merkt sich alles fuer dich.\nNotizen, Erinnerungen, Kontakte.\nVorlieben, Allergien, Termine.\nDu bestimmst was KIM weiss.'},
+     {title:'Fotos & Videos', content:'Fotoalben nach Anlass sortiert.\nYouTube-Clips & Playlists.\nAlbum-Druck per Overnight-Service.\nTeilen mit Familie & Freunden.'},
+     {title:'Dokumente', content:'Rechnungen • Lieferscheine\nVertraege • Belege • Urkunden\nAusweise • Fuehrerschein\nAlles verschluesselt & sicher.'},
+     {title:'Meine Geraete', content:'Bedienungsanleitungen gespeichert.\nFrag KIM: "Was kann meine Mikrowelle?"\nKIM erklaert jede Funktion.\nNie wieder Handbuch lesen.'},
+     {title:'Mein Buecherregal', content:'Lieblingsbuecher & Rezepte.\nMarkierte Passagen wiederfinden.\nKochbuecher • Reisefuehrer\nKIM liest vor & sucht raus.'},
+     {title:'Nachschlagewerke', content:'Brockhaus • Duden • Atlas\nGelbe Seiten • Wer liefert was?\nTelefonbuch • Fachliteratur\nAlles was frueher im Regal stand.'},
+   ]},
+  {id:'apps2', icon:'📱', title:'Apps', subtitle:'Deine Lieblings-Apps', color:'#06b6d4', email:'apps@kimanus.de', phone:'',
+   backs:[
+     {title:'Ueber Apps', content:'Deine wichtigsten Apps\ndirekt von KIMANUS aus starten.\nKein App-Chaos mehr.\nAlles an einem Ort.'},
+     {title:'Kommunikation', content:'WhatsApp • Telegram\nSignal • Telefon\nE-Mail • SMS\nSag KIM wen du erreichen willst.'},
+     {title:'Navigation & Medien', content:'Google Maps • DB Navigator\nSpotify • Netflix • Podcasts\nKamera • Galerie\n"KIM, navigiere mich nach..."'},
+     {title:'Alltag', content:'Banking • PayPal\nLieferando • Amazon\nWetter • Kalender\nDie Apps die du taeglich brauchst.'},
+     {title:'Handy-Hilfe', content:'KIM erklaert jede Funktion.\n"Was macht dieser Knopf?"\nSchritt-fuer-Schritt Anleitung.\nFuer Anfaenger & Profis.'},
+     {title:'Handy-Schutz', content:'Fake-Anruf Erkennung\nPhishing & Betrugs-Warnung\nKindersicherung & Zeitlimits\nDatenschutz-Check fuer Apps'},
+   ]},
+  {id:'chat2', icon:'💬', title:'Chat', subtitle:'Deine letzten Gespraeche', color:'#f472b6', email:'chat@kimanus.de', phone:'',
+   backs:[
+     {title:'Letzte Gespraeche', content:'Hier findest du alle deine\nChats auf einen Blick.\nTippe um weiterzulesen.\nNeueste zuerst.'},
+     {title:'KIM — gerade eben', content:'Wie wird das Wetter morgen?\n→ Sonnig, 22 Grad...\n\n(Tippe um fortzusetzen)'},
+     {title:'Justus — gestern', content:'Mietvertrag pruefen\n→ Klausel 4 ist unwirksam...\n\n(Tippe um fortzusetzen)'},
+     {title:'Wetterfrosch — Mo', content:'Wochenende in Coburg?\n→ Samstag perfekt, Sonntag Regen\n\n(Tippe um fortzusetzen)'},
+     {title:'Lena — letzte Woche', content:'EDEKA Rechnung checken\n→ Differenz 12,50 EUR gefunden\n\n(Tippe um fortzusetzen)'},
+     {title:'Aeltere Gespraeche', content:'Alle bisherigen Chats\nnach Datum sortiert.\nSuche per Sprache:\n"KIM, was hab ich letztens gefragt?"'},
+   ]},
+];
+
+// === AGENTEN-REGISTRY (jeder Agent einzeln aufs Rad schaltbar) ===
+const ALL_AGENTS = [
+  // Scouts
+  {id:'ag-youtube', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'youtube@kimanus.de', phone:'Durchwahl 101', category:'Scouts', backs:[{title:'Ueber mich', content:'Ich finde die besten Videos\nfuer dich auf YouTube.\nKapitel, Timestamps, Analyse.'}]},
+  {id:'ag-web', icon:'🌐', title:'Web Scout', subtitle:'Internet-Recherche', color:'#4285f4', email:'web@kimanus.de', phone:'Durchwahl 102', category:'Scouts', backs:[{title:'Ueber mich', content:'Ich durchsuche das Web\nfuer dich. Fakten-Check,\nQuellen pruefen, zusammenfassen.'}]},
+  {id:'ag-news', icon:'📰', title:'News Scout', subtitle:'Nachrichten & Trends', color:'#34a853', email:'news@kimanus.de', phone:'Durchwahl 103', category:'Scouts', backs:[{title:'Ueber mich', content:'Aktuelle Nachrichten\nund Trends fuer dich.\nRegional und weltweit.'}]},
+  {id:'ag-deals', icon:'💰', title:'Deal Scout', subtitle:'Schnaeppchen & Angebote', color:'#fbbc05', email:'deals@kimanus.de', phone:'Durchwahl 104', category:'Scouts', backs:[{title:'Ueber mich', content:'Ich finde die besten\nAngebote und Schnaeppchen.\nPreisvergleich inklusive.'}]},
+  {id:'ag-social', icon:'📱', title:'Social Scout', subtitle:'Social Media', color:'#e1306c', email:'social@kimanus.de', phone:'Durchwahl 105', category:'Scouts', backs:[{title:'Ueber mich', content:'Trends auf Social Media.\nWas ist viral, was relevant\nfuer dich.'}]},
+  // Guides
+  {id:'ag-animateur', icon:'🎭', title:'Animateur', subtitle:'Freizeit & Events', color:'#ff6b35', email:'freizeit@kimanus.de', phone:'Durchwahl 201', category:'Guides', backs:[{title:'Ueber mich', content:'Ausflugsziele, Events,\nFreizeit-Tipps in deiner Region.\nImmer was los!'}]},
+  {id:'ag-gastro', icon:'🍽️', title:'Gastro-Guide', subtitle:'Restaurants & Tipps', color:'#d4a574', email:'gastro@kimanus.de', phone:'Durchwahl 202', category:'Guides', backs:[{title:'Ueber mich', content:'Die besten Restaurants,\nCafes und Bars.\nReservierung inklusive.'}]},
+  {id:'ag-nachtfahrer', icon:'🚗', title:'Nachtfahrer', subtitle:'Komm gut heim', color:'#1a1a2e', email:'heimfahrt@kimanus.de', phone:'Durchwahl 203', category:'Guides', backs:[{title:'Ueber mich', content:'Sichere Heimfahrt.\nTaxi rufen, Route planen.\nAlkomat-Check.'}]},
+  {id:'ag-regiopilot', icon:'📍', title:'RegioPilot', subtitle:'Regionale Geheimtipps', color:'#2d6a4f', email:'regio@kimanus.de', phone:'Durchwahl 204', category:'Guides', backs:[{title:'Ueber mich', content:'Geheimtipps in deiner Region.\nOrte die kein Tourist kennt.\nEcht und authentisch.'}]},
+  {id:'ag-stadtfuehrer', icon:'🏛️', title:'Stadtfuehrer', subtitle:'Sehenswuerdigkeiten', color:'#6b705c', email:'tour@kimanus.de', phone:'Durchwahl 205', category:'Guides', backs:[{title:'Ueber mich', content:'Stadtfuehrung per Sprache.\nGeschichte, Architektur,\nKultur erleben.'}]},
+  // Berater
+  {id:'ag-wetterfrosch', icon:'🌤️', title:'Wetterfrosch', subtitle:'Wetter & Lifestyle', color:'#48cae4', email:'wetter@kimanus.de', phone:'Durchwahl 301', category:'Berater', backs:[{title:'Ueber mich', content:'Wetter und was du\ndaraus machen kannst.\nAnzieh-Tipps inklusive.'}]},
+  {id:'ag-dolmetscher', icon:'🌍', title:'Dolmetscher', subtitle:'Uebersetzen & Sprachen', color:'#7209b7', email:'sprache@kimanus.de', phone:'Durchwahl 302', category:'Berater', backs:[{title:'Ueber mich', content:'Ich uebersetze fuer dich.\nAlle Sprachen, sofort.\nAuch Dokumente.'}]},
+  {id:'ag-sekretaer', icon:'📅', title:'Sekretaer', subtitle:'Termine & Planung', color:'#3a86ff', email:'termine@kimanus.de', phone:'Durchwahl 303', category:'Berater', backs:[{title:'Ueber mich', content:'Termine verwalten,\nErinnerungen setzen,\nTagesablauf planen.'}]},
+  {id:'ag-bibliothekar', icon:'📚', title:'Bibliothekar', subtitle:'Wissen & Gedaechtnis', color:'#8338ec', email:'wissen@kimanus.de', phone:'Durchwahl 304', category:'Berater', backs:[{title:'Ueber mich', content:'Dein Wissen verwalten.\nBuecher, Notizen, Passagen.\nIch vergesse nichts.'}]},
+  // Business
+  {id:'ag-kalkulierer', icon:'🧮', title:'Kalkulierer', subtitle:'Rohaufschlag & Marge', color:'#06d6a0', email:'kalkulation@kimanus.de', phone:'Durchwahl 401', category:'Business', backs:[{title:'Ueber mich', content:'Rohaufschlag berechnen,\nMarge optimieren,\nPreise kalkulieren.'}]},
+  {id:'ag-bestellprofi', icon:'📦', title:'Bestellprofi', subtitle:'Lieferanten & Mengen', color:'#118ab2', email:'bestellung@kimanus.de', phone:'Durchwahl 402', category:'Business', backs:[{title:'Ueber mich', content:'Bestellvorschlaege,\nLieferanten-Split,\nPreiserhoehungen im Blick.'}]},
+  {id:'ag-lagerist', icon:'🏭', title:'Lagerist', subtitle:'Bestand & Inventur', color:'#073b4c', email:'lager@kimanus.de', phone:'Durchwahl 403', category:'Business', backs:[{title:'Ueber mich', content:'Bestandserfassung per Kamera,\nMix-Matrix, Inventur,\nVerlust-Protokoll.'}]},
+  // Rechtsabteilung
+  {id:'ag-justus', icon:'⚖️', title:'Justus', subtitle:'Allgemeines Recht', color:'#264653', email:'recht@kimanus.de', phone:'Durchwahl 404', category:'Recht', backs:[{title:'Ueber mich', content:'Allgemeine Rechtsfragen,\nVertraege pruefen,\nMietrecht, Kaufrecht.'}]},
+  {id:'ag-steuerrecht', icon:'🧾', title:'Dr. Steuer', subtitle:'Steuerrecht', color:'#264653', email:'steuer@kimanus.de', phone:'Durchwahl 410', category:'Recht', backs:[{title:'Ueber mich', content:'Steuererklärung,\nBetriebspruefung,\nUmsatzsteuer, Gewerbesteuer.'}]},
+  {id:'ag-patentrecht', icon:'💡', title:'Patentius', subtitle:'Patent- & Markenrecht', color:'#264653', email:'patent@kimanus.de', phone:'Durchwahl 411', category:'Recht', backs:[{title:'Ueber mich', content:'Patentanmeldung,\nMarkenschutz, DPMA, EUIPO,\nDesignschutz.'}]},
+  {id:'ag-arbeitsrecht', icon:'👷', title:'Arbex', subtitle:'Arbeitsrecht', color:'#264653', email:'arbeit@kimanus.de', phone:'Durchwahl 412', category:'Recht', backs:[{title:'Ueber mich', content:'Arbeitsvertraege,\nKuendigung, Abmahnung,\nBetriebsrat, Urlaub.'}]},
+  {id:'ag-veranstaltungsrecht', icon:'🎪', title:'Eventus', subtitle:'Veranstaltungsrecht', color:'#264653', email:'event-recht@kimanus.de', phone:'Durchwahl 413', category:'Recht', backs:[{title:'Ueber mich', content:'Genehmigungen, GEMA,\nHaftung, Versicherung,\nJugendschutz, Laermschutz.'}]},
+  // Finanzabteilung
+  {id:'ag-lena', icon:'💶', title:'Lena', subtitle:'Buchhaltung', color:'#2a9d8f', email:'finanzen@kimanus.de', phone:'Durchwahl 405', category:'Finanzen', backs:[{title:'Ueber mich', content:'Buchhaltung, Belege,\nRechnungen schreiben,\nMahnwesen.'}]},
+  {id:'ag-steuerlena', icon:'📊', title:'Steuerchen', subtitle:'Steuern & Abgaben', color:'#2a9d8f', email:'steuern@kimanus.de', phone:'Durchwahl 414', category:'Finanzen', backs:[{title:'Ueber mich', content:'Steuererklärung vorbereiten,\nVoranmeldungen,\nAbschreibungen.'}]},
+  {id:'ag-controlling', icon:'📈', title:'Controller', subtitle:'Controlling & Analyse', color:'#2a9d8f', email:'controlling@kimanus.de', phone:'Durchwahl 415', category:'Finanzen', backs:[{title:'Ueber mich', content:'Kennzahlen, Berichte,\nBudgetplanung,\nSoll-Ist-Vergleich.'}]},
+  // Spezialisten
+  {id:'ag-ithilfe', icon:'💻', title:'IT-Hilfe', subtitle:'Technik-Support', color:'#e76f51', email:'hilfe@kimanus.de', phone:'Durchwahl 501', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Technik-Probleme loesen.\nGeduldig erklaert.\nFuer Anfaenger & Profis.'}]},
+  {id:'ag-safety', icon:'🔒', title:'Safety-Checker', subtitle:'NFC-Sicherheit', color:'#264653', email:'sicherheit@kimanus.de', phone:'Durchwahl 502', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Sicherheitsrundgaenge,\nNFC-Pruefungen, HACCP.\nManipulationssicher.'}]},
+  {id:'ag-marketing', icon:'📣', title:'Marketing', subtitle:'Werbung & Social Media', color:'#e63946', email:'marketing@kimanus.de', phone:'Durchwahl 503', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Werbung, Posts, Kampagnen.\nContent erstellen.\nReichweite steigern.'}]},
+  {id:'ag-dj', icon:'🎵', title:'DJ', subtitle:'Musik & Playlists', color:'#9b5de5', email:'musik@kimanus.de', phone:'Durchwahl 504', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Musik fuer jeden Anlass.\nPlaylists, Wuensche,\nStimmung machen.'}]},
+  {id:'ag-print', icon:'🖨️', title:'Print-Memorys', subtitle:'Drucksachen', color:'#f15bb5', email:'print@kimanus.de', phone:'Durchwahl 505', category:'Spezialisten', backs:[{title:'Ueber mich', content:'Fotodruck, Gravur,\nSouvenirs, Alben.\nErinnerungen zum Anfassen.'}]},
+];
+
+// Scout-Karten
+const SCOUTS = [
+  {id:'yt-scout', icon:'🎬', title:'YouTube Scout', subtitle:'Video-Spezialist', color:'#ff0000', email:'video@kimanus.de', phone:'Durchwahl 101',
+   backs:[
+     {title:'', content:'', type:'yt-input'},
+     {title:'', content:'', type:'yt-player'},
+     {title:'', content:'', type:'yt-chapters'},
+     {title:'', content:'', type:'yt-saved'},
+     {title:'', content:'', type:'yt-info'},
+   ]},
+  {id:'web-scout', icon:'🌐', title:'Web Scout', subtitle:'Internet-Rechercheur', color:'#4285f4', email:'recherche@kimanus.de', phone:'Durchwahl 102',
+   backs:[
+     {title:'Suche', content:'Ich durchsuche das Web\nfür dich!'},
+     {title:'Fakten-Check', content:'Quellen prüfen\nFake News erkennen\nZusammenfassen'},
+     {title:'Zuletzt', content:'Brauerei-Preise recherchiert\nWettbewerber analysiert'},
+     {title:'Fähigkeiten', content:'Google • Wikipedia\nNachrichtenseiten\nFachportale'},
+     {title:'Einstellungen', content:'Sprache: Deutsch\nRegion: Bayern\nSafe Search: An'},
+   ]},
+  {id:'news-scout', icon:'📰', title:'News Scout', subtitle:'Nachrichten-Jäger', color:'#1a73e8', email:'news@kimanus.de', phone:'Durchwahl 103',
+   backs:[
+     {title:'Heute', content:'3 relevante Nachrichten\nfür dich gefunden'},
+     {title:'Gastronomie', content:'Neue Hygiene-Verordnung ab Mai\nMehrwegpflicht Update'},
+     {title:'Technologie', content:'KI-Gesetz EU beschlossen\nNeue Whisper Version'},
+     {title:'Regional', content:'Volksfest Nürnberg Termine\nNeue Brauerei eröffnet'},
+     {title:'Einstellungen', content:'Themen: Gastro, Tech, Regional\nFrequenz: Täglich'},
+   ]},
+  {id:'deal-scout', icon:'💰', title:'Deal Scout', subtitle:'Schnäppchen-Finder', color:'#34a853', email:'deals@kimanus.de', phone:'Durchwahl 104',
+   backs:[
+     {title:'Aktuelle Deals', content:'Metro: Rindfleisch -15%\nSelgros: Getränke-Aktion'},
+     {title:'Preisalarm', content:'3 Preisalarme aktiv\nLachs unter 12€/kg\nOlivenöl unter 8€/l'},
+     {title:'Vergleich', content:'Metro vs. Selgros\nvs. Hamberger\nBester Preis markiert'},
+     {title:'Lieferanten', content:'Metro Nürnberg\nSelgros Fürth\nHamberger Online'},
+     {title:'Gespart', content:'Diese Woche: 127€\nDieser Monat: 483€'},
+   ]},
+  {id:'social-scout', icon:'📱', title:'Social Scout', subtitle:'Social Media Finder', color:'#e1306c', email:'social@kimanus.de', phone:'Durchwahl 105',
+   backs:[
+     {title:'Trends', content:'#FrankenBier trending\n#Gastro2026 aktiv'},
+     {title:'Instagram', content:'Neue Posts von\nfränkischen Brauereien'},
+     {title:'TikTok', content:'Virale Gastro-Videos\nKoch-Trends'},
+     {title:'Bewertungen', content:'3 neue Google Reviews\n1 neue Tripadvisor'},
+     {title:'Wettbewerber', content:'Konkurrenz-Posts\ndieser Woche analysiert'},
+   ]},
+];
+
+// REGISTERS entfernt - Inhalt lebt jetzt auf KIM's Rueckseite
+
+let activeCards = CARDS;
+let currentIndex = 0;
+let isFlipped = false;
+let backIndex = 0;
+let isListening = false;
+let registerOpen = false;
+let panelH = 0;
+let isAnimating = false;
+
+function init() {
+  calcSizes();
+  // Setup-Config anwenden BEVOR Karten gebaut werden
+  rebuildWheel();
+
+  // Wiederkehrende Nutzer: letzte Position wiederherstellen
+  const visited = localStorage.getItem('kimanus-visited');
+  const lastCard = parseInt(localStorage.getItem('kimanus-lastCard') || '0');
+  if (visited && lastCard > 0 && lastCard < activeCards.length) {
+    currentIndex = lastCard;
+    positionCards(false);
+  }
+
+  window.addEventListener('resize', () => { calcSizes(); positionCards(false); });
+}
+
+function calcSizes() {
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+  panelH = centerH;
+  // Debug
+  document.querySelector('#header .title').textContent = 'KIMANUS';
+}
+
+function buildCards() {
+  const track = document.getElementById('wheel-track');
+  track.innerHTML = activeCards.map((card, i) => `
+    <div class="wheel-card" id="card-${i}" onclick="handleCardTap(${i})">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-icon">${card.icon}</div>
+          <div class="card-header">
+            <div class="card-name">${card.title}${card.features ? '<span class="card-name-sub">KIMANUS</span>' : ''}</div>
+            <div class="card-role">${card.subtitle}</div>
+          </div>
+          ${card.features ? `
+          <div class="card-body">
+            <div class="card-features">
+              ${card.features.map(f => `<span>${f}</span>`).join('')}
+            </div>
+            <div class="card-contact-right">
+              <span>${card.email || ''}</span>
+              <span>${card.phone || ''}</span>
+            </div>
+          </div>
+          ` : `
+          <div class="card-contact">
+            <span>${card.email || ''}</span>
+            <span>${card.phone || ''}</span>
+          </div>
+          <div class="card-brand">KIMANUS</div>
+          `}
+        </div>
+        <div class="card-face card-back">
+          <div class="back-title" id="back-title-${i}">${card.backs?.[0]?.title || ''}</div>
+          <div class="back-content" id="back-content-${i}">${card.backs?.[0]?.content || ''}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function positionCards(animate) {
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+
+  // Mittelpunkte der drei Panels
+  const topMid = topH / 2;
+  const centerMid = topH + (centerH / 2);
+  const bottomMid = topH + centerH + (bottomH / 2);
+
+  activeCards.forEach((card, i) => {
+    const el = document.getElementById('card-' + i);
+    if (!el) return;
+
+    const cardH = el.offsetHeight || 200;
+    const offset = getOffset(i);
+
+    let cardMid;
+    if (offset === 0) cardMid = centerMid;
+    else if (offset === -1) cardMid = topMid;
+    else if (offset === 1) cardMid = bottomMid + 40;
+    else if (offset < -1) cardMid = topMid - topH;
+    else cardMid = bottomMid + bottomH + 60;
+
+    el.style.top = (cardMid - cardH / 2) + 'px';
+    el.style.transition = animate ? 'all 1.2s cubic-bezier(0.23,1,0.32,1)' : 'none';
+
+    if (offset === 0) {
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) scale(1)';
+      el.style.zIndex = '10';
+    } else if (Math.abs(offset) === 1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'translateX(-50%) scale(0.9)';
+      el.style.zIndex = '5';
+    } else {
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(-50%) scale(0.8)';
+      el.style.zIndex = '1';
+    }
+  });
+  updateStatus();
+  updateFlipLabel();
+}
+
+function getOffset(i) {
+  let diff = i - currentIndex;
+  if (diff > activeCards.length / 2) diff -= activeCards.length;
+  if (diff < -activeCards.length / 2) diff += activeCards.length;
+  return diff;
+}
+
+function spinWheel(direction) {
+  if (isAnimating) return;
+  // Chat/Dialogplatte schliessen beim Wischen
+  closeChatOverlay();
+  // Header-Karte entfernen wenn User am Rad dreht
+  if (headerCardActive && !isFlipped) {
+    hideHeaderCard();
+    return;
+  }
+  if (isFlipped) {
+    const backs = activeCards[currentIndex].backs || [];
+    if (backs.length < 2) return;
+    isAnimating = true;
+    backIndex = (backIndex + direction + backs.length) % backs.length;
+    positionBackCards(true);
+    setTimeout(() => { isAnimating = false; }, 400);
+    return;
+  }
+  isAnimating = true;
+  currentIndex = (currentIndex + direction + activeCards.length) % activeCards.length;
+  positionCards(true);
+  // Position merken
+  localStorage.setItem('kimanus-lastCard', currentIndex);
+  localStorage.setItem('kimanus-visited', 'true');
+  setTimeout(() => { isAnimating = false; }, 400);
+}
+
+function handleCardTap(i) {
+  if (i === currentIndex) {
+    // Aktive Karte antippen = Flip
+    flipCard();
+  }
+}
+
+function flipCard() {
+  closeChatOverlay();
+  const el = document.getElementById('card-' + currentIndex);
+  if (!el) return;
+  isFlipped = !isFlipped;
+  // Swipe-Hint: verstecken wenn geflippt, zeigen wenn zurueck
+  const hb = document.getElementById('swipe-hint-behind');
+  if (hb) hb.style.display = isFlipped ? 'none' : 'block';
+  backIndex = 0;
+
+  const backTrack = document.getElementById('back-track');
+  const wheelTrack = document.getElementById('wheel-track');
+
+  if (isFlipped) {
+    el.classList.add('flipped');
+    // Hauptrad verstecken, Rückseiten-Rad zeigen
+    setTimeout(() => {
+      wheelTrack.style.display = 'none';
+      backTrack.style.display = 'block';
+      buildBackCards();
+      positionBackCards(false);
+      adjustBrightness(currentBrightness); // Helligkeit auf neue Karten anwenden
+    }, 700); // Nach der Flip-Animation
+  } else {
+    // Rückseiten-Rad verstecken, Hauptrad zeigen
+    backTrack.style.display = 'none';
+    wheelTrack.style.display = 'block';
+    el.classList.remove('flipped');
+    positionCards(false);
+    // Header-Karte entfernen wenn zurueckgeflippt
+    if (headerCardActive) {
+      setTimeout(() => hideHeaderCard(), 300);
+    }
+  }
+  updateFlipLabel();
+}
+
+function buildBackCards() {
+  const card = activeCards[currentIndex];
+  let backs = card.backs || [];
+  // Bei weniger als 5 Backs: verdoppeln fuer fluessiges Endlos-Drehen
+  if (backs.length > 0 && backs.length < 5) {
+    const orig = [...backs];
+    while (backs.length < 5) {
+      backs = backs.concat(orig.map(b => ({...b})));
+    }
+    card.backs = backs;
+  }
+  const backTrack = document.getElementById('back-track');
+  backTrack.innerHTML = backs.map((back, i) => {
+    let inner = '';
+    if (back.type === 'kim-contact') {
+      inner = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px">
+          <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:6px">Soll ich mich bei dir eintragen?</div>
+          <button onclick="kimAddContact()" style="width:80%;padding:12px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:rgba(34,197,94,0.7);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">📇 Als Kontakt speichern</button>
+          <button onclick="kimOpenWhatsApp()" style="width:80%;padding:12px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);color:rgba(37,211,102,0.7);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">💬 WhatsApp Chat starten</button>
+          <button onclick="kimCall()" style="width:80%;padding:12px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:rgba(59,130,246,0.7);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px">📞 KIM anrufen</button>
+        </div>`;
+    } else if (back.type === 'yt-input') {
+      inner = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+          <div id="yt-url" style="width:100%;min-height:36px;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-size:12px;word-break:break-all;overflow:hidden">Tippe 🎤 oder 📋</div>
+          <div style="display:flex;gap:6px;width:100%">
+            <button onclick="ytMic()" style="flex:1;padding:10px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);color:rgba(230,57,70,0.5);font-size:12px;cursor:pointer">🎤 Sprechen</button>
+            <button onclick="ytPaste()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer">📋 Einfügen</button>
+          </div>
+          <button onclick="ytGo()" style="width:100%;padding:12px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.5);font-size:13px;cursor:pointer;letter-spacing:2px;font-weight:600">🔍 LOS</button>
+        </div>`;
+    } else if (back.type === 'yt-player') {
+      inner = `<div id="yt-player-wrap" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15)">Kein Video geladen</div>
+      </div>`;
+    } else if (back.type === 'yt-chapters') {
+      inner = `<div id="yt-chapters-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Erst ein Video analysieren</div>
+      </div>`;
+    } else if (back.type === 'yt-saved') {
+      inner = `<div id="yt-saved-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+        <button onclick="ytLoadSaved()" style="padding:12px 24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer">📚 Videos laden</button>
+      </div>`;
+    } else if (back.type === 'yt-info') {
+      inner = `<div id="yt-info-wrap" style="width:100%;height:100%;overflow-y:auto;padding:12px;scrollbar-width:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Video-Details erscheinen nach Analyse</div>
+      </div>`;
+    } else if (back.type === 'video' && back.videoId) {
+      inner = `
+        <iframe class="bwc-video-full" src="https://www.youtube.com/embed/${back.videoId}?rel=0&modestbranding=1&playsinline=1"
+          frameborder="0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture"
+          allowfullscreen></iframe>`;
+    } else if (back.type === 'grid') {
+      const cols = back.gridCols || 4;
+      if (back.sections) {
+        const GW = 355, GH = 210;
+        const cardW = (78/GW*100).toFixed(1);
+        const cardH = (40/GH*100).toFixed(1); // etwas kleiner
+        const colX = [9,95,181,267].map(x => (x/GW*100).toFixed(1));
+        const rowY = [22,82,142].map(y => (y/GH*100).toFixed(1)); // enger zusammen
+        const labelOffset = ((40+2)/GH*100).toFixed(1);
+        // Setup-Config lesen und deaktivierte Genres/Items filtern
+        const setupCfg = getSetupConfig();
+        const cardId = activeCards[currentIndex]?.id?.replace('2','') || '';
+        const filteredSections = back.sections.filter(sec => {
+          const secKey = cardId + '_' + sec.label;
+          return setupCfg[secKey] !== false;
+        }).map(sec => {
+          const secKey = cardId + '_' + sec.label;
+          const filteredItems = sec.items.filter(item => {
+            const itemKey = secKey + '_' + item.label;
+            return setupCfg[itemKey] !== false;
+          });
+          return {...sec, items: filteredItems};
+        }).filter(sec => sec.items.length > 0);
+
+        // Berechnen welche Genres draufpassen (max 3 Reihen)
+        let testRow = 0;
+        const visibleGenres = [];
+        filteredSections.forEach(sec => {
+          if (testRow >= 3) return;
+          visibleGenres.push(sec.label);
+          const rowsNeeded = Math.ceil(sec.items.length / cols);
+          testRow += rowsNeeded;
+        });
+        const genreNames = visibleGenres.join(' · ');
+        let html = genreNames ? `<div style="position:absolute;left:2.5%;top:1%;font-size:9px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase">${genreNames}</div>` : '';
+        let currentRow = 0;
+        filteredSections.forEach(sec => {
+          if (currentRow >= 3) return;
+          sec.items.forEach((item, idx) => {
+            const col = idx % cols;
+            if (idx > 0 && col === 0) currentRow++;
+            if (currentRow >= 3) return;
+            const left = colX[col];
+            const top = rowY[currentRow];
+            const lTop = (parseFloat(top) + parseFloat(labelOffset)).toFixed(1);
+            html += `<div style="position:absolute;left:${left}%;top:${top}%;width:${cardW}%;height:${cardH}%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer">${item.icon}</div>`;
+            html += `<div style="position:absolute;left:${left}%;top:${lTop}%;width:${cardW}%;text-align:center;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4)">${item.label}</div>`;
+          });
+          // Naechstes Genre beginnt in neuer Reihe
+          currentRow++;
+        });
+        inner = `<div style="position:relative;width:100%;height:100%">${html}</div>`;
+      } else {
+        const rows = back.gridRows || 6;
+        const totalCells = cols * rows;
+        let cells = '';
+        for (let c = 0; c < totalCells; c++) {
+          const item = back.items && back.items[c];
+          if (item) {
+            cells += `<div class="grid-cell grid-cell-filled"><span class="grid-cell-icon">${item.icon}</span><span class="grid-cell-label">${item.label}</span></div>`;
+          } else {
+            cells += `<div class="grid-cell"></div>`;
+          }
+        }
+        inner = `
+          <div class="grid-header">${back.title}</div>
+          <div class="grid-container" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr)">${cells}</div>`;
+      }
+    } else if (back.type === 'search') {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.content}</div>
+        <div class="bwc-search-hint">🎤 Drück den KIM-Button und sag was du suchst</div>`;
+    } else {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.content}</div>`;
+    }
+    return `<div class="back-wheel-card" id="bcard-${i}">${inner}</div>`;
+  }).join('');
+}
+
+function positionBackCards(animate) {
+  const card = activeCards[currentIndex];
+  const backs = card.backs || [];
+  if (backs.length === 0) return;
+
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230;
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6);
+  const bottomH = remainH - topH;
+  const topMid = topH / 2;
+  const centerMid = topH + (centerH / 2);
+  const bottomMid = topH + centerH + (bottomH / 2);
+  const cardH = 210;
+
+  backs.forEach((back, i) => {
+    const el = document.getElementById('bcard-' + i);
+    if (!el) return;
+
+    let diff = i - backIndex;
+    if (diff > backs.length / 2) diff -= backs.length;
+    if (diff < -backs.length / 2) diff += backs.length;
+
+    // EXAKT wie Hauptrad
+    let cardMid;
+    if (diff === 0) cardMid = centerMid;
+    else if (diff === -1) cardMid = topMid;
+    else if (diff === 1) cardMid = bottomMid + 40;
+    else if (diff < -1) cardMid = topMid - topH;
+    else cardMid = bottomMid + bottomH + 60;
+
+    el.style.top = (cardMid - cardH / 2) + 'px';
+    el.style.transition = animate ? 'all 1.2s cubic-bezier(0.23,1,0.32,1)' : 'none';
+
+    if (diff === 0) {
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+      el.style.zIndex = '10';
+    } else if (diff === 1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'scale(0.9)';
+      el.style.zIndex = '5';
+    } else if (diff === -1) {
+      el.style.opacity = '0.5';
+      el.style.transform = 'scale(0.8)';
+      el.style.zIndex = '5';
+    } else {
+      el.style.opacity = '0';
+      el.style.transform = 'scale(0.75)';
+      el.style.zIndex = '1';
+    }
+  });
+}
+
+// updateBackContent nicht mehr noetig - eigenes Rad uebernimmt
+
+function updateFlipLabel() {
+  const fl = document.getElementById('flip-label');
+  if (isFlipped) {
+    const card = activeCards[currentIndex];
+    document.getElementById('fl-card').innerHTML = `
+      <div class="fl-icon">${card.icon}</div>
+      <div>
+        <div class="fl-name">${card.title}</div>
+        <div class="fl-role">${card.subtitle}</div>
+      </div>
+      <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
+      <div class="fl-brand">KIMANUS</div>
+    `;
+    // Position: gleich wie die obere Milchglas-Karte
+    const container = document.getElementById('wheel-container');
+    const totalH = container.clientHeight;
+    const centerH = 230;
+    const remainH = totalH - centerH;
+    const topH = Math.floor(remainH * 0.6);
+    const topMid = topH / 2;
+    const cardH = 210;
+    fl.style.display = '';
+    fl.style.top = (topMid - cardH / 2) + 'px';
+    fl.classList.add('visible');
+    adjustBrightness(currentBrightness);
+  } else {
+    fl.classList.remove('visible');
+  }
+}
+
+function updateStatus() {
+  const card = activeCards[currentIndex];
+  document.getElementById('status-text').textContent = card.title;
+}
+
+// === HELLIGKEIT ===
+let currentBrightness = 30;
+function adjustBrightness(val) {
+  currentBrightness = val;
+  const v = val / 100;
+  // Spektrum: schwarz bis fast weiss
+  const cardBg = Math.round(v * 220);
+  const cardAlpha = 0.04 + v * 0.92;
+  const borderAlpha = 0.1 + v * 0.5;
+  const textAlpha = 0.4 + v * 0.6;
+  // Bei hellen Karten dunkle Schrift, bei dunklen helle Schrift
+  const textColor = v > 0.6 ? `rgba(0,0,0,${0.3 + v * 0.7})` : `rgba(255,255,255,${textAlpha})`;
+  const textSub = v > 0.6 ? `rgba(0,0,0,${0.2 + v * 0.5})` : `rgba(255,255,255,${textAlpha * 0.7})`;
+  const textFine = v > 0.6 ? `rgba(0,0,0,${0.15 + v * 0.4})` : `rgba(255,255,255,${textAlpha * 0.6})`;
+  const cardStyle = `rgba(${cardBg},${cardBg},${cardBg+2},${cardAlpha})`;
+  // Vorderseiten-Karten
+  document.querySelectorAll('.wheel-card').forEach(c => {
+    c.style.background = cardStyle;
+    c.style.borderColor = `rgba(255,255,255,${borderAlpha})`;
+  });
+  // Rueckseiten-Karten (gleiche Helligkeit!)
+  document.querySelectorAll('.back-wheel-card').forEach(c => {
+    c.style.background = cardStyle;
+    c.style.borderColor = `rgba(255,255,255,${borderAlpha})`;
+  });
+  // Flip-Label oben (gleiche Helligkeit wie Karten!)
+  const fl = document.getElementById('flip-label');
+  if (fl) fl.style.background = `rgba(${cardBg},${cardBg},${cardBg+2},0.95)`;
+  // Texte - Vorderseite
+  document.querySelectorAll('.card-front .card-name').forEach(e => e.style.color = textColor);
+  document.querySelectorAll('.card-front .card-role').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.card-front .card-contact span').forEach(e => e.style.color = textFine);
+  document.querySelectorAll('.card-front .card-brand').forEach(e => e.style.color = textFine);
+  // Texte - Rueckseiten-Rad
+  document.querySelectorAll('.bwc-title').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.bwc-content').forEach(e => e.style.color = textFine);
+  // Texte - Flip-Rueckseite
+  document.querySelectorAll('.back-title').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.back-content').forEach(e => e.style.color = textFine);
+  // Texte - Flip-Label oben (fl-name, fl-role, fl-contact, fl-brand)
+  document.querySelectorAll('.fl-name').forEach(e => e.style.color = textColor);
+  document.querySelectorAll('.fl-role').forEach(e => e.style.color = textSub);
+  document.querySelectorAll('.fl-contact').forEach(e => e.style.color = textFine);
+  document.querySelectorAll('.fl-brand').forEach(e => e.style.color = textFine);
+  // Bar-Kanten dynamisch anpassen (dunkel=dezent, hell=sichtbar)
+  const edgeAlpha = 0.06 + v * 0.25;
+  const edgeBorder = `2px solid rgba(255,255,255,${edgeAlpha})`;
+  document.getElementById('header').style.borderTop = 'none';
+  document.getElementById('header').style.borderBottom = edgeBorder;
+  document.getElementById('bottom-bar').style.borderTop = edgeBorder;
+  document.getElementById('bottom-bar').style.borderBottom = edgeBorder;
+  // Setup-Panel Helligkeit anpassen
+  const setupPanel = document.getElementById('setup-panel');
+  if (setupPanel) {
+    const setupBg = Math.round(v * 40);
+    setupPanel.style.background = `rgb(${setupBg},${setupBg},${setupBg})`;
+  }
+}
+
+// === SETUP (Kaertchen-Auswahl) ===
+function getSetupConfig() {
+  try {
+    const stored = localStorage.getItem('kimanus-setup');
+    if (!stored) {
+      // Erster Start: Alles aus - User schaltet im Setup dazu
+      const defaultCfg = {};
+      // Nur YouTube Scout als Demo aktivieren
+      defaultCfg['agent_ag-youtube'] = true;
+      localStorage.setItem('kimanus-setup', JSON.stringify(defaultCfg));
+      return defaultCfg;
+    }
+    return JSON.parse(stored);
+  } catch(e) { return {}; }
+}
+function saveSetupConfig(cfg) {
+  localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
+}
+
+// === SETTINGS (iPhone-Style Fullscreen-Folie) ===
+let settingsOpen = false;
+let setupHistory = []; // Navigation-Stack
+
+function openSettings() {
+  settingsOpen = true;
+  setupHistory = [];
+  openSetup('main');
+  // Folie von unten reinschieben
+  document.getElementById('setup-panel').style.transform = 'translateY(0)';
+  document.getElementById('setup-backdrop').style.background = 'rgba(0,0,0,0.4)';
+  document.getElementById('setup-overlay').style.pointerEvents = 'auto';
+}
+
+function setupGoBack() {
+  if (setupHistory.length > 0) {
+    const prev = setupHistory.pop();
+    openSetup(prev, true);
+  } else {
+    openSetup('main', true);
+  }
+}
+
+function openSetupKim() { setupHistory.push('main'); openSetup('kim'); }
+function openSetupKimPersoenlich() { setupHistory.push('main'); openSetup('kim_persoenlich'); }
+function openSetupAgenten() { setupHistory.push('main'); openSetup('agenten'); }
+function openSetupBereiche() { setupHistory.push('main'); openSetup('bereiche'); }
+function openSetupKimanus() { setupHistory.push('main'); openSetup('kimanus'); }
+function openSetupClaude() { setupHistory.push('main'); openSetup('claude'); }
+
+let setupMode = 'main';
+function openSetup(mode, isBack) {
+  setupMode = mode || 'main';
+  const cfg = getSetupConfig();
+  const list = document.getElementById('setup-list');
+  // Header updaten
+  const titles = {main:'Einstellungen',kim:'KAI',kim_persoenlich:'KIM',agenten:'Agenten',bereiche:'Abteilungen',kimanus:'KIMANUS',claude:'Claude'};
+  document.getElementById('setup-title').textContent = titles[setupMode] || 'Einstellungen';
+  const backBtn = document.getElementById('setup-back');
+  const backSpacer = document.getElementById('setup-back-spacer');
+  if (setupMode === 'main') {
+    backBtn.style.display = 'none';
+    backSpacer.style.display = 'block';
+  } else {
+    backBtn.style.display = 'block';
+    backSpacer.style.display = 'none';
+  }
+  const configCards = CARDS.filter(c => !c.id.endsWith('2') && c.backs && c.backs.some(b => b.type === 'grid' && b.sections));
+  const groupStyle = 'background:#1c1c1e;border-radius:12px;overflow:hidden;margin-bottom:35px';
+  const rowStyle = 'display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.12);gap:14px;min-height:44px';
+  const lastRowStyle = 'display:flex;align-items:center;padding:12px 16px;gap:14px;min-height:44px';
+  const labelStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.85)';
+  const labelOffStyle = 'flex:1;font-size:17px;color:rgba(255,255,255,0.3)';
+  const subLabelStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.7);margin-left:2px';
+  const subLabelOffStyle = 'flex:1;font-size:16px;color:rgba(255,255,255,0.25);margin-left:2px';
+  const iconColors = {'⚖️':'#5856d6','💶':'#34c759','📦':'#ff9500','📣':'#ff2d55','🏛️':'#5ac8fa','🔍':'#007aff','💡':'#ffcc00','🔒':'#8e8e93','🛠️':'#ff9500','💳':'#34c759','📁':'#5856d6','📱':'#007aff','🤝':'#e63946','👤':'#ff2d55','🧠':'#5856d6','⚙️':'#8e8e93','🔗':'#007aff','🔀':'#34c759','🎭':'#ff9500','🌤️':'#5ac8fa','🌐':'#007aff','🎬':'#ff0000','📰':'#34c759','💰':'#ffcc00','📱':'#e1306c','🧭':'#ff9500','💼':'#5856d6','🔧':'#8e8e93','👥':'#007aff','🏢':'#34c759','📊':'#5856d6','📈':'#34c759','🧮':'#ff9500','🏭':'#8e8e93','📅':'#007aff','📚':'#5856d6','🌍':'#5ac8fa','🚗':'#1a1a2e','📍':'#34c759','🎵':'#ff2d55','🖨️':'#ff9500','💻':'#007aff','📣':'#ff2d55','🎪':'#ff9500','👷':'#ffcc00','🧾':'#8e8e93','📸':'#ff2d55','☀️':'#ffcc00','🎨':'#5856d6'};
+  const iconBox = (emoji) => `<div style="width:30px;height:30px;border-radius:7px;background:${iconColors[emoji]||'#636366'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${emoji}</div>`;
+  const toggle = (key, on) => `<div onclick="event.stopPropagation();toggleSetupItem('${key}',${!on})" style="width:51px;height:31px;border-radius:16px;background:${on?'#34c759':'rgba(120,120,128,0.32)'};position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s"><div style="width:27px;height:27px;border-radius:14px;background:white;position:absolute;top:2px;${on?'right:2px':'left:2px'};transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.3)"></div></div>`;
+
+  let html = '';
+
+  if (setupMode === 'main') {
+  // === HAUPTSEITE: iPhone Settings Style ===
+
+  // 1. KAI Profil (wie Apple ID oben)
+  html += `<div onclick="openSetupKim()" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer">`;
+  html += `<div style="width:54px;height:54px;border-radius:27px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
+  html += `</div>`;
+
+  // 2. KIM Profil (persoenliche Assistentin)
+  html += `<div onclick="openSetupKimPersoenlich()" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;margin-top:10px">`;
+  html += `<div style="width:54px;height:54px;border-radius:27px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:20px">›</span>`;
+  html += `</div>`;
+
+  // 3. Agenten & Abteilungen
+  html += `<div style="${groupStyle};margin-top:35px">`;
+  html += `<div onclick="openSetupAgenten()" style="${rowStyle}cursor:pointer">${iconBox('👥')}<span style="${labelStyle}">Agenten</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupBereiche()" style="${lastRowStyle}cursor:pointer">${iconBox('🏢')}<span style="${labelStyle}">Abteilungen</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 4. Schliessfach & Postfach
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🔐')}<div style="flex:1"><span style="${labelStyle}">Schliessfach</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Sichere Aufbewahrung</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📬')}<div style="flex:1"><span style="${labelStyle}">Postfach</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Verschluesselte Korrespondenz</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 5. Archiv (Aktenordner, Filme, CDs, Fotoalben)
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('📁')}<div style="flex:1"><span style="${labelStyle}">Aktenordner</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Dokumente, Vertraege, Belege</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('🎬')}<div style="flex:1"><span style="${labelStyle}">Filme & Videos</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Videothek, YouTube Favoriten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}cursor:pointer">${iconBox('💿')}<div style="flex:1"><span style="${labelStyle}">Musik & CDs</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Playlists, Lieblingssongs</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}cursor:pointer">${iconBox('📸')}<div style="flex:1"><span style="${labelStyle}">Fotoalben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Erinnerungen, Familienfotos</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 6. System
+  html += `<div style="${groupStyle}">`;
+  html += `<div onclick="openSetupKimanus()" style="${rowStyle}cursor:pointer">${iconBox('🤝')}<span style="${labelStyle}">KIMANUS</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div onclick="openSetupClaude()" style="${lastRowStyle}cursor:pointer">${iconBox('🧡')}<span style="${labelStyle}">Claude</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  // 7. Darstellung
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('☀️')}<span style="${labelStyle}">Helligkeit</span><div style="flex:1;max-width:140px"><input type="range" min="0" max="100" value="${currentBrightness||30}" oninput="adjustBrightness(this.value)" style="width:100%;accent-color:#e63946"></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🎨')}<span style="${labelStyle}">Design</span><span style="color:rgba(255,255,255,0.3);font-size:14px">Dunkel ›</span></div>`;
+  html += `</div>`;
+
+  // 8. Info
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v7.9 ›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  } // Ende main
+
+  if (setupMode === 'kim') {
+  // KIM Profil-Karte (wie Apple ID oben in den Einstellungen)
+  const kimMode = cfg['kim_mode'] || 'persoenlich';
+  const kimGender = cfg['kim_gender'] || 'weiblich';
+  const kimVoice = cfg['kim_voice'] || 'warm';
+  html += `<div onclick="" style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👤</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
+  html += `</div>`;
+
+  // KIM Einstellungen
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">KIM Einstellungen</div>`;
+  html += `<div style="${groupStyle}">`;
+  // Modus
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('🎭');
+  html += `<span style="${labelStyle}">Modus</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_mode','concierge')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimMode==='concierge'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Concierge</div>`;
+  html += `<div onclick="toggleSetupItem('kim_mode','persoenlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimMode==='persoenlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Persoenlich</div>`;
+  html += `</div></div>`;
+  // Geschlecht
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('⚥');
+  html += `<span style="${labelStyle}">Geschlecht</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_gender','weiblich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='weiblich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Weiblich</div>`;
+  html += `<div onclick="toggleSetupItem('kim_gender','maennlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='maennlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Maennlich</div>`;
+  html += `</div></div>`;
+  // Stimme
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('🔊');
+  html += `<span style="${labelStyle}">Stimme</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_voice','warm')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimVoice==='warm'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Warm</div>`;
+  html += `<div onclick="toggleSetupItem('kim_voice','kuhl')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimVoice==='kuhl'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Kuhl</div>`;
+  html += `</div></div>`;
+  // Sprache
+  html += `<div style="${lastRowStyle}">`;
+  html += iconBox('🌐');
+  html += `<span style="${labelStyle}">Sprache</span>`;
+  html += `<span style="color:rgba(255,255,255,0.3);font-size:14px">Deutsch ›</span>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  // KI MANUS (Erweitert)
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">KI MANUS</div>`;
+  html += `<div style="${groupStyle}">`;
+  const llmQuality = cfg['llm_quality'] || 'ausgewogen';
+  html += `<div style="${rowStyle}">`;
+  html += iconBox('🧠');
+  html += `<span style="${labelStyle}">KI-Qualitaet</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('llm_quality','schnell')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='schnell'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Schnell</div>`;
+  html += `<div onclick="toggleSetupItem('llm_quality','ausgewogen')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='ausgewogen'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Ausgewogen</div>`;
+  html += `<div onclick="toggleSetupItem('llm_quality','premium')" style="padding:5px 8px;font-size:11px;cursor:pointer;${llmQuality==='premium'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Premium</div>`;
+  html += `</div></div>`;
+  html += `<div style="${lastRowStyle}">`;
+  html += iconBox('⚙️');
+  html += `<span style="${labelStyle}">Orchestrator</span>`;
+  html += `<span style="color:rgba(255,255,255,0.3);font-size:14px">Automatisch ›</span>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  } // Ende KAI-Setup
+
+  if (setupMode === 'kim_persoenlich') {
+  // KIM Persoenliche Assistentin
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">💜</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
+  html += `</div>`;
+
+  const kimGender = cfg['kim_gender'] || 'weiblich';
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Persoenlichkeit</div>`;
+  html += `<div style="${groupStyle}">`;
+  // Geschlecht
+  html += `<div style="${rowStyle}">${iconBox('⚥')}<span style="${labelStyle}">Anrede</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += `<div onclick="toggleSetupItem('kim_gender','weiblich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='weiblich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Sie</div>`;
+  html += `<div onclick="toggleSetupItem('kim_gender','maennlich')" style="padding:5px 10px;font-size:12px;cursor:pointer;${kimGender==='maennlich'?'background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)':'color:rgba(255,255,255,0.3)'}">Er</div>`;
+  html += `</div></div>`;
+  // Telefon
+  html += `<div style="${rowStyle}">${iconBox('📞')}<div style="flex:1"><span style="${labelStyle}">Telefonnummer</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Noch nicht eingerichtet</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  // WhatsApp
+  html += `<div style="${rowStyle}">${iconBox('💬')}<div style="flex:1"><span style="${labelStyle}">WhatsApp</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Noch nicht eingerichtet</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  // E-Mail
+  html += `<div style="${lastRowStyle}">${iconBox('📧')}<div style="flex:1"><span style="${labelStyle}">E-Mail</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">kim@kimanus.de</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Was KIM weiss</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('❤️')}<div style="flex:1"><span style="${labelStyle}">Vorlieben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Essen, Hobbys, Gewohnheiten</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('👨‍👩‍👧‍👦')}<div style="flex:1"><span style="${labelStyle}">Familie & Kontakte</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Geburtstage, Namen</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📅')}<div style="flex:1"><span style="${labelStyle}">Termine & Erinnerungen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Kalender, Medikamente</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🧠')}<div style="flex:1"><span style="${labelStyle}">Gedaechtnis</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Was KIM sich gemerkt hat</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Erreichbarkeit</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🎙')}<span style="${labelStyle}">In der App (Text)</span>${toggle('kim_app_active', cfg['kim_app_active'] !== false)}</div>`;
+  html += `<div style="${rowStyle}">${iconBox('📞')}<span style="${labelStyle}">Per Telefon (Stimme)</span>${toggle('kim_phone_active', cfg['kim_phone_active'] === true)}</div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('💬')}<span style="${labelStyle}">Per WhatsApp</span>${toggle('kim_whatsapp_active', cfg['kim_whatsapp_active'] === true)}</div>`;
+  html += `</div>`;
+
+  } // Ende KIM-Persoenlich
+
+  if (setupMode === 'agenten') {
+  // Agenten aufklappbar nach Kategorie (wie Abteilungen)
+  const catIcons = {Scouts:'🔍',Guides:'🧭',Berater:'💡',Business:'💼',Spezialisten:'🔧',Recht:'⚖️',Finanzen:'💶'};
+  const categories = [...new Set(ALL_AGENTS.map(a => a.category))];
+
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👥</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Agenten</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein Team zusammenstellen</div></div>`;
+  html += `</div>`;
+
+  // Nur aktive aus den Agenten-Kategorien (Scouts, Guides, Berater, Spezialisten)
+  const agentCategories = ['Scouts','Guides','Berater','Business','Spezialisten'];
+  const activeAgents = ALL_AGENTS.filter(a => agentCategories.includes(a.category) && cfg['agent_' + a.id] === true);
+  if (activeAgents.length > 0) {
+    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktiv (${activeAgents.length})</div>`;
+    html += `<div style="${groupStyle}">`;
+    activeAgents.forEach((agent, ai) => {
+      const key = 'agent_' + agent.id;
+      const isLast = ai === activeAgents.length - 1;
+      html += `<div style="${isLast ? lastRowStyle : rowStyle}">`;
+      html += iconBox(agent.icon);
+      html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+      html += toggle(key, true);
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Alle Agenten</div>`;
+  html += `<div style="${groupStyle}">`;
+  categories.forEach((cat, ci) => {
+    const agents = ALL_AGENTS.filter(a => a.category === cat);
+    const activeCount = agents.filter(a => cfg['agent_' + a.id] === true).length;
+    const catKey = 'agcat_open_' + cat;
+    const isOpen = cfg[catKey] === true;
+    const isLast = ci === categories.length - 1 && !isOpen;
+
+    // Kategorie-Zeile mit Pfeil
+    html += `<div onclick="toggleSetupItem('${catKey}',${!isOpen})" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(catIcons[cat] || '📦');
+    html += `<div style="flex:1"><span style="${labelStyle}">${cat}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${activeCount > 0 ? activeCount + ' aktiv' : agents.length + ' verfuegbar'}</div></div>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
+    html += `</div>`;
+
+    // Aufgeklappt: einzelne Agenten
+    if (isOpen) {
+      agents.forEach((agent, ai) => {
+        const key = 'agent_' + agent.id;
+        const enabled = cfg[key] === true;
+        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${ai < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.08)':''}gap:10px">`;
+        html += `<div style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
+        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+        html += toggle(key, enabled);
+        html += `</div>`;
+      });
+    }
+  });
+  html += `</div>`;
+
+  } // Ende Agenten-Setup
+
+  if (setupMode === 'bereiche') {
+  // Abteilungen wie in einer Firma
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🏢</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Abteilungen</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Deine Firma, deine Mitarbeiter</div></div>`;
+  html += `</div>`;
+
+  // Nur aktive aus Abteilungs-Kategorien (Recht, Finanzen)
+  const abtCategories = ['Recht','Finanzen'];
+  const activeInAbt = ALL_AGENTS.filter(a => abtCategories.includes(a.category) && cfg['agent_' + a.id] === true);
+  const activeCards2 = ['tools','wallet','archiv','apps'].filter(id => cfg['card_' + id] === true);
+  if (activeInAbt.length > 0 || activeCards2.length > 0) {
+    html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Aktiv (${activeInAbt.length + activeCards2.length})</div>`;
+    html += `<div style="${groupStyle}">`;
+    activeInAbt.forEach((agent, ai) => {
+      const key = 'agent_' + agent.id;
+      html += `<div style="${rowStyle}">`;
+      html += iconBox(agent.icon);
+      html += `<div style="flex:1"><span style="${labelStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+      html += toggle(key, true);
+      html += `</div>`;
+    });
+    const cardNames = {tools:'🛠️ Tools',wallet:'💳 Wallet',archiv:'📁 Archiv',apps:'📱 Apps'};
+    activeCards2.forEach(id => {
+      const key = 'card_' + id;
+      html += `<div style="${rowStyle}">`;
+      html += iconBox(cardNames[id]?.charAt(0) || '📦');
+      html += `<span style="${labelStyle}">${cardNames[id] || id}</span>`;
+      html += toggle(key, true);
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  const abteilungen = [
+    {id:'rechtsabteilung', icon:'⚖️', name:'Rechtsabteilung', agents:['ag-justus','ag-steuerrecht','ag-patentrecht','ag-arbeitsrecht','ag-veranstaltungsrecht'],
+     sub:'Allgemein, Steuer, Patent, Arbeit, Veranstaltung'},
+    {id:'finanzabteilung', icon:'💶', name:'Finanzabteilung', agents:['ag-lena','ag-steuerlena','ag-controlling'],
+     sub:'Buchhaltung, Steuern, Controlling'},
+    {id:'einkauf', icon:'📦', name:'Einkauf & Lager', agents:['ag-bestellprofi','ag-lagerist','ag-kalkulierer'],
+     sub:'Bestellung, Inventur, Kalkulation'},
+    {id:'marketing', icon:'📣', name:'Marketing & Medien', agents:['ag-marketing','ag-dj','ag-print'],
+     sub:'Werbung, Musik, Drucksachen'},
+    {id:'empfang', icon:'🏛️', name:'Empfang & Concierge', agents:['ag-stadtfuehrer','ag-gastro','ag-animateur','ag-regiopilot'],
+     sub:'Gaeste, Restaurants, Events, Region'},
+    {id:'recherche', icon:'🔍', name:'Recherche & Scouts', agents:['ag-youtube','ag-web','ag-news','ag-deals','ag-social'],
+     sub:'Videos, Web, News, Angebote'},
+    {id:'beratung', icon:'💡', name:'Beratung', agents:['ag-wetterfrosch','ag-dolmetscher','ag-sekretaer','ag-bibliothekar'],
+     sub:'Wetter, Sprachen, Termine, Wissen'},
+    {id:'sicherheit', icon:'🔒', name:'Sicherheit & IT', agents:['ag-ithilfe','ag-safety','ag-nachtfahrer'],
+     sub:'IT-Support, Safety-Check, Heimfahrt'},
+    {id:'tools', icon:'🛠️', name:'Werkstatt & Tools', cardId:'tools',
+     sub:'Scanner, Laser, RegioPic, Fotoalbum'},
+    {id:'finanzen_kasse', icon:'💳', name:'Kasse & Wallet', cardId:'wallet',
+     sub:'Cap-Coin, NFC-Stempel, Bezahlen'},
+    {id:'archiv_abt', icon:'📁', name:'Archiv & Ablage', cardId:'archiv',
+     sub:'Fotos, Dokumente, Buecher, Geraete'},
+    {id:'it_abt', icon:'📱', name:'IT & Apps', cardId:'apps',
+     sub:'WhatsApp, Maps, Handy-Hilfe'},
+  ];
+
+  // Alle Abteilungen in einer Gruppe wie iPhone Einstellungen
+  html += `<div style="${groupStyle}">`;
+  abteilungen.forEach((abt, ai) => {
+    const abtKey = 'abt_open_' + abt.id;
+    const isOpen = cfg[abtKey] === true;
+    let activeCount = 0, totalCount = 0;
+    if (abt.agents) {
+      totalCount = abt.agents.length;
+      activeCount = abt.agents.filter(a => cfg['agent_' + a] === true).length;
+    } else if (abt.cardId) {
+      totalCount = 1;
+      activeCount = cfg['card_' + abt.cardId] === true ? 1 : 0;
+    }
+    const isLast = ai === abteilungen.length - 1 && !isOpen;
+
+    // Abteilungs-Zeile (antippbar -> aufklappen)
+    html += `<div onclick="toggleSetupItem('${abtKey}',${!isOpen})" style="${isLast ? lastRowStyle : rowStyle}cursor:pointer">`;
+    html += iconBox(abt.icon);
+    html += `<div style="flex:1"><span style="${labelStyle}">${abt.name}</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${activeCount > 0 ? activeCount + ' aktiv' : abt.sub}</div></div>`;
+    html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;transition:transform 0.2s;transform:rotate(${isOpen?'90':'0'}deg)">›</span>`;
+    html += `</div>`;
+
+    // Aufgeklappte Mitarbeiter
+    if (isOpen) {
+      if (abt.agents) {
+        const agents = abt.agents.map(id => ALL_AGENTS.find(a => a.id === id)).filter(Boolean);
+        agents.forEach((agent, agi) => {
+          const key = 'agent_' + agent.id;
+          const enabled = cfg[key] === true;
+          const isAgentLast = agi === agents.length - 1 && (isLast || ai < abteilungen.length - 1);
+          html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;${agi < agents.length-1?'border-bottom:1px solid rgba(255,255,255,0.08)':''}gap:10px">`;
+          html += `<div style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${iconColors[agent.icon]||'#636366'}30">${agent.icon}</div>`;
+          html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${agent.title}</span><div style="font-size:13px;color:rgba(255,255,255,0.2)">${agent.subtitle}</div></div>`;
+          html += toggle(key, enabled);
+          html += `</div>`;
+        });
+      } else if (abt.cardId) {
+        const key = 'card_' + abt.cardId;
+        const enabled = cfg[key] === true;
+        html += `<div style="display:flex;align-items:center;padding:10px 16px 10px 58px;gap:10px">`;
+        html += `<span style="font-size:18px;flex-shrink:0">${abt.icon}</span>`;
+        html += `<div style="flex:1"><span style="${enabled ? subLabelStyle : subLabelOffStyle}">${abt.sub}</span></div>`;
+        html += toggle(key, enabled);
+        html += `</div>`;
+      }
+    }
+  });
+  html += `</div>`;
+  } // Ende Bereiche-Setup
+
+  if (setupMode === 'kimanus') {
+  // KIMANUS Orchestrator Einstellungen
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🤝</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIMANUS</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Orchestrator & Agenten-Manager</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Orchestrierung</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🔀')}<span style="${labelStyle}">Auto-Routing</span><span style="color:rgba(100,200,100,0.6);font-size:13px">Aktiv</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🧠')}<span style="${labelStyle}">Agenten-Training</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📊')}<span style="${labelStyle}">Qualitaets-Check</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('⚡')}<span style="${labelStyle}">Neue Skills vergeben</span><span style="color:rgba(255,255,255,0.3);font-size:14px">›</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">LLM Routing</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('🚀')}<div style="flex:1"><span style="${labelStyle}">Schnell (Groq)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Scouts, einfache Fragen</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('⚖️')}<div style="flex:1"><span style="${labelStyle}">Ausgewogen (DeepSeek)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Berater, Business</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('💎')}<div style="flex:1"><span style="${labelStyle}">Premium (Claude)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">KIM persoenlich, komplexe Aufgaben</div></div></div>`;
+  html += `</div>`;
+  } // Ende KIMANUS-Setup
+
+  if (setupMode === 'claude') {
+  // Claude Einstellungen
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#d4a574,#c2410c);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧡</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Claude</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Chefentwickler & Berater</div></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Verbindung</div>`;
+  html += `<div style="${groupStyle}">`;
+  const claudeConnected = true;
+  html += `<div style="${rowStyle}">${iconBox('🔗')}<span style="${labelStyle}">Status</span><span style="color:${claudeConnected?'rgba(100,200,100,0.7)':'rgba(230,57,70,0.7)'};font-size:13px">${claudeConnected?'Verbunden':'Offline'}</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🤖')}<span style="${labelStyle}">Modell</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Opus 4.6</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('📊')}<span style="${labelStyle}">Kontext</span><span style="color:rgba(255,255,255,0.3);font-size:13px">1M Tokens</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Faehigkeiten</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('💻')}<div style="flex:1"><span style="${labelStyle}">Code schreiben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Apps, Workflows, Websites</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🔧')}<div style="flex:1"><span style="${labelStyle}">Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Neue Agenten per Sprache erstellen</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🌐')}<div style="flex:1"><span style="${labelStyle}">Web durchsuchen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Recherche, Browser Use</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🖥️')}<div style="flex:1"><span style="${labelStyle}">Server verwalten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Docker, Deploy, Monitoring</div></div></div>`;
+  html += `</div>`;
+  } // Ende Claude-Setup
+
+  list.innerHTML = html;
+  // Folie oeffnen falls noch nicht offen
+  if (!settingsOpen) {
+    settingsOpen = true;
+    document.getElementById('setup-panel').style.transform = 'translateY(0)';
+    document.getElementById('setup-backdrop').style.background = 'rgba(0,0,0,0.4)';
+    document.getElementById('setup-overlay').style.pointerEvents = 'auto';
+  }
+  // Flip-Label verstecken
+  const fl = document.getElementById('flip-label');
+  if (fl) fl.style.display = 'none';
+}
+
+function closeSetup() {
+  settingsOpen = false;
+  document.getElementById('setup-panel').style.transform = 'translateY(100%)';
+  document.getElementById('setup-backdrop').style.background = 'rgba(0,0,0,0)';
+  setTimeout(() => {
+    document.getElementById('setup-overlay').style.pointerEvents = 'none';
+  }, 350);
+  // KIM Karte schliessen wenn offen
+  const kimCard = document.getElementById('kim-card-overlay');
+  if (kimCard) kimCard.style.display = 'none';
+  updateHeaderKimStatus();
+  updateKimBacks();
+  rebuildWheel();
+}
+
+function toggleSetupItem(key, enabled) {
+  const cfg = getSetupConfig();
+  cfg[key] = enabled;
+  saveSetupConfig(cfg);
+  // Setup neu rendern aber offen lassen
+  openSetup(setupMode);
+}
+
+function applyProfile(profile) {
+  const cfg = {};
+  if (profile === 'all') {
+    // Alles loeschen = alles an (default)
+  } else if (profile === 'minimal') {
+    // Alles aus ausser KIM Scouts
+    CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+      card.backs.forEach(back => {
+        if (back.sections) back.sections.forEach(sec => {
+          const key = card.id + '_' + sec.label;
+          cfg[key] = (card.id === 'kim' && sec.label === 'SCOUTS');
+        });
+      });
+    });
+  } else if (profile === 'gastro') {
+    CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+      card.backs.forEach(back => {
+        if (back.sections) back.sections.forEach(sec => {
+          const key = card.id + '_' + sec.label;
+          const gastroSections = ['BUSINESS','SCANNER','ALLTAGSHELFER','CAP-COIN','NFC-STEMPEL','BEZAHLEN'];
+          cfg[key] = gastroSections.includes(sec.label);
+        });
+      });
+    });
+  } else if (profile === 'privat') {
+    CARDS.filter(c => !c.id.endsWith('2')).forEach(card => {
+      card.backs.forEach(back => {
+        if (back.sections) back.sections.forEach(sec => {
+          const key = card.id + '_' + sec.label;
+          const privatSections = ['SCOUTS','GUIDES','GEDAECHTNIS','FOTOS & VIDEOS','KOMMUNIKATION','ALLTAG'];
+          cfg[key] = privatSections.includes(sec.label);
+        });
+      });
+    });
+  }
+  saveSetupConfig(cfg);
+  openSetup();
+}
+
+function rebuildWheel() {
+  if (isFlipped) flipCard();
+  const cfg = getSetupConfig();
+
+  // KIMANUS und KIM sind jetzt im Header, nicht mehr auf dem Rad
+  let wheelCards = [];
+
+  // Aktivierte Agenten als eigene Karten hinzufuegen
+  ALL_AGENTS.forEach(agent => {
+    const key = 'agent_' + agent.id;
+    if (cfg[key] === true) {
+      wheelCards.push(agent);
+    }
+  });
+
+  // Haupt-Karten (Tools, Wallet, Archiv, Apps, Chat) wenn aktiv
+  const mainCards = CARDS.filter(c =>
+    !c.id.endsWith('2') &&
+    !['landing','kim'].includes(c.id) &&
+    c.id !== 'chat'
+  );
+  mainCards.forEach(card => {
+    const key = 'card_' + card.id;
+    if (cfg[key] === true) {
+      wheelCards.push(card);
+    }
+  });
+
+  // Chat immer wenn mindestens ein Agent aktiv
+  const chat = CARDS.find(c => c.id === 'chat');
+  if (wheelCards.length > 2 && chat) {
+    wheelCards.push(chat);
+  }
+
+  // Hinweis-Karte wenn Rad leer
+  if (wheelCards.length === 0) {
+    wheelCards.push({id:'hint', icon:'⚙️', title:'Setup', subtitle:'Agenten aktivieren', color:'#64748b', email:'', phone:'',
+      backs:[{title:'Los gehts!', content:'Oeffne das Setup (Schloss unten)\nund waehle deine Agenten.\n\nTippe auf KIMANUS oder KIM\nim Header fuer mehr Infos.'}]
+    });
+  }
+
+  // Duplikate fuer fluessiges Endlos-Rad (mindestens 5 Karten)
+  const origCards = [...wheelCards];
+  if (origCards.length > 0) {
+    while (wheelCards.length < 5) {
+      wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_d' + wheelCards.length})));
+    }
+    wheelCards = wheelCards.concat(origCards.map(c => ({...c, id: c.id + '_dup'})));
+  }
+
+  activeCards = wheelCards;
+  currentIndex = 0;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
+}
+
+// === KIM SPRECHBLASE (im Setup) ===
+function showKimBubble() {
+  const cfg = typeof getSetupConfig === 'function' ? getSetupConfig() : {};
+  const mode = cfg['kim_mode'] || 'concierge';
+  const gender = cfg['kim_gender'] || 'weiblich';
+  const greeting = mode === 'concierge' ? 'Kann ich helfen?' : 'Was brauchst du?';
+  const subtitle = mode === 'concierge' ? 'Concierge' : (gender === 'weiblich' ? 'Persoenliche Assistentin' : 'Persoenlicher Assistent');
+
+  let card = document.getElementById('kim-card-overlay');
+  if (card) {
+    card.style.display = card.style.display === 'none' ? 'flex' : 'none';
+    return;
+  }
+  card = document.createElement('div');
+  card.id = 'kim-card-overlay';
+  // Position: direkt unter dem Header (Oberkante Setup-Bereich)
+  const headerH = 60; // Header Hoehe
+  const setupHeader = 44; // Setup "Zurueck" Leiste
+  const cardTop = headerH + setupHeader + 34;
+  card.style.cssText = `position:fixed;top:${cardTop}px;left:10px;right:10px;height:210px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;justify-content:center;z-index:30;padding:20px;gap:10px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)`;
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>
+      <div style="flex:1">
+        <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:1px">KAI</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.35)">${subtitle}</div>
+      </div>
+      <button onclick="document.getElementById('kim-card-overlay').style.display='none'" style="background:rgba(120,120,128,0.32);border:none;color:rgba(255,255,255,0.5);font-size:16px;cursor:pointer;width:32px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+    </div>
+    <div style="font-size:15px;color:rgba(255,255,255,0.5);line-height:1.5">${greeting}</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">kim@kimanus.de</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">·</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">0800 546 2687</div>
+    </div>
+  `;
+  document.body.appendChild(card);
+}
+
+// === HEADER INFO (KIMANUS + KIM) ===
+let headerCardActive = null; // Merkt sich ob KIMANUS/KIM gerade angezeigt wird
+
+function showKimanusInfo() {
+  const kimanusCard = CARDS.find(c => c.id === 'landing');
+  if (!kimanusCard) return;
+  showHeaderCard(kimanusCard);
+}
+
+function showKimInfo() {
+  // Erst Backs updaten je nach Modus
+  updateKimBacks();
+  const cfg = getSetupConfig();
+  const mode = cfg['kim_mode'] || 'concierge';
+  const gender = cfg['kim_gender'] || 'weiblich';
+  // KIM Karte mit passendem Titel/Subtitle
+  const kimCard = CARDS.find(c => c.id === 'kim');
+  if (!kimCard) return;
+  if (mode === 'concierge') {
+    kimCard.subtitle = 'Dein Concierge';
+  } else {
+    kimCard.subtitle = gender === 'weiblich' ? 'Deine persoenliche Assistentin' : 'Dein persoenlicher Assistent';
+  }
+  showHeaderCard(kimCard);
+}
+
+function showHeaderCard(card) {
+  // Wenn schon eine Header-Karte aktiv ist, erst zuruecksetzen
+  if (headerCardActive) {
+    hideHeaderCard();
+  }
+  // Wenn geflippt, erst zurueckflippen
+  if (isFlipped) flipCard();
+
+  // Aktuelle Karte merken und Header-Karte temporaer einsetzen
+  headerCardActive = {
+    origCards: [...activeCards],
+    origIndex: currentIndex
+  };
+
+  // Header-Karte an Position 0 einfuegen
+  activeCards = [card, ...activeCards];
+  currentIndex = 0;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
+}
+
+function hideHeaderCard() {
+  if (!headerCardActive) return;
+  if (isFlipped) flipCard();
+  activeCards = headerCardActive.origCards;
+  currentIndex = headerCardActive.origIndex;
+  headerCardActive = null;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
+}
+
+// Header-Status updaten
+function updateHeaderKimStatus() {
+  const cfg = getSetupConfig();
+  const mode = cfg['kim_mode'] || 'concierge';
+  const el = document.getElementById('header-kim-status');
+  const gender = cfg['kim_gender'] || 'weiblich';
+  if (mode === 'concierge') {
+    el.textContent = 'Concierge';
+  } else {
+    el.textContent = gender === 'weiblich' ? 'Persoenliche Assistentin' : 'Persoenlicher Assistent';
+  }
+}
+
+// KIM Kontakt-Funktionen
+function kimAddContact() {
+  const vcard = 'BEGIN:VCARD\nVERSION:3.0\nFN:KIM (KIMANUS)\nTEL;TYPE=WORK:+4908005462687\nEMAIL:kim@kimanus.de\nURL:https://app.kimanus.de\nNOTE:Dein persoenlicher Assistent von KIMANUS\nEND:VCARD';
+  const blob = new Blob([vcard], {type:'text/vcard'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'KIM-KIMANUS.vcf';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function kimOpenWhatsApp() {
+  window.open('https://wa.me/4908005462687?text=Hallo%20KIM!', '_blank');
+}
+function kimCall() {
+  window.open('tel:+4908005462687');
+}
+
+function updateKimBacks() {
+  const cfg = getSetupConfig();
+  const mode = cfg['kim_mode'] || 'concierge';
+  const conciergebacks = [
+    {title:'KIM · Concierge', content:'Ich bin dein Concierge.\nSchnell, effizient, auf den Punkt.\nIch verbinde dich sofort\nmit dem richtigen Experten.'},
+    {title:'Was ich tue', content:'Anfragen entgegennehmen\nAn den richtigen Agenten weiterleiten\nTermine koordinieren\nInformationen beschaffen\nProbleme sofort loesen'},
+    {title:'Mein Service', content:'Reservierungen buchen\nTaxi bestellen\nWeg beschreiben\nOeffnungszeiten nennen\nVerfuegbarkeit pruefen'},
+    {title:'Empfehlungen', content:'Restaurants in der Naehe\nVeranstaltungen heute\nBeste Angebote\nRegionale Geheimtipps\nImmer aktuell & lokal'},
+    {title:'Mein Team', content:'Hinter mir stehen Experten:\nScouts • Guides • Berater\nBusiness • Spezialisten\nIch verbinde dich in Sekunden.'},
+    {title:'Soll ich mich eintragen?', content:'', type:'kim-contact'},
+  ];
+  const persoenlichbacks = [
+    {title:'KIM · Persoenlich', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich und denke mit.\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
+    {title:'Dein Alltag', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
+    {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nMedikamente & Arzttermine'},
+    {title:'Ich denke mit', content:'"Du bestellst immer Cappuccino."\n"Morgen hat deine Mutter Geburtstag."\n"Der Friseur hat heute offen."\n"Dein Lieblingswein ist im Angebot."\nIch lerne staendig dazu.'},
+    {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+    {title:'Soll ich mich eintragen?', content:'', type:'kim-contact'},
+  ];
+  const newBacks = mode === 'concierge' ? conciergebacks : persoenlichbacks;
+  // Alle KIM Karten updaten
+  CARDS.forEach(card => {
+    if (card.id === 'kim' || card.id === 'kim2') {
+      card.backs = newBacks;
+    }
+  });
+}
+
+// === TRESOR ENTFERNT - Settings ist jetzt Fullscreen-Folie ===
+// Settings-Folie runter-wischen zum Schliessen
+(function(){
+  let tStartY = 0;
+  const sp = document.getElementById('setup-panel');
+  if (!sp) return;
+  sp.addEventListener('touchstart', e => { tStartY = e.touches[0].clientY; }, {passive:true});
+  sp.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientY - tStartY;
+    if (diff > 80) closeSetup();
+  }, {passive:true});
+})();
+
+// === TASTATUR-TOOLBAR ===
+function kbDismiss() {
+  document.activeElement.blur();
+}
+
+// Toolbar zeigen wenn Input fokussiert, verstecken wenn nicht
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const toolbar = document.getElementById('kb-toolbar');
+    const heightDiff = window.innerHeight - window.visualViewport.height;
+    if (heightDiff > 100 && isFlipped && activeCards[currentIndex]?.id === 'yt-scout') {
+      // Tastatur ist offen UND YouTube Scout aktiv
+      toolbar.classList.add('visible');
+      toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
+    } else {
+      toolbar.classList.remove('visible');
+    }
+  });
+  window.visualViewport.addEventListener('scroll', () => {
+    const toolbar = document.getElementById('kb-toolbar');
+    if (toolbar.classList.contains('visible')) {
+      toolbar.style.bottom = (window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop) + 'px';
+    }
+  });
+}
+
+// === YOUTUBE SCOUT ===
+let ytCurrentVideoId = '';
+
+async function ytPaste() {
+  try {
+    const text = await navigator.clipboard.readText();
+    const urlField = document.getElementById('yt-url');
+    urlField.textContent = text.trim();
+    urlField.style.color = 'rgba(255,255,255,0.5)';
+  } catch(e) {
+    alert('Clipboard nicht verfügbar. Bitte URL kopieren und nochmal versuchen.');
+  }
+}
+
+// Einfache Spracheingabe NUR fuer URL-Feld (kein KIM Chat)
+let ytMicRecorder = null;
+let ytMicChunks = [];
+let ytMicStream = null;
+let ytMicActive = false;
+
+function ytMic() {
+  if (ytMicActive) {
+    ytMicStop();
+  } else {
+    ytMicStart();
+  }
+}
+
+async function ytMicStart() {
+  try {
+    ytMicActive = true;
+    const urlField = document.getElementById('yt-url');
+    urlField.textContent = '🎤 Sprich jetzt...';
+    urlField.style.color = 'rgba(230,57,70,0.5)';
+
+    ytMicStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    // Beste Audio-Qualitaet fuer Whisper: mp4 auf iOS, webm auf Android/Desktop
+    const mimeOptions = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+    let selectedMime = '';
+    for (const mime of mimeOptions) {
+      if (MediaRecorder.isTypeSupported(mime)) { selectedMime = mime; break; }
+    }
+    ytMicRecorder = selectedMime ? new MediaRecorder(ytMicStream, {mimeType:selectedMime}) : new MediaRecorder(ytMicStream);
+    ytMicChunks = [];
+
+    ytMicRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) ytMicChunks.push(e.data);
+    };
+
+    ytMicRecorder.onstop = async () => {
+      const mimeType = ytMicRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(ytMicChunks, {type:mimeType});
+      if (ytMicStream) { ytMicStream.getTracks().forEach(t=>t.stop()); ytMicStream=null; }
+      ytMicActive = false;
+
+      if (blob.size < 1000) {
+        urlField.textContent = 'Keine URL';
+        urlField.style.color = 'rgba(255,255,255,0.4)';
+        return;
+      }
+
+      urlField.textContent = '⏳ Erkenne...';
+
+      const formData = new FormData();
+      const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      formData.append('audio', blob, 'recording.' + ext);
+
+      try {
+        const resp = await fetch('/api/stt', {method:'POST', body:formData});
+        const data = await resp.json();
+        const text = (data.text || '').trim();
+        if (text) {
+          urlField.textContent = text;
+          urlField.style.color = 'rgba(255,255,255,0.5)';
+        } else {
+          urlField.textContent = 'Nicht verstanden - nochmal versuchen';
+          urlField.style.color = 'rgba(255,255,255,0.2)';
+        }
+      } catch(e) {
+        urlField.textContent = 'Fehler - nochmal versuchen';
+        urlField.style.color = 'rgba(255,255,255,0.2)';
+      }
+    };
+
+    ytMicRecorder.start(250);
+
+    // Auto-stop nach 8 Sekunden
+    setTimeout(() => { if (ytMicActive) ytMicStop(); }, 8000);
+
+  } catch(e) {
+    ytMicActive = false;
+    console.error('Mic-Fehler:', e);
+  }
+}
+
+function ytMicStop() {
+  ytMicActive = false;
+  if (ytMicRecorder && ytMicRecorder.state === 'recording') {
+    ytMicRecorder.stop();
+  }
+}
+
+function ytExtractId(url) {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+
+function ytGo() {
+  const el = document.getElementById('yt-url');
+  if (!el) return;
+  const text = (el.textContent || '').trim();
+  if (!text || text === 'Tippe 🎤 oder 📋' || text === 'Keine URL') return;
+
+  const videoId = ytExtractId(text);
+  if (videoId) {
+    ytAnalyzeVideo(videoId);
+  } else {
+    ytSearch(text);
+  }
+}
+
+async function ytAnalyzeVideo(videoId) {
+
+  ytCurrentVideoId = videoId;
+
+  // Player sofort laden
+  const playerWrap = document.getElementById('yt-player-wrap');
+  if (playerWrap) {
+    playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
+  }
+
+  // Zur Player-Glasplatte drehen
+  if (isFlipped) {
+    backIndex = 1;
+    positionBackCards(true);
+  }
+
+  // Analyse starten via KIM
+  const chaptersWrap = document.getElementById('yt-chapters-wrap');
+  if (chaptersWrap) {
+    chaptersWrap.innerHTML = '<div style="font-size:11px;color:rgba(230,57,70,0.4);text-align:center">Analysiere Video...</div>';
+  }
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: 'Analysiere dieses YouTube Video und erstelle Kapitel mit Timestamps: https://www.youtube.com/watch?v=' + videoId,
+        agent:'kim',
+        model:'groq-llama',
+        session:'yt-scout-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    const analysis = data.output || data.text || '';
+
+    // Kapitel anzeigen
+    if (chaptersWrap && analysis) {
+      chaptersWrap.innerHTML = `<div style="font-size:12px;color:rgba(255,255,255,0.3);line-height:1.8;white-space:pre-line">${analysis}</div>`;
+    }
+
+    // Info anzeigen
+    const infoWrap = document.getElementById('yt-info-wrap');
+    if (infoWrap) {
+      infoWrap.innerHTML = `
+        <div style="margin-bottom:8px"><img src="https://img.youtube.com/vi/${videoId}/mqdefault.jpg" style="width:100%;border-radius:2px;opacity:0.6"></div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.2)">ID: ${videoId}</div>
+        <button onclick="ytSave('${videoId}')" style="margin-top:8px;width:100%;padding:8px;background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.3);color:rgba(76,175,80,0.6);font-size:11px;cursor:pointer">💾 SPEICHERN</button>
+      `;
+    }
+  } catch(e) {
+    console.error('Analyse-Fehler:', e);
+    if (chaptersWrap) chaptersWrap.innerHTML = '<div style="color:rgba(230,57,70,0.4);font-size:11px">Analyse fehlgeschlagen</div>';
+  }
+}
+
+async function ytSave(videoId) {
+  try {
+    await fetch('/api/video-save', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url:'https://www.youtube.com/watch?v=' + videoId, analysis:'Gespeichert via Wheel'})
+    });
+    alert('Video gespeichert!');
+  } catch(e) { console.error(e); }
+}
+
+async function ytLoadSaved() {
+  const wrap = document.getElementById('yt-saved-wrap');
+  if (!wrap) return;
+  try {
+    const resp = await fetch('/api/video-list');
+    const data = await resp.json();
+    const videos = data.videos || [];
+    if (videos.length === 0) {
+      wrap.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center">Noch keine Videos gespeichert</div>';
+      return;
+    }
+
+    // Duplikate entfernen
+    const seen = new Set();
+    const unique = videos.filter(v => {
+      const vid = ytExtractId(v.url || '');
+      if (vid && !seen.has(vid)) { seen.add(vid); return true; }
+      return false;
+    });
+
+    wrap.style.scrollbarWidth = 'none';
+    wrap.innerHTML = unique.slice(0, 10).map(v => {
+      const vid = ytExtractId(v.url || '');
+      const title = (v.title || 'Video').slice(0, 40);
+      return `<div onclick="ytLoadVideo('${vid}')" style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;align-items:center">
+        <div style="width:64px;height:42px;flex-shrink:0;position:relative;overflow:hidden">
+          <img src="https://img.youtube.com/vi/${vid}/default.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.7;display:block">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <div style="width:18px;height:18px;background:rgba(230,57,70,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">▶</div>
+          </div>
+        </div>
+        <div style="flex:1;font-size:10px;color:rgba(255,255,255,0.3);line-height:1.3">${title}</div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    wrap.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.15)">Fehler beim Laden</div>';
+  }
+}
+
+function ytShowSavedOnWheel(videos) {
+  const backTrack = document.getElementById('back-track');
+  const uniqueVids = [];
+  const seenIds = new Set();
+
+  // Duplikate entfernen (gleiche Video-ID)
+  videos.forEach(v => {
+    const vid = ytExtractId(v.url || '');
+    if (vid && !seenIds.has(vid)) {
+      seenIds.add(vid);
+      uniqueVids.push({...v, videoId: vid});
+    }
+  });
+
+  const cards = uniqueVids.slice(0, 10).map((v, idx) => `
+    <div class="back-wheel-card" id="bcard-${idx}" onclick="ytLoadVideo('${v.videoId}')">
+      <div style="width:100%;height:100%;display:flex;flex-direction:row;padding:0;overflow:hidden;cursor:pointer">
+        <div style="width:45%;height:100%;overflow:hidden;border-right:1px solid rgba(255,255,255,0.04);position:relative">
+          <img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.8">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+            <div style="width:36px;height:36px;background:rgba(230,57,70,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff">▶</div>
+          </div>
+        </div>
+        <div style="flex:1;padding:10px;display:flex;flex-direction:column;justify-content:center;gap:4px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4">${(v.title || 'Video').slice(0, 60)}</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.15)">Antippen = Abspielen</div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Zurueck-Karte
+  const resetCard = `<div class="back-wheel-card" id="bcard-${uniqueVids.length}">
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+      <div style="font-size:11px;color:rgba(255,255,255,0.2)">${uniqueVids.length} Videos gespeichert</div>
+      <button onclick="ytResetInput()" style="padding:8px 16px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.4);font-size:11px;cursor:pointer">↩ Zurück</button>
+    </div>
+  </div>`;
+
+  backTrack.innerHTML = cards + resetCard;
+
+  const tempBacks = uniqueVids.slice(0, 10).map(v => ({title:v.title, content:''}));
+  tempBacks.push({title:'reset', content:''});
+  activeCards[currentIndex].backs = tempBacks;
+
+  backIndex = 0;
+  positionBackCards(true);
+}
+
+function ytLoadVideo(videoId) {
+  if (!videoId) return;
+  ytCurrentVideoId = videoId;
+  const urlField = document.getElementById('yt-url');
+  if (urlField) urlField.textContent = 'https://www.youtube.com/watch?v=' + videoId;
+  const playerWrap = document.getElementById('yt-player-wrap');
+  if (playerWrap) {
+    playerWrap.innerHTML = `<iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1" frameborder="0" allowfullscreen></iframe>`;
+  }
+  // Zur Player-Glasplatte drehen
+  backIndex = 1;
+  positionBackCards(true);
+}
+
+async function ytSearch(query) {
+  // Auf der aktuellen BACK-Card anzeigen (bcard-0 = Eingabe-Platte)
+  const bcard = document.getElementById('bcard-0');
+  if (!bcard) return;
+
+  // Ladebildschirm
+  bcard.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:8px">
+      <div style="font-size:24px;animation:spin 1s linear infinite">⏳</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3)">Suche: ${query}</div>
+    </div>`;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message: 'Suche die 5 besten YouTube Videos zu: ' + query + '. Antworte EXAKT in diesem Format pro Zeile: NUMMER. TITEL | youtube.com/watch?v=VIDEO_ID - Nur echte YouTube URLs die wirklich existieren!',
+        agent:'kim',
+        model:'groq-llama',
+        session:'yt-search-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+    const answer = data.output || data.text || 'Keine Ergebnisse';
+
+    // Ergebnisse in einzelne Video-Karten aufteilen
+    const results = answer.split(/\n/).filter(l => l.trim().length > 10);
+    if (results.length > 1) {
+      const backTrack = document.getElementById('back-track');
+      const colors = ['#e63946','#4a90d9','#4caf50','#ff9800','#9c27b0','#607d8b','#d4a017','#e91e63'];
+
+      const cards = results.slice(0, 8).map((r, idx) => {
+        const color = colors[idx % colors.length];
+        const line = r.replace(/^\d+[\.\)\-]\s*/, '').trim();
+        const num = idx + 1;
+
+        // YouTube Video-ID extrahieren falls vorhanden
+        const vidMatch = line.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+        const vidId = vidMatch ? vidMatch[1] : '';
+        const title = line.replace(/\|.*$/, '').replace(/https?:\/\/\S+/g, '').replace(/-\s*$/, '').trim();
+
+        const thumbArea = vidId
+          ? `<img src="https://img.youtube.com/vi/${vidId}/mqdefault.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.7" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:100%;height:100%;align-items:center;justify-content:center"><div style='font-size:40px;opacity:0.3'>▶</div></div>`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,${color}22,${color}11)"><div style='font-size:40px;opacity:0.3'>▶</div></div>`;
+
+        return `
+        <div class="back-wheel-card" id="bcard-${idx}" ${vidId ? 'onclick="ytLoadVideo(\''+vidId+'\')"' : ''}>
+          <div style="width:100%;height:100%;display:flex;flex-direction:row;padding:0;overflow:hidden;cursor:${vidId?'pointer':'default'}">
+            <div style="width:45%;height:100%;overflow:hidden;border-right:1px solid rgba(255,255,255,0.04)">
+              ${thumbArea}
+            </div>
+            <div style="flex:1;padding:12px;display:flex;flex-direction:column;justify-content:center;gap:4px">
+              <div style="font-size:9px;color:rgba(255,255,255,0.15)">Video ${num}${vidId?' • Antippen = Abspielen':''}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.4">${title}</div>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      const resetCard = `<div class="back-wheel-card" id="bcard-${results.length}">
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px">
+          <div style="font-size:11px;color:rgba(255,255,255,0.2)">🔍 ${query} - ${results.length} Ergebnisse</div>
+          <button onclick="ytResetInput()" style="padding:10px 20px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);color:rgba(230,57,70,0.4);font-size:12px;cursor:pointer">↩ Neue Suche</button>
+        </div>
+      </div>`;
+
+      backTrack.innerHTML = cards + resetCard;
+
+      const tempBacks = results.slice(0, 8).map(r => ({title:'', content:r.trim()}));
+      tempBacks.push({title:'reset', content:''});
+      activeCards[currentIndex].backs = tempBacks;
+
+      backIndex = 0;
+      positionBackCards(true);
+    } else {
+      bcard.innerHTML = `
+        <div style="width:100%;height:100%;display:flex;flex-direction:column;padding:12px 16px;overflow-y:auto;scrollbar-width:none">
+          <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-bottom:6px">🔍 ${query}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.7;white-space:pre-line">${answer}</div>
+          <div onclick="ytResetInput()" style="font-size:10px;color:rgba(230,57,70,0.3);text-align:center;margin-top:6px;cursor:pointer">↩ Neue Suche</div>
+        </div>`;
+    }
+
+  } catch(e) {
+    bcard.innerHTML = `
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px">
+        <div style="font-size:12px;color:rgba(230,57,70,0.4)">Suche fehlgeschlagen</div>
+        <div onclick="ytResetInput()" style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;cursor:pointer">↩ Nochmal</div>
+      </div>`;
+  }
+}
+
+function ytResetInput() {
+  // Zurück zur Eingabe-Glasplatte
+  backIndex = 0;
+  buildBackCards();
+  positionBackCards(false);
+}
+
+// === SPRACH-PIPELINE ===
+let mediaRecorder = null;
+let audioChunks = [];
+let audioStream = null;
+
+let speechState = 'idle'; // idle -> recording -> processing -> review -> sending
+let pendingText = '';
+let currentAgent = 'KAI'; // Rufanlage: wer gerade angesprochen wird
+let silenceTimer = null;
+
+// === WALKIE-TALKIE MODUS ===
+let walkieActive = false;
+
+// === CHAT-OVERLAY (eigenes Fenster statt Glasplatte) ===
+function openChatOverlay() {
+  // Chat-Bereich: unter KIM-Kaertchen bis Unterkante Hauptglasplatte
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+  const centerH = 230; // Sichtfenster-Hoehe
+  const remainH = totalH - centerH;
+  const topH = Math.floor(remainH * 0.6); // Oberkante Sichtfenster
+
+  // KIM-Karte: 216px hoch, 5px hoeher
+  const kimTopPct = 8 / 812;
+  const kimTop = Math.round(totalH * kimTopPct);
+  const kimHeight = 216;
+  const kimBottom = kimTop + kimHeight;
+
+  // Dialogplatte: 110px unter KIM-Karte bis Unterkante Glasplatte (+25px)
+  const glasBottom = topH + centerH + 25;
+  const chatTop = kimBottom + 131; // +3px tiefer (Oberkante anpassen)
+  const chatHeight = 205; // 3px kleiner von oben
+
+  const chatArea = document.getElementById('chat-scroll-area');
+  chatArea.style.top = chatTop + 'px';
+  chatArea.style.height = chatHeight + 'px';
+  chatArea.style.left = '10px';
+  chatArea.style.right = '10px';
+  chatArea.style.display = 'block';
+
+  // KIM Kaertchen oben zeigen
+  showKimCardAbove();
+
+  // Messages leeren
+  document.getElementById('chat-messages').innerHTML = '';
+}
+
+function closeChatOverlay() {
+  const ca = document.getElementById('chat-scroll-area');
+  if (ca && ca.style.display !== 'none') {
+    ca.style.display = 'none';
+    hideKimCardAbove();
+    resetSpeechState();
+  }
+}
+
+function chatShowThinking() {
+  const messages = document.getElementById('chat-messages');
+  messages.innerHTML += `<div id="chat-thinking" style="margin-bottom:12px">
+    <div style="font-size:12px;font-weight:700;color:rgba(100,200,100,0.5);margin-bottom:2px">KAI:</div>
+    <div style="display:flex;gap:4px;align-items:center;padding:4px 0">
+      <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.4);animation:bwave 0.8s ease-in-out infinite"></span>
+      <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.5);animation:bwave 0.8s ease-in-out 0.2s infinite"></span>
+      <span style="width:6px;height:6px;border-radius:3px;background:rgba(100,200,100,0.4);animation:bwave 0.8s ease-in-out 0.4s infinite"></span>
+    </div>
+  </div>`;
+  const scroll = document.getElementById('chat-scroll-area');
+  // Nicht nach unten scrollen - Text bleibt oben lesbar
+}
+
+function chatRemoveThinking() {
+  const thinking = document.getElementById('chat-thinking');
+  if (thinking) thinking.remove();
+}
+
+function chatAddMessage(role, text) {
+  chatRemoveThinking();
+  const messages = document.getElementById('chat-messages');
+  // Markdown-Sternchen entfernen (**fett** → fett, *kursiv* → kursiv)
+  let cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+  cleanText = cleanText.replace(/\n/g, '<br>');
+  const color = role === 'DU' ? 'rgba(230,57,70,0.5)' : 'rgba(100,200,100,0.5)';
+  messages.innerHTML += `<div style="margin-bottom:12px">
+    <div style="font-size:12px;font-weight:700;color:${color};margin-bottom:2px">${role}:</div>
+    <div style="color:rgba(255,255,255,0.5)">${cleanText}</div>
+  </div>`;
+  // Immer nach oben scrollen - Frage+Antwort von oben lesbar
+  const scroll = document.getElementById('chat-scroll-area');
+  if (scroll) scroll.scrollTop = 0;
+}
+
+function showKimCardAbove() {
+  // KAI Avatar-Kaertchen
+  const fl = document.getElementById('flip-label');
+  if (!fl) return;
+  const subtitle = 'Concierge';
+
+  document.getElementById('fl-card').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;width:100%;height:100%;padding:12px 16px">
+      <div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
+      <div style="flex:1">
+        <div class="fl-name" style="font-size:18px">KAI</div>
+        <div class="fl-role" style="font-size:12px">${subtitle} · Hoert zu...</div>
+      </div>
+      <div id="kim-wave-container" style="width:70px;height:34px;display:none;align-items:center;justify-content:center;gap:3px"></div>
+    </div>
+  `;
+  const container = document.getElementById('wheel-container');
+  const totalH = container.clientHeight;
+
+  // KIM-Karte: 216px hoch, 5px hoeher
+  const kimTopPct = 8 / 812; // 5px hoeher (war 13)
+  const kimTop = Math.round(totalH * kimTopPct);
+
+  fl.style.display = 'flex';
+  fl.style.opacity = '1';
+  fl.style.top = kimTop + 'px';
+  fl.style.height = '216px';
+  fl.classList.add('visible');
+}
+
+function hideKimCardAbove() {
+  const fl = document.getElementById('flip-label');
+  if (fl) fl.classList.remove('visible');
+  kimStopWave();
+  kimStopThink();
+}
+
+// === KIM Welle (Sprechen) ===
+function kimStartWave() {
+  const wc = document.getElementById('kim-wave-container');
+  if (!wc) return;
+  wc.innerHTML = '<div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>';
+  wc.style.display = 'flex';
+  // Status-Text aktualisieren
+  const role = document.querySelector('#flip-label .fl-role');
+  if (role) role.textContent = 'Hoert zu...';
+}
+
+function kimStopWave() {
+  const wc = document.getElementById('kim-wave-container');
+  if (wc) { wc.style.display = 'none'; wc.innerHTML = ''; }
+}
+
+// === KIM Denken (Verarbeiten) ===
+function kimStartThink() {
+  kimStopWave();
+  const wc = document.getElementById('kim-wave-container');
+  if (!wc) return;
+  wc.innerHTML = '<div class="think-dot"></div><div class="think-dot"></div><div class="think-dot"></div>';
+  wc.id = 'kim-think-container';
+  wc.style.display = 'flex';
+  // Status-Text aktualisieren
+  const role = document.querySelector('#flip-label .fl-role');
+  if (role) role.textContent = 'Denkt nach...';
+}
+
+function kimStopThink() {
+  const tc = document.getElementById('kim-think-container');
+  if (tc) { tc.style.display = 'none'; tc.innerHTML = ''; tc.id = 'kim-wave-container'; }
+}
+
+function walkieStart(e) {
+  e.preventDefault();
+  const btn = document.getElementById('speech-btn');
+
+  // Wenn Setup offen: KIM Karte zeigen
+  if (settingsOpen) {
+    showKimBubble();
+    return;
+  }
+
+  if (walkieActive) return;
+  walkieActive = true;
+
+  // Chat-Overlay oeffnen (statt Glasplatte)
+  openChatOverlay();
+
+  // Sofort Aufnahme starten
+  speechState = 'recording';
+  isListening = true;
+  btn.classList.add('listening');
+  btn.querySelector('span').textContent = '●';
+  btn.querySelector('span').style.fontSize = '22px';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%)';
+  startRecording();
+
+  // Wave-Animation im KIM-Kaertchen starten
+  kimStartWave();
+}
+
+function walkieEnd(e) {
+  e.preventDefault();
+  if (!walkieActive) return;
+  walkieActive = false;
+
+  const btn = document.getElementById('speech-btn');
+
+  // Aufnahme stoppen und SOFORT senden
+  speechState = 'processing';
+  isListening = false;
+  btn.classList.remove('listening');
+  btn.querySelector('span').textContent = '⏳';
+  btn.querySelector('span').style.fontSize = '';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+
+  const cc = document.getElementById('chat-content');
+  if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.35);font-size:14px">Wird erkannt...</span>';
+
+  // Wave stoppen, Denk-Animation starten
+  kimStartThink();
+
+  stopRecording();
+  // processVoice wird durch mediaRecorder.onstop aufgerufen
+  // und sendet dann direkt an KIM (walkieTalkieMode)
+}
+
+function toggleSpeech() {
+  // Fallback fuer alte Aufrufe
+  const btn = document.getElementById('speech-btn');
+
+  if (settingsOpen) {
+    showKimBubble();
+    return;
+  }
+
+  if (speechState === 'idle') {
+    // Start: Aufnahme beginnen (kein separater Chat-Modus mehr)
+    speechState = 'recording';
+    isListening = true;
+    btn.classList.add('listening');
+    btn.querySelector('span').textContent = '●';
+    btn.querySelector('span').style.fontSize = '22px';
+    btn.style.background = 'radial-gradient(circle at 30% 30%,#ff4d5a 0%,var(--kim-red) 50%,#b81c2a 100%)';
+    showEmptyBook();
+    startRecording();
+
+  } else if (speechState === 'recording') {
+    // Stop: Aufnahme beenden
+    speechState = 'processing';
+    isListening = false;
+    if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+    btn.classList.remove('listening');
+    btn.querySelector('span').textContent = '⏳';
+    btn.querySelector('span').style.fontSize = '';
+    btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+    // Zeige auf Glasplatte: "Wird erkannt..."
+    const cc = document.getElementById('chat-content');
+    if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.35);font-size:14px">Wird erkannt<span style="display:inline-flex;gap:2px;margin-left:6px;vertical-align:middle"><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bwave 0.6s ease-in-out infinite"></span><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bwave 0.6s ease-in-out 0.2s infinite"></span><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.4);animation:bwave 0.6s ease-in-out 0.4s infinite"></span></span></span>';
+    stopRecording();
+    // processVoice wird automatisch aufgerufen durch mediaRecorder.onstop
+
+  } else if (speechState === 'processing') {
+    return;
+
+  } else if (speechState === 'review') {
+    // Senden!
+    speechState = 'sending';
+    btn.classList.remove('send-ready');
+    btn.querySelector('span').textContent = '⏳';
+    btn.style.background = '';
+    if (pendingText) {
+      sendToKim(pendingText).then(() => {
+        speechState = 'idle';
+        btn.querySelector('span').textContent = '🎙';
+      });
+    } else {
+      resetSpeechState();
+    }
+  }
+}
+
+function resetSpeechState() {
+  speechState = 'idle';
+  pendingText = '';
+  isListening = false;
+  walkieActive = false;
+  kimStopWave();
+  kimStopThink();
+  const btn = document.getElementById('speech-btn');
+  btn.classList.remove('listening');
+  btn.classList.remove('send-ready');
+  btn.querySelector('span').textContent = '🎙';
+  btn.querySelector('span').style.fontSize = '';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+  const delBtn = document.getElementById('delete-btn');
+  if (delBtn) delBtn.style.display = 'none';
+}
+
+function clearAndRespeak() {
+  pendingText = '';
+  stopAudioVisualizer();
+  cleanupMic();
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    try { mediaRecorder.stop(); } catch(e) {}
+  }
+  resetSpeechState();
+  // Im Chat bleiben! Nur leere Glasplatte zeigen
+  showEmptyBook();
+}
+
+function showEmptyBook() {
+  const centerCardEl = document.getElementById('card-' + currentIndex);
+  if (!centerCardEl || isFlipped) return;
+  const front = centerCardEl.querySelector('.card-front');
+  if (!front) return;
+  front.innerHTML = `
+    <div id="chat-page" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;color:rgba(230,57,70,0.6);font-weight:700">DU:</span>
+        <span style="flex:1"></span>
+      </div>
+      <canvas id="audio-wave" width="280" height="24" style="margin:4px 0;opacity:0.6"></canvas>
+      <div id="chat-content" style="font-size:13px;color:rgba(255,255,255,0.2);line-height:1.4">Sprich jetzt...</div>
+    </div>`;
+  adjustBrightness(currentBrightness);
+}
+
+let audioCtx, analyser, animFrameId;
+
+function startAudioVisualizer(stream) {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  const source = audioCtx.createMediaStreamSource(stream);
+  source.connect(analyser);
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  const canvas = document.getElementById('audio-wave');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const barCount = 20;
+  const barW = 3, gap = (W - barCount * barW) / (barCount - 1);
+
+  function draw() {
+    animFrameId = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(data);
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < barCount; i++) {
+      const val = data[i * 3] / 255;
+      const h = Math.max(2, val * H);
+      const x = i * (barW + gap);
+      const y = (H - h) / 2;
+      const alpha = 0.2 + val * 0.5;
+      ctx.fillStyle = `rgba(230,57,70,${alpha})`;
+      ctx.fillRect(x, y, barW, h);
+    }
+  }
+  draw();
+}
+
+function stopAudioVisualizer() {
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  if (audioCtx) { audioCtx.close().catch(()=>{}); audioCtx = null; }
+  const canvas = document.getElementById('audio-wave');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Zeichne flache Linie
+    ctx.fillStyle = 'rgba(230,57,70,0.15)';
+    ctx.fillRect(0, 11, canvas.width, 2);
+  }
+}
+
+async function startRecording() {
+  try {
+    audioStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    startAudioVisualizer(audioStream);
+    mediaRecorder = new MediaRecorder(audioStream);
+    audioChunks = [];
+    let liveTranscriptTimer = null;
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    // Live-Transkription: Alle 3 Sekunden bisheriges Audio transkribieren
+    let lastLiveText = '';
+    liveTranscriptTimer = setInterval(async () => {
+      if (speechState !== 'recording' || audioChunks.length === 0) return;
+      try {
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const liveBlob = new Blob([...audioChunks], {type: mimeType});
+        if (liveBlob.size < 3000) return;
+        const fd = new FormData();
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+        fd.append('audio', liveBlob, 'live.' + ext);
+        const resp = await fetch('/api/stt', {method:'POST', body:fd});
+        const data = await resp.json();
+        if (data.text && data.text.trim() && data.text !== lastLiveText && speechState === 'recording') {
+          lastLiveText = data.text;
+          const cc = document.getElementById('chat-content');
+          if (cc) cc.innerHTML = '<span style="color:rgba(255,255,255,0.4)">' + data.text + '</span><span style="display:inline-block;width:2px;height:13px;background:rgba(230,57,70,0.5);margin-left:3px;vertical-align:middle;animation:bwave 0.5s infinite"></span>';
+        }
+      } catch(e) {}
+    }, 3000);
+
+    mediaRecorder.onstop = async () => {
+      if (liveTranscriptTimer) { clearInterval(liveTranscriptTimer); liveTranscriptTimer = null; }
+      const mimeType = mediaRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(audioChunks, {type: mimeType});
+      cleanupMic();
+      if (blob.size > 1000) {
+        await processVoice(blob, mimeType);
+      }
+    };
+    mediaRecorder.start(250);
+  } catch(err) {
+    console.error('Mikrofon-Fehler:', err);
+    resetSpeechState();
+  }
+}
+
+function stopRecording() {
+  stopAudioVisualizer();
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+  }
+}
+
+function cleanupMic() {
+  if (audioStream) {
+    audioStream.getTracks().forEach(t => t.stop());
+    audioStream = null;
+  }
+}
+
+// === RUFANLAGE: Name im gesprochenen Text erkennen ===
+function detectSpokenAgent(text) {
+  const lower = text.toLowerCase().trim();
+  // Begruessung + Name am Anfang erkennen ("hey kai", "hallo kim", "justus,")
+  const greetings = /^(hey|hallo|hi|guten tag|morgen|moin|servus)?\s*/;
+  const cleaned = lower.replace(greetings, '').trim();
+
+  // KIM = Persoenliche Assistentin
+  if (/^kim[\s,!.]/.test(cleaned) || lower.startsWith('hey kim') || lower.startsWith('hallo kim'))
+    return {name:'KIM', role:'Assistentin', agent:'kim'};
+
+  // KAI = Concierge (explizit angesprochen)
+  if (/^kai[\s,!.]/.test(cleaned) || lower.startsWith('hey kai') || lower.startsWith('hallo kai'))
+    return {name:'KAI', role:'Concierge', agent:'kai'};
+
+  // Alle Agenten aus ALL_AGENTS durchgehen
+  const agentNames = [
+    {match:['justus'], name:'Justus', role:'Recht', agent:'ag-justus'},
+    {match:['lena'], name:'Lena', role:'Buchhaltung', agent:'ag-lena'},
+    {match:['wetterfrosch','wetter'], name:'Wetterfrosch', role:'Wetter', agent:'ag-wetterfrosch'},
+    {match:['kalkulierer','kalkulation'], name:'Kalkulierer', role:'Kalkulation', agent:'ag-kalkulierer'},
+    {match:['bestellprofi','bestell'], name:'Bestellprofi', role:'Bestellung', agent:'ag-bestellprofi'},
+    {match:['lagerist','lager'], name:'Lagerist', role:'Lager', agent:'ag-lagerist'},
+    {match:['sekretaer','sekretär'], name:'Sekretaer', role:'Termine', agent:'ag-sekretaer'},
+    {match:['dolmetscher','übersetzer','uebersetzer'], name:'Dolmetscher', role:'Sprachen', agent:'ag-dolmetscher'},
+    {match:['bibliothekar','bibliothek'], name:'Bibliothekar', role:'Wissen', agent:'ag-bibliothekar'},
+    {match:['animateur','freizeit'], name:'Animateur', role:'Freizeit', agent:'ag-animateur'},
+    {match:['it-hilfe','it hilfe','technik'], name:'IT-Hilfe', role:'Support', agent:'ag-ithilfe'},
+    {match:['marketing'], name:'Marketing', role:'Werbung', agent:'ag-marketing'},
+    {match:['dj','musik'], name:'DJ', role:'Musik', agent:'ag-dj'},
+    {match:['nachtfahrer','taxi','heimfahrt'], name:'Nachtfahrer', role:'Heimfahrt', agent:'ag-nachtfahrer'},
+    {match:['dr. steuer','steuerrecht','steuer'], name:'Dr. Steuer', role:'Steuerrecht', agent:'ag-steuerrecht'},
+    {match:['patentius','patentrecht','patent'], name:'Patentius', role:'Patentrecht', agent:'ag-patentrecht'},
+    {match:['arbex','arbeitsrecht'], name:'Arbex', role:'Arbeitsrecht', agent:'ag-arbeitsrecht'},
+    {match:['eventus','veranstaltung'], name:'Eventus', role:'Veranstaltungsrecht', agent:'ag-veranstaltungsrecht'},
+    {match:['controller','controlling'], name:'Controller', role:'Controlling', agent:'ag-controlling'},
+    {match:['steuerchen'], name:'Steuerchen', role:'Steuern', agent:'ag-steuerlena'},
+    {match:['youtube','video scout'], name:'YouTube Scout', role:'Videos', agent:'ag-youtube'},
+    {match:['web scout','web-scout'], name:'Web Scout', role:'Recherche', agent:'ag-web'},
+    {match:['news','nachrichten'], name:'News Scout', role:'Nachrichten', agent:'ag-news'},
+  ];
+
+  for (const a of agentNames) {
+    for (const m of a.match) {
+      if (cleaned.startsWith(m + ' ') || cleaned.startsWith(m + ',') || cleaned.startsWith(m + '!') || cleaned === m)
+        return {name:a.name, role:a.role, agent:a.agent};
+    }
+  }
+
+  // Kein Name erkannt → KAI (Concierge) nimmt an
+  return null;
+}
+
+async function processVoice(blob, mimeType) {
+  const btn = document.getElementById('speech-btn');
+  btn.querySelector('span').textContent = '⏳';
+
+  // Sofort-Check: Sind wir offline?
+  if (!navigator.onLine) {
+    chatAddMessage('KAI', 'Ich bin gerade offline. Sobald du wieder Netz hast, bin ich sofort fuer dich da! 📡');
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = 'Offline 📡';
+    resetSpeechState();
+    return;
+  }
+
+  // 1. Sprache -> Text (Groq Whisper)
+  const formData = new FormData();
+  const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('webm') ? 'webm' : 'wav';
+  formData.append('audio', blob, 'recording.' + ext);
+
+  try {
+    const sttResp = await fetch('/api/stt', {method:'POST', body:formData});
+    const sttData = await sttResp.json();
+    const userText = sttData.text || '';
+
+    if (!userText.trim()) {
+      btn.querySelector('span').textContent = '❌';
+      setTimeout(() => resetSpeechState(), 2000);
+      return;
+    }
+
+    // Pruefen ob wir im YouTube Scout sind
+    const currentCard = activeCards[currentIndex];
+    const ytUrlField = document.getElementById('yt-url');
+
+    if (currentCard && currentCard.id === 'yt-scout' && ytUrlField) {
+      // Im YouTube Scout: Text ins URL-Feld oder direkt an KIM
+      const videoId = ytExtractId(userText);
+      if (videoId) {
+        // User hat eine URL gesprochen
+        ytUrlField.textContent = userText;
+        ytUrlField.style.color = 'rgba(255,255,255,0.5)';
+        btn.querySelector('span').textContent = '🎙';
+        ytAnalyze();
+        return;
+      }
+      // Kein URL - als Suchanfrage an KIM weiterleiten
+    }
+
+    // === RUFANLAGE: Wer wird angesprochen? ===
+    const spokenAgent = detectSpokenAgent(userText);
+    currentAgent = spokenAgent ? spokenAgent.name : 'KAI';
+    if (spokenAgent) {
+      // Agent direkt angesprochen - Avatar-Kaertchen updaten
+      const flName = document.querySelector('#flip-label .fl-name');
+      if (flName) flName.textContent = spokenAgent.name;
+      const flRole = document.querySelector('#flip-label .fl-role');
+      if (flRole) flRole.textContent = spokenAgent.role + ' · Hoert zu...';
+    }
+
+    // Erkannten Text direkt im Chat-Overlay zeigen
+    pendingText = userText;
+    chatAddMessage('DU', userText);
+    chatShowThinking();
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (spokenAgent ? spokenAgent.role : 'Concierge') + ' · Denkt nach...';
+    // Button auf SENDEN setzen (gruen, blinkend) + Loeschen-Button zeigen
+    speechState = 'review';
+    btn.querySelector('span').textContent = '▶';
+    btn.querySelector('span').style.fontSize = '';
+    btn.classList.add('send-ready');
+    btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+    const delBtn = document.getElementById('delete-btn');
+    if (delBtn) delBtn.style.display = 'flex';
+
+    if (walkieTalkieMode) {
+      // Walkie-Talkie: Sofort senden
+      await sendToKim(userText);
+    }
+    // Review: Warten bis User auf gruenen Button drueckt
+
+  } catch(err) {
+    console.error('Pipeline-Fehler:', err);
+  }
+  if (speechState !== 'review') {
+    resetSpeechState();
+  }
+}
+
+let walkieTalkieMode = true; // Walkie-Talkie: Loslassen = sofort senden
+
+async function sendToKim(userText) {
+  const btn = document.getElementById('speech-btn');
+  const delBtn = document.getElementById('delete-btn');
+  if (delBtn) delBtn.style.display = 'none';
+  btn.classList.remove('send-ready');
+
+  // Denk-Animation im KIM-Kaertchen
+  kimStartThink();
+
+  // Sofort-Check: Offline?
+  if (!navigator.onLine) {
+    chatAddMessage('KAI', 'Ich bin gerade offline. Deine Frage habe ich mir gemerkt - sobald du wieder Netz hast, beantworte ich sie! 📡');
+    const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = 'Offline 📡';
+    resetSpeechState();
+    return;
+  }
+
+  btn.querySelector('span').textContent = '⏳';
+  btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
+
+  // Zeige "KIM denkt nach" auf der Glasplatte
+  showBookQuestion(userText);
+
+  try {
+    const chatResp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: userText,
+        agent: 'kim',
+        model: 'groq-llama',
+        session: 'wheel-' + Date.now()
+      })
+    });
+
+    let kimAnswer = '';
+    const contentType = chatResp.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      const data = await chatResp.json();
+      kimAnswer = data.output || data.text || data.answer || '';
+    } else {
+      const reader = chatResp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, {stream:true});
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const d = JSON.parse(line.slice(6));
+              if (d.token) kimAnswer += d.token;
+              if (d.full) kimAnswer = d.full;
+              if (d.output) kimAnswer = d.output;
+            } catch(e) {}
+          }
+        }
+      }
+    }
+
+    if (kimAnswer) {
+      conversationHistory.push({q: userText, a: kimAnswer, time: Date.now()});
+      lastKimAnswer = kimAnswer;
+      showKimResponse(userText, kimAnswer);
+    }
+  } catch(err) {
+    console.error('KIM-Fehler:', err);
+  }
+  resetSpeechState();
+}
+
+// === CHAT-MODUS: Rad wird zum Gespraechs-Verlauf ===
+let conversationHistory = [];
+let lastKimAnswer = '';
+let chatMode = false;
+let savedCards = null;
+let savedIndex = 0;
+
+function enterChatMode() {
+  if (chatMode) return;
+  chatMode = true;
+  savedCards = activeCards;
+  savedIndex = currentIndex;
+  // Chat startet mit leerer Frage-Glasplatte
+  conversationHistory = [];
+  activeCards = [{id:'chat-q-0', chatType:'question', icon:'', title:'', subtitle:'', color:'', email:'', phone:'', backs:[]}];
+  currentIndex = 0;
+  isFlipped = false;
+  buildCards();
+  positionCards(false);
+  // Leere Chat-Glasplatte zeigen
+  showChatInput();
+}
+
+function exitChatMode() {
+  if (!chatMode) return;
+  chatMode = false;
+  activeCards = savedCards;
+  currentIndex = savedIndex;
+  isFlipped = false;
+  buildCards();
+  positionCards(false);
+  adjustBrightness(currentBrightness);
+}
+
+function showChatInput() {
+  const el = document.getElementById('card-' + currentIndex);
+  if (!el) return;
+  const front = el.querySelector('.card-front');
+  if (!front) return;
+  front.innerHTML = `
+    <div id="chat-page" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
+      <div style="font-size:11px;color:rgba(230,57,70,0.6);font-weight:700">DU:</div>
+      <canvas id="audio-wave" width="280" height="24" style="margin:4px 0;opacity:0.6"></canvas>
+      <div id="chat-content" style="font-size:13px;color:rgba(255,255,255,0.2);line-height:1.4">Sprich jetzt...</div>
+    </div>`;
+  adjustBrightness(currentBrightness);
+}
+
+function addAnswerCard(answer) {
+  const cleanAnswer = answer.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/\n/g, '<br>');
+  const safeAnswer = answer.replace(/'/g, "\\'").replace(/\n/g, " ").substring(0, 500);
+  // Neue Antwort-Glasplatte zum Rad hinzufuegen
+  const idx = activeCards.length;
+  activeCards.push({id:'chat-a-'+idx, chatType:'answer', icon:'', title:'', subtitle:'', color:'', email:'', phone:'', backs:[]});
+  // Karte ins DOM
+  const track = document.getElementById('wheel-track');
+  const div = document.createElement('div');
+  div.className = 'wheel-card';
+  div.id = 'card-' + idx;
+  div.innerHTML = `
+    <div class="card-inner">
+      <div class="card-face card-front">
+        <div id="chat-page-${idx}" style="width:100%;height:100%;display:flex;flex-direction:column;padding:6px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KAI:</span>
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.4;margin-top:2px">${cleanAnswer}</div>
+        </div>
+      </div>
+      <div class="card-face card-back"></div>
+    </div>`;
+  track.appendChild(div);
+  // Zum Antwort-Karte scrollen
+  currentIndex = idx;
+  positionCards(true);
+  adjustBrightness(currentBrightness);
+}
+
+function addQuestionCard() {
+  // Neue leere Frage-Glasplatte
+  const idx = activeCards.length;
+  activeCards.push({id:'chat-q-'+idx, chatType:'question', icon:'', title:'', subtitle:'', color:'', email:'', phone:'', backs:[]});
+  const track = document.getElementById('wheel-track');
+  const div = document.createElement('div');
+  div.className = 'wheel-card';
+  div.id = 'card-' + idx;
+  div.innerHTML = `
+    <div class="card-inner">
+      <div class="card-face card-front"></div>
+      <div class="card-face card-back"></div>
+    </div>`;
+  track.appendChild(div);
+  currentIndex = idx;
+  positionCards(true);
+  showChatInput();
+}
+
+function showBookQuestion(question) {
+  const chatContent = document.getElementById('chat-content');
+  if (!chatContent) return;
+  chatContent.innerHTML = `<span style="color:rgba(255,255,255,0.5)">${question}</span>
+<div><span style="font-size:11px;color:rgba(100,200,100,0.6);font-weight:700">KAI:</span> <span style="display:inline-flex;gap:2px;align-items:center;vertical-align:middle"><span style="width:2px;height:8px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out infinite"></span><span style="width:2px;height:14px;background:rgba(100,200,100,0.5);border-radius:1px;animation:bwave 0.6s ease-in-out 0.15s infinite"></span><span style="width:2px;height:10px;background:rgba(100,200,100,0.4);border-radius:1px;animation:bwave 0.6s ease-in-out 0.3s infinite"></span></span></div>`;
+}
+
+function showKimResponse(question, answer) {
+  // Denk-Animation stoppen - KIM hat geantwortet
+  kimStopThink();
+  const role = document.querySelector('#flip-label .fl-role');
+  if (role) role.textContent = 'Antwortet';
+
+  const currentCard = activeCards[currentIndex];
+
+  // Im YouTube Scout: Antwort auf die Kapitel-Glasplatte
+  if (currentCard && currentCard.id === 'yt-scout' && isFlipped) {
+    const chaptersWrap = document.getElementById('yt-chapters-wrap');
+    if (chaptersWrap) {
+      chaptersWrap.innerHTML = `
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:6px">🗣️ ${question}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.8;white-space:pre-line">${answer}</div>`;
+    }
+    backIndex = 2;
+    positionBackCards(true);
+    return;
+  }
+
+  // Gespraech speichern
+  conversationHistory.push({q: question, a: answer, time: Date.now()});
+  lastKimAnswer = answer;
+
+  // Antwort ins Chat-Overlay
+  chatAddMessage(currentAgent, answer);
+
+  // Status updaten - zeigt wer geantwortet hat
+  const _flr = document.querySelector('#flip-label .fl-role'); if(_flr) _flr.textContent = (currentAgent === 'KAI' ? 'Concierge' : currentAgent) + ' · Fertig ✓';
+}
+
+function speakAnswer(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'de-DE';
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function demoKimAction() {
+  document.getElementById('status-text').textContent = 'KIM: "Hier ist das Wetter!"';
+  if (isFlipped) flipCard();
+  const target = activeCards.findIndex(c => c.id === 'wetterfrosch');
+  animateToCard(target, () => setTimeout(flipCard, 500));
+}
+
+function animateToCard(target, cb) {
+  if (currentIndex === target) { if (cb) cb(); return; }
+  const iv = setInterval(() => {
+    if (currentIndex === target) { clearInterval(iv); if (cb) cb(); return; }
+    const diff = (target - currentIndex + activeCards.length) % activeCards.length;
+    spinWheel(diff <= activeCards.length / 2 ? 1 : -1);
+  }, 250);
+}
+
+function showKeyboard() { alert('Tastatur - kommt noch!'); }
+
+// Globaler Handler fuer Muelleimer (click + touchend fuer iOS)
+function handleTrash(e) {
+  const t = e.target;
+  if (t && (t.id === 'trash-btn-glass' || t.closest('#trash-btn-glass'))) {
+    e.preventDefault();
+    e.stopPropagation();
+    clearAndRespeak();
+  }
+}
+document.addEventListener('click', handleTrash);
+document.addEventListener('touchend', handleTrash);
+
+// Touch - vertikal=Rad drehen, horizontal=Flip
+let dragStartY = 0;
+let dragStartX = 0;
+const wc = document.getElementById('wheel-container');
+
+let touchInScrollable = false;
+let touchOnButton = false;
+wc.addEventListener('touchstart', e => {
+  dragStartY = e.touches[0].clientY;
+  dragStartX = e.touches[0].clientX;
+  touchOnButton = false;
+  touchInScrollable = false;
+  const el = e.target;
+  // Pruefen ob Touch auf einem Button oder klickbaren Element ist
+  if (el.tagName === 'BUTTON' || el.id === 'trash-btn-glass' || el.closest('button')) {
+    touchOnButton = true;
+    return;
+  }
+  // Pruefen ob Touch innerhalb eines scrollbaren Bereichs ist
+  let node = el;
+  while (node && node !== wc) {
+    const style = getComputedStyle(node);
+    if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+      touchInScrollable = true;
+      break;
+    }
+    node = node.parentElement;
+  }
+}, {passive:true});
+wc.addEventListener('touchend', e => {
+  // Wenn Touch auf Button war, nicht als Swipe behandeln
+  if (touchOnButton) { touchOnButton = false; return; }
+  // Wenn Touch in scrollbarem Bereich war, Karte NICHT bewegen
+  if (touchInScrollable) { touchInScrollable = false; return; }
+  const diffY = dragStartY - e.changedTouches[0].clientY;
+  const diffX = e.changedTouches[0].clientX - dragStartX;
+  // Horizontal stärker = Flip
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+    flipCard();
+  }
+  // Vertikal stärker = Rad drehen
+  else if (Math.abs(diffY) > 40) {
+    spinWheel(diffY > 0 ? 1 : -1);
+  }
+}, {passive:true});
+
+// Mouse
+wc.addEventListener('mousedown', e => { dragStartY = e.clientY; dragStartX = e.clientX; });
+wc.addEventListener('mouseup', e => {
+  const diffY = dragStartY - e.clientY;
+  const diffX = e.clientX - dragStartX;
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+    flipCard();
+  } else if (Math.abs(diffY) > 40) {
+    spinWheel(diffY > 0 ? 1 : -1);
+  }
+});
+
+// Scroll wheel
+wc.addEventListener('wheel', e => {
+  e.preventDefault();
+  spinWheel(e.deltaY > 0 ? 1 : -1);
+}, {passive:false});
+
+// Service Worker registrieren (Offline-First)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('SW registriert:', reg.scope))
+    .catch(err => console.log('SW Fehler:', err));
+}
+
+// Init
+init();
+</script>
+</body>
+</html>

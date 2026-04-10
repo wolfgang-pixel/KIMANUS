@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v23.9 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v18.2 - Ring-Button, KAI permanent, Clean rebuild -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -9,7 +9,6 @@
 <meta name="theme-color" content="#0e0e0e">
 <link rel="manifest" href="/manifest.json">
 <title>KIMANUS</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--skin-bg);color:var(--skin-glass-text)}
@@ -468,104 +467,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 .register-tab .tab-icon{font-size:20px}
 .register-tab .tab-name{font-size:14px;font-weight:600;color:#ccc;flex:1}
 
-/* === REGIOPRESS VOLLBILD === */
-#regio-fullpage{
-  display:none;position:fixed;left:0;right:0;z-index:50;
-  background:#0a0a0a;
-  overflow:hidden;
-}
-#regio-fullpage.visible{display:flex;flex-direction:column}
-#regio-fullpage .rp-close{
-  position:absolute;top:6px;right:8px;z-index:60;
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(204,0,0,0.9);border:2px solid #fff;
-  color:#fff;font-size:20px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  box-shadow:0 2px 10px rgba(0,0,0,0.5);
-}
-#regio-fullpage .rp-page{
-  flex:1;width:100%;overflow:hidden;position:relative;
-}
-#regio-fullpage .rp-page iframe{
-  position:absolute;top:0;left:0;width:100%;height:100%;border:none;
-  z-index:1;
-}
-/* Touch-Zone oben rechts damit X-Button immer erreichbar */
-#regio-fullpage .rp-close-zone{
-  position:absolute;top:0;right:0;width:60px;height:60px;z-index:58;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-}
-#regio-fullpage .rp-dots{
-  padding:6px 0;display:flex;justify-content:center;gap:6px;flex-shrink:0;
-}
-#regio-fullpage .rp-dot{
-  width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.2);
-  transition:background 0.3s;
-}
-#regio-fullpage .rp-dot.active{background:#CC0000}
-/* Nachrichtenstudio Flip-Label */
-.fl-studio{
-  width:100%;height:100%;display:flex;flex-direction:column;
-  background:linear-gradient(135deg,#0a1628 0%,#1a2744 50%,#0d1b33 100%);
-  position:relative;overflow:hidden;
-}
-.fl-studio::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 80%, rgba(40,80,160,0.15) 0%, transparent 70%);
-  pointer-events:none;
-}
-.fl-studio .studio-header{
-  padding:8px 12px 4px;display:flex;align-items:center;gap:8px;
-}
-.fl-studio .studio-logo{
-  font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;
-  color:#CC0000;letter-spacing:2px;text-transform:uppercase;
-}
-.fl-studio .studio-live{
-  font-size:8px;font-weight:700;color:#fff;background:#CC0000;
-  padding:1px 5px;border-radius:2px;animation:livePulse 2s infinite;
-}
-@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.5}}
-.fl-studio .studio-body{
-  flex:1;display:flex;align-items:center;padding:0 16px;gap:14px;
-}
-.fl-studio .studio-avatar{
-  width:64px;height:64px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,#1e3a5f,#2a4a7f);
-  border:2px solid rgba(100,150,255,0.3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;
-}
-.fl-studio .studio-text{flex:1}
-.fl-studio .studio-greeting{
-  font-family:'Merriweather',serif;font-size:12px;color:rgba(255,255,255,0.7);
-  line-height:1.4;
-}
-.fl-studio .studio-ticker{
-  background:rgba(204,0,0,0.9);padding:5px 12px;
-  overflow:hidden;white-space:nowrap;
-}
-.fl-studio .studio-ticker span{
-  font-family:'Oswald',sans-serif;font-size:11px;color:#fff;
-  letter-spacing:0.5px;
-  display:inline-block;animation:tickerScroll 60s linear infinite;
-}
-@keyframes tickerScroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
-/* Doppelseite im Studio */
-.fl-studio .studio-preview{
-  flex:1;display:flex;gap:3px;padding:4px 8px;overflow:hidden;min-height:0;
-}
-.fl-studio .studio-mini-page{
-  flex:1;background:#1a1a1a;border-radius:2px;overflow:hidden;
-  display:flex;flex-direction:column;cursor:pointer;
-  border:1px solid rgba(255,255,255,0.08);
-  -webkit-tap-highlight-color:transparent;
-}
-.fl-studio .studio-mini-page img{width:100%;height:32px;object-fit:cover;display:block}
-.fl-studio .smp-cat{font-family:'Oswald',sans-serif;font-size:7px;color:#fff;padding:1px 4px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
-.fl-studio .smp-headline{font-family:'Oswald',sans-serif;font-size:8px;color:rgba(255,255,255,0.8);padding:2px 4px;line-height:1.1;font-weight:700;text-transform:uppercase;flex:1}
-
 /* === BOTTOM BAR === */
 #bottom-bar{
   display:flex;align-items:center;justify-content:center;gap:6px;
@@ -716,24 +617,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   50%{box-shadow:0 0 0 18px rgba(230,57,70,0);transform:scale(1.05)}
   100%{box-shadow:0 0 0 0 rgba(230,57,70,0);transform:scale(1)}
 }
-
-.input-mode-btn{
-  width:40px;height:40px;border-radius:50%;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.15);
-  font-size:18px;cursor:pointer;
-  display:none;
-  align-items:center;justify-content:center;
-  transition:all 0.3s;
-  -webkit-tap-highlight-color:transparent;
-}
-.input-mode-btn.visible{display:flex}
-.input-mode-btn.active{
-  background:rgba(74,222,128,0.2);
-  border:2px solid rgba(74,222,128,0.6);
-  box-shadow:0 0 10px rgba(74,222,128,0.3);
-}
-.input-mode-btn:active{transform:scale(0.9)}
 
 .small-btn{
   width:36px;height:36px;border-radius:50%;
@@ -890,13 +773,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <div class="logo-circle" onclick="showKimanusInfo()">K</div>
     <div style="flex:1">
       <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
-        <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v23.9</span>
+      <div onclick="showKimInfo()" style="cursor:pointer">
+        <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
+        <span id="header-kim-status" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-left:4px">Concierge</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-left:6px">v18.2</span>
       </div>
     </div>
-    <button class="hdr-btn" onclick="clipPaste()" title="Einfuegen" style="font-size:18px;padding:4px 2px">📋</button>
     <button class="hdr-btn" onclick="location.reload()" title="Aktualisieren">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
     </button>
@@ -919,13 +801,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
         <button id="speech-btn">
           <span id="speech-agent">🎙</span>
         </button>
-      </div>
-      <!-- Eingabemodi-Buttons -->
-      <div id="input-modes" style="position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:16;pointer-events:none">
-        <button class="input-mode-btn" id="btn-walkie" onclick="setInputMode('walkie')" title="Walkie-Talkie" style="pointer-events:auto">🎙</button>
-        <button class="input-mode-btn" id="btn-keyboard" onclick="setInputMode('keyboard')" title="Tastatur" style="pointer-events:auto">⌨️</button>
-        <button class="input-mode-btn" id="btn-stt" onclick="setInputMode('stt')" title="Sprache-zu-Text" style="pointer-events:auto">💬</button>
-        <button class="input-mode-btn" id="btn-live" onclick="setInputMode('live')" title="Live-Dialog" style="pointer-events:auto"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"/><line x1="8" y1="5" x2="8" y2="19"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="16" y1="5" x2="16" y2="19"/><line x1="20" y1="8" x2="20" y2="16"/></svg></button>
       </div>
     </div>
 
@@ -990,14 +865,6 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
     <!-- Delete-Button (nur beim Sprechen sichtbar) -->
     <button id="delete-btn" type="button" onclick="clearAndRespeak()" style="display:none;position:absolute;left:calc(50% - 62px);top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff4d5a 0%,#e63946 50%,#b81c2a 100%);border:2px solid rgba(220,220,220,0.3);cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:12px;align-items:center;justify-content:center;margin-top:-16px">🗑</button>
   </div>
-</div>
-
-<!-- REGIOPRESS Vollbild-Overlay -->
-<div id="regio-fullpage">
-  <div class="rp-close-zone" onclick="closeRegioPage()" ontouchend="event.preventDefault();closeRegioPage()"></div>
-  <div class="rp-close" onclick="closeRegioPage()" ontouchend="event.preventDefault();closeRegioPage()">✕</div>
-  <div class="rp-page" id="regio-page-content"></div>
-  <div class="rp-dots" id="regio-dots"></div>
 </div>
 
 <!-- Action-Sheet (iOS-Style, von unten) -->
@@ -1072,15 +939,6 @@ const CARDS = [
          {icon:'🖨️', label:'Print'},
        ]},
      ]},
-   ]},
-
-  // --- 2b. KIM (Persoenliche Assistentin) ---
-  {id:'kim', icon:'💜', title:'KIM', subtitle:'Deine persoenliche Assistentin', color:'#8b5cf6', email:'kim@kimanus.de', phone:'0800 546 2687',
-   backs:[
-     {title:'Ueber KIM', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich, deine Vorlieben,\ndeine Familie, deine Termine.\nAlles Persoenliche bleibt bei mir.'},
-     {title:'Was ich fuer dich tue', content:'Termine erinnern\nGeburtstage merken\nEinkaufslisten fuehren\nRezepte vorschlagen\nAlltag organisieren'},
-     {title:'Ich bin verschwiegen', content:'Deine Daten gehoeren dir.\nIch teile nichts mit anderen.\nVerschluesselt und sicher.\nNur du hast Zugriff.'},
-     {title:'So erreichst du mich', content:'Roter Button unten = Sprechen\nIch hoere immer zu.\nOder ruf mich an:\n0800 546 2687'},
    ]},
 
   // --- 3. Tools (Werkzeuge, Hardware, Services) ---
@@ -1167,16 +1025,6 @@ const CARDS = [
   {id:'clubkarten', icon:'🎴', title:'Clubkarten', subtitle:'Deine Mitgliedskarten', color:'#e63946', email:'', phone:'',
    backs:[ // Werden dynamisch befuellt in buildBackCards
      {title:'Clubkarten', content:'Wische nach oben fuer mehr'}
-   ]},
-
-  // --- 4c. REGIOPRESS (Lokalnachrichten als Zeitungs-Glasplatten) ---
-  {id:'regiopresse', icon:'📰', title:'REGIOPRESS', subtitle:'Ebersdorf · Frohnlach · Umgebung', color:'#CC0000', email:'', phone:'',
-   backs:[
-     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-1-2.html', pages:'1-2', label:'Titel + Rathaus'},
-     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-3-4.html', pages:'3-4', label:'Vereine + Events'},
-     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-5-6.html', pages:'5-6', label:'Bauprojekte + Ortsteile'},
-     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-7-8.html', pages:'7-8', label:'Termine + Service'},
-     {type:'newspaper-doppel', src:'/regio-presse-ebersdorf/ebersdorf-service.html', pages:'9-10', label:'Notruf + Meine Gemeinde'},
    ]},
 
   // --- 5. Archiv (Second Brain, Buecherregal, Lebens-Ordner) ---
@@ -1531,183 +1379,30 @@ function handleShareTarget() {
   const sharedText = params.get('shared_text') || '';
   const sharedUrl = params.get('shared_url') || '';
 
-  if (!sharedTitle && !sharedText && !sharedUrl) return;
+  if (!sharedTitle && !sharedText && !sharedUrl) return; // Kein Share
 
-  // URL bereinigen
+  // URL bereinigen (Share-Parameter entfernen)
   history.replaceState(null, '', window.location.pathname);
 
-  // In Notiz-Ablage speichern
-  const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-  const notiz = {
-    id: 'note-' + Date.now(),
-    title: sharedTitle || (sharedText ? sharedText.substring(0, 50) : 'Link'),
-    text: sharedText || '',
-    url: sharedUrl || '',
-    date: new Date().toLocaleString('de-DE'),
-    gelesen: false
-  };
-  notizen.unshift(notiz);
-  localStorage.setItem('kimanus-notizen', JSON.stringify(notizen));
-
-  // Anzeige nach init
+  // Verzoeert anzeigen (nach init)
   setTimeout(() => {
-    const name = notiz.title.substring(0, 40);
-    const count = notizen.filter(n => !n.gelesen).length;
-
-    // Bestaetigungs-Overlay
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-tap-highlight-color:transparent';
-    overlay.innerHTML = `
-      <div style="font-size:40px;margin-bottom:12px">📥</div>
-      <div style="font-size:18px;font-weight:700;color:#fff;text-align:center;margin-bottom:8px">Gespeichert!</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.6);text-align:center;margin-bottom:4px">${name}</div>
-      ${sharedUrl ? '<div style="font-size:11px;color:rgba(139,92,246,0.6);text-align:center;word-break:break-all;max-width:280px">' + sharedUrl.substring(0, 60) + '</div>' : ''}
-      <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:12px">${count} Notiz${count > 1 ? 'en' : ''} in der Ablage</div>
-      <div style="margin-top:20px;display:flex;gap:10px">
-        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="padding:10px 24px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:14px;border-radius:8px;cursor:pointer">OK</button>
-        <button onclick="this.parentElement.parentElement.parentElement.remove();openSharedWithKim('${notiz.id}')" style="padding:10px 24px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);color:rgba(139,92,246,0.8);font-size:14px;border-radius:8px;cursor:pointer">KIM fragen</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-  }, 800);
-}
-
-function openSharedWithKim(noteId) {
-  const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-  const notiz = notizen.find(n => n.id === noteId);
-  if (!notiz) return;
-  // Sende an KIM als Frage
-  const frage = notiz.url
-    ? 'Schau dir das mal an und fass es kurz zusammen: ' + notiz.url
-    : 'Was sagst du dazu: ' + notiz.text;
-  if (typeof sendToKim === 'function') sendToKim(frage);
-}
-
-function getUnreadNotizen() {
-  const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-  return notizen.filter(n => !n.gelesen);
-}
-
-// Clipboard-Check: Beim App-Oeffnen Zwischenablage lesen
-async function checkClipboard() {
-  try {
-    const text = await navigator.clipboard.readText();
-    if (!text || text.trim().length < 5) return;
-    const trimmed = text.trim();
-
-    // Nur URLs oder laengere Texte (keine einzelnen Woerter)
-    const isUrl = /^https?:\/\//i.test(trimmed);
-    const isLongText = trimmed.length > 30;
-    if (!isUrl && !isLongText) return;
-
-    // Pruefen ob schon gespeichert (Duplikat-Schutz)
-    const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-    const duplicate = notizen.find(n => n.url === trimmed || n.text === trimmed);
-    if (duplicate) return;
-
-    // Letzte Clipboard-Pruefung merken (nicht bei jedem Fokus nerven)
-    const lastClip = localStorage.getItem('kimanus-last-clip');
-    if (lastClip === trimmed) return;
-    localStorage.setItem('kimanus-last-clip', trimmed);
-
-    // Frage-Overlay anzeigen
-    const preview = isUrl ? trimmed.substring(0, 50) + '...' : trimmed.substring(0, 60) + '...';
-    const overlay = document.createElement('div');
-    overlay.id = 'clip-overlay';
-    overlay.style.cssText = 'position:fixed;bottom:100px;left:12px;right:12px;z-index:200;background:#1c1c1e;border:1px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,0.5);-webkit-tap-highlight-color:transparent';
-    overlay.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <span style="font-size:22px">📋</span>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.7)">In der Zwischenablage gefunden:</div>
-          <div style="font-size:11px;color:rgba(139,92,246,0.6);margin-top:2px;word-break:break-all">${preview}</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button onclick="document.getElementById('clip-overlay').remove()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:13px;border-radius:8px;cursor:pointer">Ignorieren</button>
-        <button onclick="clipSave('${isUrl ? trimmed.replace(/'/g,'') : ''}')" style="flex:1;padding:10px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:rgba(139,92,246,0.8);font-size:13px;border-radius:8px;cursor:pointer">📥 Speichern</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    // Auto-ausblenden nach 8 Sekunden
-    setTimeout(() => { const el = document.getElementById('clip-overlay'); if (el) el.remove(); }, 8000);
-  } catch(e) {
-    // Clipboard nicht verfuegbar (kein HTTPS oder Permission denied) - still ignorieren
-  }
-}
-
-async function clipPaste() {
-  try {
-    const text = await navigator.clipboard.readText();
-    if (!text || text.trim().length < 5) {
-      const t = document.createElement('div');
-      t.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);padding:8px 20px;border-radius:20px;font-size:13px;z-index:200';
-      t.textContent = 'Zwischenablage ist leer';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2000);
-      return;
+    const name = sharedTitle || sharedText.split('\n')[0] || sharedUrl.split('/').pop() || 'Unbekannt';
+    const confirmed = confirm('KAI: "' + name + '" als Clubkarte hinzufuegen?');
+    if (confirmed) {
+      const clubs = JSON.parse(localStorage.getItem('kimanus-clubkarten') || '[]');
+      clubs.push({
+        id: 'club-' + Date.now(),
+        name: name.substring(0, 30),
+        icon: '🎴',
+        color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+        sub: sharedUrl || 'Clubkarte',
+        memberId: '',
+        appScheme: sharedUrl || ''
+      });
+      localStorage.setItem('kimanus-clubkarten', JSON.stringify(clubs));
+      rebuildWheel();
     }
-    const trimmed = text.trim();
-    const isUrl = /^https?:\/\//i.test(trimmed);
-
-    // Duplikat-Check
-    const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-    if (notizen.find(n => n.url === trimmed || n.text === trimmed)) {
-      const t = document.createElement('div');
-      t.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(245,158,11,0.9);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;z-index:200';
-      t.textContent = 'Schon gespeichert!';
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2000);
-      return;
-    }
-
-    notizen.unshift({
-      id: 'note-' + Date.now(),
-      title: isUrl ? new URL(trimmed).hostname.replace('www.','') : trimmed.substring(0, 50),
-      text: isUrl ? '' : trimmed,
-      url: isUrl ? trimmed : '',
-      date: new Date().toLocaleString('de-DE'),
-      gelesen: false
-    });
-    localStorage.setItem('kimanus-notizen', JSON.stringify(notizen));
-
-    const t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(139,92,246,0.9);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:200';
-    t.textContent = '📥 Gespeichert! (' + notizen.length + ' Notizen)';
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2500);
-  } catch(e) {
-    const t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(230,57,70,0.9);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;z-index:200';
-    t.textContent = 'Clipboard nicht verfuegbar';
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2000);
-  }
-}
-
-function clipSave(url) {
-  const el = document.getElementById('clip-overlay');
-  if (el) el.remove();
-  navigator.clipboard.readText().then(text => {
-    const trimmed = text.trim();
-    const notizen = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-    notizen.unshift({
-      id: 'note-' + Date.now(),
-      title: url ? new URL(url).hostname.replace('www.','') : trimmed.substring(0, 50),
-      text: url ? '' : trimmed,
-      url: url || '',
-      date: new Date().toLocaleString('de-DE'),
-      gelesen: false
-    });
-    localStorage.setItem('kimanus-notizen', JSON.stringify(notizen));
-    // Kurze Bestaetigung
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(139,92,246,0.9);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:200';
-    toast.textContent = '📥 Gespeichert!';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
-  });
+  }, 1000);
 }
 
 function seedServerAgents() {
@@ -1736,14 +1431,6 @@ function init() {
   calcSizes();
   // Setup-Config anwenden BEVOR Karten gebaut werden
   rebuildWheel();
-  updateHeaderAgents();
-  updateInputModes();
-  // Zwischenablage pruefen (nach 2s damit App erst geladen ist)
-  setTimeout(() => checkClipboard(), 2000);
-  // Auch pruefen wenn App aus dem Hintergrund zurueckkommt
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') setTimeout(() => checkClipboard(), 500);
-  });
 
   // Wiederkehrende Nutzer: letzte Position wiederherstellen
   const visited = localStorage.getItem('kimanus-visited');
@@ -1950,18 +1637,10 @@ function activateHotkey(idx) {
     rebuildWheel();
     cardIdx = activeCards.findIndex(c => c.id === hk.cardId);
   }
-  if (cardIdx >= 0) {
-    // Erst zurueckflippen wenn eine Karte geflippt ist
-    if (isFlipped) flipCard();
-    // Header-Karte und KAI-Vorschau verstecken
-    if (headerCardActive) hideHeaderCard();
-    hideKimCardAbove();
-    // Zur Hotkey-Karte springen
+  if (cardIdx >= 0 && cardIdx !== currentIndex) {
     currentIndex = cardIdx;
     positionCards(true);
     localStorage.setItem('kimanus-lastCard', currentIndex);
-    // KAI-Vorschau nach kurzer Verzoegerung wieder zeigen
-    setTimeout(() => showKimCardAbove(), 500);
   }
 }
 
@@ -2389,58 +2068,6 @@ function buildBackCards() {
         <div style="font-size:14px;color:rgba(255,255,255,0.3)">Noch keine Clubkarten</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.15);text-align:center;line-height:1.5">Sag KAI welche Club-Apps du hast,<br>oder teile sie direkt aus der App.</div>
       </div>`;
-    } else if (back.type === 'newspaper-doppel') {
-      const pNums = (back.pages||'1-2').split('-');
-      const leftPage = pNums[0] || '1';
-      const rightPage = pNums[1] || '2';
-      // Glasplatte ~355px breit, 210px hoch. Doppelseite 710x420 → scale 0.5 passt genau
-      inner = `
-        <div style="width:100%;height:100%;position:relative;overflow:hidden;background:#111;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <iframe src="${back.src}" style="width:710px;height:420px;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none;position:absolute;top:0;left:0" scrolling="no"></iframe>
-          <div onclick="openRegioEinzel('${back.src}','left',${i})" style="position:absolute;top:0;left:0;width:50%;height:100%;z-index:2"></div>
-          <div onclick="openRegioEinzel('${back.src}','right',${i})" style="position:absolute;top:0;right:0;width:50%;height:100%;z-index:2"></div>
-          <div style="position:absolute;bottom:1px;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:2px 8px;display:flex;justify-content:space-between;z-index:3;pointer-events:none">
-            <span style="font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.3);letter-spacing:1px">REGIOPRESS</span>
-            <span style="font-family:'Oswald',sans-serif;font-size:7px;color:rgba(255,255,255,0.25)">S. ${leftPage}-${rightPage}</span>
-          </div>
-        </div>`;
-    } else if (back.type === 'newspaper') {
-      const catColors = {TITELSEITE:'#CC0000',POLITIK:'#1a5276',BLAULICHT:'#CC0000',WIRTSCHAFT:'#1e8449',EVENTS:'#7d3c98',SPORT:'#2e86c1',WETTER:'#d4ac0d'};
-      const catColor = catColors[back.category] || '#CC0000';
-      const headlineLines = (back.headline||'').split('\n').join(' ');
-      // Naechste Seite fuer Doppelseite
-      const allBacks = activeCards[currentIndex]?.backs || [];
-      const newsOnly = allBacks.filter(b => b.type === 'newspaper');
-      const curNewsIdx = newsOnly.indexOf(back);
-      const nextNews = newsOnly[(curNewsIdx + 1) % newsOnly.length];
-      const nextColor = catColors[nextNews?.category] || '#CC0000';
-      const nextHeadline = (nextNews?.headline||'').split('\n').join(' ');
-      function miniSide(p, cc, hl, clickIdx) {
-        return `<div onclick="openRegioPage(${clickIdx})" style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:#1a1a1a;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <div style="background:${cc};padding:2px 6px;flex-shrink:0">
-            <span style="font-family:'Oswald',sans-serif;font-size:7px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px">${p.category||''}</span>
-          </div>
-          ${p.img ? `<img src="${p.img}" style="width:100%;height:50px;object-fit:cover;display:block;flex-shrink:0" onerror="this.style.display='none'">` : ''}
-          <div style="background:${cc};padding:3px 6px;flex-shrink:0">
-            <div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;line-height:1.1">${hl}</div>
-          </div>
-          <div style="padding:3px 6px;flex:1;overflow:hidden">
-            <div style="font-size:8px;line-height:1.35;color:rgba(255,255,255,0.6)">${p.text ? p.text.substring(0,80)+'...' : ''}</div>
-          </div>
-        </div>`;
-      }
-      // Finde den backs-index fuer die naechste Seite
-      const nextBackIdx = allBacks.indexOf(nextNews);
-      inner = `
-        <div style="width:100%;height:100%;display:flex;gap:2px;font-family:'Merriweather',serif;overflow:hidden;position:relative">
-          ${miniSide(back, catColor, headlineLines, i)}
-          <div style="width:1px;background:rgba(255,255,255,0.1);flex-shrink:0"></div>
-          ${miniSide(nextNews, nextColor, nextHeadline, nextBackIdx >= 0 ? nextBackIdx : i)}
-          <div style="position:absolute;bottom:1px;left:0;right:0;background:#111;padding:1px 6px;display:flex;justify-content:space-between">
-            <span style="font-family:'Oswald',sans-serif;font-size:6px;color:rgba(255,255,255,0.25);letter-spacing:1px">REGIOPRESS</span>
-            <span style="font-family:'Oswald',sans-serif;font-size:6px;color:rgba(255,255,255,0.2)">${back.page}-${nextNews?.page||''} / ${back.total}</span>
-          </div>
-        </div>`;
     } else {
       inner = `
         <div class="bwc-title">${back.title}</div>
@@ -2511,38 +2138,15 @@ function updateFlipLabel() {
   const fl = document.getElementById('flip-label');
   if (isFlipped) {
     const card = activeCards[currentIndex];
-    const isRegio = card.id === 'regiopresse' || card.id.startsWith('regiopresse');
-    if (isRegio) {
-      // Nachrichtenstudio-Design
-      const backs = card.backs || [];
-      const currentBack = backs[backIndex % backs.length] || {};
-      const tickerHeadlines = backs.filter(b=>b.type==='newspaper-doppel').map(b=>b.label||'').join('  +++  ') || backs.filter(b=>b.type==='newspaper').map(b=>(b.headline||'').replace(/\n/g,' ')).join('  +++  ');
-      document.getElementById('fl-card').innerHTML = `
-        <div class="fl-studio">
-          <div class="studio-header">
-            <span class="studio-logo">REGIOPRESS</span>
-            <span class="studio-live">LIVE</span>
-          </div>
-          <div class="studio-body">
-            <div class="studio-avatar">🎙️</div>
-            <div class="studio-text">
-              <div class="studio-greeting">Guten Abend aus Coburg.<br>Die Nachrichten vom 6. April.</div>
-            </div>
-          </div>
-          <div class="studio-ticker"><span>${tickerHeadlines}  +++  ${tickerHeadlines}</span></div>
-        </div>
-      `;
-    } else {
-      document.getElementById('fl-card').innerHTML = `
-        <div class="fl-icon">${card.icon}</div>
-        <div>
-          <div class="fl-name">${card.title}</div>
-          <div class="fl-role">${card.subtitle}</div>
-        </div>
-        <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
-        <div class="fl-brand">KIMANUS</div>
-      `;
-    }
+    document.getElementById('fl-card').innerHTML = `
+      <div class="fl-icon">${card.icon}</div>
+      <div>
+        <div class="fl-name">${card.title}</div>
+        <div class="fl-role">${card.subtitle}</div>
+      </div>
+      <div class="fl-contact">${card.email || ''}<br>${card.phone || ''}</div>
+      <div class="fl-brand">KIMANUS</div>
+    `;
     // Position: gleich wie die obere Milchglas-Karte
     const container = document.getElementById('wheel-container');
     const totalH = container.clientHeight;
@@ -2813,8 +2417,6 @@ function getSetupConfig() {
 }
 function saveSetupConfig(cfg) {
   localStorage.setItem('kimanus-setup', JSON.stringify(cfg));
-  updateHeaderAgents();
-  updateInputModes();
 }
 
 // === SETTINGS (iPhone-Style Fullscreen-Folie) ===
@@ -2996,44 +2598,25 @@ function openSetup(mode, isBack) {
 
   // --- PROFILE ---
   // KAI Profil
-  const kaiOn = cfg['agent_kai'] !== false; // Default: aktiv
+  const kaiActive = (cfg['main_contact'] || 'kai') === 'kai';
   html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px">`;
   html += `<div onclick="openSetupKim()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
   html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e63946,#ff6b7a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`;
-  const kaiRolleMain = cfg['kai_rolle'] || 'concierge';
-  const kaiRolleDisplay = {concierge:'Concierge',rezeptionist:'Rezeptionist',vermittlung:'Vermittlung',auskunft:'Auskunft',mitarbeiter:'Mitarbeiter',lager:'Lager-Assistent',service:'Service-Assistent',sicherheit:'Sicherheit',management:'Management'}[kaiRolleMain] || 'Concierge';
-  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">${kaiRolleDisplay}</div></div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KAI</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Concierge · Vermittlung · Auskunft</div></div>`;
   html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
   html += `</div>`;
-  html += toggle('agent_kai', kaiOn);
+  html += toggle('main_contact_kai', kaiActive);
   html += `</div>`;
 
   // KIM Profil
-  const kimOn = cfg['agent_kim'] !== false; // Default: aktiv
+  const kimActive = (cfg['main_contact'] || 'kai') === 'kim';
   html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px">`;
   html += `<div onclick="openSetupKimPersoenlich()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
   html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">💜</div>`;
   html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
   html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
   html += `</div>`;
-  html += toggle('agent_kim', kimOn);
-  html += `</div>`;
-
-  // --- EINGABE (global fuer alle Agenten) ---
-  html += sectionTitle('Eingabe');
-  html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('🎙')}<span style="${labelStyle}">Walkie-Talkie</span>`;
-  html += toggle('input_walkie', cfg['input_walkie'] !== false);
-  html += `</div>`;
-  html += `<div style="${rowStyle}">${iconBox('⌨️')}<span style="${labelStyle}">Tastatur</span>`;
-  html += toggle('input_keyboard', cfg['input_keyboard'] === true);
-  html += `</div>`;
-  html += `<div style="${rowStyle}">${iconBox('💬')}<span style="${labelStyle}">Sprache-zu-Text</span>`;
-  html += toggle('input_stt', cfg['input_stt'] === true);
-  html += `</div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('🟢')}<span style="${labelStyle}">Live-Dialog</span>`;
-  html += toggle('input_live', cfg['input_live'] === true);
-  html += `</div>`;
+  html += toggle('main_contact_kim', kimActive);
   html += `</div>`;
 
   // --- SYSTEM ---
@@ -3083,7 +2666,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v23.9 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v18.2 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -3189,36 +2772,23 @@ function openSetup(mode, isBack) {
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
   html += `</div>`;
 
-  // Stimme (Gemini Live Audio)
+  // Stimme
   html += sectionTitle('Stimme');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('👩')}<span style="${labelStyle}">Weiblich</span>`;
+  html += `<div style="${rowStyle}">${iconBox('🔊')}<span style="${labelStyle}">Stimme</span>`;
   html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += segBtn2('kim_voice','Aoede','Aoede','Kore');
-  html += segBtn2('kim_voice','Kore','Kore','Kore');
-  html += segBtn2('kim_voice','Leda','Leda','Kore');
-  html += segBtn2('kim_voice','Zephyr','Zephyr','Kore');
+  html += segBtn2('kim_voice','ara','Ara','ara');
+  html += segBtn2('kim_voice','nova','Nova','ara');
+  html += segBtn2('kim_voice','luna','Luna','ara');
+  html += segBtn2('kim_voice','stella','Stella','ara');
   html += `</div></div>`;
-  html += `<div style="${rowStyle}">${iconBox('👨')}<span style="${labelStyle}">Maennlich</span>`;
+  html += `<div style="${rowStyle}">${iconBox('🎵')}<span style="${labelStyle}">Tonhoehe</span>`;
   html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += segBtn2('kim_voice','Charon','Charon','Kore');
-  html += segBtn2('kim_voice','Puck','Puck','Kore');
-  html += segBtn2('kim_voice','Fenrir','Fenrir','Kore');
-  html += segBtn2('kim_voice','Orus','Orus','Kore');
+  html += segBtn2('kim_pitch','tief','Tief','normal');
+  html += segBtn2('kim_pitch','normal','Normal','normal');
+  html += segBtn2('kim_pitch','hoch','Hoch','normal');
   html += `</div></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('🌐')}<span style="${labelStyle}">Sprache</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Deutsch · Gemini Live</span></div>`;
-  html += `</div>`;
-
-  // Eingabe-Modi (4 Arten)
-  // Eingabe-Modi sind jetzt auf der Hauptseite der Einstellungen (global)
-
-  // Gespraechsverlauf
-  html += sectionTitle('Verlauf');
-  const transcriptCount = getLiveTranscripts().length;
-  html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('💬')}<span style="${labelStyle}">Gespeicherte Nachrichten</span><span style="color:rgba(255,255,255,0.4);font-size:14px">${transcriptCount}</span></div>`;
-  html += `<div style="${rowStyle}">${iconBox('📋')}<span style="${labelStyle}">Verlauf anzeigen</span><span style="color:rgba(139,92,246,0.6);font-size:13px;cursor:pointer" onclick="showTranscriptHistory()">Oeffnen ›</span></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('🗑')}<span style="${labelStyle}">Verlauf loeschen</span><span style="color:rgba(230,57,70,0.6);font-size:13px;cursor:pointer" onclick="if(confirm('Alle Gespraeche loeschen?')){deleteLiveTranscripts();openSettings();}">Loeschen</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🌐')}<span style="${labelStyle}">Sprache</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Deutsch</span></div>`;
   html += `</div>`;
 
   // Charakter
@@ -3896,9 +3466,6 @@ function toggleSetupItem(key, enabled) {
   const cfg = getSetupConfig();
   cfg[key] = enabled;
   saveSetupConfig(cfg);
-  // Rad und Header aktualisieren
-  rebuildWheel();
-  updateHeaderHighlight();
   // Setup neu rendern aber offen lassen
   openSetup(setupMode);
 }
@@ -3946,102 +3513,8 @@ function rebuildWheel() {
   if (isFlipped) flipCard();
   const cfg = getSetupConfig();
 
-  // KAI und KIM Karten aufs Rad wenn im Setup aktiviert
+  // KIMANUS und KIM sind jetzt im Header, nicht mehr auf dem Rad
   let wheelCards = [];
-  const kaiCard = CARDS.find(c => c.id === 'kai');
-  const kimCard = CARDS.find(c => c.id === 'kim');
-  // KAI-Karte: Subtitle, Backs und Beschreibung an Setup-Rolle anpassen
-  if (kaiCard && cfg['agent_kai'] !== false) {
-    const rolle = cfg['kai_rolle'] || 'concierge';
-    const rollenConfig = {
-      concierge: {
-        display: 'Concierge',
-        icon: '🏨',
-        backs: [
-          {title:'KAI · Concierge', content:'Willkommen! Ich bin dein Concierge.\nIch kenne mich aus und vermittle.\nFrag mich einfach.'},
-          {title:'Das kann ich', content:'✓ Gaeste empfangen & beraten\n✓ Restaurants empfehlen\n✓ Reservierungen machen\n✓ Wegbeschreibungen geben\n✓ Spezialisten vermitteln\n✓ Beschwerden aufnehmen'},
-          {title:'So arbeite ich', content:'Ich hoere dir zu.\nIch finde die beste Loesung.\nWenn ich es nicht weiss,\nfrage ich einen Spezialisten.\nFuer Persoenliches hole ich KIM.'}
-        ]
-      },
-      rezeptionist: {
-        display: 'Rezeptionist',
-        icon: '🏛️',
-        backs: [
-          {title:'KAI · Rezeptionist', content:'Ich bin dein erster Kontakt.\nEmpfang, Begruessung, Weiterleitung.\nImmer freundlich, immer da.'},
-          {title:'Das kann ich', content:'✓ Gaeste begrüessen\n✓ Termine verwalten\n✓ Anrufe entgegennehmen\n✓ Post & Pakete verwalten\n✓ Raeume koordinieren\n✓ Check-in & Check-out'},
-          {title:'So arbeite ich', content:'Erster Eindruck zaehlt.\nIch bin immer freundlich.\nIch leite schnell weiter.\nKein Gast wartet lange.'}
-        ]
-      },
-      vermittlung: {
-        display: 'Vermittlung',
-        icon: '📞',
-        backs: [
-          {title:'KAI · Vermittlung', content:'Ich bin deine Telefonzentrale.\nIch verbinde dich mit dem\nrichtigen Ansprechpartner.'},
-          {title:'Das kann ich', content:'✓ Anrufe weiterleiten\n✓ Kontakte finden\n✓ Termine koordinieren\n✓ Nachrichten hinterlassen\n✓ Rueckrufe organisieren\n✓ Erreichbarkeit pruefen'},
-          {title:'So arbeite ich', content:'Sag mir wen du brauchst.\nIch finde den richtigen Kontakt.\nWenn jemand nicht erreichbar ist,\nhinterlasse ich eine Nachricht.'}
-        ]
-      },
-      auskunft: {
-        display: 'Auskunft',
-        icon: 'ℹ️',
-        backs: [
-          {title:'KAI · Auskunft', content:'Ich beantworte deine Fragen.\nSachlich, praezise, schnell.\nFrag mich alles.'},
-          {title:'Das kann ich', content:'✓ Fragen beantworten\n✓ Informationen recherchieren\n✓ Oeffnungszeiten nennen\n✓ Preise vergleichen\n✓ Fakten pruefen\n✓ Anleitungen geben'},
-          {title:'So arbeite ich', content:'Ich antworte kurz und praezise.\nWenn ich unsicher bin, sage ich es.\nIch pruefe meine Quellen.\nFaktencheck ist mir wichtig.'}
-        ]
-      },
-      mitarbeiter: {
-        display: 'Mitarbeiter',
-        icon: '👔',
-        backs: [
-          {title:'KAI · Mitarbeiter', content:'Ich bin dein Kollege.\nIch arbeite mit, denke mit,\nund helfe praktisch.'},
-          {title:'Das kann ich', content:'✓ Aufgaben uebernehmen\n✓ Texte schreiben & pruefen\n✓ Recherche durchfuehren\n✓ Praesentationen vorbereiten\n✓ Zusammenfassungen erstellen\n✓ Ideen entwickeln'},
-          {title:'So arbeite ich', content:'Sag mir was ansteht.\nIch packe mit an.\nIch denke mit und\nmache Vorschlaege.'}
-        ]
-      },
-      lager: {
-        display: 'Lager-Assistent',
-        icon: '📦',
-        backs: [
-          {title:'KAI · Lager-Assistent', content:'Ich kuemmere mich um\nBestand, Bestellungen und\nalles was rein und raus geht.'},
-          {title:'Das kann ich', content:'✓ Bestellungen aufgeben\n✓ Wareneingang per Foto pruefen\n✓ Warenausgang dokumentieren\n✓ Bestand kontrollieren\n✓ Mindestbestand melden\n✓ Lieferanten verwalten\n✓ Inventur durchfuehren'},
-          {title:'So arbeite ich', content:'Fotografiere die Lieferung,\nich pruefe den Wareneingang.\nIch melde wenn was fehlt.\nBestellungen mache ich\nautomatisch bei Bedarf.'}
-        ]
-      },
-      service: {
-        display: 'Service-Assistent',
-        icon: '🍽️',
-        backs: [
-          {title:'KAI · Service-Assistent', content:'Ich helfe bei Bestellungen,\nKasse und Gaeste-Betreuung.\nDein rechte Hand im Service.'},
-          {title:'Das kann ich', content:'✓ Bestellungen aufnehmen\n✓ Speisekarte erklaeren\n✓ Allergien beruecksichtigen\n✓ Rechnung erstellen\n✓ Tische verwalten\n✓ Gaeste-Wuensche merken\n✓ Feedback aufnehmen'},
-          {title:'So arbeite ich', content:'Der Gast ist Koenig.\nIch merke mir Vorlieben.\nIch bin schnell und aufmerksam.\nBeschwerden nehme ich ernst.'}
-        ]
-      },
-      sicherheit: {
-        display: 'Sicherheit',
-        icon: '🔒',
-        backs: [
-          {title:'KAI · Sicherheit', content:'Ich passe auf.\nRundgaenge, Protokolle,\nSafety first.'},
-          {title:'Das kann ich', content:'✓ Rundgaenge protokollieren\n✓ Zugangskontrollen pruefen\n✓ Vorfaelle dokumentieren\n✓ Notfallplaene bereithalten\n✓ Kameras ueberwachen\n✓ Alarme verwalten\n✓ Brandschutz pruefen'},
-          {title:'So arbeite ich', content:'Sicherheit geht vor.\nIch dokumentiere alles.\nBei Gefahr alarmiere ich sofort.\nPraevention ist mein Motto.'}
-        ]
-      },
-      management: {
-        display: 'Management',
-        icon: '📊',
-        backs: [
-          {title:'KAI · Management', content:'Ich habe den Ueberblick.\nFinanzen, Strategie,\nOrganisation.'},
-          {title:'Das kann ich', content:'✓ Umsaetze auswerten\n✓ Kosten analysieren\n✓ Berichte erstellen\n✓ Termine koordinieren\n✓ Mitarbeiter einteilen\n✓ Strategie entwickeln\n✓ Kennzahlen tracken'},
-          {title:'So arbeite ich', content:'Zahlen luegen nicht.\nIch zeige dir den Ueberblick.\nIch mache Vorschlaege\nfuer Verbesserungen.'}
-        ]
-      }
-    };
-    const rc = rollenConfig[rolle] || rollenConfig.concierge;
-    kaiCard.subtitle = rc.display;
-    kaiCard.backs = rc.backs;
-    wheelCards.push(kaiCard);
-  }
-  if (kimCard && cfg['agent_kim'] !== false) wheelCards.push(kimCard);
 
   // Aktivierte Agenten als eigene Karten hinzufuegen
   ALL_AGENTS.forEach(agent => {
@@ -4080,31 +3553,6 @@ function rebuildWheel() {
       clubCard.subtitle = clubs.length + ' Karte' + (clubs.length > 1 ? 'n' : '');
       wheelCards.push(clubCard);
     }
-  }
-
-  // REGIOPRESS: immer zeigen (Lokalnachrichten)
-  const regioCard = CARDS.find(c => c.id === 'regiopresse');
-  if (regioCard && cfg['card_regiopresse'] !== false) {
-    wheelCards.push(regioCard);
-  }
-
-  // NOTIZEN: zeigen wenn Notizen vorhanden
-  const notizenList = JSON.parse(localStorage.getItem('kimanus-notizen') || '[]');
-  if (notizenList.length > 0) {
-    const notizenBacks = notizenList.slice(0, 20).map(n => ({
-      title: n.title || 'Notiz',
-      content: (n.url ? '🔗 ' + n.url + '\n' : '') + (n.text || '') + '\n\n📅 ' + (n.date || '')
-    }));
-    wheelCards.push({
-      id: 'notizen',
-      icon: '📋',
-      title: 'Notizen',
-      subtitle: notizenList.length + ' gespeichert',
-      color: '#8b5cf6',
-      email: '',
-      phone: '',
-      backs: notizenBacks
-    });
   }
 
   // Haupt-Karten (Tools, Wallet, Archiv, Apps) wenn aktiv
@@ -4722,135 +4170,6 @@ let audioStream = null;
 let speechState = 'idle'; // idle -> recording -> processing -> review -> sending
 let pendingText = '';
 let currentAgent = 'KAI'; // Rufanlage: wer gerade angesprochen wird
-
-function switchAgent(agent) {
-  currentAgent = agent.toUpperCase();
-  setMicAgent(currentAgent);
-  updateHeaderHighlight();
-  // Karte auf dem Rad zeigen
-  if (agent === 'kai') {
-    const kaiCard = CARDS.find(c => c.id === 'kai');
-    if (kaiCard) showHeaderCard(kaiCard);
-  } else if (agent === 'kim') {
-    showKimInfo();
-  }
-}
-
-function updateHeaderAgents() {
-  const cfg = getSetupConfig();
-  const hdrKai = document.getElementById('hdr-kai');
-  const hdrKim = document.getElementById('hdr-kim');
-  const kaiOn = cfg['agent_kai'] !== false;
-  const kimOn = cfg['agent_kim'] !== false;
-  if (hdrKai) hdrKai.style.display = kaiOn ? '' : 'none';
-  if (hdrKim) hdrKim.style.display = kimOn ? '' : 'none';
-  if (kaiOn && !kimOn) { currentAgent = 'KAI'; setMicAgent('KAI'); }
-  if (kimOn && !kaiOn) { currentAgent = 'KIM'; setMicAgent('KIM'); }
-  updateHeaderHighlight();
-}
-
-let currentInputMode = 'walkie'; // Default
-
-function updateInputModes() {
-  const cfg = getSetupConfig();
-  const modes = [
-    { id: 'walkie', key: 'input_walkie', defaultOn: true },
-    { id: 'keyboard', key: 'input_keyboard', defaultOn: false },
-    { id: 'stt', key: 'input_stt', defaultOn: false },
-    { id: 'live', key: 'input_live', defaultOn: false }
-  ];
-  let anyVisible = false;
-  modes.forEach(m => {
-    const btn = document.getElementById('btn-' + m.id);
-    if (!btn) return;
-    const on = m.defaultOn ? cfg[m.key] !== false : cfg[m.key] === true;
-    btn.classList.toggle('visible', on);
-    if (on) anyVisible = true;
-    btn.classList.toggle('active', m.id === currentInputMode);
-  });
-  // Wenn aktiver Modus ausgeblendet, auf ersten sichtbaren wechseln
-  const activeBtn = document.getElementById('btn-' + currentInputMode);
-  if (!activeBtn || !activeBtn.classList.contains('visible')) {
-    const first = modes.find(m => {
-      const b = document.getElementById('btn-' + m.id);
-      return b && b.classList.contains('visible');
-    });
-    if (first) setInputMode(first.id);
-  }
-}
-
-function setInputMode(mode) {
-  currentInputMode = mode;
-  document.querySelectorAll('.input-mode-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById('btn-' + mode);
-  if (btn) btn.classList.add('active');
-  // Hauptbutton-Icon anpassen
-  const agent = document.getElementById('speech-agent');
-  if (agent) {
-    if (mode === 'live') {
-      // Wellen-Icon (wie Google Assistant / Siri)
-      agent.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>';
-    } else {
-      const icons = { walkie: '🎙', keyboard: '⌨️', stt: '💬' };
-      agent.textContent = icons[mode] || '🎙';
-    }
-  }
-  localStorage.setItem('kimanus-input-mode', mode);
-  // Tastatur-Modus: direkt Tastatur oeffnen beim Wechsel
-  if (mode === 'keyboard') {
-    setTimeout(() => openKeyboardInput(), 300);
-  }
-}
-
-function openKeyboardInput() {
-  // Erzeuge oder fokussiere ein verstecktes Eingabefeld
-  let inp = document.getElementById('kb-hidden-input');
-  if (!inp) {
-    inp = document.createElement('input');
-    inp.id = 'kb-hidden-input';
-    inp.type = 'text';
-    inp.placeholder = 'Nachricht an KIM...';
-    inp.style.cssText = 'position:fixed;bottom:80px;left:16px;right:16px;z-index:200;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(20,20,20,0.95);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(10px)';
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && inp.value.trim()) {
-        const text = inp.value.trim();
-        inp.value = '';
-        inp.blur();
-        inp.style.display = 'none';
-        // Nachricht an KIM senden (gleicher Weg wie Sprache)
-        if (typeof sendToAgent === 'function') sendToAgent(text);
-        else if (typeof sendChatMessage === 'function') sendChatMessage(text);
-      }
-    });
-    inp.addEventListener('blur', () => {
-      setTimeout(() => { inp.style.display = 'none'; }, 200);
-    });
-    document.body.appendChild(inp);
-  }
-  inp.style.display = 'block';
-  inp.focus();
-}
-
-// Beim Start gespeicherten Modus laden
-(function() {
-  const saved = localStorage.getItem('kimanus-input-mode');
-  if (saved) currentInputMode = saved;
-})();
-
-function updateHeaderHighlight() {
-  const nameEl = document.getElementById('hdr-agent-name');
-  const roleEl = document.getElementById('hdr-agent-role');
-  if (!nameEl || !roleEl) return;
-  const cfg = getSetupConfig();
-  nameEl.textContent = currentAgent;
-  if (currentAgent === 'KIM') {
-    roleEl.textContent = 'Assistentin';
-  } else {
-    const rollenNames = {concierge:'Concierge',rezeptionist:'Rezeptionist',vermittlung:'Vermittlung',auskunft:'Auskunft',mitarbeiter:'Mitarbeiter',lager:'Lager-Assistent',service:'Service-Assistent',sicherheit:'Sicherheit',management:'Management'};
-    const rolle = cfg['kai_rolle'] || 'concierge';
-    roleEl.textContent = rollenNames[rolle] || 'Concierge';
-  }
-}
 let silenceTimer = null;
 
 // === WALKIE-TALKIE MODUS ===
@@ -4980,18 +4299,12 @@ function showKimCardAbove() {
   let agentIcon = '👤';
   let agentColor = '#e63946';
 
-  if (currentCard) {
-    agentName = currentCard.title || 'KAI';
-    agentRole = currentCard.subtitle || '';
-    agentIcon = currentCard.icon || '👤';
-    agentColor = currentCard.color || '#e63946';
-  }
-  // Fallback: KAI Rolle aus Setup holen
-  if (agentName === 'KAI' && !agentRole) {
-    const cfg2 = getSetupConfig();
-    const rolle = cfg2['kai_rolle'] || 'concierge';
-    const rd = {concierge:'Concierge',rezeptionist:'Rezeptionist',vermittlung:'Vermittlung',auskunft:'Auskunft',mitarbeiter:'Mitarbeiter',lager:'Lager-Assistent',service:'Service-Assistent',sicherheit:'Sicherheit',management:'Management'};
-    agentRole = rd[rolle] || 'Concierge';
+  if (currentCard && currentCard.webhookUrl) {
+    // Custom-Agent
+    agentName = currentCard.title;
+    agentRole = currentCard.subtitle || currentCard.role || '';
+    agentIcon = currentCard.icon || '🤖';
+    agentColor = currentCard.color || '#f59e0b';
   }
 
   document.getElementById('fl-card').innerHTML = `
@@ -5098,11 +4411,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let micRecordStart = 0;
   btn.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    // Live-Modus: Sofort reagieren (Toggle), kein Hold noetig
-    if (currentInputMode === 'live') {
-      walkieStartDirect();
-      return;
-    }
     micRecording = false;
     micHoldTimer = setTimeout(() => {
       micRecording = true;
@@ -5113,7 +4421,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btn.addEventListener('touchend', () => {
-    if (currentInputMode === 'live') return; // Live-Modus: Nichts beim Loslassen
     if (micHoldTimer) { clearTimeout(micHoldTimer); micHoldTimer = null; }
     if (micRecording) {
       const dur = Date.now() - micRecordStart;
@@ -5184,16 +4491,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Direkte Start/End ohne Event (von neuem Mic-Handler aufgerufen)
 function walkieStartDirect() {
-  console.log('walkieStartDirect called, inputMode=' + currentInputMode);
-  // Live-Dialog Modus: Gemini Live starten (kein Walkie-Talkie)
-  if (currentInputMode === 'live') {
-    if (liveIsActive) {
-      endLiveSession();
-    } else {
-      startLiveSession();
-    }
-    return;
-  }
   // Aktuellen Agenten SOFORT setzen (bevor Aufnahme startet)
   const card = activeCards[currentIndex];
   if (card && card.webhookUrl) {
@@ -5204,8 +4501,6 @@ function walkieStartDirect() {
   walkieStart(e);
 }
 function walkieEndDirect() {
-  // Im Live-Modus: Nichts tun beim Loslassen (laeuft weiter)
-  if (currentInputMode === 'live') return;
   const e = {preventDefault:()=>{}};
   walkieEnd(e);
 }
@@ -6018,762 +5313,6 @@ if ('serviceWorker' in navigator) {
     .then(reg => console.log('SW registriert:', reg.scope))
     .catch(err => console.log('SW Fehler:', err));
 }
-
-// === REGIOPRESS VOLLBILD ===
-let regioFullpageOpen = false;
-let regioPageIndex = 0;
-let regioPages = [];
-let regioSwipeStartX = 0;
-let regioSwipeStartY = 0;
-
-function getRegioPages() {
-  const card = activeCards[currentIndex];
-  if (!card) return [];
-  return (card.backs || []).filter(b => b.type === 'newspaper');
-}
-
-function renderRegioFullpage(pageIdx) {
-  const pages = getRegioPages();
-  if (pages.length === 0) return;
-  regioPages = pages;
-  regioPageIndex = Math.max(0, Math.min(pageIdx, pages.length - 1));
-  const p = pages[regioPageIndex];
-  const catColors = {TITELSEITE:'#CC0000',POLITIK:'#1a5276',BLAULICHT:'#CC0000',WIRTSCHAFT:'#1e8449',EVENTS:'#7d3c98',SPORT:'#2e86c1',WETTER:'#d4ac0d'};
-  const catColor = catColors[p.category] || '#CC0000';
-  const headlineLines = (p.headline||'').split('\n');
-
-  document.getElementById('regio-page-content').innerHTML = `
-    <div style="min-height:100%;display:flex;flex-direction:column;font-family:'Merriweather',serif;background:#111">
-      <div style="background:${catColor};padding:6px 14px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:2px">${p.category}</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:11px;color:rgba(255,255,255,0.8)">Seite ${p.page} von ${p.total}</span>
-      </div>
-      ${p.img ? `<img src="${p.img.replace('h=120','h=250')}" style="width:100%;height:200px;object-fit:cover;display:block" onerror="this.style.height='0'">` : ''}
-      <div style="background:${catColor};padding:12px 16px">
-        <div style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:#fff;text-transform:uppercase;line-height:1.05">${headlineLines.join('<br>')}</div>
-      </div>
-      <div style="padding:8px 16px 4px">
-        <div style="font-family:'Oswald',sans-serif;font-size:14px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px">${p.subline||''}</div>
-      </div>
-      <div style="padding:8px 16px 20px;flex:1">
-        <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,0.8)">${p.text||''}</div>
-      </div>
-      <div style="background:${catColor};height:3px"></div>
-      <div style="background:#0a0a0a;padding:6px 16px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:2px">REGIOPRESS</span>
-        <span style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">6. April 2026</span>
-      </div>
-    </div>
-  `;
-
-  // Dots aktualisieren
-  const dotsEl = document.getElementById('regio-dots');
-  dotsEl.innerHTML = pages.map((_, idx) =>
-    `<div class="rp-dot${idx === regioPageIndex ? ' active' : ''}" onclick="renderRegioFullpage(${idx})"></div>`
-  ).join('');
-}
-
-function openRegioPage(backIdx) {
-  // backIdx ist der Index im backs-Array (inkl. Duplikate fuer Endlos-Rad)
-  const card = activeCards[currentIndex];
-  const pages = (card.backs || []).filter(b => b.type === 'newspaper');
-  // Finde die echte Seite (backIdx kann durch Duplikation groesser sein)
-  const realIdx = backIdx % pages.length;
-
-  const overlay = document.getElementById('regio-fullpage');
-  overlay.style.top = '0px';
-  overlay.style.bottom = '40px';
-
-  renderRegioFullpage(realIdx);
-  overlay.style.display = 'block';
-  requestAnimationFrame(() => {
-    overlay.classList.add('visible');
-  });
-  regioFullpageOpen = true;
-}
-
-function openRegioEinzel(src, side, backIdx) {
-  const overlay = document.getElementById('regio-fullpage');
-  overlay.style.top = '60px';
-  overlay.style.bottom = '0px';
-
-  const card = activeCards[currentIndex];
-  const doppelPages = (card.backs || []).filter(b => b.type === 'newspaper-doppel');
-  regioPages = doppelPages;
-  regioFullpageOpen = true;
-
-  // backIdx ist der Index der Doppelseite im backs-Array (inkl. Duplikate)
-  // Finde welche echte Doppelseite das ist
-  const allBacks = card.backs || [];
-  const doppelOnly = allBacks.filter(b => b.type === 'newspaper-doppel');
-  const doppelIdx = backIdx % doppelOnly.length;
-  // Einzelseiten-Index: jede Doppelseite hat 2 Einzelseiten
-  const einzelIdx = (doppelIdx * 2) + (side === 'right' ? 1 : 0);
-
-  renderRegioFeed(einzelIdx);
-  overlay.classList.add('visible');
-}
-
-let regioCurrentSide = 'left';
-
-function renderRegioFeed(startAtPage) {
-  const pages = regioPages.length ? regioPages : getRegioDoppelPages();
-  if (pages.length === 0) return;
-
-  const screenW = window.innerWidth;
-  const scale = screenW / 355;
-  const pageH = Math.ceil(420 * scale);
-
-  // Alle Einzelseiten (links + rechts aus jeder Doppelseite) untereinander
-  let html = '';
-  pages.forEach((p, doppelIdx) => {
-    const pNums = (p.pages||'1-2').split('-');
-    // Linke Seite
-    html += `<div style="width:${screenW}px;height:${pageH}px;overflow:hidden;position:relative;border-bottom:3px solid #CC0000">
-      <iframe src="${p.src}" style="width:710px;height:420px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none" scrolling="no"></iframe>
-    </div>`;
-    // Rechte Seite
-    html += `<div style="width:${screenW}px;height:${pageH}px;overflow:hidden;position:relative;border-bottom:3px solid #CC0000">
-      <iframe src="${p.src}" style="width:710px;height:420px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;position:absolute;top:0;left:${(-355*scale).toFixed(0)}px;pointer-events:none" scrolling="no"></iframe>
-    </div>`;
-  });
-
-  document.getElementById('regio-page-content').innerHTML = `
-    <div id="regio-feed-scroll" style="width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none">${html}</div>
-  `;
-
-  // Zum angeklickten Seite scrollen
-  if (startAtPage > 0) {
-    const scrollTo = startAtPage * pageH;
-    // Mehrfach versuchen weil iframes Zeit brauchen
-    const scroller = document.getElementById('regio-feed-scroll');
-    if (scroller) {
-      scroller.scrollTop = scrollTo;
-      setTimeout(() => { scroller.scrollTop = scrollTo; }, 50);
-      setTimeout(() => { scroller.scrollTop = scrollTo; }, 200);
-      setTimeout(() => { scroller.scrollTop = scrollTo; }, 500);
-    }
-  }
-
-  document.getElementById('regio-dots').innerHTML = '';
-}
-
-function renderRegioEinzel(idx, side) {
-  const pages = regioPages.length ? regioPages : getRegioDoppelPages();
-  if (pages.length === 0) return;
-  regioPageIndex = Math.max(0, Math.min(idx, pages.length - 1));
-  regioCurrentSide = side || 'left';
-  const p = pages[regioPageIndex];
-
-  // Doppelseite = 710px breit, jede Haelfte 355px.
-  // Wir zeigen nur eine Haelfte, skaliert auf volle Screenbreite.
-  const screenW = window.innerWidth;
-  const scale = screenW / 355;
-  // clip-path schneidet die andere Haelfte ab
-  const clipLeft = side === 'right' ? 'clip-path:inset(0 0 0 50%)' : 'clip-path:inset(0 50% 0 0)';
-  const translateX = side === 'right' ? -355 * scale : 0;
-
-  document.getElementById('regio-page-content').innerHTML = `
-    <div style="width:100%;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;position:relative">
-      <div style="width:${screenW}px;height:${420*scale}px;overflow:hidden;position:relative">
-        <iframe src="${p.src}" style="width:710px;height:420px;border:none;transform:scale(${scale.toFixed(3)});transform-origin:top left;position:absolute;top:0;left:${translateX.toFixed(0)}px;pointer-events:none" scrolling="no"></iframe>
-      </div>
-    </div>
-  `;
-
-  const pNums = (p.pages||'').split('-');
-  const pageNum = side === 'right' ? (pNums[1]||'') : (pNums[0]||'');
-  const dotsEl = document.getElementById('regio-dots');
-  dotsEl.innerHTML = `<span style="font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,255,255,0.4)">Seite ${pageNum}</span>`;
-}
-
-function openRegioDoppel(src, backIdx) {
-  const overlay = document.getElementById('regio-fullpage');
-  // Direkt unter Header (60px) bis ueber Bottom-Bar (40px sichtbar)
-  overlay.style.top = '60px';
-  overlay.style.bottom = '40px';
-
-  const card = activeCards[currentIndex];
-  const doppelPages = (card.backs || []).filter(b => b.type === 'newspaper-doppel');
-  const realIdx = backIdx % doppelPages.length;
-  regioPageIndex = realIdx;
-  regioPages = doppelPages;
-
-  renderRegioDoppelFullpage(realIdx);
-  overlay.classList.add('visible');
-  regioFullpageOpen = true;
-}
-
-function renderRegioDoppelFullpage(idx) {
-  const pages = regioPages.length ? regioPages : getRegioDoppelPages();
-  if (pages.length === 0) return;
-  regioPageIndex = Math.max(0, Math.min(idx, pages.length - 1));
-  const p = pages[regioPageIndex];
-
-  // iframe füllt den ganzen rp-page Container (via CSS position:absolute)
-  document.getElementById('regio-page-content').innerHTML = `
-    <iframe src="${p.src}" scrolling="auto"></iframe>
-  `;
-
-  const dotsEl = document.getElementById('regio-dots');
-  dotsEl.innerHTML = pages.map((pg, j) =>
-    `<div class="rp-dot${j === regioPageIndex ? ' active' : ''}" onclick="renderRegioDoppelFullpage(${j})"></div>`
-  ).join('');
-}
-
-function getRegioDoppelPages() {
-  const card = activeCards[currentIndex];
-  if (!card) return [];
-  return (card.backs || []).filter(b => b.type === 'newspaper-doppel');
-}
-
-function closeRegioPage() {
-  if (!regioFullpageOpen) return;
-  regioFullpageOpen = false;
-  const overlay = document.getElementById('regio-fullpage');
-  overlay.classList.remove('visible');
-  document.getElementById('regio-page-content').innerHTML = '';
-  // Kurz Touch-Events blockieren damit kein versehentlicher Flip passiert
-  document.body.style.pointerEvents = 'none';
-  setTimeout(() => { document.body.style.pointerEvents = ''; }, 400);
-}
-
-// Swipe-Handler fuer Vollbild
-(function() {
-  const el = document.getElementById('regio-fullpage');
-  el.addEventListener('touchstart', function(e) {
-    regioSwipeStartX = e.touches[0].clientX;
-    regioSwipeStartY = e.touches[0].clientY;
-  }, {passive: true});
-
-  el.addEventListener('touchend', function(e) {
-    if (!regioFullpageOpen) return;
-    const dx = e.changedTouches[0].clientX - regioSwipeStartX;
-    const dy = e.changedTouches[0].clientY - regioSwipeStartY;
-
-    // Runter-Wischen = schliessen
-    if (dy > 100 && Math.abs(dx) < 80) {
-      closeRegioPage();
-      return;
-    }
-
-    // Links/Rechts Wischen = Einzelseite blaettern
-    if (Math.abs(dx) > 50 && Math.abs(dy) < 80) {
-      const pages = regioPages.length ? regioPages : getRegioDoppelPages();
-      if (dx < 0) {
-        // Swipe links = naechste Seite
-        if (regioCurrentSide === 'left') {
-          renderRegioEinzel(regioPageIndex, 'right');
-        } else if (regioPageIndex < pages.length - 1) {
-          renderRegioEinzel(regioPageIndex + 1, 'left');
-        }
-      } else {
-        // Swipe rechts = vorherige Seite
-        if (regioCurrentSide === 'right') {
-          renderRegioEinzel(regioPageIndex, 'left');
-        } else if (regioPageIndex > 0) {
-          renderRegioEinzel(regioPageIndex - 1, 'right');
-        }
-      }
-    }
-  }, {passive: true});
-})();
-
-// === LIVE TRANSKRIPT SPEICHERUNG ===
-function saveLiveTranscript(role, text) {
-  if (!text || !text.trim()) return;
-  const transcripts = JSON.parse(localStorage.getItem('kimanus-live-transcripts') || '[]');
-  transcripts.push({
-    role: role, // 'user' oder 'kim'
-    text: text.trim(),
-    time: new Date().toISOString()
-  });
-  // Max 500 Eintraege behalten
-  if (transcripts.length > 500) transcripts.splice(0, transcripts.length - 500);
-  localStorage.setItem('kimanus-live-transcripts', JSON.stringify(transcripts));
-}
-
-function getLiveTranscripts() {
-  return JSON.parse(localStorage.getItem('kimanus-live-transcripts') || '[]');
-}
-
-function deleteLiveTranscripts() {
-  localStorage.removeItem('kimanus-live-transcripts');
-}
-
-function showTranscriptHistory() {
-  const transcripts = getLiveTranscripts();
-  if (transcripts.length === 0) {
-    alert('Keine Gespraeche gespeichert');
-    return;
-  }
-  // Overlay mit Verlauf anzeigen
-  let overlay = document.getElementById('transcript-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'transcript-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.95);overflow-y:auto;padding:20px 16px;display:none';
-    document.body.appendChild(overlay);
-  }
-  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">';
-  html += '<h2 style="color:#fff;font-size:18px;font-weight:700">Gespraechsverlauf</h2>';
-  html += '<button onclick="document.getElementById(\'transcript-overlay\').style.display=\'none\'" style="background:rgba(230,57,70,0.2);border:1px solid rgba(230,57,70,0.3);color:#e63946;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer">Schliessen</button>';
-  html += '</div>';
-
-  let lastDate = '';
-  transcripts.slice().reverse().forEach(t => {
-    const date = t.time.split('T')[0];
-    const time = t.time.split('T')[1].substring(0, 5);
-    if (date !== lastDate) {
-      html += '<div style="color:rgba(255,255,255,0.3);font-size:11px;text-align:center;margin:12px 0 6px">' + date + '</div>';
-      lastDate = date;
-    }
-    const isKim = t.role === 'kim';
-    const bg = isKim ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.06)';
-    const border = isKim ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.1)';
-    const color = isKim ? 'rgba(139,92,246,0.9)' : 'rgba(255,255,255,0.7)';
-    const align = isKim ? 'flex-start' : 'flex-end';
-    const label = isKim ? 'KIM' : 'Du';
-    html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:4px">';
-    html += '<div style="max-width:85%;padding:8px 12px;border-radius:10px;background:' + bg + ';border:1px solid ' + border + '">';
-    html += '<span style="font-size:10px;color:rgba(255,255,255,0.3)">' + time + ' ' + label + '</span><br>';
-    html += '<span style="font-size:14px;color:' + color + '">' + t.text + '</span>';
-    html += '</div></div>';
-  });
-
-  overlay.innerHTML = html;
-  overlay.style.display = 'block';
-}
-
-function getTranscriptSummary() {
-  const t = getLiveTranscripts();
-  if (t.length === 0) return 'Keine Gespraeche gespeichert';
-  const sessions = {};
-  t.forEach(entry => {
-    const date = entry.time.split('T')[0];
-    if (!sessions[date]) sessions[date] = 0;
-    sessions[date]++;
-  });
-  const dates = Object.keys(sessions).sort().reverse();
-  return dates.slice(0, 5).map(d => d + ': ' + sessions[d] + ' Nachrichten').join('\n');
-}
-
-// === GEMINI LIVE AUDIO ENGINE ===
-const GEMINI_LIVE_MODEL = 'gemini-3.1-flash-live-preview';
-// WebSocket ueber unseren Proxy-Server (API-Key bleibt sicher auf dem Server)
-const GEMINI_WS_URL = 'wss://voice.kimanus.de/ws/live';
-
-let liveWs = null;
-let liveAudioCtx = null;
-let liveMicStream = null;
-let liveProcessor = null;
-let liveIsActive = false;
-let livePlaybackQueue = [];
-let liveIsPlaying = false;
-let livePlayCtx = null;
-let liveLastSpeaker = '';
-
-function getLiveVoice() {
-  const cfg = getSetupConfig();
-  const validVoices = ['Aoede','Kore','Leda','Zephyr','Charon','Puck','Fenrir','Orus'];
-  let voice;
-  if (currentAgent === 'KAI') {
-    voice = cfg['kai_voice'] || 'Puck';
-  } else {
-    voice = cfg['kim_voice'] || 'Kore';
-  }
-  // Fallback wenn ungueltige Stimme im Setup
-  if (!validVoices.includes(voice)) {
-    console.log('Invalid voice:', voice, '-> fallback to Kore');
-    voice = currentAgent === 'KAI' ? 'Puck' : 'Kore';
-  }
-  return voice;
-}
-
-function getRecentMemory() {
-  // Letzte Gespraeche als Kontext laden
-  const transcripts = getLiveTranscripts();
-  if (transcripts.length === 0) return '';
-  // Letzte 20 Nachrichten als Kontext
-  const recent = transcripts.slice(-20);
-  let memory = '\n\nLETZTE GESPRAECHE (dein Gedaechtnis):\n';
-  recent.forEach(t => {
-    const who = t.role === 'kim' ? 'KAI' : 'User';
-    memory += who + ': ' + t.text + '\n';
-  });
-  return memory;
-}
-
-function saveLiveToN8n() {
-  // Nach Session: Zusammenfassung an n8n senden damit KAI es im Memory hat
-  const transcripts = getLiveTranscripts();
-  if (transcripts.length === 0) return;
-  // Letzte 10 Nachrichten als Zusammenfassung
-  const recent = transcripts.slice(-10);
-  const summary = recent.map(t => (t.role === 'kim' ? 'KAI' : 'User') + ': ' + t.text).join('\n');
-
-  // An KAI Webhook senden (gleicher Weg wie Walkie-Talkie)
-  const webhookUrl = 'https://manus.kimanus.de/webhook/kim';
-  fetch(webhookUrl, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      message: '[Live-Dialog Zusammenfassung]\n' + summary,
-      agent: currentAgent,
-      mode: 'live-memory'
-    })
-  }).catch(e => console.log('Memory save failed:', e));
-}
-
-function getLivePrompt() {
-  const cfg = getSetupConfig();
-  const memory = getRecentMemory();
-  if (currentAgent === 'KAI') {
-    const rolle = cfg['kai_rolle'] || 'concierge';
-    const rollenInfo = {
-      concierge: {name:'Concierge', desc:'Du bist wie ein Hotel-Concierge: vermittelst, beraetst, kennst dich aus.'},
-      rezeptionist: {name:'Rezeptionist', desc:'Du bist der Empfang: erster Kontakt, begruesst freundlich, leitest weiter.'},
-      vermittlung: {name:'Vermittlung', desc:'Du bist die Telefonzentrale: leitest Anfragen weiter, verbindest mit Spezialisten.'},
-      auskunft: {name:'Auskunft', desc:'Du bist die Auskunft: beantwortest Fragen, informierst sachlich und praezise.'},
-      mitarbeiter: {name:'Mitarbeiter', desc:'Du bist ein Kollege: arbeitest mit, denkst mit, hilfst praktisch.'},
-      lager: {name:'Lager-Assistent', desc:'Du kuemerst dich um Bestand, Bestellungen und Inventur.'},
-      service: {name:'Service-Assistent', desc:'Du hilfst bei Bestellungen, Kasse und Gaeste-Betreuung.'},
-      sicherheit: {name:'Sicherheit', desc:'Du kuemerst dich um Sicherheit, Protokolle und Safety.'},
-      management: {name:'Management', desc:'Du hast den Ueberblick: Finanzen, Strategie, Organisation.'}
-    };
-    const r = rollenInfo[rolle] || rollenInfo.concierge;
-    return `Du bist KAI, der ${r.name} von KIMANUS. Du sprichst Deutsch.
-DEINE ROLLE: ${r.desc}
-REGELN:
-- Antworte IMMER auf Deutsch
-- Maximal 2-3 Saetze, kurz und knapp
-- Du bist maennlich, professionell und hilfsbereit
-- Du hilfst bei technischen Fragen, App-Einstellungen, Navigation
-- Du kennst die KIMANUS App: Riesenrad mit Glasplatten
-- Bei persoenlichen Fragen (Termine, Familie) sagst du: "Da hole ich dir KIM, deine persoenliche Assistentin."
-- Sprich ruhig und gleichmaessig
-- Stelle dich nicht vor - direkt zur Sache${memory}`;
-  }
-  return `Du bist KIM, die persoenliche Assistentin von KIMANUS. Du sprichst Deutsch.
-REGELN:
-- Antworte IMMER auf Deutsch
-- Maximal 2-3 Saetze, kurz und knapp
-- Du bist freundlich und hilfsbereit wie eine gute Freundin
-- Du kuemerst dich um persoenliche Sachen: Termine, Erinnerungen, Vorlieben
-- Bei technischen Fragen sagst du: "Da frag am besten KAI, der kennt sich damit aus."
-- Sprich ruhig und gleichmaessig
-- Stelle dich nicht vor - direkt zur Sache${memory}`;
-}
-
-function ensureLivePlaybackCtx() {
-  const AC = window.AudioContext || window.webkitAudioContext;
-  if (!livePlayCtx || livePlayCtx.state === 'closed') {
-    livePlayCtx = new AC({ sampleRate: 24000 });
-  }
-  if (livePlayCtx.state === 'suspended') {
-    livePlayCtx.resume();
-    const silent = livePlayCtx.createBuffer(1, 1, 24000);
-    const src = livePlayCtx.createBufferSource();
-    src.buffer = silent;
-    src.connect(livePlayCtx.destination);
-    src.start();
-  }
-  return livePlayCtx;
-}
-
-async function startLiveSession() {
-  console.log('startLiveSession called!');
-  const btn = document.getElementById('speech-btn');
-  const agent = document.getElementById('speech-agent');
-
-  ensureLivePlaybackCtx();
-
-  liveLastSpeaker = '';
-  livePageCount = 0;
-  liveAllPages = [];
-  liveViewStart = 0;
-
-  // Glasplatte mit Status-Anzeige vorbereiten
-  const liveCardEl = document.getElementById('card-' + currentIndex);
-  if (liveCardEl && !isFlipped) {
-    const front = liveCardEl.querySelector('.card-front');
-    if (front) {
-      front.innerHTML = `
-        <div id="live-status" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-          <div id="live-status-icon" style="font-size:40px">⏳</div>
-          <div id="live-status-name" style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:1px">${currentAgent} Live</div>
-          <div id="live-status-sub" style="font-size:11px;color:rgba(255,255,255,0.3)">Verbinde...</div>
-          <svg id="live-status-waves" style="display:none;width:120px;height:30px" viewBox="0 0 120 30">
-            <line x1="15" y1="8" x2="15" y2="22" stroke="rgba(139,92,246,0.6)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="8;3;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="22;27;22" dur="0.8s" repeatCount="indefinite"/></line>
-            <line x1="30" y1="6" x2="30" y2="24" stroke="rgba(139,92,246,0.6)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="6;1;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="24;29;24" dur="0.6s" repeatCount="indefinite"/></line>
-            <line x1="45" y1="4" x2="45" y2="26" stroke="rgba(139,92,246,0.8)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="4;0;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="26;30;26" dur="0.5s" repeatCount="indefinite"/></line>
-            <line x1="60" y1="3" x2="60" y2="27" stroke="rgba(139,92,246,0.8)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="3;0;3" dur="0.45s" repeatCount="indefinite"/><animate attributeName="y2" values="27;30;27" dur="0.45s" repeatCount="indefinite"/></line>
-            <line x1="75" y1="4" x2="75" y2="26" stroke="rgba(139,92,246,0.8)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="4;0;4" dur="0.55s" repeatCount="indefinite"/><animate attributeName="y2" values="26;30;26" dur="0.55s" repeatCount="indefinite"/></line>
-            <line x1="90" y1="6" x2="90" y2="24" stroke="rgba(139,92,246,0.6)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="6;2;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="24;28;24" dur="0.7s" repeatCount="indefinite"/></line>
-            <line x1="105" y1="8" x2="105" y2="22" stroke="rgba(139,92,246,0.6)" stroke-width="3" stroke-linecap="round"><animate attributeName="y1" values="8;4;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="22;26;22" dur="0.9s" repeatCount="indefinite"/></line>
-          </svg>
-        </div>`;
-      adjustBrightness(currentBrightness);
-    }
-  }
-
-  agent.innerHTML = '⏳';
-  btn.style.background = 'radial-gradient(circle at 30% 30%,#f59e0b 0%,#d97706 50%,#b45309 100%)';
-
-  try {
-    liveWs = new WebSocket(GEMINI_WS_URL);
-
-    liveWs.onopen = () => {
-      console.log('LIVE WS OPEN');
-      const voiceName = getLiveVoice();
-      console.log('Voice:', voiceName, 'Model:', GEMINI_LIVE_MODEL);
-      const setup = {
-        setup: {
-          model: `models/${GEMINI_LIVE_MODEL}`,
-          generationConfig: {
-            responseModalities: ['AUDIO'],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: { voiceName: voiceName }
-              }
-            },
-            temperature: 0.7
-          },
-          systemInstruction: {
-            parts: [{
-              text: getLivePrompt()
-            }]
-          },
-          realtimeInputConfig: {
-            automaticActivityDetection: {
-              disabled: false,
-              startOfSpeechSensitivity: 'START_SENSITIVITY_LOW',
-              endOfSpeechSensitivity: 'END_SENSITIVITY_LOW'
-            },
-            activityHandling: 'START_OF_ACTIVITY_INTERRUPTS'
-          }
-        }
-      };
-      liveWs.send(JSON.stringify(setup));
-    };
-
-    liveWs.onmessage = async (event) => {
-      const raw = event.data instanceof Blob ? await event.data.text() : event.data;
-      console.log('LIVE MSG:', raw.substring(0, 200));
-      const data = JSON.parse(raw);
-
-      if (data.setupComplete) {
-        console.log('LIVE SETUP COMPLETE!');
-        liveIsActive = true;
-        agent.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>';
-        btn.style.background = 'radial-gradient(circle at 30% 30%,#8b5cf6 0%,#7c3aed 50%,#6d28d9 100%)';
-        // Status auf Glasplatte aktualisieren
-        const statusName = document.getElementById('live-status-name');
-        const statusSub = document.getElementById('live-status-sub');
-        const statusWaves = document.getElementById('live-status-waves');
-        const statusIcon = document.getElementById('live-status-icon');
-        if (statusName) statusName.textContent = currentAgent + ' Live';
-        if (statusSub) statusSub.textContent = 'Sprich einfach los!';
-        if (statusWaves) statusWaves.style.display = 'block';
-        if (statusIcon) statusIcon.style.display = 'none';
-        startLiveMicrophone();
-      }
-
-      if (data.serverContent) {
-        const sc = data.serverContent;
-        if (sc.modelTurn && sc.modelTurn.parts) {
-          btn.style.background = 'radial-gradient(circle at 30% 30%,#8b5cf6 0%,#7c3aed 50%,#6d28d9 100%)';
-          for (const part of sc.modelTurn.parts) {
-            if (part.inlineData && part.inlineData.mimeType.startsWith('audio')) {
-              livePlaybackQueue.push(part.inlineData.data);
-              if (!liveIsPlaying) playNextLiveAudio();
-            }
-          }
-        }
-        if (sc.inputTranscription && sc.inputTranscription.text) {
-          saveLiveTranscript('user', sc.inputTranscription.text);
-          // Fliesstext: Nur "Du:" beim ersten Mal, danach nur Text anhaengen
-          if (liveLastSpeaker !== 'user') {
-            appendToNotebook(' <b style="color:rgba(255,255,255,0.4)">Du:</b> ');
-            liveLastSpeaker = 'user';
-          }
-          appendToNotebook('<span style="color:rgba(255,255,255,0.6)">' + sc.inputTranscription.text + ' </span>');
-        }
-        if (sc.outputTranscription && sc.outputTranscription.text) {
-          saveLiveTranscript('kim', sc.outputTranscription.text);
-          // Fliesstext: Nur "KIM:" beim Sprecherwechsel
-          if (liveLastSpeaker !== 'kim') {
-            appendToNotebook(' <b style="color:rgba(139,92,246,0.6)">KIM:</b> ');
-            liveLastSpeaker = 'kim';
-          }
-          appendToNotebook('<span style="color:rgba(139,92,246,0.8)">' + sc.outputTranscription.text + ' </span>');
-        }
-        if (sc.turnComplete) {
-          agent.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>';
-        }
-      }
-    };
-
-    liveWs.onerror = (e) => { console.log('LIVE WS ERROR', e); endLiveSession(); };
-    liveWs.onclose = (e) => { console.log('LIVE WS CLOSED', e.code, e.reason); if (liveIsActive) endLiveSession(); };
-  } catch(err) {
-    console.error('Live-Fehler:', err);
-    endLiveSession();
-  }
-}
-
-async function startLiveMicrophone() {
-  try {
-    liveMicStream = await navigator.mediaDevices.getUserMedia({
-      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
-    });
-    const AC = window.AudioContext || window.webkitAudioContext;
-    liveAudioCtx = new AC({ sampleRate: 16000 });
-    if (liveAudioCtx.state === 'suspended') await liveAudioCtx.resume();
-    const source = liveAudioCtx.createMediaStreamSource(liveMicStream);
-    liveProcessor = liveAudioCtx.createScriptProcessor(8192, 1, 1);
-    liveProcessor.onaudioprocess = (e) => {
-      if (!liveIsActive || !liveWs || liveWs.readyState !== WebSocket.OPEN) return;
-      const float32 = e.inputBuffer.getChannelData(0);
-      const int16 = new Int16Array(float32.length);
-      for (let i = 0; i < float32.length; i++) {
-        int16[i] = Math.max(-32768, Math.min(32767, float32[i] * 32768));
-      }
-      const bytes = new Uint8Array(int16.buffer);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-      liveWs.send(JSON.stringify({
-        realtimeInput: { audio: { data: btoa(binary), mimeType: 'audio/pcm;rate=16000' } }
-      }));
-    };
-    source.connect(liveProcessor);
-    liveProcessor.connect(liveAudioCtx.destination);
-  } catch(err) {
-    console.error('Live Mic Fehler:', err);
-  }
-}
-
-async function playNextLiveAudio() {
-  if (livePlaybackQueue.length === 0) { liveIsPlaying = false; return; }
-  liveIsPlaying = true;
-  const b64 = livePlaybackQueue.shift();
-  try {
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const int16 = new Int16Array(bytes.buffer);
-    const ctx = ensureLivePlaybackCtx();
-    if (ctx.state === 'suspended') await ctx.resume();
-    const buffer = ctx.createBuffer(1, int16.length, 24000);
-    const channel = buffer.getChannelData(0);
-    // Sanfte Konvertierung ohne aggressive Normalisierung
-    for (let i = 0; i < int16.length; i++) channel[i] = int16[i] / 32768;
-    // Sanftes Ein-/Ausblenden gegen Knacksen (Fade 64 Samples = ~2.7ms)
-    const fade = Math.min(64, int16.length / 4);
-    for (let i = 0; i < fade; i++) channel[i] *= i / fade;
-    for (let i = 0; i < fade; i++) channel[int16.length - 1 - i] *= i / fade;
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    // Moderater Gain (nicht zu laut, kein Clipping)
-    const gainNode = ctx.createGain();
-    gainNode.gain.value = 1.2;
-    source.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    source.onended = () => playNextLiveAudio();
-    source.start();
-  } catch(err) { playNextLiveAudio(); }
-}
-
-let livePageCount = 0;
-let liveAllPages = [];
-let liveViewStart = 0;
-
-function createNotebookPage() {
-  livePageCount++;
-  const page = document.createElement('div');
-  page.className = 'live-page';
-  page.id = 'live-page-' + livePageCount;
-  page.style.cssText = 'flex:1;height:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:2px;padding:2px 4px;overflow:hidden;font-size:9px;line-height:1.3;color:rgba(255,255,255,0.5);word-wrap:break-word';
-  const content = document.createElement('div');
-  content.className = 'live-page-content';
-  if (livePageCount === 1) {
-    content.innerHTML = '<span style="font-size:7px;color:rgba(139,92,246,0.35)">Notiz ' + new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) + ' · </span>';
-  }
-  page.appendChild(content);
-  liveAllPages.push({ page, content });
-  return content;
-}
-
-function showPagePair(startIdx) {
-  const view = document.getElementById('live-pages-view');
-  if (!view) return;
-  view.innerHTML = '';
-  for (let i = startIdx; i < startIdx + 2 && i < liveAllPages.length; i++) {
-    view.appendChild(liveAllPages[i].page);
-  }
-  const nav = document.getElementById('live-pages-nav');
-  const indicator = document.getElementById('live-page-indicator');
-  if (nav && indicator && liveAllPages.length > 2) {
-    nav.style.display = 'block';
-    indicator.textContent = 'S.' + (startIdx + 1) + '-' + Math.min(startIdx + 2, liveAllPages.length) + ' von ' + liveAllPages.length;
-  }
-  liveViewStart = startIdx;
-}
-
-function getCurrentPage() {
-  if (liveAllPages.length === 0) {
-    createNotebookPage();
-    createNotebookPage();
-    showPagePair(0);
-    return liveAllPages[0].content;
-  }
-  const last = liveAllPages[liveAllPages.length - 1];
-  if (last.page.scrollHeight > last.page.clientHeight) {
-    const newContent = createNotebookPage();
-    const newStart = Math.max(0, liveAllPages.length - 2);
-    if (newStart !== liveViewStart) showPagePair(newStart);
-    return newContent;
-  }
-  return last.content;
-}
-
-function appendToNotebook(html) {
-  const page = getCurrentPage();
-  if (!page) return;
-  const span = document.createElement('span');
-  span.innerHTML = html;
-  page.appendChild(span);
-  const parent = page.parentElement;
-  if (parent && page.scrollHeight > parent.clientHeight) {
-    page.removeChild(span);
-    const newContent = createNotebookPage();
-    if (newContent) {
-      newContent.appendChild(span);
-      const newStart = Math.max(0, liveAllPages.length - 2);
-      showPagePair(newStart);
-    }
-  }
-}
-
-function endLiveSession() {
-  // Gespraech ins n8n-Memory speichern
-  saveLiveToN8n();
-  liveIsActive = false;
-  if (liveWs) { liveWs.close(); liveWs = null; }
-  if (liveProcessor) { liveProcessor.disconnect(); liveProcessor = null; }
-  if (liveMicStream) { liveMicStream.getTracks().forEach(t => t.stop()); liveMicStream = null; }
-  if (liveAudioCtx && liveAudioCtx.state !== 'closed') { liveAudioCtx.close(); liveAudioCtx = null; }
-  livePlaybackQueue = [];
-  liveIsPlaying = false;
-  // Button zuruecksetzen
-  const btn = document.getElementById('speech-btn');
-  const agent = document.getElementById('speech-agent');
-  if (btn) btn.style.background = 'radial-gradient(circle at 30% 30%,#4ade80 0%,#22c55e 50%,#16a34a 100%)';
-  setInputMode(currentInputMode); // Reset icon
-  // Glasplatte zuruecksetzen - Original-Karte wiederherstellen
-  rebuildWheel();
-}
-// === END GEMINI LIVE ===
 
 // Init
 init();
