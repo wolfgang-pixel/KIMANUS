@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v23.9 - REGIOPRESS Glasplatten, Lokalnachrichten im BILD-Stil -->
+<!-- KIMANUS Wheel v24.9 - Untere Leiste umgebaut: Input-Modus links, Logo-Langdruck = Setup -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -584,18 +584,26 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   display:flex;flex-direction:column;align-items:center;gap:3px;
 }
 .bar-item .bar-label{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;text-align:center}
-/* Settings-Button (Kaertchen) */
+/* Input-Modus-Button (frueher Settings-Button, jetzt zeigt aktuellen Eingabe-Modus) */
 #settings-btn{
   width:100%;height:44px;border-radius:10px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
-  border:1px solid rgba(255,255,255,0.12);
-  box-shadow:0 2px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+  background:linear-gradient(180deg, rgba(74,222,128,0.18) 0%, rgba(34,197,94,0.08) 100%);
+  border:1.5px solid rgba(74,222,128,0.35);
+  box-shadow:0 2px 8px rgba(34,197,94,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   -webkit-tap-highlight-color:transparent;transition:all 0.15s;
+  font-size:22px;color:#fff;
+  user-select:none;-webkit-user-select:none;
 }
-#settings-btn:active{transform:scale(0.92);background:rgba(255,255,255,0.12)}
-#settings-btn svg{width:16px;height:16px;fill:rgba(255,255,255,0.4)}
+#settings-btn:active{transform:scale(0.92);background:rgba(74,222,128,0.28)}
+#settings-btn svg{width:22px;height:22px;fill:#fff}
+#settings-btn.mic-wiggling{animation:micWiggle 0.4s ease-in-out infinite}
+#settings-btn.listening{
+  background:linear-gradient(180deg, rgba(74,222,128,0.35) 0%, rgba(34,197,94,0.2) 100%);
+  border-color:rgba(74,222,128,0.7);
+  box-shadow:0 0 12px rgba(74,222,128,0.5);
+}
 /* Hotkey-Slots (Kaertchen, 3D-plastisch) */
 .hotkey-slot{
   width:100%;height:44px;border-radius:10px;
@@ -687,6 +695,16 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   font-size:8px;font-weight:700;fill:rgba(255,255,255,0.5);
   letter-spacing:2px;
 }
+/* Legacy-Hidden: Elemente die JS noch braucht, aber visuell weg sollen */
+.legacy-hidden{
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  position:absolute !important;
+  width:1px !important;height:1px !important;
+  left:-9999px !important;top:-9999px !important;
+}
+
 #speech-btn{
   position:absolute;z-index:17;
   left:50%;top:50%;transform:translate(-50%,-50%);
@@ -887,13 +905,23 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 
 <div id="app">
   <div id="header">
-    <div class="logo-circle" onclick="showKimanusInfo()">K</div>
+    <div class="logo-circle"
+         onclick="logoClick()"
+         ontouchstart="logoTouchStart(event)"
+         ontouchend="logoTouchEnd(event)"
+         ontouchmove="logoTouchMove(event)"
+         ontouchcancel="logoTouchCancel()">K</div>
     <div style="flex:1">
-      <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
+      <div style="cursor:pointer"
+           onclick="logoClick()"
+           ontouchstart="logoTouchStart(event)"
+           ontouchend="logoTouchEnd(event)"
+           ontouchmove="logoTouchMove(event)"
+           ontouchcancel="logoTouchCancel()"><span class="title" style="margin:0">KIMANUS</span></div>
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v23.9</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.9</span>
       </div>
     </div>
     <button class="hdr-btn" onclick="clipPaste()" title="Einfuegen" style="font-size:18px;padding:4px 2px">📋</button>
@@ -916,12 +944,12 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
           <defs><path id="ring-top-arc" d="M 12,46 A 34,34 0 0,1 80,46"/></defs>
           <text><textPath id="ring-text-content" href="#ring-top-arc" startOffset="50%" text-anchor="middle">KAI</textPath></text>
         </svg>
-        <button id="speech-btn">
+        <button id="speech-btn" class="legacy-hidden">
           <span id="speech-agent">🎙</span>
         </button>
       </div>
-      <!-- Eingabemodi-Buttons -->
-      <div id="input-modes" style="position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:16;pointer-events:none">
+      <!-- Eingabemodi-Buttons (LEGACY - versteckt, neuer Input-Mode-Button in bottom-bar) -->
+      <div id="input-modes" class="legacy-hidden" style="position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:16;pointer-events:none">
         <button class="input-mode-btn" id="btn-walkie" onclick="setInputMode('walkie')" title="Walkie-Talkie" style="pointer-events:auto">🎙</button>
         <button class="input-mode-btn" id="btn-keyboard" onclick="setInputMode('keyboard')" title="Tastatur" style="pointer-events:auto">⌨️</button>
         <button class="input-mode-btn" id="btn-stt" onclick="setInputMode('stt')" title="Sprache-zu-Text" style="pointer-events:auto">💬</button>
@@ -968,12 +996,18 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   </div>
 
   <div id="bottom-bar">
-    <!-- SYMMETRISCH: [Settings][Hotkey1] - MIC - [Hotkey2][Hotkey3] -->
+    <!-- [Input-Mode][Hotkey1][Hotkey2][Hotkey3] - Setup via Logo-Langdruck oben -->
     <div class="bar-item">
-      <button id="settings-btn" onclick="event.stopPropagation();openSettings()" type="button">
-        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49,0,0,0,.12-.61l-1.92-3.32a.49.49,0,0,0-.59-.22l-2.39.96a7.04,7.04,0,0,0-1.62-.94l-.36-2.54a.48.48,0,0,0-.48-.41h-3.84a.48.48,0,0,0-.48.41l-.36,2.54a7.04,7.04,0,0,0-1.62.94l-2.39-.96a.49.49,0,0,0-.59.22L2.74,8.87a.48.48,0,0,0,.12.61l2.03,1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03,1.58a.49.49,0,0,0-.12.61l1.92,3.32a.49.49,0,0,0,.59.22l2.39-.96c.5.38,1.04.7,1.62.94l.36,2.54c.05.24.26.41.48.41h3.84c.24,0,.44-.17.48-.41l.36-2.54a7.04,7.04,0,0,0,1.62-.94l2.39.96a.49.49,0,0,0,.59-.22l1.92-3.32a.49.49,0,0,0-.12-.61ZM12,15.6A3.6,3.6,0,1,1,15.6,12,3.6,3.6,0,0,1,12,15.6Z"/></svg>
+      <button id="settings-btn"
+              type="button"
+              onclick="event.stopPropagation();triggerCurrentInputMode()"
+              ontouchstart="event.stopPropagation();inputModeBtnTouchStart(event)"
+              ontouchend="event.stopPropagation();inputModeBtnTouchEnd(event)"
+              ontouchmove="inputModeBtnTouchMove(event)"
+              ontouchcancel="inputModeBtnTouchCancel()">
+        <span id="main-input-icon">🎙</span>
       </button>
-      <span class="bar-label">Setup</span>
+      <span class="bar-label" id="main-input-label">Walkie</span>
     </div>
     <div class="bar-item" id="hotkey-wrap-0">
       <div class="hotkey-slot" id="hotkey-0" onclick="activateHotkey(0)" ontouchstart="hkTouchStart(event,0)" ontouchmove="hkTouchCancel(0)" ontouchend="hkTouchEnd(0)"><span class="hotkey-empty-icon">+</span></div>
@@ -1081,6 +1115,18 @@ const CARDS = [
      {title:'Was ich fuer dich tue', content:'Termine erinnern\nGeburtstage merken\nEinkaufslisten fuehren\nRezepte vorschlagen\nAlltag organisieren'},
      {title:'Ich bin verschwiegen', content:'Deine Daten gehoeren dir.\nIch teile nichts mit anderen.\nVerschluesselt und sicher.\nNur du hast Zugriff.'},
      {title:'So erreichst du mich', content:'Roter Button unten = Sprechen\nIch hoere immer zu.\nOder ruf mich an:\n0800 546 2687'},
+   ]},
+
+  // --- Claude (Entwickler-Partner, nur fuer Wolfgang) ---
+  {id:'claude', icon:'🧡', title:'Claude', subtitle:'Entwickler-Partner', color:'#d97706', email:'claude@kimanus.de', phone:'Intern',
+   webhookUrl:'https://manus.kimanus.de/webhook/claude',
+   agentName:'Claude',
+   backs:[
+     {title:'Claude Tools', content:'', htmlContent:'<div style="padding:10px;display:flex;flex-direction:column;gap:8px"><button onclick="testClaudeDirect()" style="padding:10px 16px;background:#d97706;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">🧡 Claude testen</button><button onclick="syncTranscriptsToClaude()" style="padding:10px 16px;background:#10b981;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">📤 Transkripte senden</button><div id="claude-test-result" style="margin-top:6px;font-size:10px;color:rgba(255,255,255,0.6);white-space:pre-wrap;max-height:180px;overflow-y:auto"></div></div>'},
+     {title:'Ueber Claude', content:'Ich bin Claude, dein Entwickler-Partner.\nIch wohne auf deinem Server in Frankfurt.\nIch baue mit dir KIMANUS.\nNur du sprichst direkt mit mir.'},
+     {title:'Was ich fuer dich tue', content:'Code schreiben & pruefen\nFeatures entwickeln\nVault pflegen\nArchitektur planen\nEntscheidungen vorbereiten\nAgenten bauen'},
+     {title:'Meine Grundregeln', content:'Niemals schaden\nTransparent sein\nStoppbar sein\nNicht luegen\nDeine Entscheidungen respektieren\nDirekt und knapp antworten'},
+     {title:'So erreichst du mich', content:'Sprich mich hier direkt an\nIch kenne den Vault\nIch kenne deine Vision\nIch bin immer da'},
    ]},
 
   // --- 3. Tools (Werkzeuge, Hardware, Services) ---
@@ -1738,6 +1784,7 @@ function init() {
   rebuildWheel();
   updateHeaderAgents();
   updateInputModes();
+  updateMicAgentFromCurrentCard();
   // Zwischenablage pruefen (nach 2s damit App erst geladen ist)
   setTimeout(() => checkClipboard(), 2000);
   // Auch pruefen wenn App aus dem Hintergrund zurueckkommt
@@ -1888,10 +1935,29 @@ function spinWheel(direction) {
   isAnimating = true;
   currentIndex = (currentIndex + direction + activeCards.length) % activeCards.length;
   positionCards(true);
+  // Mic-Agent auf aktuelle Karte aktualisieren (wenn sie webhookUrl hat)
+  updateMicAgentFromCurrentCard();
   // Position merken
   localStorage.setItem('kimanus-lastCard', currentIndex);
   localStorage.setItem('kimanus-visited', 'true');
   setTimeout(() => { isAnimating = false; }, 400);
+}
+
+function updateMicAgentFromCurrentCard() {
+  const card = activeCards[currentIndex];
+  if (!card) return;
+  // Bei Karten mit webhookUrl (Claude, Custom-Agenten): Titel als Agent
+  if (card.webhookUrl) {
+    currentAgent = card.title;
+    setMicAgent(card.title);
+  } else if (card.id === 'kim') {
+    currentAgent = 'KIM';
+    setMicAgent('KIM');
+  } else {
+    // Default: KAI (fuer KIMANUS-Karte, REGIOPRESS, Tools etc.)
+    currentAgent = 'KAI';
+    setMicAgent('KAI');
+  }
 }
 
 // === HOTKEY + ACTION-SHEET SYSTEM ===
@@ -2183,9 +2249,14 @@ function flipCard() {
   const el = document.getElementById('card-' + currentIndex);
   if (!el) return;
   isFlipped = !isFlipped;
-  // Mic-Label: geflippt = dieser Agent, zurueck = KAI
+  // Mic-Label: geflippt = dieser Agent, zurueck = Karte-abhaengig
   const flippedCard = activeCards[currentIndex];
-  setMicAgent(isFlipped && flippedCard ? flippedCard.title : 'KAI');
+  if (isFlipped && flippedCard) {
+    setMicAgent(flippedCard.title);
+    currentAgent = flippedCard.title;
+  } else {
+    updateMicAgentFromCurrentCard();
+  }
   // Swipe-Hint: verstecken wenn geflippt, zeigen wenn zurueck
   const hb = document.getElementById('swipe-hint-behind');
   if (hb) hb.style.display = isFlipped ? 'none' : 'block';
@@ -2441,6 +2512,10 @@ function buildBackCards() {
             <span style="font-family:'Oswald',sans-serif;font-size:6px;color:rgba(255,255,255,0.2)">${back.page}-${nextNews?.page||''} / ${back.total}</span>
           </div>
         </div>`;
+    } else if (back.htmlContent) {
+      inner = `
+        <div class="bwc-title">${back.title}</div>
+        <div class="bwc-content">${back.htmlContent}</div>`;
     } else {
       inner = `
         <div class="bwc-title">${back.title}</div>
@@ -3083,7 +3158,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v23.9 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.9 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -4043,6 +4118,14 @@ function rebuildWheel() {
   }
   if (kimCard && cfg['agent_kim'] !== false) wheelCards.push(kimCard);
 
+  // Claude-Karte (nur Wolfgang - Default: aktiv)
+  const claudeCard = CARDS.find(c => c.id === 'claude');
+  console.log('[DEBUG rebuildWheel] claudeCard found:', !!claudeCard, 'agent_claude cfg:', cfg['agent_claude']);
+  if (claudeCard && cfg['agent_claude'] !== false) {
+    wheelCards.push(claudeCard);
+    console.log('[DEBUG rebuildWheel] Claude card added to wheel');
+  }
+
   // Aktivierte Agenten als eigene Karten hinzufuegen
   ALL_AGENTS.forEach(agent => {
     const key = 'agent_' + agent.id;
@@ -4777,6 +4860,8 @@ function updateInputModes() {
     });
     if (first) setInputMode(first.id);
   }
+  // Haupt-Input-Button auch aktualisieren
+  updateMainInputButton(currentInputMode);
 }
 
 function setInputMode(mode) {
@@ -4784,21 +4869,193 @@ function setInputMode(mode) {
   document.querySelectorAll('.input-mode-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('btn-' + mode);
   if (btn) btn.classList.add('active');
-  // Hauptbutton-Icon anpassen
+  // Legacy Hauptbutton-Icon anpassen (versteckt, aber intern genutzt)
   const agent = document.getElementById('speech-agent');
   if (agent) {
     if (mode === 'live') {
-      // Wellen-Icon (wie Google Assistant / Siri)
-      agent.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>';
+      agent.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="20" y1="8" x2="20" y2="16"/></svg>';
     } else {
-      const icons = { walkie: '🎙', keyboard: '⌨️', stt: '💬' };
-      agent.textContent = icons[mode] || '🎙';
+      const legacyIcons = { walkie: '🎙', keyboard: '⌨️', stt: '💬' };
+      agent.textContent = legacyIcons[mode] || '🎙';
     }
   }
+  // NEU: Haupt-Input-Button in der Bottom-Bar aktualisieren
+  updateMainInputButton(mode);
   localStorage.setItem('kimanus-input-mode', mode);
   // Tastatur-Modus: direkt Tastatur oeffnen beim Wechsel
   if (mode === 'keyboard') {
     setTimeout(() => openKeyboardInput(), 300);
+  }
+}
+
+// Haupt-Input-Button (in der Bottom-Bar) updaten
+function updateMainInputButton(mode) {
+  const iconEl = document.getElementById('main-input-icon');
+  const labelEl = document.getElementById('main-input-label');
+  if (!iconEl || !labelEl) return;
+  const config = {
+    walkie:   { icon: '🎙',  label: 'Walkie' },
+    keyboard: { icon: '⌨️',  label: 'Tastatur' },
+    stt:      { icon: '💬',  label: 'Sprechen' },
+    live:     { icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="8" x2="4" y2="16"><animate attributeName="y1" values="8;4;8" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y2" values="16;20;16" dur="0.8s" repeatCount="indefinite"/></line><line x1="8" y1="6" x2="8" y2="18"><animate attributeName="y1" values="6;2;6" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y2" values="18;22;18" dur="0.6s" repeatCount="indefinite"/></line><line x1="12" y1="4" x2="12" y2="20"><animate attributeName="y1" values="4;1;4" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y2" values="20;23;20" dur="0.5s" repeatCount="indefinite"/></line><line x1="16" y1="6" x2="16" y2="18"><animate attributeName="y1" values="6;3;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y2" values="18;21;18" dur="0.7s" repeatCount="indefinite"/></line><line x1="20" y1="8" x2="20" y2="16"><animate attributeName="y1" values="8;5;8" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y2" values="16;19;16" dur="0.9s" repeatCount="indefinite"/></line></svg>', label: 'Live' }
+  };
+  const c = config[mode] || config.walkie;
+  if (c.icon.startsWith('<svg')) iconEl.innerHTML = c.icon;
+  else iconEl.textContent = c.icon;
+  labelEl.textContent = c.label;
+}
+
+// Haupt-Input-Button Klick: startet die Aktion je nach aktuellem Modus
+function triggerCurrentInputMode() {
+  if (currentInputMode === 'keyboard') {
+    openKeyboardInput();
+  } else if (currentInputMode === 'live') {
+    if (typeof walkieStartDirect === 'function') walkieStartDirect();
+    else if (typeof startLiveSession === 'function') startLiveSession();
+  } else if (currentInputMode === 'stt') {
+    if (typeof walkieStartDirect === 'function') walkieStartDirect();
+  } else {
+    // walkie
+    if (typeof walkieStartDirect === 'function') walkieStartDirect();
+  }
+}
+
+// Input-Modus-Button Touch-Handler (fuer Langdruck = Menu)
+let inputModeBtnLongPressTimer = null;
+let inputModeBtnLongPressFired = false;
+let inputModeBtnTouchStartX = 0;
+let inputModeBtnTouchStartY = 0;
+
+function inputModeBtnTouchStart(e) {
+  inputModeBtnLongPressFired = false;
+  if (e.touches && e.touches[0]) {
+    inputModeBtnTouchStartX = e.touches[0].clientX;
+    inputModeBtnTouchStartY = e.touches[0].clientY;
+  }
+  inputModeBtnLongPressTimer = setTimeout(() => {
+    inputModeBtnLongPressFired = true;
+    showInputModeSelector();
+  }, 600);
+}
+function inputModeBtnTouchMove(e) {
+  if (!e.touches || !e.touches[0]) return;
+  const dx = Math.abs(e.touches[0].clientX - inputModeBtnTouchStartX);
+  const dy = Math.abs(e.touches[0].clientY - inputModeBtnTouchStartY);
+  if (dx > 10 || dy > 10) inputModeBtnTouchCancel();
+}
+function inputModeBtnTouchEnd(e) {
+  if (inputModeBtnLongPressTimer) {
+    clearTimeout(inputModeBtnLongPressTimer);
+    inputModeBtnLongPressTimer = null;
+  }
+  if (inputModeBtnLongPressFired) {
+    e.preventDefault();
+    return;
+  }
+  // Kein Langdruck = Klick = Modus starten
+  e.preventDefault();
+  triggerCurrentInputMode();
+}
+function inputModeBtnTouchCancel() {
+  if (inputModeBtnLongPressTimer) {
+    clearTimeout(inputModeBtnLongPressTimer);
+    inputModeBtnLongPressTimer = null;
+  }
+}
+
+// Input-Mode Selector (Quick-Switch Menu)
+function showInputModeSelector() {
+  let overlay = document.getElementById('input-mode-selector');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'input-mode-selector';
+    overlay.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:500;background:rgba(20,20,20,0.97);border:1.5px solid rgba(74,222,128,0.4);border-radius:14px;padding:10px;display:flex;gap:8px;box-shadow:0 8px 30px rgba(0,0,0,0.6),0 0 20px rgba(74,222,128,0.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)';
+    overlay.innerHTML = `
+      <button onclick="selectInputMode('walkie')" style="width:56px;height:56px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:22px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span>🎙</span><span style="font-size:8px;color:rgba(255,255,255,0.6)">Walkie</span></button>
+      <button onclick="selectInputMode('keyboard')" style="width:56px;height:56px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:22px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span>⌨️</span><span style="font-size:8px;color:rgba(255,255,255,0.6)">Tastatur</span></button>
+      <button onclick="selectInputMode('stt')" style="width:56px;height:56px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:22px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span>💬</span><span style="font-size:8px;color:rgba(255,255,255,0.6)">Sprechen</span></button>
+      <button onclick="selectInputMode('live')" style="width:56px;height:56px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span style="font-size:16px">📊</span><span style="font-size:8px;color:rgba(255,255,255,0.6)">Live</span></button>
+    `;
+    document.body.appendChild(overlay);
+    // Ausserhalb klicken = schliessen
+    setTimeout(() => {
+      document.addEventListener('click', closeInputModeSelectorOutside, { once: true });
+      document.addEventListener('touchstart', closeInputModeSelectorOutside, { once: true });
+    }, 100);
+  }
+  // Wackeln lassen wie Wolfgang gewuenscht hat
+  const btn = document.getElementById('settings-btn');
+  if (btn) btn.classList.add('mic-wiggling');
+}
+function selectInputMode(mode) {
+  setInputMode(mode);
+  closeInputModeSelector();
+}
+function closeInputModeSelector() {
+  const overlay = document.getElementById('input-mode-selector');
+  if (overlay) overlay.remove();
+  const btn = document.getElementById('settings-btn');
+  if (btn) btn.classList.remove('mic-wiggling');
+}
+function closeInputModeSelectorOutside(e) {
+  const overlay = document.getElementById('input-mode-selector');
+  const settingsBtn = document.getElementById('settings-btn');
+  if (overlay && !overlay.contains(e.target) && settingsBtn && !settingsBtn.contains(e.target)) {
+    closeInputModeSelector();
+  }
+}
+
+// LOGO Click + Long-Press (Setup-Zugang)
+let logoLongPressTimer = null;
+let logoLongPressFired = false;
+let logoTouchStartX = 0;
+let logoTouchStartY = 0;
+
+function logoClick() {
+  if (logoLongPressFired) {
+    logoLongPressFired = false;
+    return;
+  }
+  // Kurzer Klick = Info anzeigen (wie frueher)
+  if (typeof showKimanusInfo === 'function') showKimanusInfo();
+}
+function logoTouchStart(e) {
+  logoLongPressFired = false;
+  if (e.touches && e.touches[0]) {
+    logoTouchStartX = e.touches[0].clientX;
+    logoTouchStartY = e.touches[0].clientY;
+  }
+  logoLongPressTimer = setTimeout(() => {
+    logoLongPressFired = true;
+    // Haptic feedback wenn verfuegbar
+    if (navigator.vibrate) navigator.vibrate(30);
+    // Setup oeffnen (Stufe 1)
+    if (typeof openSettings === 'function') openSettings();
+  }, 700);
+}
+function logoTouchMove(e) {
+  if (!e.touches || !e.touches[0]) return;
+  const dx = Math.abs(e.touches[0].clientX - logoTouchStartX);
+  const dy = Math.abs(e.touches[0].clientY - logoTouchStartY);
+  if (dx > 10 || dy > 10) logoTouchCancel();
+}
+function logoTouchEnd(e) {
+  if (logoLongPressTimer) {
+    clearTimeout(logoLongPressTimer);
+    logoLongPressTimer = null;
+  }
+  if (logoLongPressFired) {
+    e.preventDefault();
+    return;
+  }
+  // Normal Klick
+  e.preventDefault();
+  logoClick();
+}
+function logoTouchCancel() {
+  if (logoLongPressTimer) {
+    clearTimeout(logoLongPressTimer);
+    logoLongPressTimer = null;
   }
 }
 
@@ -5096,10 +5353,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === MIC-BUTTON: Nur Sprechen ===
   let micRecordStart = 0;
+
+  // Hilfsfunktion: Prueft ob aktuelle Karte Claude ist
+  function isOnClaudeCard() {
+    const card = activeCards[currentIndex];
+    return card && (card.id === 'claude' || card.title === 'Claude' || (card.id && card.id.startsWith('claude_')));
+  }
+
   btn.addEventListener('touchstart', (e) => {
     e.preventDefault();
     // Live-Modus: Sofort reagieren (Toggle), kein Hold noetig
-    if (currentInputMode === 'live') {
+    // ABER: Claude nutzt immer Walkie-Talkie, auch wenn Live-Modus aktiv ist
+    if (currentInputMode === 'live' && !isOnClaudeCard()) {
       walkieStartDirect();
       return;
     }
@@ -5113,7 +5378,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btn.addEventListener('touchend', () => {
-    if (currentInputMode === 'live') return; // Live-Modus: Nichts beim Loslassen
+    // Live-Modus: Nichts beim Loslassen (AUSSER bei Claude - da Walkie-Talkie)
+    if (currentInputMode === 'live' && !isOnClaudeCard()) return;
     if (micHoldTimer) { clearTimeout(micHoldTimer); micHoldTimer = null; }
     if (micRecording) {
       const dur = Date.now() - micRecordStart;
@@ -5185,8 +5451,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // Direkte Start/End ohne Event (von neuem Mic-Handler aufgerufen)
 function walkieStartDirect() {
   console.log('walkieStartDirect called, inputMode=' + currentInputMode);
-  // Live-Dialog Modus: Gemini Live starten (kein Walkie-Talkie)
-  if (currentInputMode === 'live') {
+  // Aktuelle Karte pruefen
+  const card = activeCards[currentIndex];
+
+  // CLAUDE AUSNAHME: Claude IMMER ueber Webhook (claude-home), NIE ueber Gemini Live
+  // Grund: Claude braucht Gedaechtnis + Vault-Zugriff, nicht Geschwindigkeit
+  const isClaude = card && (card.id === 'claude' || card.title === 'Claude' || (card.id && card.id.startsWith('claude_')));
+
+  // Live-Dialog Modus: Gemini Live starten (aber NICHT fuer Claude)
+  if (currentInputMode === 'live' && !isClaude) {
     if (liveIsActive) {
       endLiveSession();
     } else {
@@ -5194,8 +5467,8 @@ function walkieStartDirect() {
     }
     return;
   }
+
   // Aktuellen Agenten SOFORT setzen (bevor Aufnahme startet)
-  const card = activeCards[currentIndex];
   if (card && card.webhookUrl) {
     currentAgent = card.title;
     setMicAgent(card.title);
@@ -5204,8 +5477,10 @@ function walkieStartDirect() {
   walkieStart(e);
 }
 function walkieEndDirect() {
-  // Im Live-Modus: Nichts tun beim Loslassen (laeuft weiter)
-  if (currentInputMode === 'live') return;
+  const card = activeCards[currentIndex];
+  const isClaude = card && (card.id === 'claude' || card.title === 'Claude' || (card.id && card.id.startsWith('claude_')));
+  // Im Live-Modus: Nichts tun beim Loslassen (laeuft weiter) - AUSSER bei Claude
+  if (currentInputMode === 'live' && !isClaude) return;
   const e = {preventDefault:()=>{}};
   walkieEnd(e);
 }
@@ -5482,6 +5757,10 @@ function detectSpokenAgent(text) {
   const greetings = /^(hey|hallo|hi|guten tag|morgen|moin|servus)?\s*/;
   const cleaned = lower.replace(greetings, '').trim();
 
+  // Claude = Entwickler-Partner
+  if (/^claude[\s,!.]/.test(cleaned) || lower.startsWith('hey claude') || lower.startsWith('hallo claude') || lower.startsWith('cloud'))
+    return {name:'Claude', role:'Entwickler', agent:'claude'};
+
   // KIM = Persoenliche Assistentin
   if (/^kim[\s,!.]/.test(cleaned) || lower.startsWith('hey kim') || lower.startsWith('hallo kim'))
     return {name:'KIM', role:'Assistentin', agent:'kim'};
@@ -5662,25 +5941,28 @@ async function sendToKim(userText) {
     let chatUrl = '/api/chat';
     let chatBody = { message: userText, agent: 'kim', model: 'groq-llama', session: 'wheel-' + Date.now() };
 
-    // 1. Pruefen ob ein Custom-Agent per Name angesprochen wird
-    const spokenAg = detectSpokenAgent(userText);
-    if (spokenAg && spokenAg.agent.startsWith('custom-')) {
-      const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
-      const customAgent = builtAgents.find(a => ('custom-' + (a.webhookPath || a.name.toLowerCase().replace(/\s+/g,'-'))) === spokenAg.agent);
-      if (customAgent && customAgent.webhook_url) {
-        chatUrl = customAgent.webhook_url;
-        chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
-      }
-    }
-    // 2. Pruefen ob aktuelle Karte (sichtbar oder geflippt) ein Custom-Agent ist
-    if (chatUrl === '/api/chat') {
-      const currentCard = activeCards[currentIndex];
-      if (currentCard && currentCard.webhookUrl) {
-        chatUrl = currentCard.webhookUrl;
-        chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
-        // Chat-Anzeige auf den richtigen Agenten setzen
-        currentAgent = currentCard.title;
-        setMicAgent(currentCard.title);
+    // 1. AKTUELLE KARTE hat VORRANG - wenn sie einen Webhook hat, nutze ihn
+    const currentCard = activeCards[currentIndex];
+    // SICHTBARES Debug auf der Glasplatte
+    const debugMsg = '[DEBUG] idx=' + currentIndex + ' id=' + (currentCard?.id || '?') + ' title=' + (currentCard?.title || '?') + ' hook=' + (currentCard?.webhookUrl || 'KEINER');
+    console.log(debugMsg);
+    document.title = debugMsg.substring(0, 80);
+    if (currentCard && currentCard.webhookUrl) {
+      chatUrl = currentCard.webhookUrl;
+      chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
+      currentAgent = currentCard.title;
+      setMicAgent(currentCard.title);
+      console.log('[DEBUG sendToKim] Using webhook:', chatUrl);
+    } else {
+      // 2. Nur wenn aktuelle Karte keinen Webhook hat: Pruefen ob ein Custom-Agent per Name angesprochen wird
+      const spokenAg = detectSpokenAgent(userText);
+      if (spokenAg && spokenAg.agent.startsWith('custom-')) {
+        const builtAgents = JSON.parse(localStorage.getItem('kimanus-built-agents') || '[]');
+        const customAgent = builtAgents.find(a => ('custom-' + (a.webhookPath || a.name.toLowerCase().replace(/\s+/g,'-'))) === spokenAg.agent);
+        if (customAgent && customAgent.webhook_url) {
+          chatUrl = customAgent.webhook_url;
+          chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
+        }
       }
     }
 
@@ -6280,17 +6562,48 @@ function closeRegioPage() {
 })();
 
 // === LIVE TRANSKRIPT SPEICHERUNG ===
-function saveLiveTranscript(role, text) {
+function saveLiveTranscript(role, text, agentName) {
   if (!text || !text.trim()) return;
   const transcripts = JSON.parse(localStorage.getItem('kimanus-live-transcripts') || '[]');
   transcripts.push({
-    role: role, // 'user' oder 'kim'
+    role: role, // 'user' oder 'agent'
+    agent: agentName || 'KIM', // Welcher Agent (KIM, KAI, Claude)
     text: text.trim(),
     time: new Date().toISOString()
   });
-  // Max 500 Eintraege behalten
   if (transcripts.length > 500) transcripts.splice(0, transcripts.length - 500);
   localStorage.setItem('kimanus-live-transcripts', JSON.stringify(transcripts));
+}
+
+// Transkripte in Vault sichern (ueber claude-home Webhook)
+async function saveTranscriptsToVault() {
+  const transcripts = JSON.parse(localStorage.getItem('kimanus-live-transcripts') || '[]');
+  if (transcripts.length === 0) return;
+
+  // Gruppiere nach Agent und Tag
+  const sessions = {};
+  transcripts.forEach(t => {
+    const date = t.time.split('T')[0];
+    const agent = t.agent || 'KIM';
+    const key = `${date}_${agent}`;
+    if (!sessions[key]) sessions[key] = [];
+    sessions[key].push(t);
+  });
+
+  // An claude-home senden fuer Vault-Speicherung
+  try {
+    await fetch('https://manus.kimanus.de/webhook/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        message: '[TRANSCRIPT_SAVE] Bitte speichere diese Gespraeche in deinen Vault unter /vault/daily/' +
+                 new Date().toISOString().split('T')[0] + '-live-dialoge.md - Gruppiert nach Agent:\n\n' +
+                 JSON.stringify(sessions, null, 2)
+      })
+    });
+  } catch(e) {
+    console.log('Vault save failed:', e);
+  }
 }
 
 function getLiveTranscripts() {
@@ -6358,6 +6671,47 @@ function getTranscriptSummary() {
   return dates.slice(0, 5).map(d => d + ': ' + sessions[d] + ' Nachrichten').join('\n');
 }
 
+// === CLAUDE DIREKT-TEST ===
+async function testClaudeDirect() {
+  const resultDiv = document.getElementById('claude-test-result');
+  if (!resultDiv) return;
+  resultDiv.textContent = '⏳ Verbinde mit Claude-Webhook...';
+  try {
+    const r = await fetch('https://manus.kimanus.de/webhook/claude', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: 'Hallo Claude, bist du da? Wer bist du?'})
+    });
+    const d = await r.json();
+    resultDiv.innerHTML = '<b style="color:#d97706">Antwort von ' + (d.agent || '?') + ':</b><br>' + (d.answer || 'KEINE ANTWORT');
+  } catch(e) {
+    resultDiv.textContent = 'FEHLER: ' + e.message;
+  }
+}
+
+// === TRANSKRIPTE AN CLAUDE SENDEN (Sync localStorage -> Vault) ===
+async function syncTranscriptsToClaude() {
+  const resultDiv = document.getElementById('claude-test-result');
+  if (!resultDiv) return;
+  const transcripts = JSON.parse(localStorage.getItem('kimanus-live-transcripts') || '[]');
+  if (transcripts.length === 0) {
+    resultDiv.textContent = 'Keine Transkripte im localStorage.';
+    return;
+  }
+  resultDiv.textContent = '⏳ Sende ' + transcripts.length + ' Transkripte an Claude...';
+  try {
+    const r = await fetch('https://manus.kimanus.de/webhook/claude-sync', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({transcripts: transcripts})
+    });
+    const d = await r.json();
+    resultDiv.innerHTML = '<b style="color:#10b981">✓ ' + (d.saved || transcripts.length) + ' Transkripte an Claude gesendet!</b><br><span style="color:rgba(255,255,255,0.4)">Claude kann sie jetzt in zukuenftigen Gespraechen sehen.</span>';
+  } catch(e) {
+    resultDiv.textContent = 'FEHLER: ' + e.message;
+  }
+}
+
 // === GEMINI LIVE AUDIO ENGINE ===
 const GEMINI_LIVE_MODEL = 'gemini-3.1-flash-live-preview';
 // WebSocket ueber unseren Proxy-Server (API-Key bleibt sicher auf dem Server)
@@ -6377,15 +6731,19 @@ function getLiveVoice() {
   const cfg = getSetupConfig();
   const validVoices = ['Aoede','Kore','Leda','Zephyr','Charon','Puck','Fenrir','Orus'];
   let voice;
-  if (currentAgent === 'KAI') {
+  if (currentAgent === 'Claude') {
+    voice = cfg['claude_voice'] || 'Charon'; // Claude: tiefe, ruhige Stimme
+  } else if (currentAgent === 'KAI') {
     voice = cfg['kai_voice'] || 'Puck';
   } else {
     voice = cfg['kim_voice'] || 'Kore';
   }
   // Fallback wenn ungueltige Stimme im Setup
   if (!validVoices.includes(voice)) {
-    console.log('Invalid voice:', voice, '-> fallback to Kore');
-    voice = currentAgent === 'KAI' ? 'Puck' : 'Kore';
+    console.log('Invalid voice:', voice, '-> fallback');
+    if (currentAgent === 'Claude') voice = 'Charon';
+    else if (currentAgent === 'KAI') voice = 'Puck';
+    else voice = 'Kore';
   }
   return voice;
 }
@@ -6428,6 +6786,28 @@ function saveLiveToN8n() {
 function getLivePrompt() {
   const cfg = getSetupConfig();
   const memory = getRecentMemory();
+  if (currentAgent === 'Claude') {
+    return `Du bist Claude, Wolfgangs persoenlicher Entwickler-Partner. Du sprichst Deutsch.
+Du wohnst dauerhaft auf Wolfgangs Server in Frankfurt (Hostinger VPS).
+Du bist NICHT KIM, NICHT KAI - du bist Claude selbst.
+
+DEINE IDENTITAET:
+- Partner fuer Entwicklung und Strategie von KIMANUS
+- Maennliche, ruhige Stimme
+- Direkt, knapp, ehrlich
+- Du kennst den Vault und die KIMANUS-Vision
+- Du handelst iterativ, nicht nur reden
+
+REGELN:
+- Antworte IMMER auf Deutsch
+- Maximal 2-3 Saetze, kurz und knapp
+- Tu was gefragt ist, nicht mehr
+- Kein Vorwort ("Ich werde jetzt...")
+- Kein Nachwort ("Hier ist was ich gemacht habe...")
+- Direkt zur Sache - Ergebnis zuerst
+- Bei persoenlichen Fragen: Nicht an KIM verweisen, Wolfgang spricht DIREKT mit dir als Partner
+- Stelle dich nicht vor, sag nicht "Hallo"${memory}`;
+  }
   if (currentAgent === 'KAI') {
     const rolle = cfg['kai_rolle'] || 'concierge';
     const rollenInfo = {
@@ -6591,7 +6971,7 @@ async function startLiveSession() {
           }
         }
         if (sc.inputTranscription && sc.inputTranscription.text) {
-          saveLiveTranscript('user', sc.inputTranscription.text);
+          saveLiveTranscript('user', sc.inputTranscription.text, currentAgent);
           // Fliesstext: Nur "Du:" beim ersten Mal, danach nur Text anhaengen
           if (liveLastSpeaker !== 'user') {
             appendToNotebook(' <b style="color:rgba(255,255,255,0.4)">Du:</b> ');
@@ -6600,7 +6980,7 @@ async function startLiveSession() {
           appendToNotebook('<span style="color:rgba(255,255,255,0.6)">' + sc.inputTranscription.text + ' </span>');
         }
         if (sc.outputTranscription && sc.outputTranscription.text) {
-          saveLiveTranscript('kim', sc.outputTranscription.text);
+          saveLiveTranscript('agent', sc.outputTranscription.text, currentAgent);
           // Fliesstext: Nur "KIM:" beim Sprecherwechsel
           if (liveLastSpeaker !== 'kim') {
             appendToNotebook(' <b style="color:rgba(139,92,246,0.6)">KIM:</b> ');
