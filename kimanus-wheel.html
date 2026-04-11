@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v24.14 - Tastatur visualViewport-fix, Swipe Cool-down 800ms gegen versehentliches Live -->
+<!-- KIMANUS Wheel v24.15 - Vollbild-Tastatur-Modal (loest Wheel-Verschiebung auf iOS endgueltig) -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -579,34 +579,87 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
   position:relative;
   transition:opacity 0.2s, transform 0.25s;
 }
-/* Wenn Tastatur offen: body wird fixiert damit Safari das Layout nicht hochschiebt */
-/* Der JS setzt body.style.top dynamisch auf die Scroll-Position (als negative Zahl) */
-body.keyboard-open{
-  position:fixed;
-  left:0;right:0;
-  width:100%;
-  overflow:hidden;
-}
-/* Wheel bleibt an seiner Position, die Tastatur legt sich darueber */
-body.keyboard-open #wheel-container{
-  /* keine Transformation - Rad bleibt wo es ist */
-}
-body.keyboard-open #bottom-bar{
-  opacity:0;
-  transform:translateY(100%);
-  pointer-events:none;
-}
-body.keyboard-open #input-mode-selector{
-  display:none !important;
-}
-/* Abdunkelndes Overlay ueber dem Rad wenn Tastatur offen (Fokus auf Eingabe) */
-body.keyboard-open::before{
-  content:"";
+/* === VOLLBILD-TASTATUR-MODAL (loest iOS-Problem mit Wheel-Verschiebung) === */
+#kb-fullscreen-modal{
   position:fixed;inset:0;
-  background:rgba(0,0,0,0.4);
-  z-index:150;
-  pointer-events:none;
+  z-index:10000;
+  background:linear-gradient(180deg, rgba(12,12,14,0.98) 0%, rgba(18,18,22,0.99) 100%);
+  display:none;
+  flex-direction:column;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  animation:kbModalFadeIn 0.2s ease-out;
 }
+#kb-fullscreen-modal.open{display:flex}
+@keyframes kbModalFadeIn{
+  0%{opacity:0;transform:translateY(8px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+#kb-modal-header{
+  display:flex;align-items:center;gap:12px;
+  padding:calc(env(safe-area-inset-top,0) + 16px) 16px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  flex-shrink:0;
+}
+#kb-modal-close{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);
+  color:#fff;font-size:18px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+#kb-modal-close:active{transform:scale(0.92)}
+#kb-modal-title{
+  flex:1;color:rgba(255,255,255,0.7);
+  font-size:14px;font-weight:500;
+}
+#kb-modal-title #kb-modal-agent{
+  color:#4ade80;font-weight:700;letter-spacing:1px;
+}
+#kb-modal-body{
+  flex:1;
+  padding:16px;
+  overflow:hidden;
+  display:flex;
+}
+#kb-modal-textarea{
+  width:100%;
+  flex:1;
+  background:rgba(255,255,255,0.04);
+  border:1.5px solid rgba(74,222,128,0.35);
+  border-radius:14px;
+  color:#fff;
+  font-size:17px;
+  line-height:1.5;
+  padding:16px 18px;
+  outline:none;
+  resize:none;
+  font-family:inherit;
+  -webkit-appearance:none;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.3);
+}
+#kb-modal-textarea::placeholder{color:rgba(255,255,255,0.3)}
+#kb-modal-textarea:focus{
+  border-color:rgba(74,222,128,0.6);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.3), 0 0 0 3px rgba(74,222,128,0.15);
+}
+#kb-modal-footer{
+  padding:12px 16px calc(env(safe-area-inset-bottom,0) + 12px);
+  border-top:1px solid rgba(255,255,255,0.08);
+  display:flex;justify-content:flex-end;
+  flex-shrink:0;
+}
+#kb-modal-send{
+  padding:13px 26px;
+  background:linear-gradient(180deg, rgba(74,222,128,0.9), rgba(34,197,94,0.85));
+  border:1px solid rgba(74,222,128,0.6);
+  border-radius:12px;
+  color:#fff;font-size:15px;font-weight:700;letter-spacing:0.5px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 3px 12px rgba(34,197,94,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+#kb-modal-send:active{transform:scale(0.96)}
 /* Settings-Button + Hotkey-Slots: Wrapper mit Label darunter */
 .bar-item{
   flex:1;
@@ -966,7 +1019,7 @@ body.keyboard-open::before{
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.14</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.15</span>
       </div>
     </div>
     <!-- Hamburger-Menu (ersetzt Clipboard + Refresh + Logo-Langdruck als Setup-Zugang) -->
@@ -3205,7 +3258,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.14 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v24.15 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -5210,79 +5263,76 @@ function closeHamburgerOutside(e) {
   }
 }
 
-// Scroll-Position merken, wenn Tastatur oeffnet/schliesst
-let keyboardSavedScrollY = 0;
-
+// Vollbild-Tastatur-Modal (statt native Tastatur-Input im Hintergrund)
+// Loest das iOS-Problem dass das Wheel mit der Tastatur verschoben wird
 function openKeyboardInput() {
-  // Aktuelle Scroll-Position merken
-  keyboardSavedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-  // Body-Klasse setzen: versteckt Bottom-Bar + andere Elemente die beim Hochfahren stoeren
-  document.body.classList.add('keyboard-open');
-  // Body fixieren auf aktueller Position damit Safari nicht scrollt
-  document.body.style.top = (-keyboardSavedScrollY) + 'px';
-  // Erzeuge oder fokussiere ein verstecktes Eingabefeld
-  let inp = document.getElementById('kb-hidden-input');
-  if (!inp) {
-    inp = document.createElement('input');
-    inp.id = 'kb-hidden-input';
-    inp.type = 'text';
-    inp.placeholder = 'Nachricht an KIM...';
-    inp.autocomplete = 'off';
-    inp.autocapitalize = 'sentences';
-    inp.style.cssText = 'position:fixed;left:16px;right:16px;bottom:8px;z-index:10000;padding:14px 18px;border-radius:14px;border:1.5px solid rgba(74,222,128,0.45);background:rgba(15,15,15,0.98);color:#fff;font-size:16px;outline:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -8px 30px rgba(0,0,0,0.65),0 0 20px rgba(74,222,128,0.15);transform:translateY(0);transition:bottom 0.15s';
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && inp.value.trim()) {
-        const text = inp.value.trim();
-        inp.value = '';
-        closeKeyboardInput();
-        // Nachricht an KIM senden (gleicher Weg wie Sprache)
-        if (typeof sendToAgent === 'function') sendToAgent(text);
-        else if (typeof sendChatMessage === 'function') sendChatMessage(text);
+  let modal = document.getElementById('kb-fullscreen-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'kb-fullscreen-modal';
+    modal.innerHTML = `
+      <div id="kb-modal-header">
+        <button id="kb-modal-close" type="button" aria-label="Schliessen">✕</button>
+        <div id="kb-modal-title">Nachricht an <span id="kb-modal-agent">KAI</span></div>
+      </div>
+      <div id="kb-modal-body">
+        <textarea id="kb-modal-textarea" placeholder="Tippe deine Nachricht..." autocomplete="off" autocapitalize="sentences"></textarea>
+      </div>
+      <div id="kb-modal-footer">
+        <button id="kb-modal-send" type="button">Senden ➤</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    // Event Listeners
+    document.getElementById('kb-modal-close').addEventListener('click', closeKeyboardInput);
+    document.getElementById('kb-modal-close').addEventListener('touchend', (e) => { e.preventDefault(); closeKeyboardInput(); });
+    document.getElementById('kb-modal-send').addEventListener('click', submitKeyboardInput);
+    document.getElementById('kb-modal-send').addEventListener('touchend', (e) => { e.preventDefault(); submitKeyboardInput(); });
+    const ta = document.getElementById('kb-modal-textarea');
+    ta.addEventListener('keydown', (e) => {
+      // Enter sendet, Shift+Enter = neue Zeile
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitKeyboardInput();
       }
     });
-    inp.addEventListener('blur', () => {
-      setTimeout(() => closeKeyboardInput(), 150);
-    });
-    document.body.appendChild(inp);
   }
-  inp.style.display = 'block';
-  // Fokus mit kurzem Delay damit body-fix angewendet wird
+  // Aktuellen Agenten im Header anzeigen
+  const agentEl = document.getElementById('kb-modal-agent');
+  if (agentEl) agentEl.textContent = (typeof currentAgent !== 'undefined' ? currentAgent : 'KAI') || 'KAI';
+  // Modal oeffnen mit Fade-In
+  modal.classList.add('open');
+  // Textarea fokussieren (triggert Tastatur)
   setTimeout(() => {
-    inp.focus();
-    // Nach dem Fokus die Tastatur-Hoehe auslesen und Input entsprechend positionieren
-    updateKeyboardInputPosition();
-  }, 50);
+    const ta = document.getElementById('kb-modal-textarea');
+    if (ta) {
+      ta.value = '';
+      ta.focus();
+    }
+  }, 150);
 }
 
 function closeKeyboardInput() {
-  const inp = document.getElementById('kb-hidden-input');
-  if (inp) {
-    inp.blur();
-    inp.style.display = 'none';
-  }
-  document.body.classList.remove('keyboard-open');
-  document.body.style.top = '';
-  // Scroll-Position wiederherstellen
-  window.scrollTo(0, keyboardSavedScrollY);
+  const modal = document.getElementById('kb-fullscreen-modal');
+  if (!modal) return;
+  const ta = document.getElementById('kb-modal-textarea');
+  if (ta) ta.blur();
+  modal.classList.remove('open');
 }
 
-// Input-Feld Position updaten basierend auf visualViewport (iOS-Tastatur)
-function updateKeyboardInputPosition() {
-  const inp = document.getElementById('kb-hidden-input');
-  if (!inp || inp.style.display === 'none') return;
-  if (window.visualViewport) {
-    const vv = window.visualViewport;
-    // Abstand vom Fenster-Boden bis zum Tastatur-Oberkante
-    const bottomOffset = (window.innerHeight - vv.height - vv.offsetTop);
-    // Input-Feld direkt ueber der Tastatur positionieren
-    inp.style.bottom = Math.max(8, bottomOffset + 8) + 'px';
+function submitKeyboardInput() {
+  const ta = document.getElementById('kb-modal-textarea');
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (!text) {
+    closeKeyboardInput();
+    return;
   }
-}
-
-// Auf visualViewport-Aenderungen reagieren (Tastatur oeffnet/schliesst/Groesse aendert)
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', updateKeyboardInputPosition);
-  window.visualViewport.addEventListener('scroll', updateKeyboardInputPosition);
+  ta.value = '';
+  closeKeyboardInput();
+  // Nachricht an den aktuellen Agenten senden (gleicher Weg wie Sprache)
+  if (typeof sendToAgent === 'function') sendToAgent(text);
+  else if (typeof sendChatMessage === 'function') sendChatMessage(text);
 }
 
 // Beim Start gespeicherten Modus laden
