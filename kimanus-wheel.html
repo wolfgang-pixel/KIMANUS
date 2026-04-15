@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v24.16 - Chat-Dialog-Modal (WhatsApp-Style) mit Loeschen/Speichern -->
+<!-- KIMANUS Wheel v24.17 - Rollen-Klarstellung: KIMANUS=Chef, KAI=Empfang, KIM=persoenlich -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -1324,25 +1324,25 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
 <script>
 const CARDS = [
   // --- 1. KIMANUS (Projekt-Vorstellung, Flip = PowerPoint-Praesentation) ---
-  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
+  {id:'landing', icon:'🤝', title:'KIMANUS', subtitle:'Chef des Hauses - die helfende Hand', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
-     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
-     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
-     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Was ist KIMANUS?', content:'Drei Haende, eine Mission:\nMensch + KI + Universum.\nIch bin der Chef des Hauses -\ndie helfende Hand fuer alles.'},
+     {title:'So funktioniert es', content:'KAI empfaengt dich im Haus.\nKIM ist deine persoenliche Assistentin.\nSpezialisten arbeiten im Hintergrund.\nDu sprichst, wir kuemmern uns.'},
+     {title:'Deine Belegschaft', content:'KAI am Empfang kennt das Haus.\nKIM kennt dich persoenlich.\nScouts, Berater, Spezialisten -\njeder mit eigener Aufgabe.'},
      {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
      {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
-     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
+     {title:'Los gehts!', content:'1. Druecke den gruenen Button\n2. Sag was du brauchst\n3. KAI empfaengt dich\n\nHalten = Sprechen\n3x Tap = Hilfe'},
    ]},
 
-  // --- 2. KAI (Concierge + Vermittlung + Auskunft) ---
-  {id:'kai', icon:'👤', title:'KAI', subtitle:'Concierge · Vermittlung · Auskunft', color:'#e63946', email:'0800 524 2687', phone:'kai@kimanus.de',
+  // --- 2. KAI (Empfang + Rezeption + Information) ---
+  {id:'kai', icon:'👤', title:'KAI', subtitle:'Empfang · Rezeption · Information', color:'#e63946', email:'kai@kimanus.de', phone:'0800 524 2687',
    backs:[
-     {title:'Ueber KAI', content:'Ich bin dein Concierge bei KIMANUS.\nIch verbinde dich mit dem richtigen Experten.\nIch beantworte einfache Fragen sofort.\nFuer Persoenliches stelle ich zu KIM durch.'},
-     {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
-     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
-     {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
-     {title:'Mein Team', content:'Ich habe ein ganzes Team hinter mir:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nDu sprichst nur mit mir.'},
-     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+     {title:'Ueber KAI', content:'Ich bin der Empfang bei KIMANUS.\nIch kenne das Haus und jeden, der hier arbeitet.\nEinfache Fragen beantworte ich sofort.\nFuer Persoenliches verbinde ich zu KIM.'},
+     {title:'Wie ich helfe', content:'Begruessen · Wiedererkennen\nWeiterleiten zum richtigen Ansprechpartner\nTermine annehmen bei Abwesenheit\nNachrichten aufnehmen\nNavigation im System'},
+     {title:'Das Haus kennen', content:'Ich weiss wer wofuer zustaendig ist.\nOeffnungszeiten, Kontakte, Strukturen.\nFAQ beantworte ich selbst.\nKomplexe Fragen gebe ich weiter.'},
+     {title:'So erreichst du mich', content:'Gruener Button = Sprechen.\n"Hey KAI" weckt mich ueberall.\nTelefon: 0800 524 2687\nMail: kai@kimanus.de'},
+     {title:'Mein Team', content:'Ich kenne jeden im Haus:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nIch verbinde dich mit dem Richtigen.'},
+     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf das Haus auf.'},
      // --- Duplikate fuer fluessiges Endlos-Scrollen ---
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
@@ -1389,10 +1389,11 @@ const CARDS = [
   // --- 2b. KIM (Persoenliche Assistentin) ---
   {id:'kim', icon:'💜', title:'KIM', subtitle:'Deine persoenliche Assistentin', color:'#8b5cf6', email:'kim@kimanus.de', phone:'0800 546 2687',
    backs:[
-     {title:'Ueber KIM', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich, deine Vorlieben,\ndeine Familie, deine Termine.\nAlles Persoenliche bleibt bei mir.'},
-     {title:'Was ich fuer dich tue', content:'Termine erinnern\nGeburtstage merken\nEinkaufslisten fuehren\nRezepte vorschlagen\nAlltag organisieren'},
+     {title:'Ueber KIM', content:'Ich bin deine persoenliche Assistentin.\nIch kenne dich, deine Vorlieben,\ndeine Familie, deine Termine.\nAlles Persoenliche bleibt bei mir.\nManchmal helfe ich auch KIMANUS im Buero.'},
+     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
+     {title:'Was ich fuer dich tue', content:'Termine erinnern\nGeburtstage merken\nEinkaufslisten fuehren\nRezepte vorschlagen\nReisen organisieren\nAlltag organisieren'},
      {title:'Ich bin verschwiegen', content:'Deine Daten gehoeren dir.\nIch teile nichts mit anderen.\nVerschluesselt und sicher.\nNur du hast Zugriff.'},
-     {title:'So erreichst du mich', content:'Roter Button unten = Sprechen\nIch hoere immer zu.\nOder ruf mich an:\n0800 546 2687'},
+     {title:'So erreichst du mich', content:'Gruener Button = Sprechen\n(KAI gibt mich fuer Persoenliches weiter)\nDirekt anrufen: 0800 546 2687\nMail: kim@kimanus.de'},
    ]},
 
   // --- Claude (Entwickler-Partner, nur fuer Wolfgang) ---
@@ -1600,16 +1601,16 @@ const CARDS = [
    ]},
 
   // --- Verdoppelt fuer fluessiges Endlos-Rad ---
-  {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Dein digitales Betriebssystem', color:'#e63946', email:'kimanus.de', phone:'',
+  {id:'landing2', icon:'🤝', title:'KIMANUS', subtitle:'Chef des Hauses - die helfende Hand', color:'#e63946', email:'kimanus.de', phone:'',
    backs:[
-     {title:'Was ist KIMANUS?', content:'KIM + MANUS = Die helfende Hand.\nMensch, KI und Universum.\nDein Assistent, der dich versteht.'},
-     {title:'So funktioniert es', content:'Sprich mit KIM — alles andere\npassiert im Hintergrund.\nKeine Buttons, keine Menues.\nEinfach reden.'},
-     {title:'Deine Belegschaft', content:'KIM steuert ein ganzes Team:\nScouts • Berater • Spezialisten\nJeder hat seine Aufgabe.\nDu sprichst nur mit KIM.'},
+     {title:'Was ist KIMANUS?', content:'Drei Haende, eine Mission:\nMensch + KI + Universum.\nIch bin der Chef des Hauses -\ndie helfende Hand fuer alles.'},
+     {title:'So funktioniert es', content:'KAI empfaengt dich im Haus.\nKIM ist deine persoenliche Assistentin.\nSpezialisten arbeiten im Hintergrund.\nDu sprichst, wir kuemmern uns.'},
+     {title:'Deine Belegschaft', content:'KAI am Empfang kennt das Haus.\nKIM kennt dich persoenlich.\nScouts, Berater, Spezialisten -\njeder mit eigener Aufgabe.'},
      {title:'Sicherheit', content:'Deine Daten gehoeren dir.\nVerschluesselt. Lokal. Privat.\nNFC-Schutz fuer Sensibles.\nKein Lock-in, alles offen.'},
      {title:'Wallet & Cap-Coin', content:'Sammle Cap-Coins.\nVerwalte Clubkarten & Bonus.\nBezahle digital.\nAlles in deinem Wallet.'},
-     {title:'Los gehts!', content:'1. Druecke den KIM-Button\n2. Sag was du brauchst\n3. KIM kuemmert sich\n\nHalte KIM = Sprechen\n3x Tap = Hilfe'},
+     {title:'Los gehts!', content:'1. Druecke den gruenen Button\n2. Sag was du brauchst\n3. KAI empfaengt dich\n\nHalten = Sprechen\n3x Tap = Hilfe'},
    ]},
-  {id:'kai2', icon:'👤', title:'KAI', subtitle:'Concierge · Vermittlung · Auskunft', color:'#e63946', email:'0800 524 2687', phone:'kai@kimanus.de',
+  {id:'kai2', icon:'👤', title:'KAI', subtitle:'Empfang · Rezeption · Information', color:'#e63946', email:'kai@kimanus.de', phone:'0800 524 2687',
    features:[
      'Scouts',
      'Guides',
@@ -1618,12 +1619,12 @@ const CARDS = [
      'Spezialisten',
    ],
    backs:[
-     {title:'Ueber KIM', content:'Ich bin dein persoenlicher Assistent.\nIch kuemmer mich um alles.\nFrag mich einfach was du brauchst.\nIch verbinde dich mit dem richtigen Experten.'},
-     {title:'Was ich fuer dich tue', content:'Termine planen & erinnern\nEinkaufslisten fuehren\nReisen organisieren\nPreise vergleichen\nEntscheidungen vorbereiten'},
-     {title:'Ich kenne dich', content:'Deine Vorlieben & Gewohnheiten\nAllergien & Unvertraeglichkeiten\nLieblingsrestaurants & Rezepte\nGeburtstage deiner Familie\nJe laenger wir zusammen sind,\ndesto besser werde ich.'},
-     {title:'So erreichst du mich', content:'Gruener Button unten = Sprechen\nIch hoere immer zu.\nDu kannst mich auch anrufen:\n0800 546 2687\nOder per Mail: kim@kimanus.de'},
-     {title:'Mein Team', content:'Ich habe ein ganzes Team hinter mir:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nDu sprichst nur mit mir.'},
-     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf dich auf.'},
+     {title:'Ueber KAI', content:'Ich bin der Empfang bei KIMANUS.\nIch kenne das Haus und jeden, der hier arbeitet.\nEinfache Fragen beantworte ich sofort.\nFuer Persoenliches verbinde ich zu KIM.'},
+     {title:'Wie ich helfe', content:'Begruessen · Wiedererkennen\nWeiterleiten zum richtigen Ansprechpartner\nTermine annehmen bei Abwesenheit\nNachrichten aufnehmen\nNavigation im System'},
+     {title:'Das Haus kennen', content:'Ich weiss wer wofuer zustaendig ist.\nOeffnungszeiten, Kontakte, Strukturen.\nFAQ beantworte ich selbst.\nKomplexe Fragen gebe ich weiter.'},
+     {title:'So erreichst du mich', content:'Gruener Button = Sprechen.\n"Hey KAI" weckt mich ueberall.\nTelefon: 0800 524 2687\nMail: kai@kimanus.de'},
+     {title:'Mein Team', content:'Ich kenne jeden im Haus:\nScouts finden Informationen\nGuides fuehren dich\nBerater helfen bei Entscheidungen\nSpezialisten loesen Probleme\nIch verbinde dich mit dem Richtigen.'},
+     {title:'Dein Schutz', content:'Fake-Anruf Erkennung\nPhishing-Warnung\nKindersicherung\nDatenschutz-Check\nIch passe auf das Haus auf.'},
      // --- Duplikate fuer fluessiges Endlos-Scrollen ---
      {title:'', content:'', type:'grid', gridCols:4, gridRows:3, sections:[
        {label:'SCOUTS', items:[
