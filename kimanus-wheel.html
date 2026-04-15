@@ -1196,7 +1196,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="cursor:pointer" onclick="showKimanusInfo()"><span class="title" style="margin:0">KIMANUS</span></div>
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
-        <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Concierge</span>
+        <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Empfang</span>
         <span style="font-size:11px;color:rgba(255,255,255,0.15);margin-left:4px">v24.17</span>
       </div>
     </div>
@@ -4559,16 +4559,12 @@ function showKimInfo() {
   // Erst Backs updaten je nach Modus
   updateKimBacks();
   const cfg = getSetupConfig();
-  const mode = cfg['kim_mode'] || 'concierge';
   const gender = cfg['kim_gender'] || 'weiblich';
-  // KIM Karte mit passendem Titel/Subtitle
+  // KIM ist immer persoenliche Assistentin (Rollen-Klarstellung 15.04.2026)
+  // KAI ist der Empfang - nicht KIM
   const kimCard = CARDS.find(c => c.id === 'kim');
   if (!kimCard) return;
-  if (mode === 'concierge') {
-    kimCard.subtitle = 'Dein Concierge';
-  } else {
-    kimCard.subtitle = gender === 'weiblich' ? 'Deine persoenliche Assistentin' : 'Dein persoenlicher Assistent';
-  }
+  kimCard.subtitle = gender === 'weiblich' ? 'Deine persoenliche Assistentin' : 'Dein persoenlicher Assistent';
   showHeaderCard(kimCard);
 }
 
