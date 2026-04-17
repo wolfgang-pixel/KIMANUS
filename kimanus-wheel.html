@@ -3462,17 +3462,42 @@ function openSetup(mode, isBack) {
   html += `<div onclick="setupHistory.push('kim');openSetup('kai_rolle')" style="${lastRowStyle}cursor:pointer">${iconBox('🎭')}<div style="flex:1"><span style="${labelStyle}">Modus</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">${({empfang:'Empfang',rezeption:'Rezeption',information:'Information',concierge:'Empfang',rezeptionist:'Empfang'})[cfg['kai_rolle']] || 'Empfang'}</div></div><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
-  // Stimme
-  html += sectionTitle('Stimme');
+  // Voice-Engine Auswahl
+  html += sectionTitle('Voice-Engine');
   html += `<div style="${groupStyle}">`;
-  const kaiVoice = cfg['kai_voice'] || 'rex';
-  html += `<div style="${rowStyle}">${iconBox('🔊')}<span style="${labelStyle}">Stimme</span>`;
+  const kaiEngine = cfg['kai_engine'] || 'gemini';
+  html += `<div style="${rowStyle}">${iconBox('🎙️')}<span style="${labelStyle}">Sprachsystem</span>`;
   html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
-  html += segBtn('kai_voice','rex','Rex');
-  html += segBtn('kai_voice','ara','Ara');
-  html += segBtn('kai_voice','leo','Leo');
+  html += segBtn('kai_engine','gemini','Gemini 3.1');
+  html += segBtn('kai_engine','chatgpt','ChatGPT');
+  html += segBtn('kai_engine','offline','Offline');
   html += `</div></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('🌐')}<span style="${labelStyle}">Sprache</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Deutsch</span></div>`;
+  const engineInfo = kaiEngine === 'gemini' ? 'Gemini 3.1 Flash Live · Google · Voice-Dialog'
+    : kaiEngine === 'chatgpt' ? 'ChatGPT Voice · OpenAI · Voice-Dialog'
+    : 'AI Chat · Gemma 4 lokal · kein Internet noetig';
+  const engineColor = kaiEngine === 'offline' ? 'rgba(80,200,120,0.8)' : 'rgba(100,160,255,0.8)';
+  html += `<div style="${lastRowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Aktiv</span><span style="color:${engineColor};font-size:12px">${engineInfo}</span></div>`;
+  html += `</div>`;
+
+  // Stimme (nur bei Gemini)
+  html += sectionTitle('Stimme · Gemini 3.1');
+  html += `<div style="${groupStyle}">`;
+  const kaiVoice = cfg['kai_voice'] || 'Puck';
+  html += `<div style="${rowStyle}">${iconBox('👩')}<span style="${labelStyle}">Weiblich</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn('kai_voice','Aoede','Aoede');
+  html += segBtn('kai_voice','Kore','Kore');
+  html += segBtn('kai_voice','Leda','Leda');
+  html += segBtn('kai_voice','Zephyr','Zephyr');
+  html += `</div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('👨')}<span style="${labelStyle}">Maennlich</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn('kai_voice','Puck','Puck');
+  html += segBtn('kai_voice','Charon','Charon');
+  html += segBtn('kai_voice','Fenrir','Fenrir');
+  html += segBtn('kai_voice','Orus','Orus');
+  html += `</div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🌐')}<span style="${labelStyle}">Modell</span><span style="color:rgba(100,200,120,0.8);font-size:13px">Gemini 3.1 Flash Live · ${kaiVoice}</span></div>`;
   html += `</div>`;
 
   // KI-Modell
@@ -3538,8 +3563,25 @@ function openSetup(mode, isBack) {
   html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIM</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Dein persoenlicher Assistent</div></div>`;
   html += `</div>`;
 
+  // Voice-Engine Auswahl KIM
+  html += sectionTitle('Voice-Engine');
+  html += `<div style="${groupStyle}">`;
+  const kimEngine = cfg['kim_engine'] || 'gemini';
+  html += `<div style="${rowStyle}">${iconBox('🎙️')}<span style="${labelStyle}">Sprachsystem</span>`;
+  html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
+  html += segBtn2('kim_engine','gemini','Gemini 3.1','gemini');
+  html += segBtn2('kim_engine','chatgpt','ChatGPT','gemini');
+  html += segBtn2('kim_engine','offline','Offline','gemini');
+  html += `</div></div>`;
+  const kimEngineInfo = kimEngine === 'gemini' ? 'Gemini 3.1 Flash Live · Voice-Dialog'
+    : kimEngine === 'chatgpt' ? 'ChatGPT Voice · Voice-Dialog'
+    : 'AI Chat · Gemma 4 lokal · offline';
+  const kimEngineColor = kimEngine === 'offline' ? 'rgba(80,200,120,0.8)' : 'rgba(160,120,255,0.8)';
+  html += `<div style="${lastRowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Aktiv</span><span style="color:${kimEngineColor};font-size:12px">${kimEngineInfo}</span></div>`;
+  html += `</div>`;
+
   // Stimme (Gemini Live Audio)
-  html += sectionTitle('Stimme');
+  html += sectionTitle('Stimme · Gemini 3.1');
   html += `<div style="${groupStyle}">`;
   html += `<div style="${rowStyle}">${iconBox('👩')}<span style="${labelStyle}">Weiblich</span>`;
   html += `<div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">`;
