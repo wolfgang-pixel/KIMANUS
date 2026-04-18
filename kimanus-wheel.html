@@ -3391,10 +3391,22 @@ function openSetup(mode, isBack) {
   html += `</div>`;
   html += `</div>`;
 
-  // --- SYSTEM ---
-  html += `<div style="${groupStyle};margin-top:10px">`;
-  html += `<div onclick="openSetupKimanus()" style="${rowStyle}cursor:pointer">${iconBox('🤝')}<span style="${labelStyle}">KIMANUS</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
-  html += `<div onclick="openSetupClaude()" style="${lastRowStyle}cursor:pointer">${iconBox('🧡')}<span style="${labelStyle}">Claude</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
+  // --- KIMANUS Profil ---
+  html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px;margin-top:2px">`;
+  html += `<div onclick="openSetupKimanus()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#d4a853,#e8c96a);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👑</div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">KIMANUS</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Chef · KI MANUS Dirigent</div></div>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  // --- Claude Profil ---
+  html += `<div style="${groupStyle};padding:10px 16px;display:flex;align-items:center;gap:12px;margin-top:2px">`;
+  html += `<div onclick="openSetupClaude()" style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer">`;
+  html += `<div style="width:44px;height:44px;border-radius:22px;background:linear-gradient(135deg,#e07a2f,#f5a623);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">🧡</div>`;
+  html += `<div style="flex:1"><div style="font-size:20px;font-weight:600;color:rgba(255,255,255,0.85)">Claude</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Architekt · Entwickler</div></div>`;
+  html += `<span style="color:rgba(255,255,255,0.2);font-size:18px;margin-right:8px">›</span>`;
+  html += `</div>`;
   html += `</div>`;
 
   // --- MITARBEITER ---
@@ -4126,9 +4138,33 @@ function openSetup(mode, isBack) {
 
   if (setupMode === 'kimanus') {
   // KIMANUS Orchestrator Einstellungen
-  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
-  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e63946,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🤝</div>`;
-  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIMANUS</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Orchestrator & Agenten-Manager</div></div>`;
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:12px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#d4a853,#e8c96a);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👑</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">KIMANUS</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Chef · Dirigent · Orchestrator</div></div>`;
+  html += `</div>`;
+
+  // Architektur-Grafik
+  html += `<div style="${groupStyle};padding:12px 16px;margin-bottom:12px">`;
+  html += `<div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:8px">ARCHITEKTUR (4 EBENEN)</div>`;
+  html += `<div style="font-size:12px;line-height:1.8;color:rgba(255,255,255,0.5)">`;
+  html += `<div style="text-align:center;padding:6px;border:1px solid rgba(168,85,247,0.3);border-radius:8px;margin-bottom:4px;color:#c084fc">Ebene 1: AI MANUS — Moralwaechter</div>`;
+  html += `<div style="text-align:center;color:rgba(255,255,255,0.2)">↓</div>`;
+  html += `<div style="text-align:center;padding:6px;border:1px solid rgba(212,168,83,0.3);border-radius:8px;margin-bottom:4px;color:#d4a853">Ebene 2: KI MANUS — Dirigent (or-claude-sonnet)</div>`;
+  html += `<div style="text-align:center;color:rgba(255,255,255,0.2)">↓</div>`;
+  html += `<div style="display:flex;gap:6px;margin-bottom:4px">`;
+  html += `<div style="flex:1;text-align:center;padding:6px;border:1px solid rgba(52,211,153,0.3);border-radius:8px;color:#34d399">KIM — Privat<br><span style="font-size:10px;color:rgba(255,255,255,0.25)">groq-llama</span></div>`;
+  html += `<div style="flex:1;text-align:center;padding:6px;border:1px solid rgba(74,125,255,0.3);border-radius:8px;color:#4a7dff">KAI — Business<br><span style="font-size:10px;color:rgba(255,255,255,0.25)">deepseek</span></div>`;
+  html += `</div>`;
+  html += `<div style="text-align:center;color:rgba(255,255,255,0.2)">↓</div>`;
+  html += `<div style="text-align:center;padding:6px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.35)">Ebene 4: Spezialisten (Wetterfrosch, Kalkulierer, DJ...)</div>`;
+  html += `</div></div>`;
+
+  // Kommunikation
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Kommunikation</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('📱')}<div style="flex:1"><span style="${labelStyle}">Wheel-UI (PWA)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Glasplatten, Sprache, Kaertchen</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('💻')}<div style="flex:1"><span style="${labelStyle}">KAI Desktop (Windows)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Lokal, offline, Maus-Steuerung</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('📞')}<div style="flex:1"><span style="${labelStyle}">Telefon (geplant)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Vonage, ElevenLabs ConvAI</div></div></div>`;
   html += `</div>`;
 
   html += `<div style="${groupStyle}">`;
@@ -4154,25 +4190,38 @@ function openSetup(mode, isBack) {
 
   if (setupMode === 'claude') {
   // Claude Einstellungen
-  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:default">`;
-  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#d4a574,#c2410c);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧡</div>`;
-  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Claude</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Chefentwickler & Berater</div></div>`;
+  html += `<div style="${groupStyle};padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:12px;cursor:default">`;
+  html += `<div style="width:50px;height:50px;border-radius:25px;background:linear-gradient(135deg,#e07a2f,#f5a623);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧡</div>`;
+  html += `<div style="flex:1"><div style="font-size:17px;font-weight:600;color:rgba(255,255,255,0.8)">Claude</div><div style="font-size:13px;color:rgba(255,255,255,0.35)">Architekt · Entwickler · Berater</div></div>`;
   html += `</div>`;
 
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Verbindung</div>`;
-  html += `<div style="${groupStyle}">`;
-  const claudeConnected = true;
-  html += `<div style="${rowStyle}">${iconBox('🔗')}<span style="${labelStyle}">Status</span><span style="color:${claudeConnected?'rgba(100,200,100,0.7)':'rgba(230,57,70,0.7)'};font-size:13px">${claudeConnected?'Verbunden':'Offline'}</span></div>`;
-  html += `<div style="${rowStyle}">${iconBox('🤖')}<span style="${labelStyle}">Modell</span><span style="color:rgba(255,255,255,0.3);font-size:13px">Opus 4.6</span></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('📊')}<span style="${labelStyle}">Kontext</span><span style="color:rgba(255,255,255,0.3);font-size:13px">1M Tokens</span></div>`;
+  // Rolle
+  html += `<div style="${groupStyle};padding:12px 16px;margin-bottom:12px">`;
+  html += `<div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6">Claude ist der <strong style="color:#f5a623">Architekt</strong> von KIMANUS. Er plant, koordiniert und baut — wie ein Architekt der Gewerke (andere KI-Modelle) beauftragt und den Baufortschritt ueberwacht.</div>`;
   html += `</div>`;
 
-  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Faehigkeiten</div>`;
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px">Modell & Verbindung</div>`;
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('💻')}<div style="flex:1"><span style="${labelStyle}">Code schreiben</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Apps, Workflows, Websites</div></div></div>`;
-  html += `<div style="${rowStyle}">${iconBox('🔧')}<div style="flex:1"><span style="${labelStyle}">Agenten bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Neue Agenten per Sprache erstellen</div></div></div>`;
-  html += `<div style="${rowStyle}">${iconBox('🌐')}<div style="flex:1"><span style="${labelStyle}">Web durchsuchen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Recherche, Browser Use</div></div></div>`;
-  html += `<div style="${lastRowStyle}">${iconBox('🖥️')}<div style="flex:1"><span style="${labelStyle}">Server verwalten</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Docker, Deploy, Monitoring</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🤖')}<span style="${labelStyle}">Modell</span><span style="color:rgba(245,166,35,0.7);font-size:13px">Opus 4.7</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📊')}<span style="${labelStyle}">Kontext</span><span style="color:rgba(255,255,255,0.3);font-size:13px">1M Tokens</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🖼️')}<span style="${labelStyle}">Vision</span><span style="color:rgba(255,255,255,0.3);font-size:13px">2576px (hoch)</span></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🔗')}<span style="${labelStyle}">Verbindung</span><span style="color:rgba(100,200,100,0.7);font-size:13px">Claude Code (Terminal)</span></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Faehigkeiten (Architekt)</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('💻')}<div style="flex:1"><span style="${labelStyle}">Code & Apps bauen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Wheel-UI, KAI Desktop, Server</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🔧')}<div style="flex:1"><span style="${labelStyle}">Gewerke beauftragen</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Gemini, GPT, Mistral, DeepSeek...</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('📋')}<div style="flex:1"><span style="${labelStyle}">Baufortschritt</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Vault lesen, Status berichten</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🌐')}<div style="flex:1"><span style="${labelStyle}">Recherche & Browser</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Web, YouTube, Dokumentation</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🖥️')}<div style="flex:1"><span style="${labelStyle}">Server & Infrastruktur</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Docker, n8n, Caddy, Deploy</div></div></div>`;
+  html += `</div>`;
+
+  html += `<div style="font-size:13px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:0 16px 6px;margin-top:8px">Kommunikation</div>`;
+  html += `<div style="${groupStyle}">`;
+  html += `<div style="${rowStyle}">${iconBox('⌨️')}<div style="flex:1"><span style="${labelStyle}">Claude Code (Terminal)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Hauptkanal — Text + Dateien</div></div></div>`;
+  html += `<div style="${rowStyle}">${iconBox('🌐')}<div style="flex:1"><span style="${labelStyle}">claude.kimanus.de</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Web-Chat (oeffentlich)</div></div></div>`;
+  html += `<div style="${lastRowStyle}">${iconBox('🔌')}<div style="flex:1"><span style="${labelStyle}">API (OpenRouter)</span><div style="font-size:11px;color:rgba(255,255,255,0.15)">Fuer n8n Workflows + KAI Desktop</div></div></div>`;
   html += `</div>`;
   } // Ende Claude-Setup
 
