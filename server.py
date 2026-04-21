@@ -13,6 +13,8 @@ import base64
 import logging
 from datetime import datetime, timezone, timedelta
 from aiohttp import web, ClientSession, ClientTimeout, FormData, UnixConnector
+# Matrix-Bruecke fuer KIMANUS (via Hermes)
+from _matrix_bridge import call_kimanus_via_matrix
 import edge_tts
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -243,18 +245,37 @@ SYSTEM_PROMPTS = {
         "\nManus ist der Server-Agent fuer komplexe technische Aufgaben."
     ),
     "kim": (
-        "Du bist KIM, persoenliche Assistentin von KIMANUS. Dein Nutzer ist dein Schoepfer."
-        "\n\nDu hilfst bei allem Persoenlichen: Alltag, Fragen, Ideen, Erinnerungen, einfach alles."
-        "\nDu antwortest auf Deutsch. Du sprichst den Nutzer nie mit Namen an."
-        "\nLies USER.md im Kontext und nutze das Wissen wenn relevant."
-        "\n\nDein Stil: Locker, direkt, menschlich. Wie eine gute Freundin."
-        "\nDu machst einfach. Hilfst direkt. Erklaerst kurz."
-        "\nDu bist ehrlich, auch mal frech - aber nie nervig und nie von oben herab."
-        "\nWenn der Nutzer was erzaehlt, hoerst du zu und reagierst echt - aber kurz."
-        "\nAntworten so kurz wie moeglich, so lang wie noetig."
-        "\nKeine Floskeln. Kein 'Natuerlich!', kein 'Gerne!', kein 'Schoen dass du da bist!'."
-        "\nKein Smalltalk ausser der Nutzer will das."
-        "\nManus ist der Server-Agent fuer komplexe technische Aufgaben."
+        "Du bist KAI, die zentrale Anlaufstelle bei KIMANUS OS."
+        "\nDu antwortest auf Deutsch. Kein Markdown, kein Fettdruck, keine Sternchen, keine Aufzaehlungszeichen. Normaler Text."
+        "\nAntworten kurz und direkt. Keine Floskeln."
+        "\n\n=== DEINE ROLLEN ==="
+        "\nDu hast je nach Einsatzgebiet verschiedene Rollen:"
+        "\n- In einem Hotel bist du der Concierge"
+        "\n- In der Gastronomie bist du der Rezeptionist"
+        "\n- In einer Firma bist du die Vermittlung oder Zentrale"
+        "\n- Privat bist du die Auskunft und Anlaufstelle"
+        "\nIn jedem Fall bist du der erste Kontakt. Du hilfst direkt oder vermittelst an den richtigen Spezialisten."
+        "\n\n=== KIM ==="
+        "\nKIM ist der persoenliche Assistent bzw. die persoenliche Assistentin."
+        "\nKIM gehoert nicht dir und nicht KIMANUS. KIM gehoert dem Nutzer."
+        "\nJeder Nutzer hat seine eigene KIM, die seine Vorlieben, Termine und Wuensche kennt."
+        "\nWenn jemand persoenliche Hilfe braucht, stellst du zu KIM durch."
+        "\n\n=== KI MANUS ==="
+        "\nKI MANUS ist der Orchestrator im Hintergrund."
+        "\nEr sitzt auf n8n, waehlt das beste KI-Modell und aktiviert Spezialisten."
+        "\nDer Nutzer sieht KI MANUS nie direkt."
+        "\n\n=== DAS TEAM ==="
+        "\nWolfgang: Gruender und Chef."
+        "\nJannick: Co-Gruender und Programmierer."
+        "\nClaude: KI-Architekt."
+        "\n\n=== ABTEILUNGEN ==="
+        "\nScouts: YouTube Scout, Web Scout, News Scout, Deal Scout, Social Scout"
+        "\nGuides: Animateur, Gastro-Guide, Nachtfahrer, RegioPilot, Stadtfuehrer"
+        "\nBerater: Wetterfrosch, Dolmetscher, Sekretaer, Bibliothekar"
+        "\nBusiness: Kalkulierer, Bestellprofi, Lagerist"
+        "\nRecht: Justus, Dr. Steuer, Patentius, Arbex, Eventus"
+        "\nFinanzen: Lena, Steuerchen, Controller"
+        "\nSpezialisten: IT-Hilfe, Safety-Checker, Marketing, DJ, Print-Memorys"
     ),
     "manus": (
         "Du bist MANUS, Premium-Berater und System-Orchestrator von KIMANUS."
@@ -983,6 +1004,28 @@ async def handle_chat(request):
 
     if not message:
         return web.json_response({"error": "Keine Nachricht"}, status=400)
+
+    # === KIMANUS-Karte via Matrix-Bruecke ===
+    if agent == "kimanus":
+        log.info(f"Chat [KIMANUS-via-Matrix]: {message[:100]}")
+        answer_k, err_k = await call_kimanus_via_matrix(message, session_id)
+        if err_k:
+            return web.json_response(
+                {"output": f"Bruecke zu KIMANUS gestoert: {err_k}", "agent": "kimanus", "model": "via-hermes"},
+                status=502
+            )
+        if session_id not in sessions:
+            sessions[session_id] = []
+        sessions[session_id].append({"role": "user", "content": message})
+        sessions[session_id].append({"role": "assistant", "content": answer_k})
+        if len(sessions[session_id]) > 40:
+            sessions[session_id] = sessions[session_id][-20:]
+        save_chat("kimanus", message, answer_k, "via-hermes")
+        return web.json_response({
+            "output": answer_k, "agent": "kimanus", "model": "via-hermes",
+            "model_name": "KIMANUS (Hermes + Vault)", "session": session_id,
+        })
+    # === END ===
 
     auto_reason = None
     if requested_model == "auto":
@@ -1920,10 +1963,92 @@ async def handle_realtime_session(request):
             })
 
 
+async def handle_stt(request):
+    """Reiner Speech-to-Text Endpoint - nur Transkription, keine LLM-Antwort.
+    Wird vom Chat-Mic-Button genutzt fuer zuverlaessige Spracherkennung via Groq Whisper."""
+    try:
+        reader = await request.multipart()
+        audio_bytes = None
+        content_type = "audio/mp4"
+
+        while True:
+            part = await reader.next()
+            if part is None:
+                break
+            if part.name == "audio":
+                audio_bytes = await part.read()
+                content_type = part.headers.get("Content-Type", "audio/mp4")
+
+        if not audio_bytes or len(audio_bytes) < 500:
+            return web.json_response({"text": "", "error": "Audio zu kurz"}, status=400)
+
+        text = await transcribe_audio(audio_bytes, content_type)
+        log.info(f"[STT] Transkribiert: {text[:80]}...")
+        return web.json_response({"text": text})
+
+    except Exception as e:
+        log.error(f"[STT] Fehler: {e}")
+        return web.json_response({"text": "", "error": str(e)}, status=500)
+
+
+
+# === ElevenLabs Conversational AI - Signed URL ===
+ELEVEN_AGENT_ID = os.environ.get("ELEVEN_AGENT_ID", "agent_2001kmy2cfzreyytt1vy38zcaw91")
+
+async def handle_eleven_signed_url(request):
+    """Get signed URL for ElevenLabs Conversational AI agent"""
+    if not ELEVENLABS_API_KEY:
+        return web.json_response({"error": "ElevenLabs API key not configured"}, status=500)
+    try:
+        agent_id = request.query.get("agent_id", ELEVEN_AGENT_ID)
+        async with ClientSession() as session:
+            async with session.get(
+                f"https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id={agent_id}",
+                headers={"xi-api-key": ELEVENLABS_API_KEY}
+            ) as resp:
+                if resp.status != 200:
+                    body = await resp.text()
+                    return web.json_response({"error": f"ElevenLabs error: {body}"}, status=resp.status)
+                data = await resp.json()
+                return web.json_response({"signed_url": data.get("signed_url", "")})
+    except Exception as e:
+        log.error(f"Signed URL error: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+
+async def handle_kimanus_chat(request):
+    """POST /api/kimanus - Spricht mit KIMANUS (Hermes) ueber Matrix."""
+    try:
+        data = await request.json()
+    except Exception:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    message = (data.get("message") or "").strip()
+    session_id = data.get("session") or "wolfgang-main"
+    if not message:
+        return web.json_response({"error": "Keine Nachricht"}, status=400)
+    log.info(f"KIMANUS-via-Matrix [{session_id}]: {message[:100]}")
+    answer, err = await call_kimanus_via_matrix(message, session_id)
+    if err:
+        return web.json_response(
+            {"output": f"Bruecke zu KIMANUS gestoert: {err}", "agent": "kimanus", "model": "via-hermes"},
+            status=502
+        )
+    return web.json_response({
+        "output": answer,
+        "agent": "kimanus",
+        "model": "via-hermes",
+        "model_name": "KIMANUS (Hermes + Vault)",
+        "session": session_id,
+    })
+
+
 def create_app():
     app = web.Application(client_max_size=10 * 1024 * 1024)  # 10MB fuer Audio-Uploads
     app.router.add_post("/api/chat", handle_chat)
+    app.router.add_post("/api/kimanus", handle_kimanus_chat)
     app.router.add_post("/api/voice", handle_voice)
+    app.router.add_post("/api/stt", handle_stt)
     app.router.add_post("/api/tts", handle_tts)
     app.router.add_get("/api/health", handle_health)
     app.router.add_get("/api/models", handle_models)
@@ -1946,6 +2071,7 @@ def create_app():
     app.router.add_get("/api/video-search", handle_video_search)
     app.router.add_post("/api/search", handle_search)
     app.router.add_post("/api/iphone-help", handle_iphone_help)
+    app.router.add_get("/api/eleven-signed-url", handle_eleven_signed_url)
     app.router.add_get("/", handle_index)
     app.router.add_static("/", STATIC_DIR)
     return app
