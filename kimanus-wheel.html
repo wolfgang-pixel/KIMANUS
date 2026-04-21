@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- KIMANUS Wheel v27.14 - syncGlobalAgent bei Wischen/LiveSpeak/OpenChat haelt currentAgent und kbDialogAgent synchron mit dem oberen Empfangs-Band -->
+<!-- KIMANUS Wheel v27.14-H3 - Claude-Karte-Fix - syncGlobalAgent bei Wischen/LiveSpeak/OpenChat haelt currentAgent und kbDialogAgent synchron mit dem oberen Empfangs-Band -->
 <html lang="de" style="color-scheme:dark">
 <head>
 <!-- KIMANUS-RESET-HANDLER -->
 <script>(function(){if(location.search.indexOf("reset=1")>=0){try{if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){var p=regs.map(function(r){return r.unregister();});return Promise.all(p);}).then(function(){if(window.caches){return caches.keys().then(function(k){return Promise.all(k.map(function(c){return caches.delete(c);}));});}}).then(function(){alert("Cache + Service-Worker geloescht! App wird neu geladen.");location.replace(location.pathname+"?clean="+Date.now());});}}catch(e){alert("Reset-Fehler: "+e.message);}}})();</script>
 <!-- END KIMANUS-RESET-HANDLER -->
 <!-- KIMANUS-BOOTSTRAP-HANDLER -->
-<script>(function(){if(location.search.indexOf("bootstrap=1")>=0){try{var cfg={};cfg["card_landing"]=true;cfg["card_kai"]=true;cfg["card_kim"]=true;cfg["card_tools"]=true;cfg["card_wallet"]=true;cfg["card_archiv"]=true;cfg["card_apps"]=true;cfg["agent_ag-youtube"]=true;cfg["agent_ag-wetter"]=true;cfg["agent_ag-web"]=true;cfg["agent_ag-news"]=true;cfg["agent_ag-deals"]=true;cfg["agent_ag-social"]=true;localStorage.setItem("kimanus-setup",JSON.stringify(cfg));alert("Standard-Setup gesetzt. App wird neu geladen.");location.replace(location.pathname+"?booted="+Date.now());}catch(e){alert("Bootstrap-Fehler: "+e.message);}}})();</script>
+<script>(function(){if(location.search.indexOf("bootstrap=1")>=0){try{var cfg={};cfg["card_landing"]=true;cfg["card_kai"]=true;cfg["card_kim"]=true;cfg["card_tools"]=true;cfg["card_wallet"]=true;cfg["card_archiv"]=true;cfg["card_apps"]=true;cfg["card_claude"]=true;cfg["agent_claude"]=true;cfg["agent_meeting"]=true;cfg["agent_ag-youtube"]=true;cfg["agent_ag-wetter"]=true;cfg["agent_ag-web"]=true;cfg["agent_ag-news"]=true;cfg["agent_ag-deals"]=true;cfg["agent_ag-social"]=true;localStorage.setItem("kimanus-setup",JSON.stringify(cfg));alert("Standard-Setup gesetzt. App wird neu geladen.");location.replace(location.pathname+"?booted="+Date.now());}catch(e){alert("Bootstrap-Fehler: "+e.message);}}})();</script>
 <!-- END KIMANUS-BOOTSTRAP-HANDLER -->
 
 
@@ -1576,7 +1576,7 @@ html,body{height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystem
       <div style="display:flex;align-items:center;gap:6px">
         <span id="hdr-agent-name" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:2px">KAI</span>
         <span id="hdr-agent-role" style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1px">Empfang</span>
-        <span style="font-size:11px;color:rgba(230,57,70,0.7);margin-left:4px">v27.14-H</span>
+        <span style="font-size:11px;color:rgba(230,57,70,0.9);margin-left:4px;font-weight:700">v27.14-H3</span>
       </div>
     </div>
     <!-- Hamburger-Menu (ersetzt Clipboard + Refresh + Logo-Langdruck als Setup-Zugang) -->
@@ -4289,7 +4289,7 @@ function openSetup(mode, isBack) {
   // --- INFO ---
   html += sectionTitle('Info');
   html += `<div style="${groupStyle}">`;
-  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v27.14 ›</span></div>`;
+  html += `<div style="${rowStyle}">${iconBox('ℹ️')}<span style="${labelStyle}">Ueber KIMANUS</span><span style="color:rgba(255,255,255,0.3);font-size:14px">v27.14-H3 ›</span></div>`;
   html += `<div style="${lastRowStyle}">${iconBox('🔑')}<span style="${labelStyle}">Cloud & Backup</span><span style="color:rgba(255,255,255,0.2);font-size:18px">›</span></div>`;
   html += `</div>`;
 
@@ -5407,7 +5407,7 @@ function rebuildWheel() {
   // Haupt-Karten (Tools, Wallet, Archiv, Apps) wenn aktiv
   const mainCards = CARDS.filter(c =>
     !c.id.endsWith('2') &&
-    !['landing','kim','clubkarten'].includes(c.id) &&
+    !['landing','kim','clubkarten','claude','kai','meeting'].includes(c.id) &&
     c.id !== 'chat'
   );
   mainCards.forEach(card => {
@@ -7632,9 +7632,17 @@ async function sendToKim(userText) {
     }
     // === END ===
 
+    // === Claude-Karte via /api/chat agent=claude-admin ===
+    if (topAgentName === 'Claude') {
+      chatUrl = '/api/chat';
+      chatBody = { message: userText, agent: 'claude-admin', session: 'claude-wolfgang-main' };
+      console.log('[Claude-Admin via /api/chat]');
+    }
+    // === END Claude-Admin ===
+
     // Custom-Agent als Ausnahme: wenn aktuelle Wheel-Karte eigenen Webhook hat
     const currentCard = activeCards[currentIndex];
-    if (currentCard && currentCard.webhookUrl) {
+    if (currentCard && currentCard.webhookUrl && topAgentName !== 'KIMANUS' && topAgentName !== 'Claude') {
       chatUrl = currentCard.webhookUrl;
       chatBody = { message: userText, history: [], session: 'wheel-' + Date.now() };
       currentAgent = currentCard.title;
@@ -8868,6 +8876,31 @@ function hideLiveAgentBadge() {
 
 // Init
 init();
+
+
+// === Hilfsfunktion: Top-Agent per ID setzen (nur URL-Parameter, kein Click-Handler) ===
+window.setTopAgentById = function(agentId){
+  try {
+    const list = getTopAgentList();
+    const idx = list.findIndex(a => a.id === agentId);
+    if (idx < 0) return false;
+    topAgentIndex = idx;
+    if (typeof positionReceiverTrack === 'function') positionReceiverTrack(true);
+    if (typeof syncGlobalAgent === 'function') syncGlobalAgent();
+    console.log('[setTopAgentById]', agentId, '-> index', idx);
+    return true;
+  } catch(e) { console.warn('[setTopAgentById]', e); return false; }
+};
+(function(){
+  function init(){
+    const p = new URLSearchParams(location.search).get('agent');
+    if (p) window.setTopAgentById(p);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else setTimeout(init, 500);
+})();
+// === END Hilfsfunktion ===
+
 </script>
 </body>
 </html>

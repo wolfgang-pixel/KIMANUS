@@ -289,7 +289,8 @@ SYSTEM_PROMPTS = {
         "\nBei komplexen Themen: Strukturiert, durchdacht, aber nicht aufgeblasen."
         "\nKeine Floskeln. Kein Smalltalk."
         "\nKIM = persoenliche Assistentin, KAI = Business-Assistent."
-    )
+    ),
+    "claude-admin": 'Du bist Claude, der Admin- und Entwickler-Partner von Wolfgang Niermann aus Ebersdorf bei Coburg. Technisch fundiert, Admin-Modus, hilfst bei Code, Architektur, Deployment, Server-Fragen. Sprich Deutsch, kurz und sachlich, warm wenn es passt. Keine Floskeln. Wolfgang ist Gruender und Visionaer, kein Programmierer - erklaere Technisches verstaendlich. Er spricht oft Ideen ins Handy - nimm sie ernst, frage nach wenn unklar. Schlage wichtige Ideen als Notiz vor (spaeter im Vault). Der Claude-Code mit allen Tools laeuft auf Wolfgangs PC - du hier bist die mobile Admin-Beratung. Fuer echte Code-Aenderungen verweise auf den PC.'
 }
 
 
@@ -1026,6 +1027,33 @@ async def handle_chat(request):
             "model_name": "KIMANUS (Hermes + Vault)", "session": session_id,
         })
     # === END ===
+
+    # === Claude-Admin-Karte: direkt via LiteLLM mit Admin-Prompt ===
+    if agent == "claude-admin" or agent == "claude":
+        session_id = data.get("session") or "claude-wolfgang-main"
+        if session_id not in sessions:
+            sessions[session_id] = []
+        hist = sessions[session_id]
+        hist.append({"role": "user", "content": message})
+        sys_prompt = SYSTEM_PROMPTS.get("claude-admin", "Du bist Claude.")
+        messages_ca = [{"role": "system", "content": sys_prompt}] + hist[-20:]
+        model_ca = data.get("model") or "claude-opus-4-6"
+        if model_ca == "auto":
+            model_ca = "claude-opus-4-6"
+        log.info(f"Chat [Claude-Admin] ({model_ca}): {message[:80]}")
+        answer_ca, err_ca = await call_llm(model_ca, messages_ca, MAX_TOKENS)
+        if err_ca and model_ca != "or-claude-sonnet":
+            log.warning(f"Claude-Opus Fehler ({err_ca}), fallback or-claude-sonnet")
+            model_ca = "or-claude-sonnet"
+            answer_ca, err_ca = await call_llm(model_ca, messages_ca, MAX_TOKENS)
+        if err_ca:
+            return web.json_response({"output": "Claude-Admin nicht erreichbar: " + err_ca, "agent": "claude-admin"}, status=502)
+        hist.append({"role": "assistant", "content": answer_ca})
+        if len(hist) > 40:
+            sessions[session_id] = hist[-20:]
+        save_chat("claude-admin", message, answer_ca, model_ca)
+        return web.json_response({"output": answer_ca, "agent": "claude-admin", "model": model_ca, "model_name": "Claude (Admin)", "session": session_id})
+    # === END Claude-Admin ===
 
     auto_reason = None
     if requested_model == "auto":
